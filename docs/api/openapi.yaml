@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: IoLink App API
+  version: v0.1
+  description: >
+    微信小程序使用的业务 API。稳定契约:小程序只依赖本文,后端实现
+    (FunctionGraph 阶段 / 未来 ECS Go 服务)必须保持路径与响应结构兼容。
+servers:
+  - url: https://api.example.com/api/v1
+    description: 占位,部署后替换
+tags:
+  - name: auth
+  - name: ponds
+  - name: devices
+  - name: water
+  - name: alarms
+security:
+  - BearerAuth: []
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      security: []
+      summary: 微信 code 登录,换取 JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string, description: wx.login() 的 code }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  expires_in: { type: integer, description: 秒 }
+                  user:
+                    $ref: "#/components/schemas/User"
+  /ponds:
+    get:
+      tags: [ponds]
+      summary: 当前用户的池塘列表(含最新状态)
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PondSummary"
+  /ponds/{id}:
+    get:
+      tags: [ponds]
+      summary: 池塘详情
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PondSummary"
+  /devices:
+    get:
+      tags: [devices]
+      summary: 设备列表(可按池塘过滤)
+      parameters:
+        - { name: pond_id, in: query, schema: { type: integer } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Device"
+  /devices/{device_no}:
+    get:
+      tags: [devices]
+      summary: 设备详情(含最新一条数据)
+      parameters:
+        - { name: device_no, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceDetail"
+  /water/latest:
+    get:
+      tags: [water]
+      summary: 指定设备最新水质数据
+      parameters:
+        - { name: device_no, in: query, required: true, schema: { type: string } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaterLatest"
+  /water/history:
+    get:
+      tags: [water]
+      summary: 历史曲线数据
+      parameters:
+        - { name: device_no, in: query, required: true, schema: { type: string } }
+        - { name: metric, in: query, required: true, schema: { type: string, enum: [temperature, dissolved_oxygen, ph, turbidity, salinity] } }
+        - { name: range, in: query, schema: { type: string, enum: [today, 7d, 30d], default: today } }
+        - { name: max_points, in: query, schema: { type: integer, default: 200 } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metric: { type: string }
+                  unit: { type: string }
+                  points:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ts: { type: string, format: date-time }
+                        value: { type: number }
+  /alarms:
+    get:
+      tags: [alarms]
+      summary: 报警列表(报警中心)
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, default: 50 } }
+        - { name: only_unconfirmed, in: query, schema: { type: boolean } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alarm"
+  /alarms/{id}/confirm:
+    post:
+      tags: [alarms]
+      summary: 确认(消除)报警
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: integer } }
+      responses:
+        "204": { description: 已确认 }
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        nickname: { type: string }
+    PondSummary:
+      type: object
+      properties:
+        pond_id: { type: integer }
+        pond_name: { type: string }
+        status: { type: string, enum: [normal, warning, critical] }
+        device_count: { type: integer }
+        latest:
+          $ref: "#/components/schemas/WaterLatest"
+    Device:
+      type: object
+      properties:
+        device_no: { type: string }
+        pond_id: { type: integer }
+        model: { type: string }
+        status: { type: string, enum: [online, offline] }
+        last_seen_at: { type: string, format: date-time, nullable: true }
+    DeviceDetail:
+      allOf:
+        - $ref: "#/components/schemas/Device"
+        - type: object
+          properties:
+            latest: { $ref: "#/components/schemas/WaterLatest" }
+    WaterLatest:
+      type: object
+      nullable: true
+      properties:
+        ts: { type: string, format: date-time }
+        temperature: { type: number, nullable: true }
+        dissolved_oxygen: { type: number, nullable: true }
+        ph: { type: number, nullable: true }
+        turbidity: { type: number, nullable: true }
+        salinity: { type: number, nullable: true }
+    Alarm:
+      type: object
+      properties:
+        id: { type: integer }
+        device_no: { type: string }
+        pond_id: { type: integer }
+        metric: { type: string }
+        current_value: { type: number }
+        threshold: { type: number }
+        level: { type: string, enum: [critical, warning] }
+        message: { type: string }
+        confirmed_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
