@@ -1,6 +1,7 @@
 package adminapi
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"strconv"
@@ -79,13 +80,76 @@ type pondReq struct {
 	AreaMu float64 `json:"area_mu"`
 }
 
+// listPonds enriches ponds with status (worst open alarm) and freshest reading.
 func (s *Server) listPonds(c *gin.Context) {
 	ponds, err := s.deps.Store.ListPonds(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, ponds)
+	var worst map[int64]domain.AlarmLevel
+	if alarms, err := s.deps.Store.ListAllAlarms(c.Request.Context(), 500); err == nil {
+		worst = pondWorstLevel(alarms)
+	}
+	out := make([]gin.H, 0, len(ponds))
+	for _, p := range ponds {
+		item := gin.H{
+			"id": p.ID, "farm_id": p.FarmID, "name": p.Name,
+			"area_mu": p.AreaMu, "created_at": p.CreatedAt, "status": "normal",
+		}
+		if lvl, ok := worst[p.ID]; ok {
+			item["status"] = string(lvl)
+		}
+		item["latest"] = s.pondLatest(c.Request.Context(), p.ID)
+		out = append(out, item)
+	}
+	c.JSON(http.StatusOK, out)
+}
+
+func pondWorstLevel(alarms []domain.Alarm) map[int64]domain.AlarmLevel {
+	worst := map[int64]domain.AlarmLevel{}
+	for _, a := range alarms {
+		if a.ConfirmedAt != nil {
+			continue
+		}
+		cur, ok := worst[a.PondID]
+		if !ok || (a.Level == domain.AlarmCritical && cur != domain.AlarmCritical) {
+			worst[a.PondID] = a.Level
+		}
+	}
+	return worst
+}
+
+func (s *Server) pondLatest(ctx context.Context, pondID int64) gin.H {
+	if s.deps.Telemetry == nil {
+		return nil
+	}
+	devs, err := s.deps.Store.ListDevices(ctx)
+	if err != nil {
+		return nil
+	}
+	var best *domain.Reading
+	for _, d := range devs {
+		if d.PondID != pondID {
+			continue
+		}
+		rd, err := s.deps.Telemetry.Latest(ctx, d.DeviceNo)
+		if err != nil {
+			continue
+		}
+		if best == nil || rd.Timestamp.After(best.Timestamp) {
+			cp := rd
+			best = &cp
+		}
+	}
+	if best == nil {
+		return nil
+	}
+	return gin.H{
+		"ts": best.Timestamp, "temperature": best.Temperature,
+		"dissolved_oxygen": best.DO, "ph": best.PH,
+		"turbidity": best.Turbidity, "salinity": best.Salinity,
+	}
 }
 
 func (s *Server) createPond(c *gin.Context) {

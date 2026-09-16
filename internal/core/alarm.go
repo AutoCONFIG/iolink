@@ -8,6 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/event"
 )
 
@@ -15,8 +16,9 @@ import (
 // properties event. Rules live in alarm_rules (per pond per metric); this
 // keeps threshold tuning a data change, not a code change.
 type alarmEngine struct {
-	pool *pgxpool.Pool
-	log  *slog.Logger
+	pool     *pgxpool.Pool
+	log      *slog.Logger
+	notifier func(domain.Alarm) // late-bound by Service.SetNotifier; nil = off
 }
 
 type rule struct {
@@ -106,8 +108,38 @@ func (a *alarmEngine) raise(e event.Event, r rule, v float64) error {
 		return err
 	}
 	if ct.RowsAffected() > 0 {
+		MetricAlarmsTotal.Inc()
 		a.log.Warn("ALARM raised", "device", e.DeviceNo, "metric", r.metric, "value", v, "ts", time.Now())
-		// TODO(M4): notify adapter (WeChat subscribe message) via interface
+		a.notify(e, r, v)
 	}
 	return nil
+}
+
+// notify resolves the alarm row we just inserted and hands it to the
+// notifier (asynchronous; never blocks the ingest path).
+
+// notify resolves the just-inserted alarm row and hands it to the notifier
+// asynchronously (never blocks the ingest path). openIDs are resolved by the
+// Service wrapper via dispatchAlarmNotifications.
+func (a *alarmEngine) notify(e event.Event, r rule, v float64) {
+	if a.notifier == nil {
+		return
+	}
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		var al domain.Alarm
+		err := a.pool.QueryRow(ctx, `
+			SELECT id, device_no, pond_id, metric, current_value, threshold, level,
+			       coalesce(message,''), created_at
+			FROM alarms WHERE device_no=$1 AND metric=$2 AND confirmed_at IS NULL
+			ORDER BY created_at DESC LIMIT 1`, e.DeviceNo, r.metric).
+			Scan(&al.ID, &al.DeviceNo, &al.PondID, &al.Metric, &al.CurrentValue,
+				&al.Threshold, &al.Level, &al.Message, &al.CreatedAt)
+		if err != nil {
+			a.log.Warn("notify: load alarm", "err", err)
+			return
+		}
+		a.notifier(al)
+	}()
 }

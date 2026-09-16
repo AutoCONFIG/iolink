@@ -35,6 +35,7 @@ func (s *Service) storeReading(e event.Event) error {
 	if err := s.shadowUpsert(e.DeviceNo, e.Properties, e.Ts); err != nil {
 		return fmt.Errorf("upsert shadow: %w", err)
 	}
+	MetricTelemetryTotal.Inc()
 	return nil
 }
 
@@ -43,6 +44,9 @@ func (s *Service) storeStatus(e event.Event) error {
 	status := "offline"
 	if e.Online {
 		status = "online"
+		MetricDevicesOnline.Inc()
+	} else {
+		MetricDevicesOnline.Dec()
 	}
 	_, err := s.pool.Exec(context.Background(), q, e.DeviceNo, status, time.Now())
 	return err

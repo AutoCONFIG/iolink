@@ -7,10 +7,12 @@ package main
 import (
 	"context"
 	"errors"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -19,6 +21,9 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/appapi"
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
+	"git.hyhy.fun/rsplab/iolink/web"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -29,6 +34,9 @@ func main() {
 		PgMaxConns:   20,
 		QueryTimeout: 5 * time.Second,
 		SecretKey:    envOr("IOLINK_SECRET_KEY", "dev-only-change-me"),
+		WXAppID:      os.Getenv("IOLINK_WX_APPID"),
+		WXSecret:     os.Getenv("IOLINK_WX_SECRET"),
+		WXTemplateID: os.Getenv("IOLINK_WX_TEMPLATE_ID"),
 	}
 	log := slog.Default()
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
@@ -85,6 +93,13 @@ func main() {
 	}, log)
 
 	// single port: root mux mounts admin API, app API and health endpoint
+	// notifier: WeChat subscribe message when configured
+	if cfg.WXAppID != "" && cfg.WXSecret != "" && cfg.WXTemplateID != "" {
+		svc.SetNotifier(core.NewWeChatNotifier(cfg.WXAppID, cfg.WXSecret, cfg.WXTemplateID,
+			envOr("IOLINK_WX_PAGE", "pages/alarms/index"), log))
+		log.Info("wechat notifier enabled")
+	}
+
 	root := http.NewServeMux()
 	root.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
 		if err := pool.Ping(ctx); err != nil {
@@ -93,8 +108,15 @@ func main() {
 		}
 		w.Write([]byte("ok"))
 	})
+	root.Handle("/metrics", promhttp.Handler())
 	root.Handle("/admin/v1/", admin.Routes())
-	root.Handle("/", api.Routes())
+	adminFS, err := web.Admin()
+	if err != nil {
+		log.Error("admin frontend embed", "err", err)
+		os.Exit(1)
+	}
+	root.Handle("/api/v1/", api.Routes())
+	root.Handle("/", spaHandler(adminFS))
 
 	srv := &http.Server{Addr: cfg.HTTPAddr, Handler: root, ReadHeaderTimeout: 5 * time.Second}
 	go func() {
@@ -116,4 +138,20 @@ func envOr(k, def string) string {
 		return v
 	}
 	return def
+}
+
+// spaHandler serves the embedded admin SPA, falling back to index.html for
+// client-side routes.
+func spaHandler(fsys fs.FS) http.Handler {
+	fileServer := http.FileServer(http.FS(fsys))
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/")
+		if path == "" {
+			path = "index.html"
+		}
+		if _, err := fs.Stat(fsys, path); err != nil {
+			r.URL.Path = "/"
+		}
+		fileServer.ServeHTTP(w, r)
+	})
 }

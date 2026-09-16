@@ -35,9 +35,9 @@ func (f *fakeStore) ListFarms(_ context.Context) ([]domain.Farm, error) {
 func (f *fakeStore) CreateFarm(_ context.Context, _ int64, name, _ string) (domain.Farm, error) {
 	return domain.Farm{ID: 1, Name: name}, nil
 }
-func (f *fakeStore) UpdateFarm(_ context.Context, _ int64, _, _ string) error   { return nil }
-func (f *fakeStore) DeleteFarm(_ context.Context, _ int64) error                { return nil }
-func (f *fakeStore) ListPonds(_ context.Context) ([]domain.Pond, error)         { return nil, nil }
+func (f *fakeStore) UpdateFarm(_ context.Context, _ int64, _, _ string) error { return nil }
+func (f *fakeStore) DeleteFarm(_ context.Context, _ int64) error              { return nil }
+func (f *fakeStore) ListPonds(_ context.Context) ([]domain.Pond, error)       { return nil, nil }
 func (f *fakeStore) CreatePond(_ context.Context, _ int64, name string, _ float64) (domain.Pond, error) {
 	return domain.Pond{ID: 2, Name: name}, nil
 }

@@ -95,9 +95,9 @@ type loginReq struct {
 }
 
 type loginResp struct {
-	Token     string                        `json:"token"`
-	ExpiresIn int                           `json:"expires_in"`
-	User      *iolinkcontractsdomain.User   `json:"user"`
+	Token     string                      `json:"token"`
+	ExpiresIn int                         `json:"expires_in"`
+	User      *iolinkcontractsdomain.User `json:"user"`
 }
 
 var errWechatCodeInvalid = errors.New("wechat code invalid")

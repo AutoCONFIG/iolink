@@ -1,0 +1,34 @@
+# 生产部署: iolinkd + TimescaleDB。TLS 由前置反代(nginx/caddy)终结。
+services:
+  db:
+    image: timescale/timescaledb:latest-pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: iolink
+      POSTGRES_PASSWORD: ${IOLINK_PG_PASSWORD:?set in .env}
+      POSTGRES_DB: iolink
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ../docs/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iolink"]
+      interval: 5s
+      retries: 10
+
+  iolinkd:
+    image: iolinkd:latest        # docker build -t iolinkd:latest .
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    ports:
+      - "8080:8080"              # HTTP(/api/v1,/admin/v1,SPA,/metrics)
+      - "1883:1883"              # MQTT
+    environment:
+      IOLINK_PG_DSN: postgres://iolink:${IOLINK_PG_PASSWORD}@db:5432/iolink
+      IOLINK_SECRET_KEY: ${IOLINK_SECRET_KEY:?set in .env}
+      IOLINK_WX_APPID: ${IOLINK_WX_APPID:-}
+      IOLINK_WX_SECRET: ${IOLINK_WX_SECRET:-}
+      IOLINK_WX_TEMPLATE_ID: ${IOLINK_WX_TEMPLATE_ID:-}
+
+volumes:
+  pgdata:

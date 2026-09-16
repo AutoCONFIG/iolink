@@ -53,9 +53,11 @@ type AdminStore interface {
 	Stats(ctx context.Context) (domain.Stats, error)
 }
 
-// Deps wires the store.
+// Deps wires the store plus optional repos for pond enrichment
+// (both implemented by core).
 type Deps struct {
-	Store AdminStore
+	Store     AdminStore           // required
+	Telemetry domain.TelemetryRepo // optional; enables pond latest readings
 }
 
 // Server is the adminapi HTTP server.

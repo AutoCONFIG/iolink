@@ -55,10 +55,13 @@
 - 验收:真机预览全流程走通
 - 负责:appapi 负责人 + 小程序开发
 
-### M5 — 通知与生产化
-- [ ] 微信订阅消息:core Notifier 接口实现(报警触发→下发),BFF 提供订阅授权接口
-- [ ] 备份(pg_dump 每日)、sensor_data retention 已内建、基础 metrics(/metrics)
-- [ ] 部署定型:生产 compose / systemd 二选一,部署文档
+### M5 — 通知与生产化 ✅ 后端部分(2026-09-16;订阅消息实发需微信凭据联调)
+- [x] Notifier:core.AlarmNotifier 接口 + WeChatNotifier(订阅消息,配置驱动,未配置自动跳过)
+- [x] /metrics(prometheus):iolink_devices_online / telemetry_total / alarms_total / notifications_total
+- [x] 池塘聚合字段:status(最重未确认报警)+ latest(影子最新值)—— appapi /ponds 与 adminapi /ponds
+- [x] 部署定型:Dockerfile(多阶段)+ deploy/docker-compose.prod.yml + deploy/backup.sh(业务/时序分离,留14天)+ docs/DEPLOY.md(TLS/备份/监控/升级)
+- [x] 前端嵌入:web/admin/dist 占位页 + go:embed + SPA fallback(iolinkd 单二进制含后台)
+- [ ] 微信订阅消息真机实发(需小程序凭据+模板,随 M4 联调)
 - 负责:主仓
 
 ## 2. 分工(按交付物划分,三人协同参考)

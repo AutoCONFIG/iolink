@@ -1,6 +1,7 @@
 package appapi
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,22 +15,65 @@ import (
 // Ownership rule: every query is scoped by uid via the repository so one
 // user can never read another user's ponds.
 
+// listPonds returns ponds enriched with status (worst open alarm) and the
+// most recent reading across the pond's devices — feeds the status wall.
 func (s *Server) listPonds(c *gin.Context) {
 	ponds, err := s.deps.Ponds.ListByUser(c.Request.Context(), uid(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	alarms, _ := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 200)
+	worst := pondWorstLevel(alarms)
+
 	out := make([]gin.H, 0, len(ponds))
 	for _, p := range ponds {
-		item := gin.H{"pond_id": p.ID, "pond_name": p.Name, "status": "normal"}
-		if devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID); err == nil {
-			item["device_count"] = len(devs)
-			// pond status = worst of its devices' latest alarms (simplified M2)
+		item := gin.H{"pond_id": p.ID, "pond_name": p.Name, "status": "normal", "device_count": 0}
+		if lvl, ok := worst[p.ID]; ok {
+			item["status"] = string(lvl)
 		}
+		devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
+		if err == nil {
+			item["device_count"] = len(devs)
+		}
+		item["latest"] = s.pondLatest(c.Request.Context(), p.ID, devs)
 		out = append(out, item)
 	}
 	c.JSON(http.StatusOK, out)
+}
+
+// pondWorstLevel maps open alarms to the worst level per pond.
+func pondWorstLevel(alarms []iolinkcontractsdomain.Alarm) map[int64]iolinkcontractsdomain.AlarmLevel {
+	worst := map[int64]iolinkcontractsdomain.AlarmLevel{}
+	for _, a := range alarms {
+		if a.ConfirmedAt != nil {
+			continue
+		}
+		cur, ok := worst[a.PondID]
+		if !ok || (a.Level == iolinkcontractsdomain.AlarmCritical && cur != iolinkcontractsdomain.AlarmCritical) {
+			worst[a.PondID] = a.Level
+		}
+	}
+	return worst
+}
+
+// pondLatest picks the freshest shadow reading among the pond's devices.
+func (s *Server) pondLatest(ctx context.Context, pondID int64, devs []iolinkcontractsdomain.Device) gin.H {
+	var best *iolinkcontractsdomain.Reading
+	for _, d := range devs {
+		rd, err := s.deps.Telemetry.Latest(ctx, d.DeviceNo)
+		if err != nil {
+			continue
+		}
+		if best == nil || rd.Timestamp.After(best.Timestamp) {
+			cp := rd
+			best = &cp
+		}
+	}
+	if best == nil {
+		return nil
+	}
+	return waterLatestJSON(*best)
 }
 
 func (s *Server) getPond(c *gin.Context) {
