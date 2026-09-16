@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"git.hyhy.fun/rsplab/iolink/contracts/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
 )
 
 // FindByOpenID implements the auth-facing user lookup. Satisfies

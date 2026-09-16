@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	access "git.hyhy.fun/rsplab/iolink-access"
-	appapi "git.hyhy.fun/rsplab/iolink-appapi"
+	access "git.hyhy.fun/rsplab/iolink/internal/access"
+	appapi "git.hyhy.fun/rsplab/iolink/internal/appapi"
 
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"

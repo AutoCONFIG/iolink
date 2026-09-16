@@ -18,31 +18,29 @@
 
 数据量级:<100 设备 × 1min ≈ 14 万行/天,单实例绰绰有余;设计重心在边界清晰与可升级。
 
-## 仓库拓扑
+## 仓库结构(单仓)
 
-| 仓库 | go module | 职责 | 负责人 |
-|---|---|---|---|
-| iolink(本仓) | `git.hyhy.fun/rsplab/iolink` | 组装、部署、docs、core、contracts | - |
-| [iolink-access] | `git.hyhy.fun/rsplab/iolink-access` | 设备接入 | 独立负责 |
-| [iolink-appapi] | `git.hyhy.fun/rsplab/iolink-appapi` | 小程序 API | 独立负责 |
-
-依赖方向(单向,禁止互相 import):
+全部代码在本仓,模块边界 = Go package,分工按交付物四条线(见 docs/PLAN.md §2):
 
 ```
-iolink-access  ──►  iolink/contracts  ◄──  iolink-core(主仓)
-iolink-appapi  ──►  iolink/contracts  +  Repository 接口
+iolink/
+├── cmd/iolinkd/          # 单二进制入口(broker+core+API+前端)
+├── internal/access/      # 设备接入(内嵌 MQTT broker)
+├── internal/core/        # 数据管道/报警引擎/存储
+├── internal/appapi/      # 小程序 API /api/v1
+├── internal/adminapi/    # 管理后台 API /admin/v1(M2 进行中)
+├── internal/{domain,event,wire}/  # 共享契约
+└── web/admin/            # Vue3 管理前端(go:embed,M3)
 ```
 
-- 各负责人 **只 clone 自己的仓**,依赖 contracts 的版本 tag,日常不碰主仓
-- 主仓 **主动对接**:go.mod 按版本依赖 access/appapi,模块发新 tag 后主仓 `go get module@vX.Y.Z` 升级
-- 跨仓本地联调:`make work`(把兄弟目录 clone 加进 go.work)
+> 历史:原 iolink-access / iolink-appapi 独立仓已于 2026-09-16 并回本仓(GitLab 上已删除,
+> 完整历史备份在 ~/iolink-repo-backups/*.bundle)。
 
 ## 快速开始
 
 ```bash
-make bootstrap        # 按版本拉取全部 Go 依赖(私有仓需 netrc,见 CONTRIBUTING)
 make dev              # docker-compose 起 PostgreSQL/TimescaleDB + 运行 iolinkd
-make test             # 主仓 + contracts 测试
+make test             # 全部 Go 测试
 ```
 
 ## 契约文档(改动须评审)

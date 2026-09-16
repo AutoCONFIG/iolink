@@ -1,7 +1,7 @@
 // Package core implements the business heart: telemetry ingestion pipeline,
-// alarm engine, and the repositories promised by git.hyhy.fun/rsplab/iolink/contracts/domain.
+// alarm engine, and the repositories promised by git.hyhy.fun/rsplab/iolink/internal/domain.
 //
-// core consumes events from access (git.hyhy.fun/rsplab/iolink/contracts/event.Handler) and
+// core consumes events from access (git.hyhy.fun/rsplab/iolink/internal/event.Handler) and
 // serves appapi through domain repository interfaces. It never imports
 // access or appapi.
 package core
@@ -13,8 +13,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"git.hyhy.fun/rsplab/iolink/contracts/domain"
-	"git.hyhy.fun/rsplab/iolink/contracts/event"
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/event"
 )
 
 // Service is the assembled core. cmd/iolinkd constructs it and hands the

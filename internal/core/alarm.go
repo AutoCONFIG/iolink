@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"git.hyhy.fun/rsplab/iolink/contracts/event"
+	"git.hyhy.fun/rsplab/iolink/internal/event"
 )
 
 // alarmEngine evaluates pond-scoped threshold rules against each incoming

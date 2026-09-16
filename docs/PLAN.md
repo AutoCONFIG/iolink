@@ -29,12 +29,12 @@
 - 期间成果:thingspanel spike 实测(基座评估,报告留档);基座决策:不采用,转参照
 
 ### M2 — 并仓 + 管理后台 API(当前)
-- [ ] **并仓(两模块仓处置,不可遗漏)**:
-  - [ ] 代码搬运:iolink-access → internal/access;iolink-appapi → internal/appapi;contracts → internal/domain
-  - [ ] 回归:`go build/test ./...` 全绿;iolinkd 装配改回本地包 import;删 go.mod 对两仓的 require/replace
-  - [ ] 文档处置:两仓 docs/PLAN.md 有价值内容(模块 backlog)并入主仓 PLAN-DETAILS 对应节
-  - [ ] GitLab 仓处置:iolink-access / iolink-appapi 置为 archived(只读留档,tag v0.2.0 可追溯);CONTRIBUTING.md 同步改版(删跨仓流程)
-  - [ ] 两仓负责人切换工作方式:clone 主仓,按 package 分工,MR 流程不变
+- [x] **并仓(2026-09-16 完成)**:
+  - [x] 代码搬运:internal/access、internal/appapi、internal/{domain,event,wire}
+  - [x] 回归:build/vet/test 全绿;iolinkd 单二进制冒烟通过(broker+API)
+  - [x] 完整历史备份:~/iolink-repo-backups/*.bundle(GitLab 删除前的保险)
+  - [x] CONTRIBUTING.md 已改为单仓口径
+  - [ ] GitLab 上删除 iolink-access / iolink-appapi(需所有者操作:项目 Settings→General→Advanced→Delete;或先 Archive)
 - [ ] internal/adminapi:/admin/v1 —— 管理员登录、池塘 CRUD+绑设备、设备注册(生成 device_no+secret)、报警规则 CRUD、报警管理(列表/确认/批量)
 - [ ] 设备影子表 device_shadows(上报 UPSERT,/water/latest 改读影子)
 - [ ] 配套:docker-compose 加 admin 路由说明;openapi 拆为 app 与 admin 两份
@@ -64,7 +64,7 @@
 ## 2. 分工(按交付物划分,三人协同参考)
 
 > 原则:剩余工作按「交付物」切四条并行线,每条线有独立的验收物;线间只靠契约(openapi / admin-api 契约 / mqtt-spec)耦合,契约先行冻结即可全并行。
-> 与原 access/appapi 两仓分工无关——那两仓 M2 并回后,原负责人按下表重新认领。
+> 与原 access/appapi 两仓分工无关——那两仓已并回主仓(2026-09-16),原负责人按下表重新认领。
 
 | 线 | 交付物 | 内容 | 技能 | 建议人选 | 工期估计 |
 |---|---|---|---|---|---|
