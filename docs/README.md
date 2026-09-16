@@ -9,6 +9,8 @@
 | [PLAN.md](PLAN.md) | **计划主文档**:已定决策、里程碑 M0-M5、分工、升级触发器 | 全员,先读这个 |
 | [PLAN-DETAILS.md](PLAN-DETAILS.md) | **计划细节**:三段式架构与商业云职责映射、需求追溯矩阵、API/数据库/MQTT/前端/报警/安全全部设计、各里程碑验收清单 | 全员评审;负责人重点读自己模块的节 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 协作规范(⚠️ 其中跨仓版本流程将随 M2 并仓改版,以 PLAN.md §3 为准) | 模块负责人 |
+| [FRONTEND-HANDOVER.md](FRONTEND-HANDOVER.md) | **管理前端交接文档**(页面清单/约定/环境/验收) | 前端工程师,先读这个 |
+| [api/admin-openapi.yaml](api/admin-openapi.yaml) | 管理后台 API 契约(/admin/v1,权威) | 前端工程师 |
 | [api/openapi.yaml](api/openapi.yaml) | 小程序 API 契约(/api/v1,权威) | appapi 负责人、小程序开发 |
 | [mqtt-spec.md](mqtt-spec.md) | 设备接入规范(topic/载荷/取值范围,权威) | access 负责人、硬件方 |
 | [schema.sql](schema.sql) | 数据库 DDL(PG+TimescaleDB) | core 负责人 |

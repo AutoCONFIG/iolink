@@ -54,7 +54,7 @@
 
 ### 2.1 小程序 `/api/v1`(需求文档第八节 8 个接口全覆盖)
 
-统一响应:`{"code":0,"message":"ok","data":...}`;错误码:0 成功,1xxx 参数,2xxx 认证,3xxx 业务,5xxx 内部。鉴权:`Authorization: Bearer <JWT>`,claims={uid,exp};JWT 有效期 7d。
+统一约定(以实际实现为准):**REST 原生风格** —— 成功 2xx + 业务 JSON(无包裹层),失败 4xx/5xx + `{"error":"原因"}`;字段 snake_case;时间 RFC3339。鉴权:`Authorization: Bearer <JWT>`,claims={uid,exp};JWT 有效期 7d。管理后台 /admin/v1 同风格,claims={aid},密钥独立派生(见 admin-openapi.yaml 与 FRONTEND-HANDOVER.md)。
 
 | # | 接口 | 方法/路径 | 请求要点 | 响应要点 | 需求出处 |
 |---|---|---|---|---|---|

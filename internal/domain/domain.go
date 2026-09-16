@@ -55,11 +55,11 @@ type User struct {
 }
 
 type Farm struct {
-	ID        int64
-	OwnerID   int64 // User.ID
-	Name      string
-	Location  string
-	CreatedAt time.Time
+	ID        int64     `json:"id"`
+	OwnerID   int64     `json:"owner_id"`
+	Name      string    `json:"name"`
+	Location  string    `json:"location"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Pond struct {
@@ -88,24 +88,24 @@ const (
 )
 
 type Sensor struct {
-	ID       int64
-	DeviceID int64
-	Key      string // "temperature", "dissolved_oxygen", "ph", "turbidity", "salinity"
-	Name     string
-	Unit     string
+	ID       int64  `json:"id"`
+	DeviceID int64  `json:"device_id"`
+	Key      string `json:"key"` // "temperature", "dissolved_oxygen", "ph", "turbidity", "salinity"
+	Name     string `json:"name"`
+	Unit     string `json:"unit"`
 }
 
 // ---- Telemetry ----
 
 // Reading is one normalized sensor sample from a device.
 type Reading struct {
-	DeviceNo    string
-	Timestamp   time.Time
-	Temperature *float64 // pointers: absent fields stay nil
-	DO          *float64
-	PH          *float64
-	Turbidity   *float64
-	Salinity    *float64
+	DeviceNo    string    `json:"device_no"`
+	Timestamp   time.Time `json:"ts"`
+	Temperature *float64  `json:"temperature,omitempty"` // pointers: absent fields stay nil
+	DO          *float64  `json:"dissolved_oxygen,omitempty"`
+	PH          *float64  `json:"ph,omitempty"`
+	Turbidity   *float64  `json:"turbidity,omitempty"`
+	Salinity    *float64  `json:"salinity,omitempty"`
 }
 
 // ---- Alarms ----
