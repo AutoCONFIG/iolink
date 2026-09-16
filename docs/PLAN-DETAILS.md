@@ -5,6 +5,28 @@
 > 需求文档第一章的「商业云」段是初版快速实现路径,现役方案以本服务器为唯一中枢,见追溯矩阵第一行。
 > 状态:与 PLAN v2 同步评审。
 
+## 〇、原商业云组件 → 本服务器等价实现(职责逐项内化,无外部运行时)
+
+需求文档原方案里的每个商业云组件,在 iolinkd 中都有唯一的原生等价物(进程内函数调用替代云服务调用):
+
+| 原商业云组件(需求文档) | 原职责 | iolinkd 等价实现 | 状态 |
+|---|---|---|---|
+| **IoTDA** 设备接入 | 产品/设备管理、MQTT 接入、设备影子、状态 | access 层:内嵌 broker + 三元组鉴权 + ACL;设备影子表 device_shadows | ✅ M1 |
+| **IoTDA 规则引擎** 数据转发 | 属性上报转发到云函数 | access→core 进程内 channel(比云转发少一跳网络+序列化) | ✅ M1 |
+| **云函数 iot_data_handler** | 校验/识别设备/标准化/入库 | core.storeReading + access 取值白名单 | ✅ M1 |
+| **云函数 alarm_handler** | 阈值判断→报警记录→通知 | core.alarmEngine(alarm_rules 按池塘)+ alarms 表;通知→Notifier | ✅ M1(通知 M5) |
+| **云函数 device_status_handler** | 设备状态维护 | access 看门狗(在线判定)+ core.storeStatus + 影子表 | ✅ M1(影子 M2) |
+| **云函数 api_handler** | 小程序业务 API | appapi(/api/v1)进程内直调 core,无 HTTP 中转 | ✅ M1 |
+| **API Gateway** | 给小程序提供 HTTPS 入口 | Gin 对外端口(同进程) | ✅ M1 |
+| **SMN/通知** | 短信/推送 | Notifier 接口:实现=微信订阅消息(政策敏感,独立适配器) | M5 |
+| **OBS** | 备份/归档 | pg_dump 定时(M5 评估是否需要对象存储) | M5 |
+| **ECS(远期)** | Go 业务系统 | 本服务器即"未来的 ECS 业务系统"——原方案升级路径=部署形态切换,代码不变 | 内建 |
+
+> 关键等价性:原方案 FunctionGraph 是"无运行时"的托管函数,本项目将其职责还原为
+> 同进程的普通 Go 函数——需求文档所列 4 个 handler(iot_data_handler / alarm_handler /
+> device_status_handler / api_handler)与 core 内部结构一一对应,只是调用方式从
+> "云触发"变为"进程内方法调用",这正是"无需运行时、单程序"要求的落点。
+
 ## 一、需求追溯矩阵(需求文档 → 落点 → 里程碑)
 
 | 需求文档章节 | 原文要点 | 本方案落点 | 里程碑 |
