@@ -10,9 +10,9 @@
 
 | 决策点 | 结论 |
 |---|---|
-| 架构形态 | **单程序**:iolinkd 一个二进制 = 内嵌 broker + 业务核心 + 双 API(/api/v1、/admin/v1)+ go:embed 前端 |
+| 架构形态 | **三段式:传感器(含终端)→ 本服务器(iolinkd 自研独立进程)→ 小程序**;单程序=本服务器一个二进制(内嵌 broker + 业务核心 + 双 API + go:embed 前端) |
 | 仓库拓扑 | **单仓**:access/appapi 模块仓并回主仓(边界=Go package);contracts 并回 internal/domain |
-| 功能实现 | 全部原生自研(接入/管道/报警/双端 API/管理后台/小程序);不嵌第三方平台 |
+| 功能实现 | 全部原生自研(接入/管道/报警/双端 API/管理后台/小程序);替代原「商业云快速实现」路径,不嵌第三方平台 |
 | 数据库 | PostgreSQL 16 + TimescaleDB 单实例:业务表 + sensor_data 时序宽表 + device_shadows 影子表 |
 | 前端 | 管理后台 Vue3(soybean-admin/vben 模板 + Element Plus);小程序 uniapp |
 | 升级触发器 | OTA / 真多租户 / 复杂协议矩阵 任一出现 → 重开基座评估;/api/v1 契约不变 |
