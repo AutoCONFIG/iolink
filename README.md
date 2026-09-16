@@ -59,5 +59,7 @@ make test             # 主仓 + contracts 测试
 
 开发工具:`cmd/mqtt-sim`(设备模拟,周期上报)、`cmd/mqtt-once`(单发消息,调试报警)。
 
+各模块仓内也有自己的 `docs/PLAN.md`(模块需求 + 状态 + backlog):[access](https://git.hyhy.fun/rsplab/iolink-access/-/blob/main/docs/PLAN.md) · [appapi](https://git.hyhy.fun/rsplab/iolink-appapi/-/blob/main/docs/PLAN.md)
+
 [iolink-access]: https://git.hyhy.fun/rsplab/iolink-access
 [iolink-appapi]: https://git.hyhy.fun/rsplab/iolink-appapi
