@@ -7,7 +7,17 @@
 | [hummingbird](https://github.com/winc-link/hummingbird) | Go | Apache-2.0 | 超轻量单体平台 | SQLite/LevelDB 存储,内存占用极低;轻量级方案的代表参考。⚠️ 上游约 2025-05 起停止维护 |
 | [magistrala](https://github.com/absmach/magistrala) | Go 微服务 | Apache-2.0 | 云原生 IoT 框架 | 前身 Mainflux;消息中间件 FluxMQ + 身份/权限/设备供给,微服务架构代表 |
 | [sagooiot](https://github.com/sagoo-cloud/sagooiot) | Go (GoFrame) + Vue3 | LGPL-3.0 | 企业级全功能平台 | 设备管理、物模型、规则引擎、告警等标配功能齐全,前端完整 |
-| [thingspanel](https://github.com/ThingsPanel/thingspanel-backend-community) | Go (Gin) + Vue3 | Apache-2.0 | **插件化/组件化平台** | 与本项目插件化方向直接对口,见下方说明 |
+| [thingspanel](https://github.com/ThingsPanel/thingspanel-backend-community) | Go (Gin) + Vue3 | Apache-2.0 | **插件化/组件化平台** | 与本项目插件化方向直接对口;已升级为**基座候选**(主仓 docs/PLAN.md),见下方全家桶 |
+
+### ThingsPanel 全家桶(2026-09-16 补充,基座评估材料)
+
+| 目录 | 用途 |
+|---|---|
+| thingspanel-frontend-community | Vue3 管理后台前端(基座路线的管理界面基础) |
+| app | uniapp 移动端(小程序/App 参照与二开基础) |
+| modbus-protocol-plugin | Modbus 协议插件(RS485 传感器接入的直接答案) |
+| thingspanel-gmqtt | ThingsPanel 使用的 MQTT broker(GMQTT 分支) |
+| thingsvis | ThingsVis 可视化引擎(大屏/组态) |
 
 ## ThingsPanel 插件体系速查(重点参考)
 
