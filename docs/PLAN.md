@@ -1,6 +1,6 @@
 # IoLink 开发计划与路线图(v2 · 彻底原生开发路线)
 
-> **细节附件:[PLAN-DETAILS.md](PLAN-DETAILS.md)** —— 需求追溯矩阵、API 全量设计、数据库 DLD、MQTT/前端/报警/安全细节、各里程碑验收清单。评审计划请两份对照着看。
+> 文档入口:[docs/README.md](README.md)(地图) · 细节附件:[PLAN-DETAILS.md](PLAN-DETAILS.md)(需求追溯+各层设计+验收清单)
 
 > v2 修订于 2026-09-16。**路线决策已确认:彻底原生开发(路线 C)**——所有功能原生自研,
 > 单程序交付;ThingsPanel(upstream/thingspanel/)仅作功能设计参照,不进运行时。
