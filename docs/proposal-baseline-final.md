@@ -5,32 +5,54 @@
 
 ## 一、目标架构
 
+### 形态A(推荐):单程序 —— 一个二进制,进程内直连
+
 ```
 ┌─ 养殖现场 ─────────────────────────────────┐
-│  温度/DO/pH/浊度/盐度传感器                  │
-│        │ RS485/Modbus                      │
-│  水质监测终端(ESP32/STM32/网关)             │
-│        │ WiFi/4G                           │
+│  传感器 → RS485/Modbus → 水质监测终端        │
 └────────┼───────────────────────────────────┘
-         │ MQTT(devices/telemetry, token认证)
+         │ MQTT(devices/telemetry)
          ▼
-┌─ 平台层:ThingsPanel(Apache-2.0, Go) ──────┐
-│  gmqtt broker · 设备管理 · 物模型            │
-│  场景联动(DO<阈值 告警) · 通知组             │
-│  多租户 · OTA · Vue3管理后台 · thingsvis大屏 │
+┌─ iolinkd 单进程(一个二进制) ────────────────┐
+│  ① 内嵌 gmqtt broker(thingspanel 插件)     │
+│  ② 内嵌 ThingsPanel Application             │
+│     NewApplication(WithConfigFile,WithRedis)│
+│     →Start()/Wait()/Shutdown()              │
+│     其 MQTT adapter 经 loopback:1883        │
+│  ③ 水产 BFF(现 appapi,进程内直调服务层,     │
+│     不走 HTTP)                              │
 └────────┬───────────────────────────────────┘
-         │ open API(/api/v1/*)
-         ▼
-┌─ 业务层:水产 BFF(Go, 现appapi改造) ────────┐
-│  微信登录(code2session→自有JWT)             │
-│  养殖场→池塘 领域模型(映射平台设备分组)       │
-│  聚合:遥测/历史/告警 + 首页统计              │
-│  报警确认 · 微信订阅消息下发(M4)            │
-└────────┬───────────────────────────────────┘
-         │ HTTPS /api/v1(自有契约,与原方案相同)
-         ▼
-   微信小程序(uniapp, 参照 thingspanel/app 二开)
+         │
+   PostgreSQL + Redis(数据库,任何架构都在进程外)
+         ▲
+   Vue3 管理后台(平台自带,直连 9999 亦可关停)
+         ▲
+   微信小程序(uniapp)→ BFF /api/v1
 ```
+
+**可行性已验证**(源码实查):
+- 后端即库:`internal/app.NewApplication(options...) → Start()/Shutdown()/Wait()`,
+  Option 有 `WithConfigFile/WithRedis/DB`;还暴露 `GetUplinkBus()/GetDownlinkBus()`
+- broker 即库:gmqtt 的 `plugin/thingspanel` 插件使 broker 与后端共库共 Redis,
+  作为依赖嵌入同一进程,后端 adapter 走 loopback:1883(同机回环,µs 级)
+- BFF 不经 open API HTTP:直接 import 平台 service 层单调用,零序列化
+
+**进程间开销的诚实评估**:数据路径 设备→broker→adapter 为同进程 loopback TCP(µs 级);
+原多进程形态的 BFF→平台 HTTP 跳数(毫秒级)在单程序中归零。
+在 <100 设备、每分钟一条的量级下,单程序的收益更多是**部署与运维简单**(一个二进制),
+性能本身两种形态都绰绰有余——但单程序同时把"未来量级上来"的路径也留直了。
+
+### 形态B(备选):多进程独立部署
+
+```
+设备 → gmqtt broker(独立) → ThingsPanel 后端(独立, 9999)
+                                        │ open API
+                              水产 BFF(独立进程) → 小程序
+```
+适合:需要水平扩展、平台与业务独立发布、或用官方容器镜像零改动的场景。
+进程间仅 loopback 通信,在本项目量级下性能差异可忽略;主要差别是部署与版本管理粒度。
+
+**建议:默认形态A,保留形态B作为规模扩展出口**(两者代码几乎相同,只差装配方式)。
 
 ## 二、设计原则兑现情况(原三条不变)
 
@@ -49,6 +71,7 @@
 | 主仓 contracts | **保留** | BFF 与未来扩展仍用它定义 /api/v1 领域接口 |
 | appapi 仓 | **改造为 BFF**(核心工作) | 保留:JWT/路由/openapi 对齐;替换:Deps 实现→ThingsPanel open API client;新增:微信登录对接、池塘聚合 |
 | cmd/mqtt-sim、tp-spike-pub | 改造 | 换 ThingsPanel 的 topic/payload 格式,做联调工具 |
+| iolinkd(主仓 cmd) | **保留并升级** | 变成单程序宿主:内嵌 gmqtt + 内嵌平台 Application + BFF |
 | docs/mqtt-spec.md | **重写** | 换成 ThingsPanel 的 topic/payload(base64 values 等坑位写清) |
 
 ## 四、实施步骤(评审通过后执行,预计节奏)
