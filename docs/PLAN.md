@@ -24,14 +24,15 @@
 - [x] TimescaleDB 启动建表,/healthz 端到端验证
 - [x] CONTRIBUTING 协作规范
 
-### M1 — 端到端数据链路(当前)
-- [ ] access:挂接真实 MQTT broker(mochi-mqtt 内嵌),设备三元组鉴权 + topic ACL
-- [ ] MQTT 模拟器联调脚本(mosquitto_pub / mqttx)
-- [ ] cmd/iolinkd 正式组装 access+core(事件从进程内 channel 交付)
-- [ ] 验收:模拟器发水质数据 → sensor_data 落库 → appapi `GET /api/v1/water/latest` 查到
+### M1 — 端到端数据链路 ✅(2026-09-16 完成)
+- [x] access:内嵌 mochi-mqtt broker,设备三元组鉴权(sha256)+ topic ACL + 防伪造校验
+- [x] 模拟器:cmd/mqtt-sim(周期上报)+ cmd/mqtt-once(单发,报警触发用)
+- [x] cmd/iolinkd 全量组装(access+core+appapi 单进程);core 结构化实现 Authenticator/UserStore
+- [x] appapi:真实微信 code2session 客户端(配置驱动)+ /stats/summary 首页汇总
+- [x] 验收通过:模拟器→MQTT→sensor_data 落库→低DO触发 critical 报警→报警中心 API→确认消除
 - 负责:access 负责人 + 主仓
 
-### M2 — 报警闭环
+### M2 — 报警闭环(报警引擎已在 M1 提前打通)
 - [ ] alarm_rules 数据导入(池塘阈值配置页可后置,先 SQL)
 - [ ] 报警产生 → 报警中心列表/确认接口联调
 - [ ] 池塘状态聚合(normal/warning/critical)

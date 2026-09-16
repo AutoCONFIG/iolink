@@ -144,6 +144,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Alarm"
+  /stats/summary:
+    get:
+      tags: [stats]
+      summary: 首页汇总(在线/离线/报警设备数 + 池塘状态)
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatsSummary"
   /alarms/{id}/confirm:
     post:
       tags: [alarms]
@@ -198,6 +208,20 @@ components:
         ph: { type: number, nullable: true }
         turbidity: { type: number, nullable: true }
         salinity: { type: number, nullable: true }
+    StatsSummary:
+      type: object
+      properties:
+        online_devices: { type: integer }
+        offline_devices: { type: integer }
+        alarm_devices: { type: integer, description: 有未确认报警的设备相关计数 }
+        ponds:
+          type: array
+          items:
+            type: object
+            properties:
+              pond_id: { type: integer }
+              pond_name: { type: string }
+              status: { type: string, enum: [normal, warning, critical] }
     Alarm:
       type: object
       properties:

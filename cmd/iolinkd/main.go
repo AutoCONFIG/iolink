@@ -1,26 +1,25 @@
 // Package iolink — main service assembly.
+//
+// This is the ONLY place where all modules meet: core (here) is handed to
+// access as event.Handler+Authenticator and to appapi as repositories.
 package main
 
 import (
 	"context"
 	"errors"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	access "git.hyhy.fun/rsplab/iolink-access"
+	appapi "git.hyhy.fun/rsplab/iolink-appapi"
+
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 )
-
-// Access and AppApi are defined in their own git repositories and wired here
-// as interfaces (see contracts/). Phase-1 skeleton: log the intended wiring
-// and run the HTTP health endpoint so deployment is testable end to end.
-//
-// import access "iolink/access"    // submodule, provides access.New(cfg, handler)
-// import appapi  "iolink/appapi"   // submodule, provides appapi.New(core repos)
 
 func main() {
 	cfg := platform.Config{
@@ -31,42 +30,66 @@ func main() {
 		QueryTimeout: 5 * time.Second,
 		SecretKey:    envOr("IOLINK_SECRET_KEY", "dev-only-change-me"),
 	}
+	log := slog.Default()
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
 	pool, err := platform.DB(ctx, cfg)
 	if err != nil {
-		log.Fatalf("db connect: %v", err)
+		log.Error("db connect", "err", err)
+		os.Exit(1)
 	}
 	defer pool.Close()
 
-	svc, err := core.New(ctx, pool, platform.Logger())
+	svc, err := core.New(ctx, pool, log)
 	if err != nil {
-		log.Fatalf("core init: %v", err)
+		log.Error("core init", "err", err)
+		os.Exit(1)
 	}
-	_ = svc // consumed by access (event.Handler) and appapi (repos) once submodules land
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
-		if err := pool.Ping(ctx); err != nil {
-			http.Error(w, "db down", http.StatusServiceUnavailable)
-			return
-		}
-		w.Write([]byte("ok"))
-	})
-
-	srv := &http.Server{Addr: cfg.HTTPAddr, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
+	// --- access: embedded MQTT broker, events -> core ---
+	acc := access.New(access.Config{
+		MQTTAddr:           cfg.MQTTAddr,
+		ReportInterval:     1 * time.Minute,
+		OfflineGraceFactor: 3,
+	}, svc, svc, log) // svc is both event.Handler and Authenticator
 	go func() {
-		log.Printf("iolinkd listening on %s (mqtt %s planned)", cfg.HTTPAddr, cfg.MQTTAddr)
-		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("http: %v", err)
+		if err := acc.Serve(); err != nil {
+			log.Error("mqtt broker stopped", "err", err)
+			stop()
+		}
+	}()
+	go acc.Run(ctx)
+
+	// --- appapi: /api/v1 for the mini program, backed by core repos ---
+	api := appapi.New(appapi.Config{
+		Addr:      cfg.HTTPAddr,
+		SecretKey: cfg.SecretKey,
+		JWT:       7 * 24 * time.Hour,
+		Wechat: appapi.WechatConfig{
+			AppID:  os.Getenv("IOLINK_WX_APPID"),
+			Secret: os.Getenv("IOLINK_WX_SECRET"),
+		},
+	}, appapi.Deps{
+		Ponds:     svc.Ponds(),
+		Devices:   svc.Devices(),
+		Telemetry: svc.Telemetry(),
+		Alarms:    svc.Alarms(),
+		Users:     svc, // svc implements UserStore
+	}, log)
+	go func() {
+		if err := api.Run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Error("appapi stopped", "err", err)
+			stop()
 		}
 	}()
 
+	log.Info("iolinkd started", "http", cfg.HTTPAddr, "mqtt", cfg.MQTTAddr)
 	<-ctx.Done()
-	shut, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	_ = srv.Shutdown(shut)
+	log.Info("shutting down")
+	if err := acc.Close(); err != nil {
+		log.Warn("mqtt close", "err", err)
+	}
 }
 
 func envOr(k, def string) string {

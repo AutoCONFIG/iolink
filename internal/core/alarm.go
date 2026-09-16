@@ -85,11 +85,11 @@ func (a *alarmEngine) rulesForDevice(deviceNo string) ([]rule, error) {
 func (a *alarmEngine) raise(e event.Event, r rule, v float64) error {
 	const q = `INSERT INTO alarms
 		(device_no, pond_id, metric, current_value, threshold, level, message)
-		SELECT $1, d.pond_id, $2, $3, $4, $5, $6
-		FROM devices d WHERE d.device_no = $1
+		SELECT $1::varchar, d.pond_id, $2::varchar, $3, $4, $5::varchar, $6::varchar
+		FROM devices d WHERE d.device_no = $1::varchar
 		  AND NOT EXISTS (
 			SELECT 1 FROM alarms a
-			WHERE a.device_no = $1 AND a.metric = $2 AND a.confirmed_at IS NULL)`
+			WHERE a.device_no = $1::varchar AND a.metric = $2::varchar AND a.confirmed_at IS NULL)`
 	threshold := 0.0
 	msg := ""
 	if r.minValue != nil {
