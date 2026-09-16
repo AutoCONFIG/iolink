@@ -49,6 +49,15 @@
 | 微信 code2session 客户端(配置驱动) | 登录后端 | 代码完成,真机联调 M4 |
 | 用户级数据隔离(uid→farm→pond) | 安全 | 架构保证 |
 
+## 四·五、多用户系统(internal/core users.go + 全链路隔离)—— 全部完成
+
+| 功能 | 说明 | 验证方式 |
+|---|---|---|
+| 微信用户自动建档 | 首次登录 openid 幂等入库(EnsureUser),无需注册流程 | 单测(fake)+实现 |
+| 多用户数据隔离 | 全部查询按 uid→farm→pond 过滤,用户只见自己的池塘/设备/报警 | 架构强制(repos 全带 owner_id 条件) |
+| 管理员独立体系 | users.authority=ADMIN,独立登录(/admin/v1/login)与 JWT 派生密钥 | 单测+实测 |
+| 多端账号并存 | 同表双形态:openid(微信)+ username/password(管理员) | DDL |
+
 ## 五、管理后台 API(/admin/v1,internal/adminapi)—— 全部完成
 
 | 接口组 | 能力 | 验证方式 |
