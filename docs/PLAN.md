@@ -85,6 +85,33 @@
 internal/access、cmd/mqtt-sim → L1 兼(原 A 可认领);internal/core、internal/adminapi → L1;
 internal/appapi → L3;web/admin → L2。
 
+### M6 — 商业化前置(多产品/多租户/OpenAPI)
+- [ ] 多产品/物模型抽象:products + product_models 表,物模型字段由固定水质五参扩展为产品级定义(现有水质终端迁移为首个产品)
+- [ ] 多租户:tenants 表,users/farms 挂 tenant_id;全部查询按租户隔离;admin 后台租户管理
+- [ ] 细粒度 RBAC:casbin(角色×资源×动作),管理后台角色管理页
+- [ ] OpenAPI 开放平台:第三方应用 API-Key 签发/签名/限流,开放接口文档
+- 验收:两个租户数据互不可见;第三方持 API-Key 调开放接口
+- 负责:L1 后端 + 前端(管理页)
+
+### M7 — 行业标配(视频/地图/大屏)
+- [ ] 视频接入:GB28181/RTSP → 流媒体网关(ZLMediaKit),设备关联摄像头,后台/小程序播放
+- [ ] 设备地图:GIS 定位(设备/池塘经纬度),地图页(后台+小程序)
+- [ ] 数据大屏:聚合只读 API + 大屏前端(布局参照 thingsvis 思路)
+- 验收:地图看到设备分布;大屏实时刷新;摄像头可点开播放
+- 负责:前端为主 + L1(接口/信令)
+
+### M8 — 增强能力(数据面与协议面补全)
+- [ ] 数据转发:规则引擎 out(HTTP/MQTT 推送,按规则配置)
+- [ ] HTTP 协议接入:HTTP 上报端点(签名鉴权,复用物模型白名单)
+- [ ] Modbus 平台侧:平台 Modbus 主站直连 DTU(视硬件方案,与固件线对齐后启动)
+- [ ] 定时任务:用户可配 cron(联动触发,如定时下发命令)
+- [ ] 场景联动:条件→动作编排(触发条件复用告警条件模型)
+- [ ] 网关+子设备接入:两级拓扑(gateway→sub-devices),数据归因子设备
+- [ ] 设备调试台:Web 下发命令/查看原始报文
+- [ ] 数据报表:历史导出 CSV/Excel + 周期日报
+- 验收:逐项对应蜂鸟清单功能位,FEATURE-MATRIX.md 状态同步
+- 负责:L1 + 前端(按项拆分)
+
 ## 3. 协作与流程变化
 
 - 并仓后跨仓 go get / tag 流程取消;**接口评审 = 主仓 MR(internal/domain 或 /admin/v1 契约)**
