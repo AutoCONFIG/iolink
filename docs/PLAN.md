@@ -1,71 +1,78 @@
-# IoLink 开发计划与路线图
+# IoLink 开发计划与路线图(v2 · 彻底原生开发路线)
 
-> 制定于 2026-09-16,基于第一阶段架构决策:自研单服务替代「华为云 IoTDA + FunctionGraph」,
-> 保持设备端(MQTT)与小程序(/api/v1)契约不变,保留向 ECS 部署形态升级的路径。
+> v2 修订于 2026-09-16。**路线决策已确认:彻底原生开发(路线 C)**——所有功能原生自研,
+> 单程序交付;ThingsPanel(upstream/thingspanel/)仅作功能设计参照,不进运行时。
+> 评审依据:docs/proposal-baseline-final.md(路线对比)+ docs/baseline-spike-report.md(基座实测,留档)。
 
 ## 0. 已定架构决策(不再重复讨论)
 
 | 决策点 | 结论 |
 |---|---|
-| 架构形态 | Go 模块化单体:access(设备接入)+ core(业务)+ appapi(小程序API)单进程 |
-| 仓库拓扑 | 主仓 = contracts + core + 组装;access/appapi 独立仓,主仓以 go.mod 版本依赖主动对接(无 submodule) |
-| 共享契约 | `git.hyhy.fun/rsplab/iolink/contracts` 嵌套模块,版本化 tag,只增不改 |
-| 数据库 | PostgreSQL + TimescaleDB(时序宽表 sensor_data),单实例 |
-| MQTT | 先内嵌(规划 mochi-mqtt),接口抽象可换外部 EMQX |
-| 协作 | 契约版本化兼容,见 docs/CONTRIBUTING.md |
-| 升级路线 | 单机 compose → 100~500 台观察 → 商业化时 IoTDA→消息队列→ECS 微服务(设备/小程序零改动) |
+| 架构形态 | **单程序**:iolinkd 一个二进制 = 内嵌 broker + 业务核心 + 双 API(/api/v1、/admin/v1)+ go:embed 前端 |
+| 仓库拓扑 | **单仓**:access/appapi 模块仓并回主仓(边界=Go package);contracts 并回 internal/domain |
+| 功能实现 | 全部原生自研(接入/管道/报警/双端 API/管理后台/小程序);不嵌第三方平台 |
+| 数据库 | PostgreSQL 16 + TimescaleDB 单实例:业务表 + sensor_data 时序宽表 + device_shadows 影子表 |
+| 前端 | 管理后台 Vue3(soybean-admin/vben 模板 + Element Plus);小程序 uniapp |
+| 升级触发器 | OTA / 真多租户 / 复杂协议矩阵 任一出现 → 重开基座评估;/api/v1 契约不变 |
 
 ## 1. 里程碑
 
-### M0 — 契约与骨架 ✅(2026-09-16 完成)
-- [x] 契约三件套:openapi.yaml / mqtt-spec.md / schema.sql
-- [x] contracts 模块(domain/event/wire)+ core 骨架(管道/报警/仓库)+ cmd/iolinkd
-- [x] access/appapi 两仓 scaffold + submodule 绑定 + 全部打 tag
-- [x] TimescaleDB 启动建表,/healthz 端到端验证
-- [x] CONTRIBUTING 协作规范
+### M0 — 契约与骨架 ✅(2026-09-16)
+- [x] 契约三件套(openapi / mqtt-spec / schema)+ contracts 模块 + core 骨架 + TimescaleDB 建表
 
-### M1 — 端到端数据链路 ✅(2026-09-16 完成)
-- [x] access:内嵌 mochi-mqtt broker,设备三元组鉴权(sha256)+ topic ACL + 防伪造校验
-- [x] 模拟器:cmd/mqtt-sim(周期上报)+ cmd/mqtt-once(单发,报警触发用)
-- [x] cmd/iolinkd 全量组装(access+core+appapi 单进程);core 结构化实现 Authenticator/UserStore
-- [x] appapi:真实微信 code2session 客户端(配置驱动)+ /stats/summary 首页汇总
-- [x] 验收通过:模拟器→MQTT→sensor_data 落库→低DO触发 critical 报警→报警中心 API→确认消除
-- 负责:access 负责人 + 主仓
+### M1 — 端到端数据链路 ✅(2026-09-16)
+- [x] 内嵌 mochi-mqtt broker、三元组鉴权(sha256)、topic ACL、离线看门狗
+- [x] 管道落库 + 池塘阈值报警引擎(去重)+ 全部 appapi 接口 + 微信 code2session 客户端
+- [x] 单进程组装(iolinkd);实测:模拟器→落库→低DO→critical报警→报警中心→确认,全链路绿
+- 期间成果:thingspanel spike 实测(基座评估,报告留档);基座决策:不采用,转参照
 
-### M2 — 报警闭环(报警引擎已在 M1 提前打通)
-- [ ] alarm_rules 数据导入(池塘阈值配置页可后置,先 SQL)
-- [ ] 报警产生 → 报警中心列表/确认接口联调
-- [ ] 池塘状态聚合(normal/warning/critical)
-- 验收:模拟低 DO → 报警中心可见 → 确认后消失
-- 负责:core(主仓)+ appapi 负责人
+### M2 — 并仓 + 管理后台 API(当前)
+- [ ] 并仓:iolink-access → internal/access;iolink-appapi → internal/appapi;contracts → internal/domain(三仓存档 tag v0.2.0)
+- [ ] internal/adminapi:/admin/v1 —— 管理员登录、池塘 CRUD+绑设备、设备注册(生成 device_no+secret)、报警规则 CRUD、报警管理(列表/确认/批量)
+- [ ] 设备影子表 device_shadows(上报 UPSERT,/water/latest 改读影子)
+- [ ] 配套:docker-compose 加 admin 路由说明;openapi 拆为 app 与 admin 两份
+- 验收:curl 全套 /admin/v1;mqtt-sim→影子→latest 正确
+- 负责:主仓(adminapi)+ access 负责人(并仓/搬运与回归测试)
 
-### M3 — 小程序联调
-- [ ] appapi:接入真实微信 code2session
-- [ ] 小程序 6 页面:登录/首页/池塘列表/实时监测/历史曲线/报警中心
-- [ ] 与 appapi 按 openapi.yaml 联调
+### M3 — 管理后台前端(Vue3)
+- [ ] web/admin 脚手架:soybean-admin 或 vben 模板(拍板项3)+ Element Plus
+- [ ] 页面:登录 / 总览(池塘状态墙+统计) / 池塘管理 / 设备管理(注册发密钥) / 报警规则 / 报警中心
+- [ ] go:embed 打进 iolinkd,单二进制交付;CI 加前端 build
+- 验收:浏览器完成"建池塘→注册设备→配规则"全流程
+- 负责:前端(新)+ 主仓(adminapi 配合)
+
+### M4 — 微信小程序
+- [ ] uniapp 工程(参照 thingspanel/app 的工程化),6 页面:登录/首页/池塘/实时/历史/报警
+- [ ] 真实微信 code2session 联调(IOLINK_WX_* 凭据)
+- [ ] uCharts 历史曲线;报警中心+确认
+- 验收:真机预览全流程走通
 - 负责:appapi 负责人 + 小程序开发
 
-### M4 — 通知与运维加固
-- [ ] 微信订阅消息适配器(Notifier 接口,关注平台政策)
-- [ ] 数据保留/归档策略、备份、基础监控
-- [ ] 部署文档(生产 compose / systemd)
+### M5 — 通知与生产化
+- [ ] 微信订阅消息:core Notifier 接口实现(报警触发→下发),BFF 提供订阅授权接口
+- [ ] 备份(pg_dump 每日)、sensor_data retention 已内建、基础 metrics(/metrics)
+- [ ] 部署定型:生产 compose / systemd 二选一,部署文档
 - 负责:主仓
 
-## 2. 工作包分工
+## 2. 分工(并仓后按 package)
 
-| WP | 内容 | 负责人 | 状态 |
-|---|---|---|---|
-| WP0 | 架构/契约/骨架 | 主仓 | ✅ M0 |
-| WP1 | 设备接入 access | 模块负责人 A | M1 |
-| WP2 | 业务核心 core | 主仓 | M1-M2 |
-| WP3 | 应用 API appapi | 模块负责人 B | M2-M3 |
-| WP4 | 微信小程序 | 小程序开发 | M3 |
-| WP5 | 硬件固件(采集→Modbus→MQTT) | 硬件方 | M1(先模拟器) |
+| Package/端 | 内容 | 负责人 |
+|---|---|---|
+| internal/access + cmd/mqtt-sim | 设备接入层与联调工具 | 负责人 A(原 access) |
+| internal/core | 管道/报警/存储 | 主仓 |
+| internal/appapi + 小程序 | /api/v1 与小程序 | 负责人 B(原 appapi)|
+| internal/adminapi + web/admin | 管理后台 | 主仓 + 前端 |
+| 硬件固件 | Modbus 采集→MQTT(按 mqtt-spec) | 硬件方 |
 
-并行原则:WP1/WP3/WP4/WP5 互不阻塞——契约(mock/模拟器)先行。
+并行原则不变:契约先行,各 package 独立可测(fake/模拟器)。
 
-## 3. 规模假设与升级触发条件
+## 3. 协作与流程变化
 
-- 当前设计容量:<500 设备(每分钟上报),14 万行/天,单实例余量充足
-- 触发升级的信号:FunctionGraph→(未来)ECS 迁移点 = 设备数 >500、需设备远程控制、多租户/复杂权限、统计分析需求
-- 升级动作:access 或 appapi 从单体拆为独立进程(contracts 保证接口稳定),设备端与小程序不改
+- 并仓后跨仓 go get / tag 流程取消;**接口评审 = 主仓 MR(internal/domain 或 /admin/v1 契约)**
+- CONTRIBUTING.md 将随 M2 并仓同步改版(环境配置一节保留:netrc/GOPRIVATE 用于拉取 upstream 参照与 CI)
+- 硬件接入规范 mqtt-spec.md 不变(M1 已按它验收)
+
+## 4. 规模假设与升级触发条件
+
+- 设计容量:<500 设备、每分钟上报(≈14 万行/天),单实例余量充足
+- 升级触发:设备>500 / 设备远程控制 / 多租户商业化 / 复杂协议矩阵 → 优先方案:保持单程序扩容(资源加配);再不够,按 contracts 边界拆独立进程,设备与小程序零改动
