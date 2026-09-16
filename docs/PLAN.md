@@ -29,7 +29,12 @@
 - 期间成果:thingspanel spike 实测(基座评估,报告留档);基座决策:不采用,转参照
 
 ### M2 — 并仓 + 管理后台 API(当前)
-- [ ] 并仓:iolink-access → internal/access;iolink-appapi → internal/appapi;contracts → internal/domain(三仓存档 tag v0.2.0)
+- [ ] **并仓(两模块仓处置,不可遗漏)**:
+  - [ ] 代码搬运:iolink-access → internal/access;iolink-appapi → internal/appapi;contracts → internal/domain
+  - [ ] 回归:`go build/test ./...` 全绿;iolinkd 装配改回本地包 import;删 go.mod 对两仓的 require/replace
+  - [ ] 文档处置:两仓 docs/PLAN.md 有价值内容(模块 backlog)并入主仓 PLAN-DETAILS 对应节
+  - [ ] GitLab 仓处置:iolink-access / iolink-appapi 置为 archived(只读留档,tag v0.2.0 可追溯);CONTRIBUTING.md 同步改版(删跨仓流程)
+  - [ ] 两仓负责人切换工作方式:clone 主仓,按 package 分工,MR 流程不变
 - [ ] internal/adminapi:/admin/v1 —— 管理员登录、池塘 CRUD+绑设备、设备注册(生成 device_no+secret)、报警规则 CRUD、报警管理(列表/确认/批量)
 - [ ] 设备影子表 device_shadows(上报 UPSERT,/water/latest 改读影子)
 - [ ] 配套:docker-compose 加 admin 路由说明;openapi 拆为 app 与 admin 两份
