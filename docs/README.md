@@ -6,7 +6,8 @@
 
 | 文档 | 内容 | 读者 |
 |---|---|---|
-| [PLAN.md](PLAN.md) | **计划主文档**:已定决策、里程碑 M0-M5、分工、升级触发器 | 全员,先读这个 |
+| [IMPLEMENTED.md](IMPLEMENTED.md) | **已实现功能总表**(按模块分组,标注验证方式与待完成项) | 想知道"现在有什么" |
+| [PLAN.md](PLAN.md) | **计划主文档**:已定决策、里程碑 M0-M8、分工、升级触发器 | 全员,先读这个 |
 | [PLAN-DETAILS.md](PLAN-DETAILS.md) | **计划细节**:三段式架构与商业云职责映射、需求追溯矩阵、API/数据库/MQTT/前端/报警/安全全部设计、各里程碑验收清单 | 全员评审;负责人重点读自己模块的节 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 协作规范(⚠️ 其中跨仓版本流程将随 M2 并仓改版,以 PLAN.md §3 为准) | 模块负责人 |
 | [FRONTEND-HANDOVER.md](FRONTEND-HANDOVER.md) | **管理前端交接文档**(页面清单/约定/环境/验收) | 前端工程师,先读这个 |
