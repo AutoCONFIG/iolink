@@ -11,15 +11,15 @@ import "time"
 type Kind string
 
 const (
-	KindProperties   Kind = "properties"   // periodic telemetry report
+	KindProperties   Kind = "properties"    // periodic telemetry report
 	KindStatusChange Kind = "status_change" // device online/offline
 )
 
 // Event is the single envelope access publishes for every upstream message.
 type Event struct {
-	Kind      Kind
-	DeviceNo  string
-	Ts        time.Time
+	Kind     Kind
+	DeviceNo string
+	Ts       time.Time
 	// Properties payload (Kind == KindProperties): metric name -> value.
 	Properties map[string]float64
 	// Status payload (Kind == KindStatusChange).

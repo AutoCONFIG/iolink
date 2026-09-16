@@ -45,6 +45,22 @@ paths:
           application/json:
             schema: { $ref: "#/components/schemas/FarmReq" }
       responses: { "200": { description: ok } }
+  /password:
+    post:
+      tags: [auth]
+      summary: 修改自己的密码(旧密码校验)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [old_password, new_password]
+              properties:
+                old_password: { type: string }
+                new_password: { type: string, minLength: 8 }
+      responses:
+        "204": { description: 已修改 }
+        "401": { description: 旧密码错误 }
   /farms/{id}:
     put:
       tags: [farms]
@@ -57,9 +73,11 @@ paths:
       responses: { "204": { description: 已更新 } }
     delete:
       tags: [farms]
-      summary: 删除养殖场
+      summary: 删除养殖场(有池塘时 409)
       parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
-      responses: { "204": { description: 已删除 } }
+      responses:
+        "204": { description: 已删除 }
+        "409": { description: farm has ponds }
   /ponds:
     get: { tags: [ponds], summary: 池塘列表, responses: { "200": { description: ok } } }
     post:

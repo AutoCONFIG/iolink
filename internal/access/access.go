@@ -80,6 +80,18 @@ func (s *Server) Serve() error {
 // Close shuts the broker down (graceful shutdown from main).
 func (s *Server) Close() error { return s.broker.Close() }
 
+// fieldRanges enforces the mqtt-spec physical ranges; out-of-range fields
+// are dropped (never reject the whole message).
+var fieldRanges = map[string][2]float64{
+	"temperature":      {0, 50},
+	"dissolved_oxygen": {0, 20},
+	"ph":               {0, 14},
+	"turbidity":        {0, 1000},
+	"salinity":         {0, 50},
+	"battery":          {0, 100},
+	"signal":           {-120, 0},
+}
+
 // HandleReport processes one properties payload (called by the broker hook;
 // also directly usable by tests/simulators).
 func (s *Server) HandleReport(deviceNo string, r wire.Report) error {
@@ -109,6 +121,12 @@ func (s *Server) HandleReport(deviceNo string, r wire.Report) error {
 	}
 	if r.Signal != nil {
 		e.Properties["signal"] = float64(*r.Signal)
+	}
+	for k, v := range e.Properties {
+		if rg, ok := fieldRanges[k]; ok && (v < rg[0] || v > rg[1]) {
+			delete(e.Properties, k)
+			s.log.Warn("field out of range, dropped", "device", deviceNo, "field", k, "value", v)
+		}
 	}
 	s.touch(deviceNo)
 	return s.handler.HandleEvent(e)

@@ -17,6 +17,12 @@ var ErrUnknownMetric = errors.New("unknown metric")
 // ErrPondHasDevices is returned when deleting a pond that still has devices bound.
 var ErrPondHasDevices = errors.New("pond has bound devices")
 
+// ErrFarmHasPonds is returned when deleting a farm that still has ponds.
+var ErrFarmHasPonds = errors.New("farm has ponds")
+
+// ErrOldPasswordMismatch is returned when changing a password with a wrong old one.
+var ErrOldPasswordMismatch = errors.New("old password mismatch")
+
 // MetricColumns is the fixed thing-model: metric key -> sensor_data column.
 // Single source of truth for the whitelist enforced everywhere.
 var MetricColumns = map[string]string{

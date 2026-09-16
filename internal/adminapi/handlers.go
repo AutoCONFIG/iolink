@@ -66,6 +66,10 @@ func (s *Server) deleteFarm(c *gin.Context) {
 		return
 	}
 	if err := s.deps.Store.DeleteFarm(c.Request.Context(), id); err != nil {
+		if errors.Is(err, domain.ErrFarmHasPonds) {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -384,4 +388,28 @@ func (s *Server) stats(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, st)
+}
+
+// ---- password ----
+
+type changePasswordReq struct {
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required,min=8"`
+}
+
+func (s *Server) changePassword(c *gin.Context) {
+	var req changePasswordReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := s.deps.Store.ChangeAdminPassword(c.Request.Context(), aid(c), req.OldPassword, req.NewPassword); err != nil {
+		if errors.Is(err, domain.ErrOldPasswordMismatch) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
 }

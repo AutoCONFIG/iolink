@@ -22,6 +22,7 @@
 | 设备管理 | /devices | `/devices` | **注册成功弹窗展示 secret,明确提示"仅显示一次"**(关掉就再也拿不到) |
 | 报警规则 | /alarms/rules | `/alarm-rules` CRUD | metric 下拉固定五项;min/max 至少填一个;level: critical(红)/warning(黄) |
 | 报警中心 | /alarms | `/alarms` + confirm/batch-confirm | 列表按级别标色;单条确认 + 批量确认 |
+| 系统设置 | /system | `POST /admin/v1/password` | 管理员改密(旧密码校验;新密码≥8位) |
 
 池塘状态色规则(与小程序一致):有 critical 未确认报警=🔴;只有 warning=🟡;否则 🟢。
 (当前 `/stats` 只有计数,状态墙数据可先用 `GET /ponds` + 前端组合,M2 收尾会加聚合字段——见 §6 待办)
@@ -49,7 +50,7 @@ POST /admin/v1/alarms/batch-confirm      {ids:[...]} → {confirmed: n}
 - **时间格式**:RFC3339,如 `"2026-09-16T11:08:14.943963+08:00"`
 - **字段命名**:snake_case(`device_no`、`min_value`、`area_mu`)
 - **鉴权失败**一律 401 → 前端统一拦截跳登录
-- **删除冲突**:池塘删除 409(有设备);前端捕获并提示
+- **删除冲突**:池塘删除 409(有设备)、养殖场删除 409(有池塘);前端捕获并提示
 - 枚举值:status=`online|offline`;level=`critical|warning`;metric 五项白名单
   `temperature | dissolved_oxygen | ph | turbidity | salinity`(单位见 §6)
 
@@ -86,7 +87,8 @@ server: { proxy: { '/admin': 'http://localhost:8080', '/api': 'http://localhost:
 ## 7. 验收标准(= M3 完成)
 
 浏览器从零走通:**登录 → 建养殖场/池塘 → 注册设备(拿到 secret)→ 配一条阈值规则 →
-看到模拟器数据出现在设备列表 → 人为触发报警(sensor_data 低于阈值)→ 报警中心出现并确认**。
+看到模拟器数据出现在设备列表 → 人为触发报警(sensor_data 低于阈值)→ 报警中心出现并确认 →
+系统设置里改一次密码**。
 
 ## 8. 协作方式
 

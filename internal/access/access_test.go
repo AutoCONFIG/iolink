@@ -114,3 +114,27 @@ func TestAuthHook(t *testing.T) {
 		t.Fatal("rejected device must not authenticate")
 	}
 }
+
+func TestRangeValidation(t *testing.T) {
+	fh := &fakeHandler{}
+	s := New(Config{ReportInterval: 60}, fh, nil, testLogger())
+	_ = s.HandleReport("dev-001", wire.Report{
+		Temperature: f64(99),  // 超范围 → 丢弃
+		DO:          f64(6.8), // 合法 → 保留
+		PH:          f64(-1),  // 超范围 → 丢弃
+		Battery:     f64(95),  // 合法 → 保留
+	})
+	if len(fh.events) != 1 {
+		t.Fatalf("want 1 event, got %d", len(fh.events))
+	}
+	props := fh.events[0].Properties
+	if _, ok := props["temperature"]; ok {
+		t.Fatal("out-of-range temperature must be dropped")
+	}
+	if _, ok := props["ph"]; ok {
+		t.Fatal("out-of-range ph must be dropped")
+	}
+	if props["dissolved_oxygen"] != 6.8 || props["battery"] != 95 {
+		t.Fatalf("in-range fields must survive: %+v", props)
+	}
+}

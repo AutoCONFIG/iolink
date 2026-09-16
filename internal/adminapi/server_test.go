@@ -84,6 +84,24 @@ func (f *fakeStore) DeleteRule(_ context.Context, id int64) error {
 	return nil
 }
 
+func (f *fakeStore) FindAdminByID(_ context.Context, id int64) (*domain.User, error) {
+	if f.admin != nil && f.admin.ID == id {
+		return f.admin, nil
+	}
+	return nil, domain.ErrUnknownMetric
+}
+func (f *fakeStore) ChangeAdminPassword(_ context.Context, id int64, oldPW, newPW string) error {
+	if f.admin == nil || f.admin.ID != id {
+		return domain.ErrUnknownMetric
+	}
+	if f.admin.PasswordHash == nil || !platform.CheckPassword(*f.admin.PasswordHash, oldPW) {
+		return domain.ErrOldPasswordMismatch
+	}
+	h := platform.HashPassword(newPW)
+	f.admin.PasswordHash = &h
+	return nil
+}
+
 func (f *fakeStore) ListAllAlarms(_ context.Context, _ int) ([]domain.Alarm, error) {
 	return nil, nil
 }
@@ -238,5 +256,39 @@ func TestRuleValidation(t *testing.T) {
 	defer resp3.Body.Close()
 	if resp3.StatusCode != 200 {
 		t.Fatalf("valid rule should 200, got %d", resp3.StatusCode)
+	}
+}
+
+func TestChangeAdminPassword(t *testing.T) {
+	ts := newTestServer(t)
+	defer ts.Close()
+	token := adminLogin(t, ts)
+
+	// 错误旧密码 → 401
+	req, _ := http.NewRequest("POST", ts.URL+"/admin/v1/password",
+		strings.NewReader(`{"old_password":"wrong","new_password":"newpass123"}`))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("wrong old password should 401, got %d", resp.StatusCode)
+	}
+
+	// 正确旧密码 → 204
+	req2, _ := http.NewRequest("POST", ts.URL+"/admin/v1/password",
+		strings.NewReader(`{"old_password":"admin123","new_password":"newpass123"}`))
+	req2.Header.Set("Authorization", "Bearer "+token)
+	req2.Header.Set("Content-Type", "application/json")
+	resp2, err := http.DefaultClient.Do(req2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp2.Body.Close()
+	if resp2.StatusCode != http.StatusNoContent {
+		t.Fatalf("valid change should 204, got %d", resp2.StatusCode)
 	}
 }

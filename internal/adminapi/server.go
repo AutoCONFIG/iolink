@@ -46,6 +46,9 @@ type AdminStore interface {
 	UpdateRule(ctx context.Context, rule domain.AlarmRule) error
 	DeleteRule(ctx context.Context, id int64) error
 
+	FindAdminByID(ctx context.Context, id int64) (*domain.User, error)
+	ChangeAdminPassword(ctx context.Context, id int64, oldPassword, newPassword string) error
+
 	ListAllAlarms(ctx context.Context, limit int) ([]domain.Alarm, error)
 	ConfirmAlarm(ctx context.Context, id int64) error
 	BatchConfirm(ctx context.Context, ids []int64) (int64, error)
@@ -98,6 +101,8 @@ func (s *Server) Routes() http.Handler {
 		auth.POST("/alarm-rules", s.createRule)
 		auth.PUT("/alarm-rules/:id", s.updateRule)
 		auth.DELETE("/alarm-rules/:id", s.deleteRule)
+
+		auth.POST("/password", s.changePassword)
 
 		auth.GET("/alarms", s.listAlarms)
 		auth.POST("/alarms/:id/confirm", s.confirmAlarm)

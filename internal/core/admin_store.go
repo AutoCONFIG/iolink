@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/platform"
 )
 
 // AdminStore implementation: satisfies adminapi.AdminStore structurally —
@@ -63,7 +64,40 @@ func (s *Service) UpdateFarm(ctx context.Context, id int64, name, location strin
 	return err
 }
 
+func (s *Service) FindAdminByID(ctx context.Context, id int64) (*domain.User, error) {
+	u := &domain.User{}
+	err := s.pool.QueryRow(ctx,
+		`SELECT id, coalesce(username,''), coalesce(open_id,''), coalesce(password_hash,''), coalesce(authority,'USER')
+		 FROM users WHERE id=$1 AND authority='ADMIN'`, id).
+		Scan(&u.ID, &u.Username, &u.OpenID, &u.PasswordHash, &u.Authority)
+	if err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+// ChangeAdminPassword verifies the old password, then stores the new hash.
+func (s *Service) ChangeAdminPassword(ctx context.Context, id int64, oldPassword, newPassword string) error {
+	u, err := s.FindAdminByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if u.PasswordHash == nil || !platform.CheckPassword(*u.PasswordHash, oldPassword) {
+		return domain.ErrOldPasswordMismatch
+	}
+	_, err = s.pool.Exec(ctx, `UPDATE users SET password_hash=$2 WHERE id=$1`,
+		id, platform.HashPassword(newPassword))
+	return err
+}
+
 func (s *Service) DeleteFarm(ctx context.Context, id int64) error {
+	var n int
+	if err := s.pool.QueryRow(ctx, `SELECT count(*) FROM ponds WHERE farm_id=$1`, id).Scan(&n); err != nil {
+		return err
+	}
+	if n > 0 {
+		return domain.ErrFarmHasPonds
+	}
 	_, err := s.pool.Exec(ctx, `DELETE FROM farms WHERE id=$1`, id)
 	return err
 }
