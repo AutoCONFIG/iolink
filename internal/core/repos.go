@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -81,18 +82,40 @@ func (r *deviceRepo) UpdateStatus(ctx context.Context, no string, s domain.Devic
 
 type telemetryRepo struct{ pool *pgxpool.Pool }
 
+// Latest reads the device shadow (kept fresh by every report) instead of
+// scanning the wide time-series table.
 func (r *telemetryRepo) Latest(ctx context.Context, no string) (domain.Reading, error) {
-	var rd domain.Reading
-	rd.DeviceNo = no
-	err := r.pool.QueryRow(ctx, `
-		SELECT ts, temperature, dissolved_oxygen, ph, turbidity, salinity
-		FROM sensor_data WHERE device_no=$1 ORDER BY ts DESC LIMIT 1`, no).
-		Scan(&rd.Timestamp, &rd.Temperature, &rd.DO, &rd.PH, &rd.Turbidity, &rd.Salinity)
-	return rd, err
+	var raw []byte
+	var ts time.Time
+	err := r.pool.QueryRow(ctx,
+		`SELECT last, ts FROM device_shadows WHERE device_no=$1`, no).
+		Scan(&raw, &ts)
+	if err != nil {
+		return domain.Reading{}, err
+	}
+	var m map[string]float64
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return domain.Reading{}, err
+	}
+	ptr := func(k string) *float64 {
+		if v, ok := m[k]; ok {
+			return &v
+		}
+		return nil
+	}
+	return domain.Reading{
+		DeviceNo:    no,
+		Timestamp:   ts,
+		Temperature: ptr("temperature"),
+		DO:          ptr("dissolved_oxygen"),
+		PH:          ptr("ph"),
+		Turbidity:   ptr("turbidity"),
+		Salinity:    ptr("salinity"),
+	}, nil
 }
 
 func (r *telemetryRepo) History(ctx context.Context, no, metric string, from, to time.Time, maxPoints int) ([]domain.MetricPoint, error) {
-	col, ok := metricColumns[metric]
+	col, ok := domain.MetricColumns[metric]
 	if !ok {
 		return nil, domain.ErrUnknownMetric
 	}
@@ -122,14 +145,6 @@ func (r *telemetryRepo) History(ctx context.Context, no, metric string, from, to
 		out = append(out, p)
 	}
 	return out, rows.Err()
-}
-
-var metricColumns = map[string]string{
-	"temperature":     "temperature",
-	"dissolved_oxygen": "dissolved_oxygen",
-	"ph":              "ph",
-	"turbidity":       "turbidity",
-	"salinity":        "salinity",
 }
 
 type alarmRepo struct{ pool *pgxpool.Pool }

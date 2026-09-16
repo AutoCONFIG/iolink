@@ -7,11 +7,22 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 -- ---------- 业务表 ----------
 
 CREATE TABLE users (
-    id          BIGSERIAL PRIMARY KEY,
-    open_id     VARCHAR(64)  NOT NULL UNIQUE,          -- 微信 openid
-    nickname    VARCHAR(64),
-    phone       VARCHAR(20),
-    created_at  TIMESTAMPTZ  NOT NULL DEFAULT now()
+    id            BIGSERIAL PRIMARY KEY,
+    open_id       VARCHAR(64)  NOT NULL UNIQUE,        -- 微信 openid
+    username      VARCHAR(64)  UNIQUE,                 -- 管理后台登录名
+    password_hash VARCHAR(64),                         -- 管理员口令 sha256(iolink-admin:pw)
+    authority     VARCHAR(16)  NOT NULL DEFAULT 'USER',-- USER | ADMIN
+    nickname      VARCHAR(64),
+    phone         VARCHAR(20),
+    created_at    TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+-- 设备影子: 每设备最新物模型值(含 battery/signal), /water/latest 读这里
+CREATE TABLE device_shadows (
+    device_no VARCHAR(64) PRIMARY KEY,
+    last      JSONB        NOT NULL,
+    signal    INT,
+    ts        TIMESTAMPTZ  NOT NULL DEFAULT now()
 );
 
 CREATE TABLE farms (
@@ -85,3 +96,9 @@ CREATE TABLE sensor_data (
 SELECT create_hypertable('sensor_data', 'ts');
 SELECT add_retention_policy('sensor_data', INTERVAL '13 months');  -- 归档策略由 core 决定
 CREATE INDEX idx_sensor_data_device_ts ON sensor_data(device_no, ts DESC);
+
+-- 种子管理员(原型期): 用户名 admin / 口令 admin123 —— 首次部署后必须修改
+INSERT INTO users (open_id, username, password_hash, authority, nickname)
+VALUES ('internal-admin', 'admin', '1cd663ce3300b9f52a357c4ae4e114064b0fa066071728aca1d7a98f5916f2e0',
+        'ADMIN', '管理员')
+ON CONFLICT (open_id) DO NOTHING;

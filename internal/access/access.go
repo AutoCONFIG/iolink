@@ -107,6 +107,9 @@ func (s *Server) HandleReport(deviceNo string, r wire.Report) error {
 	if r.Battery != nil {
 		e.Properties["battery"] = *r.Battery
 	}
+	if r.Signal != nil {
+		e.Properties["signal"] = float64(*r.Signal)
+	}
 	s.touch(deviceNo)
 	return s.handler.HandleEvent(e)
 }

@@ -1,0 +1,227 @@
+openapi: 3.0.3
+info:
+  title: IoLink Admin API
+  version: v1
+  description: >
+    管理后台(/admin/v1)契约 —— web/admin 前端的唯一依赖。
+    独立 JWT(aid claim,密钥由主密钥派生),与小程序 token 不互通。
+servers:
+  - url: http://localhost:8080/admin/v1
+tags: [auth, farms, ponds, devices, rules, alarms, stats]
+security:
+  - BearerAuth: []
+paths:
+  /login:
+    post:
+      tags: [auth]
+      security: []
+      summary: 管理员登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  expires_in: { type: integer }
+  /farms:
+    get: { tags: [farms], summary: 养殖场列表, responses: { "200": { description: ok } } }
+    post:
+      tags: [farms]
+      summary: 新建养殖场
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FarmReq" }
+      responses: { "200": { description: ok } }
+  /farms/{id}:
+    put:
+      tags: [farms]
+      summary: 修改养殖场
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FarmReq" }
+      responses: { "204": { description: 已更新 } }
+    delete:
+      tags: [farms]
+      summary: 删除养殖场
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { "204": { description: 已删除 } }
+  /ponds:
+    get: { tags: [ponds], summary: 池塘列表, responses: { "200": { description: ok } } }
+    post:
+      tags: [ponds]
+      summary: 新建池塘
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PondReq" }
+      responses: { "200": { description: ok } }
+  /ponds/{id}:
+    put:
+      tags: [ponds]
+      summary: 修改池塘
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PondReq" }
+      responses: { "204": { description: 已更新 } }
+    delete:
+      tags: [ponds]
+      summary: 删除池塘(有绑定设备时 409)
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses:
+        "204": { description: 已删除 }
+        "409": { description: pond has bound devices }
+  /devices:
+    get:
+      tags: [devices]
+      summary: 设备列表(含在线状态)
+      responses: { "200": { description: ok } }
+    post:
+      tags: [devices]
+      summary: 注册设备 —— 服务端生成 device_no 与 secret(secret 仅本次返回)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pond_id]
+              properties:
+                pond_id: { type: integer }
+                model: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  device_no: { type: string }
+                  secret: { type: string, description: 明文只出现这一次,库存 sha256 }
+  /devices/{device_no}:
+    delete:
+      tags: [devices]
+      summary: 删除设备
+      parameters: [{ name: device_no, in: path, required: true, schema: { type: string } }]
+      responses: { "204": { description: 已删除 } }
+  /alarm-rules:
+    get: { tags: [rules], summary: 规则列表, responses: { "200": { description: ok } } }
+    post:
+      tags: [rules]
+      summary: 新建阈值规则(metric 白名单校验;min/max 至少一项)
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RuleReq" }
+      responses:
+        "200": { description: ok }
+        "400": { description: unknown metric / no threshold }
+  /alarm-rules/{id}:
+    put:
+      tags: [rules]
+      summary: 修改规则
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RuleReq" }
+      responses: { "204": { description: 已更新 } }
+    delete:
+      tags: [rules]
+      summary: 删除规则
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { "204": { description: 已删除 } }
+  /alarms:
+    get:
+      tags: [alarms]
+      summary: 全部报警(管理视角)
+      parameters: [{ name: limit, in: query, schema: { type: integer, default: 50 } }]
+      responses: { "200": { description: ok } }
+  /alarms/{id}/confirm:
+    post:
+      tags: [alarms]
+      summary: 确认报警
+      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      responses: { "204": { description: 已确认 } }
+  /alarms/batch-confirm:
+    post:
+      tags: [alarms]
+      summary: 批量确认
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids]
+              properties:
+                ids: { type: array, items: { type: integer } }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  confirmed: { type: integer }
+  /stats:
+    get:
+      tags: [stats]
+      summary: 总览统计
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Stats" }
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    FarmReq:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        location: { type: string }
+    PondReq:
+      type: object
+      required: [farm_id, name]
+      properties:
+        farm_id: { type: integer }
+        name: { type: string }
+        area_mu: { type: number }
+    RuleReq:
+      type: object
+      required: [pond_id, metric, level]
+      properties:
+        pond_id: { type: integer }
+        metric:
+          type: string
+          enum: [temperature, dissolved_oxygen, ph, turbidity, salinity]
+        min_value: { type: number, nullable: true }
+        max_value: { type: number, nullable: true }
+        level: { type: string, enum: [critical, warning] }
+    Stats:
+      type: object
+      properties:
+        devices_total: { type: integer }
+        online: { type: integer }
+        offline: { type: integer }
+        open_alarms: { type: integer }

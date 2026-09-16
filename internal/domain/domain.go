@@ -14,14 +14,44 @@ import (
 // ErrUnknownMetric is returned when a metric key is not a recognized column.
 var ErrUnknownMetric = errors.New("unknown metric")
 
+// ErrPondHasDevices is returned when deleting a pond that still has devices bound.
+var ErrPondHasDevices = errors.New("pond has bound devices")
+
+// MetricColumns is the fixed thing-model: metric key -> sensor_data column.
+// Single source of truth for the whitelist enforced everywhere.
+var MetricColumns = map[string]string{
+	"temperature":      "temperature",
+	"dissolved_oxygen": "dissolved_oxygen",
+	"ph":               "ph",
+	"turbidity":        "turbidity",
+	"salinity":         "salinity",
+}
+
+// ValidMetric reports whether m is a known metric key.
+func ValidMetric(m string) bool {
+	_, ok := MetricColumns[m]
+	return ok
+}
+
+// Stats is the overview counters for the admin dashboard.
+type Stats struct {
+	DevicesTotal int64 `json:"devices_total"`
+	Online       int64 `json:"online"`
+	Offline      int64 `json:"offline"`
+	OpenAlarms   int64 `json:"open_alarms"`
+}
+
 // ---- Domain entities (User -> Farm -> Pond -> Device -> Sensor) ----
 
 type User struct {
-	ID          int64
-	OpenID      string // WeChat openid, unique
-	Nickname    string
-	Phone       string
-	CreatedAt   time.Time
+	ID           int64
+	OpenID       string  // WeChat openid, unique (app login)
+	Username     *string // admin login name (unique, nullable)
+	PasswordHash *string // admin password (sha256 hex); nil for WeChat users
+	Authority    string  // USER | ADMIN
+	Nickname     string
+	Phone        string
+	CreatedAt    time.Time
 }
 
 type Farm struct {
@@ -33,21 +63,21 @@ type Farm struct {
 }
 
 type Pond struct {
-	ID      int64
-	FarmID  int64
-	Name    string
-	AreaMu  float64 // area in 亩
+	ID        int64
+	FarmID    int64
+	Name      string
+	AreaMu    float64 // area in 亩
 	CreatedAt time.Time
 }
 
 type Device struct {
-	ID          int64
-	PondID      int64
-	DeviceNo    string // hardware identity, unique, used as IoT device name
-	Model       string
-	Status      DeviceStatus
-	LastSeenAt  *time.Time
-	CreatedAt   time.Time
+	ID         int64
+	PondID     int64
+	DeviceNo   string // hardware identity, unique, used as IoT device name
+	Model      string
+	Status     DeviceStatus
+	LastSeenAt *time.Time
+	CreatedAt  time.Time
 }
 
 type DeviceStatus string
@@ -81,16 +111,16 @@ type Reading struct {
 // ---- Alarms ----
 
 type Alarm struct {
-	ID          int64
-	DeviceNo    string
-	PondID      int64
-	Metric      string  // "dissolved_oxygen", ...
+	ID           int64
+	DeviceNo     string
+	PondID       int64
+	Metric       string // "dissolved_oxygen", ...
 	CurrentValue float64
-	Threshold   float64
-	Level       AlarmLevel
-	Message     string
-	ConfirmedAt *time.Time
-	CreatedAt   time.Time
+	Threshold    float64
+	Level        AlarmLevel
+	Message      string
+	ConfirmedAt  *time.Time
+	CreatedAt    time.Time
 }
 
 type AlarmLevel string
@@ -137,11 +167,11 @@ type AlarmRuleRepo interface {
 }
 
 type AlarmRule struct {
-	ID        int64
-	PondID    int64
-	Metric    string
-	Min       *float64 // nil = no lower threshold
-	Max       *float64 // nil = no upper threshold
-	Level     AlarmLevel
-	Enabled   bool
+	ID      int64
+	PondID  int64
+	Metric  string
+	Min     *float64 // nil = no lower threshold
+	Max     *float64 // nil = no upper threshold
+	Level   AlarmLevel
+	Enabled bool
 }
