@@ -61,17 +61,26 @@
 - [ ] 部署定型:生产 compose / systemd 二选一,部署文档
 - 负责:主仓
 
-## 2. 分工(并仓后按 package)
+## 2. 分工(按交付物划分,三人协同参考)
 
-| Package/端 | 内容 | 负责人 |
-|---|---|---|
-| internal/access + cmd/mqtt-sim | 设备接入层与联调工具 | 负责人 A(原 access) |
-| internal/core | 管道/报警/存储 | 主仓 |
-| internal/appapi + 小程序 | /api/v1 与小程序 | 负责人 B(原 appapi)|
-| internal/adminapi + web/admin | 管理后台 | 主仓 + 前端 |
-| 硬件固件 | Modbus 采集→MQTT(按 mqtt-spec) | 硬件方 |
+> 原则:剩余工作按「交付物」切四条并行线,每条线有独立的验收物;线间只靠契约(openapi / admin-api 契约 / mqtt-spec)耦合,契约先行冻结即可全并行。
+> 与原 access/appapi 两仓分工无关——那两仓 M2 并回后,原负责人按下表重新认领。
 
-并行原则不变:契约先行,各 package 独立可测(fake/模拟器)。
+| 线 | 交付物 | 内容 | 技能 | 建议人选 | 工期估计 |
+|---|---|---|---|---|---|
+| **L1 后端线** | 可部署的 iolinkd | M2:并仓(机械)、/admin/v1 全套、设备影子表;M5:订阅消息 Notifier、备份/metrics、部署定型 | Go(主) | 主程(你) | 4~5 天 |
+| **L2 管理前端线** | web/admin | Vue3 模板脚手架 + 6 页面(登录/总览/池塘/设备/规则/报警),go:embed 联动 | Vue3/TS | 前端 | 1.5~2 周 |
+| **L3 小程序线** | uniapp 小程序 | 6 页面 + 微信登录联调 + uCharts 曲线 | uniapp/Vue | 前端(可兼)或第三人 | 1.5~2 周 |
+| **L4 硬件线** | 固件 | Modbus 采集 → 按 mqtt-spec 上报(先模拟器后真机) | 嵌入式 | 硬件方 | 与 L1 联调 |
+
+**协同节奏**(关键路径 = L2/L3 前端,所以契约最优先):
+1. L1 第 1 天先冻结 `/admin/v1` 契约(照 openapi.yaml 的风格补 admin 部分),L2/L3 立即用 mock 开工
+2. 三线每日集成:L1 合代码,L2/L3 对真实接口联调
+3. 人数弹性:只有 2 人 → L2+L3 合并给同一人(都是 Vue 系);>3 人 → L1 拆出"并仓机械活"给新人练手
+
+**按 package 的代码所有权**(并仓后 MR 评审归属):
+internal/access、cmd/mqtt-sim → L1 兼(原 A 可认领);internal/core、internal/adminapi → L1;
+internal/appapi → L3;web/admin → L2。
 
 ## 3. 协作与流程变化
 
