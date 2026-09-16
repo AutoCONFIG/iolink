@@ -1,10 +1,10 @@
-module iolink
+module git.hyhy.fun/rsplab/iolink
 
 go 1.26
 
 require (
+	git.hyhy.fun/rsplab/iolink/contracts v0.0.0
 	github.com/jackc/pgx/v5 v5.7.5
-	iolink/contracts v0.0.0
 )
 
 require (
@@ -16,4 +16,4 @@ require (
 	golang.org/x/text v0.24.0 // indirect
 )
 
-replace iolink/contracts => ./contracts
+replace git.hyhy.fun/rsplab/iolink/contracts => ./contracts

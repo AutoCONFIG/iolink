@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"iolink/internal/core"
-	"iolink/internal/platform"
+	"git.hyhy.fun/rsplab/iolink/internal/core"
+	"git.hyhy.fun/rsplab/iolink/internal/platform"
 )
 
 // Access and AppApi are defined in their own git repositories and wired here

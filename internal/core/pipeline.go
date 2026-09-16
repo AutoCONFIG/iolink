@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"iolink/contracts/event"
+	"git.hyhy.fun/rsplab/iolink/contracts/event"
 )
 
 // storeReading persists a normalized telemetry row into the sensor_data

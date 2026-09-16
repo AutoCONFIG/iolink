@@ -6,7 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"iolink/contracts/domain"
+	"git.hyhy.fun/rsplab/iolink/contracts/domain"
 )
 
 // ---- domain.Repository implementations over pgx ----
