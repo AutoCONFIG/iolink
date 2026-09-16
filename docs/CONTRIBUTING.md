@@ -38,10 +38,10 @@ go env -w GOPRIVATE=git.hyhy.fun/*
 | 谁 | 频率 | 动作 |
 |---|---|---|
 | 模块负责人 | 每次发版 | 自己仓:MR → merge → 打 tag;在主仓开一个"升级指针"的轻量 MR |
-| 主仓负责人 | 集成时 | `git submodule update --remote`,跑集成测试,合入指针升级 |
+| 主仓负责人 | 集成时 | `go get git.hyhy.fun/rsplab/iolink-xxx@vX.Y.Z`,跑集成测试,合入 |
 | 全员 | 契约变更时 | 走 §3 流程 |
 
 ## 5. CI 保障
 
 - 模块仓 CI:只测自己 + 契约(版本依赖),与主仓其他部分零耦合
-- 主仓 CI:`make verify` 检查 submodule 指针干净且指向已打 tag 的提交,防止集成漂移
+- 主仓 CI:`go build/test` 直接按 go.mod 版本解析,无本地路径;`make verify` 为发布门禁

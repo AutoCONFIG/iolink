@@ -1,6 +1,0 @@
-[submodule "access"]
-	path = access
-	url = https://git.hyhy.fun/rsplab/iolink-access.git
-[submodule "appapi"]
-	path = appapi
-	url = https://git.hyhy.fun/rsplab/iolink-appapi.git

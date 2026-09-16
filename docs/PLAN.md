@@ -8,7 +8,7 @@
 | 决策点 | 结论 |
 |---|---|
 | 架构形态 | Go 模块化单体:access(设备接入)+ core(业务)+ appapi(小程序API)单进程 |
-| 仓库拓扑 | 主仓 = contracts + core + 组装;access/appapi 独立仓 + git submodule 绑定 |
+| 仓库拓扑 | 主仓 = contracts + core + 组装;access/appapi 独立仓,主仓以 go.mod 版本依赖主动对接(无 submodule) |
 | 共享契约 | `git.hyhy.fun/rsplab/iolink/contracts` 嵌套模块,版本化 tag,只增不改 |
 | 数据库 | PostgreSQL + TimescaleDB(时序宽表 sensor_data),单实例 |
 | MQTT | 先内嵌(规划 mochi-mqtt),接口抽象可换外部 EMQX |

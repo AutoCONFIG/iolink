@@ -22,9 +22,9 @@
 
 | 仓库 | go module | 职责 | 负责人 |
 |---|---|---|---|
-| iolink(本仓) | `iolink` | 组装、部署、docs、core、contracts | - |
-| [iolink-access] | `iolink/access` | 设备接入 | 独立负责 |
-| [iolink-appapi] | `iolink/appapi` | 小程序 API | 独立负责 |
+| iolink(本仓) | `git.hyhy.fun/rsplab/iolink` | 组装、部署、docs、core、contracts | - |
+| [iolink-access] | `git.hyhy.fun/rsplab/iolink-access` | 设备接入 | 独立负责 |
+| [iolink-appapi] | `git.hyhy.fun/rsplab/iolink-appapi` | 小程序 API | 独立负责 |
 
 依赖方向(单向,禁止互相 import):
 
@@ -33,15 +33,16 @@ iolink-access  ──►  iolink/contracts  ◄──  iolink-core(主仓)
 iolink-appapi  ──►  iolink/contracts  +  Repository 接口
 ```
 
-- 各负责人 **只 clone 自己的仓 + contracts**(`go get iolink/contracts`),日常不碰主仓
-- 主仓通过 **git submodule** 固定 access/appapi 的集成版本,`make bootstrap` 一键拉起
+- 各负责人 **只 clone 自己的仓**,依赖 contracts 的版本 tag,日常不碰主仓
+- 主仓 **主动对接**:go.mod 按版本依赖 access/appapi,模块发新 tag 后主仓 `go get module@vX.Y.Z` 升级
+- 跨仓本地联调:`make work`(把兄弟目录 clone 加进 go.work)
 
 ## 快速开始
 
 ```bash
-make bootstrap        # init submodule + go mod resolve
+make bootstrap        # 按版本拉取全部 Go 依赖(私有仓需 netrc,见 CONTRIBUTING)
 make dev              # docker-compose 起 PostgreSQL/TimescaleDB + 运行 iolinkd
-make test             # 全部模块测试
+make test             # 主仓 + contracts 测试
 ```
 
 ## 契约文档(改动须评审)
@@ -55,6 +56,8 @@ make test             # 全部模块测试
 
 第一阶段本服务部署于单机 docker-compose;设备永远只连 MQTT,小程序永远只打 `/api/v1`。
 未来迁 ECS/微服务:把 access 或 appapi 拆成独立进程(contracts 已保证接口稳定),设备端与小程序零改动。
+
+开发工具:`cmd/mqtt-sim`(设备模拟,周期上报)、`cmd/mqtt-once`(单发消息,调试报警)。
 
 [iolink-access]: https://git.hyhy.fun/rsplab/iolink-access
 [iolink-appapi]: https://git.hyhy.fun/rsplab/iolink-appapi

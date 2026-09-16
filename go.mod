@@ -50,7 +50,3 @@ require (
 )
 
 replace git.hyhy.fun/rsplab/iolink/contracts => ./contracts
-
-replace git.hyhy.fun/rsplab/iolink-access => ./access
-
-replace git.hyhy.fun/rsplab/iolink-appapi => ./appapi
