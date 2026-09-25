@@ -1,4 +1,4 @@
 [submodule "web"]
 	path = web
-	url = https://git.hyhy.fun/rsplab/iolink-webui.git
+	url = https://github.com/AutoCONFIG/iolink-webui.git
 	branch = init-iolink-webui

@@ -4,7 +4,7 @@
 
 ## 管理前端
 
-固定Vue3 + TypeScript + Vite + Element Plus，自建脚手架。源码在独立仓库 https://git.hyhy.fun/rsplab/iolink-webui （github.com/AutoCONFIG/iolink-webui 为公开镜像），前端开发在 init-iolink-webui 分支进行，以 git 子模块形式挂载在 web/（子模块仓库根 = web/，`npm run build` 产物输出到其 dist/，即 web/dist）。主仓库构建时由 scripts/embed-frontend.sh 把 web/dist 镜像到 internal/web/dist 打入 iolinkd 单二进制（子模块没有 dist 时自动生成兜底占位页）；主仓库 clone 后需执行 `git submodule update --init` 或 `make bootstrap`。注意：GitHub Actions 拉取该子模块要求 GitLab 上的 iolink-webui 项目对匿名可读（Public）。下表页面ID是唯一范围，不再用“6+1/6+2”描述。
+固定Vue3 + TypeScript + Vite + Element Plus，自建脚手架。源码在独立仓库 https://github.com/AutoCONFIG/iolink-webui ，前端开发在 init-iolink-webui 分支进行，以 git 子模块形式挂载在 web/（子模块仓库根 = web/，`npm run build` 产物输出到其 dist/，即 web/dist）。主仓库构建时由 scripts/embed-frontend.sh 把 web/dist 镜像到 internal/web/dist 打入 iolinkd 单二进制（子模块没有 dist 时自动生成兜底占位页）；主仓库 clone 后需执行 `git submodule update --init` 或 `make bootstrap`。下表页面ID是唯一范围，不再用“6+1/6+2”描述。
 
 | 页面ID | 页面/建议路由 | 接口与验收要点 |
 |---|---|---|
