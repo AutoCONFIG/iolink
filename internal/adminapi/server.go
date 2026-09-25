@@ -26,19 +26,25 @@ type Config struct {
 // interface: tests provide fakes; core.Service implements it with SQL.
 type AdminStore interface {
 	FindAdminByLogin(ctx context.Context, login string) (*domain.User, error)
+	AdminTokenVersion(ctx context.Context, id int64) (int, error)
+	UpgradeAdminPassword(ctx context.Context, id int64, hash string) error
 
 	ListFarms(ctx context.Context) ([]domain.Farm, error)
-	CreateFarm(ctx context.Context, ownerID int64, name, location string) (domain.Farm, error)
+	CreateFarm(ctx context.Context, ownerID *int64, name, location string) (domain.Farm, error)
 	UpdateFarm(ctx context.Context, id int64, name, location string) error
 	DeleteFarm(ctx context.Context, id int64) error
+	SetFarmOwner(ctx context.Context, id int64, ownerID *int64) error
+	SearchUsers(ctx context.Context, query string, limit, offset int) ([]domain.User, error)
 
 	ListPonds(ctx context.Context) ([]domain.Pond, error)
 	CreatePond(ctx context.Context, farmID int64, name string, areaMu float64) (domain.Pond, error)
 	UpdatePond(ctx context.Context, id int64, name string, areaMu float64) error
 	DeletePond(ctx context.Context, id int64) error // ErrPondHasDevices if devices bound
 
-	RegisterDevice(ctx context.Context, pondID int64, model string) (dev domain.Device, secret string, err error)
-	ListDevices(ctx context.Context) ([]domain.Device, error)
+	RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (dev domain.Device, secret string, err error)
+	ListDevices(ctx context.Context, includeDisabled bool, pondID int64, limit, offset int) ([]domain.Device, error)
+	GetDevice(ctx context.Context, deviceNo string) (domain.Device, error)
+	MoveDevice(ctx context.Context, deviceNo string, pondID int64) error
 	DeleteDevice(ctx context.Context, deviceNo string) error
 
 	ListRules(ctx context.Context) ([]domain.AlarmRule, error)
@@ -85,8 +91,10 @@ func (s *Server) Routes() http.Handler {
 	{
 		auth.GET("/farms", s.listFarms)
 		auth.POST("/farms", s.createFarm)
+		auth.GET("/users", s.listUsers)
 		auth.PUT("/farms/:id", s.updateFarm)
 		auth.DELETE("/farms/:id", s.deleteFarm)
+		auth.PUT("/farms/:id/owner", s.setFarmOwner)
 
 		auth.GET("/ponds", s.listPonds)
 		auth.POST("/ponds", s.createPond)
@@ -95,7 +103,9 @@ func (s *Server) Routes() http.Handler {
 
 		auth.GET("/devices", s.listDevices)
 		auth.POST("/devices", s.registerDevice)
+		auth.GET("/devices/:device_no", s.getDevice)
 		auth.DELETE("/devices/:device_no", s.deleteDevice)
+		auth.PUT("/devices/:device_no/pond", s.moveDevice)
 
 		auth.GET("/alarm-rules", s.listRules)
 		auth.POST("/alarm-rules", s.createRule)
@@ -131,8 +141,16 @@ func (s *Server) login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
+	if platform.IsLegacyPassword(*u.PasswordHash) {
+		_ = s.deps.Store.UpgradeAdminPassword(c.Request.Context(), u.ID, platform.HashPassword(req.Password))
+	}
+	version, err := s.deps.Store.AdminTokenVersion(c.Request.Context(), u.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "login unavailable"})
+		return
+	}
 	key := platform.DeriveAdminKey(s.cfg.SecretKey)
-	claims := jwt.MapClaims{"aid": u.ID, "exp": time.Now().Add(s.cfg.JWT).Unix()}
+	claims := jwt.MapClaims{"aid": u.ID, "ver": version, "exp": time.Now().Add(s.cfg.JWT).Unix()}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(key)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -164,6 +182,16 @@ func (s *Server) authRequired(c *gin.Context) {
 		return
 	}
 	c.Set("aid", int64(aid))
+	version, ok := tok.Claims.(jwt.MapClaims)["ver"].(float64)
+	if !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
+		return
+	}
+	current, err := s.deps.Store.AdminTokenVersion(c.Request.Context(), int64(aid))
+	if err != nil || int64(version) != int64(current) {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token revoked"})
+		return
+	}
 	c.Next()
 }
 

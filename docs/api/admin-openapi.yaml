@@ -1,245 +1,1267 @@
 openapi: 3.0.3
 info:
-  title: IoLink Admin API
-  version: v1
-  description: >
-    管理后台(/admin/v1)契约 —— web/admin 前端的唯一依赖。
-    独立 JWT(aid claim,密钥由主密钥派生),与小程序 token 不互通。
+  title: IoLink Admin API — TARGET
+  version: 1.0.0-planned
+  description: TARGET / 待实现、待验收：本文件为 M0–M5 修订目标契约，并非现有实现已通过验收的声明。原有 31 个操作的路径保留；新增目标操作见各 summary。所有 JSON 字段 snake_case；集合始终返回数组，无结果为 []，不得返回 null。时间统一返回 UTC RFC3339
+    字符串。所有参数越界/非法值返回 400，不静默回退。所有受保护操作必须逐请求校验身份及资源归属。管理员使用aid claim和管理签名密钥，小程序使用uid claim和用户签名密钥；均由IOLINK_SECRET_KEY以不同标签派生（逻辑密钥，不是新增环境变量），不得互验。管理权限覆盖本实例全部业务资源，管理员不会自动成为
+    farm.owner_id。管理集合均支持 limit/offset，默认按 id 升序稳定排序；报警按 created_at DESC,id DESC。新增资源 POST 非幂等，网络结果未知时须查询核实，不能盲目重试；PUT 为完整字段替换且重复执行结果相同；确认操作及 DELETE 幂等，重复成功不产生新副作用。
 servers:
-  - url: http://localhost:8080/admin/v1
-tags: [auth, farms, ponds, devices, rules, alarms, stats]
+- url: http://localhost:8080/admin/v1
+tags:
+- name: auth
+- name: users
+- name: farms
+- name: ponds
+- name: devices
+- name: rules
+- name: alarms
+- name: stats
 security:
-  - BearerAuth: []
+- BearerAuth: []
 paths:
   /login:
     post:
-      tags: [auth]
-      security: []
+      tags:
+      - auth
       summary: 管理员登录
+      description: 凭据错误统一 401。POST 非幂等，每次成功可签发新 JWT。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - token
+                - expires_in
+                properties:
+                  token:
+                    type: string
+                  expires_in:
+                    type: integer
+                    minimum: 1
+                    description: 秒
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [username, password]
+              required:
+              - username
+              - password
               properties:
-                username: { type: string }
-                password: { type: string }
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token: { type: string }
-                  expires_in: { type: integer }
-  /farms:
-    get: { tags: [farms], summary: 养殖场列表, responses: { "200": { description: ok } } }
-    post:
-      tags: [farms]
-      summary: 新建养殖场
-      requestBody:
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/FarmReq" }
-      responses: { "200": { description: ok } }
+                username:
+                  type: string
+                  minLength: 1
+                password:
+                  type: string
+                  minLength: 1
+                  format: password
+              additionalProperties: false
+      security: []
   /password:
     post:
-      tags: [auth]
-      summary: 修改自己的密码(旧密码校验)
+      tags:
+      - auth
+      summary: 修改自己的密码
+      description: 校验旧密码，错误统一 401。成功后增加 token_version，全部既有管理员 token 即时失效，需要重新登录。非幂等：旧 token 或旧密码重试返回 401；不得在响应或日志暴露口令。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
-              required: [old_password, new_password]
+              required:
+              - old_password
+              - new_password
               properties:
-                old_password: { type: string }
-                new_password: { type: string, minLength: 8 }
+                old_password:
+                  type: string
+                  minLength: 1
+                  format: password
+                new_password:
+                  type: string
+                  minLength: 8
+                  format: password
+              additionalProperties: false
+  /users:
+    get:
+      tags:
+      - users
+      summary: '[新增目标] 搜索可分配养殖场的微信用户'
+      description: 仅管理端可调用，只输出 id/nickname；不允许按 openid 搜索或返回敏感字段。
       responses:
-        "204": { description: 已修改 }
-        "401": { description: 旧密码错误 }
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+        description: 按纯数字 id 精确匹配或 nickname 子串搜索；仅 USER 且已注册。
+      - &id001
+        name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 50
+      - &id002
+        name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
+  /farms:
+    get:
+      tags:
+      - farms
+      summary: 养殖场列表
+      description: 按目标契约实现并以集成测试验收。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Farm'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id001
+      - *id002
+    post:
+      tags:
+      - farms
+      summary: 新建养殖场
+      description: owner_id 缺省或 null 创建未分配养殖场；非空目标用户不存在或不是已注册 USER 返回 404。POST 非幂等。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Farm'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FarmCreateReq'
   /farms/{id}:
     put:
-      tags: [farms]
+      tags:
+      - farms
       summary: 修改养殖场
-      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
-      requestBody:
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/FarmReq" }
-      responses: { "204": { description: 已更新 } }
-    delete:
-      tags: [farms]
-      summary: 删除养殖场(有池塘时 409)
-      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      description: 幂等替换 name/location；省略 location 置空；不修改 owner_id。
       responses:
-        "204": { description: 已删除 }
-        "409": { description: farm has ponds }
-  /ponds:
-    get: { tags: [ponds], summary: 池塘列表, responses: { "200": { description: ok } } }
-    post:
-      tags: [ponds]
-      summary: 新建池塘
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - &id003
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
       requestBody:
+        required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/PondReq" }
-      responses: { "200": { description: ok } }
+            schema:
+              $ref: '#/components/schemas/FarmReq'
+    delete:
+      tags:
+      - farms
+      summary: 删除养殖场
+      description: 无记录或已删除返回 204；仍有池塘或历史引用返回 409，不级联删除历史。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id003
+  /farms/{id}/owner:
+    put:
+      tags:
+      - farms
+      summary: '[新增目标] 分配、转交或解除养殖场归属'
+      description: 幂等。非空必须为已注册 USER，否则 404。null 解除分配：小程序无人可见、订阅通知暂停。事务提交后旧 owner 立即失去该场池塘及历史访问权；新 owner 获得该场现有及历史数据。管理员始终可管理。通知发送前重新核验当前 owner。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id003
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - owner_id
+              properties:
+                owner_id:
+                  type: integer
+                  format: int64
+                  minimum: 1
+                  nullable: true
+              additionalProperties: false
+  /ponds:
+    get:
+      tags:
+      - ponds
+      summary: 池塘列表及最新状态
+      description: 按目标契约实现并以集成测试验收。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pond'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: farm_id
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      - *id001
+      - *id002
+    post:
+      tags:
+      - ponds
+      summary: 新建池塘
+      description: farm_id 不存在返回 404；成功初始 status=normal、device_count=0、latest=null。POST 非幂等。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pond'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PondReq'
   /ponds/{id}:
     put:
-      tags: [ponds]
+      tags:
+      - ponds
       summary: 修改池塘
-      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      description: 幂等；farm_id 必须保持不变。省略 area_mu 置 0。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id003
       requestBody:
+        required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/PondReq" }
-      responses: { "204": { description: 已更新 } }
+            schema:
+              $ref: '#/components/schemas/PondUpdateReq'
     delete:
-      tags: [ponds]
-      summary: 删除池塘(有绑定设备时 409)
-      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      tags:
+      - ponds
+      summary: 删除池塘
+      description: 无记录或已删除返回204；有任何设备记录（含停用）、规则、历史遥测或报警引用返回409。M0–M5不提供绕过该限制的归档/硬删入口，不级联删除历史。
       responses:
-        "204": { description: 已删除 }
-        "409": { description: pond has bound devices }
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id003
   /devices:
     get:
-      tags: [devices]
-      summary: 设备列表(含在线状态)
-      responses: { "200": { description: ok } }
-    post:
-      tags: [devices]
-      summary: 注册设备 —— 服务端生成 device_no 与 secret(secret 仅本次返回)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [pond_id]
-              properties:
-                pond_id: { type: integer }
-                model: { type: string }
+      tags:
+      - devices
+      summary: 设备列表
+      description: 默认返回未停用设备，include_disabled=true 包含停用设备；不返回明文 secret 或摘要。
       responses:
-        "200":
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: pond_id
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      - name: include_disabled
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - *id001
+      - *id002
+    post:
+      tags:
+      - devices
+      summary: 注册设备并返回一次性 secret
+      description: 强制绑定已存在 pond_id；无裸设备/裸解绑状态。device_no 服务端生成且永久唯一。secret 只在本次响应显示，服务端仅存摘要。POST 非幂等，响应丢失不得自动重试；管理员核实后停用旧记录并重新注册。
+      responses:
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
                 type: object
+                required:
+                - device_no
+                - secret
+                - pond_id
+                - name
+                - model
+                - status
+                - report_interval
                 properties:
-                  device_no: { type: string }
-                  secret: { type: string, description: 明文只出现这一次,库存 sha256 }
-  /devices/{device_no}:
-    delete:
-      tags: [devices]
-      summary: 删除设备
-      parameters: [{ name: device_no, in: path, required: true, schema: { type: string } }]
-      responses: { "204": { description: 已删除 } }
-  /alarm-rules:
-    get: { tags: [rules], summary: 规则列表, responses: { "200": { description: ok } } }
-    post:
-      tags: [rules]
-      summary: 新建阈值规则(metric 白名单校验;min/max 至少一项)
+                  device_no:
+                    type: string
+                  secret:
+                    type: string
+                    minLength: 64
+                    maxLength: 64
+                    pattern: ^[0-9a-f]{64}$
+                    description: 32字节随机值的64字符hex编码，仅本次返回。
+                  pond_id: &id004
+                    type: integer
+                    format: int64
+                    minimum: 1
+                  name:
+                    type: string
+                  model:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                    - offline
+                  report_interval:
+                    type: integer
+                    enum:
+                    - 60
+                    - 300
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
       requestBody:
+        required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/RuleReq" }
+            schema:
+              type: object
+              required:
+              - pond_id
+              properties:
+                pond_id: *id004
+                name:
+                  type: string
+                  default: ''
+                model:
+                  type: string
+                  default: ''
+                report_interval:
+                  type: integer
+                  enum:
+                  - 60
+                  - 300
+                  description: 缺省继承服务器当时IOLINK_REPORT_INTERVAL默认值（60秒），写入设备记录；固件需同周期。
+              additionalProperties: false
+  /devices/{device_no}:
+    get:
+      tags:
+      - devices
+      summary: '[新增目标] 设备详情及最新数据'
+      description: 管理端可读取停用设备详情及已保留影子；latest 只来自设备当前池塘的样本，没有样本为 null。
       responses:
-        "200": { description: ok }
-        "400": { description: unknown metric / no threshold }
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - &id005
+        name: device_no
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+    delete:
+      tags:
+      - devices
+      summary: 停用设备并保留历史
+      description: 幂等；软删除保留历史遥测、报警和池塘绑定；撤销 MQTT 连接及重连权限，立即使其退出在线计数，不再接受新消息。重复停用或不存在均 204。device_no 不得复用；管理历史报警仍可查看和确认。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id005
+  /devices/{device_no}/pond:
+    put:
+      tags:
+      - devices
+      summary: '[新增目标] 同实例设备调塘'
+      description: 幂等；目标池塘及设备必须存在且未停用。事务更新当前绑定；先断开设备并撤销旧会话，在同一事务更新绑定并清除影子；重连后按新塘写入。遥测和报警保留发生时 pond_id 快照，旧数据不随设备转移。调塘与接入写入必须序列化，latest=null 直到新塘有效上报。禁止 null 裸解绑。
+        旧塘未确认报警不自动确认；去重按device_no+发生时pond_id+metric，新塘同指标独立报警，双方只能处理各自池塘报警。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id005
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - pond_id
+              properties:
+                pond_id: *id004
+              additionalProperties: false
+  /alarm-rules:
+    get:
+      tags:
+      - rules
+      summary: 阈值规则列表
+      description: 按目标契约实现并以集成测试验收。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: pond_id
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
+      - *id001
+      - *id002
+    post:
+      tags:
+      - rules
+      summary: 新建阈值规则
+      description: POST 非幂等；校验池塘存在及上下界、metric、level，允许单边阈值。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RuleReq'
   /alarm-rules/{id}:
     put:
-      tags: [rules]
-      summary: 修改规则
-      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
+      tags:
+      - rules
+      summary: 修改阈值规则
+      description: 幂等替换完整规则；执行与创建相同的全部校验。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id003
       requestBody:
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/RuleReq" }
-      responses: { "204": { description: 已更新 } }
-    delete:
-      tags: [rules]
-      summary: 删除规则
-      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
-      responses: { "204": { description: 已删除 } }
-  /alarms:
-    get:
-      tags: [alarms]
-      summary: 全部报警(管理视角)
-      parameters: [{ name: limit, in: query, schema: { type: integer, default: 50 } }]
-      responses: { "200": { description: ok } }
-  /alarms/{id}/confirm:
-    post:
-      tags: [alarms]
-      summary: 确认报警
-      parameters: [{ name: id, in: path, required: true, schema: { type: integer } }]
-      responses: { "204": { description: 已确认 } }
-  /alarms/batch-confirm:
-    post:
-      tags: [alarms]
-      summary: 批量确认
-      requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type: object
-              required: [ids]
-              properties:
-                ids: { type: array, items: { type: integer } }
+              $ref: '#/components/schemas/RuleReq'
+    delete:
+      tags:
+      - rules
+      summary: 删除阈值规则
+      description: 幂等，已删除或不存在仍 204；已有报警保留触发时阈值及级别。
       responses:
-        "200":
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id003
+  /alarms:
+    get:
+      tags:
+      - alarms
+      summary: 报警列表（管理视角）
+      description: 按目标契约实现并以集成测试验收。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alarm'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: level
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - critical
+          - warning
+      - name: only_unconfirmed
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - *id001
+      - *id002
+  /alarms/{id}/confirm:
+    post:
+      tags:
+      - alarms
+      summary: 确认报警
+      description: 幂等：已确认仍 204，保留首次 confirmed_at。确认不删除报警或历史样本；不存在返回 404。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id003
+  /alarms/batch-confirm:
+    post:
+      tags:
+      - alarms
+      summary: 事务批量确认报警
+      description: 单事务全成或全败；任意 id 不存在/越权统一 404，其余项不变。confirmed 为本次由未确认转为已确认的数量；重复提交返回 0，首次 confirmed_at 不变。重复 ids 或空数组 400。
+      responses:
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
                 type: object
+                required:
+                - confirmed
                 properties:
-                  confirmed: { type: integer }
+                  confirmed:
+                    type: integer
+                    minimum: 0
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - ids
+              properties:
+                ids:
+                  type: array
+                  items: *id004
+                  minItems: 1
+                  maxItems: 200
+                  uniqueItems: true
+              additionalProperties: false
   /stats:
     get:
-      tags: [stats]
+      tags:
+      - stats
       summary: 总览统计
+      description: 按目标契约实现并以集成测试验收。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Stats" }
+              schema:
+                $ref: '#/components/schemas/Stats'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: 参数、JSON 或业务校验失败；error=invalid_request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: 凭据缺失/过期/错误、错误 token 类型或权限主体失效；error=unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 资源不存在或当前主体无权访问；统一 error=not_found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: 关联依赖阻止删除等状态冲突；error=conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: 内部故障；error=internal_error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UpstreamError:
+      description: 微信上游故障；error=upstream_error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
-    FarmReq:
+    Error:
       type: object
-      required: [name]
+      required:
+      - error
       properties:
-        name: { type: string }
-        location: { type: string }
-    PondReq:
+        error:
+          type: string
+          minLength: 1
+          description: 稳定错误码；不得返回数据库、口令、密钥或内部堆栈。
+      additionalProperties: false
+    User:
       type: object
-      required: [farm_id, name]
+      required:
+      - id
+      - nickname
       properties:
-        farm_id: { type: integer }
-        name: { type: string }
-        area_mu: { type: number }
-    RuleReq:
+        id: &id006
+          type: integer
+          format: int64
+          minimum: 1
+        nickname:
+          type: string
+      additionalProperties: false
+      description: 仅公开这两个字段；不返回 openid、用户名、手机号或密码摘要。
+    WaterLatest:
       type: object
-      required: [pond_id, metric, level]
+      required:
+      - device_no
+      - pond_id
+      - ts
+      - temperature
+      - dissolved_oxygen
+      - ph
+      - turbidity
+      - salinity
+      - signal
+      - timestamps
+      - report_interval
       properties:
-        pond_id: { type: integer }
+        device_no:
+          type: string
+        pond_id: *id006
+        ts: &id007
+          type: string
+          format: date-time
+        temperature:
+          type: number
+          nullable: true
+        dissolved_oxygen:
+          type: number
+          nullable: true
+        ph:
+          type: number
+          nullable: true
+        turbidity:
+          type: number
+          nullable: true
+        salinity:
+          type: number
+          nullable: true
+        signal:
+          type: integer
+          nullable: true
+        timestamps:
+          type: object
+          required:
+          - temperature
+          - dissolved_oxygen
+          - ph
+          - turbidity
+          - salinity
+          - signal
+          properties:
+            temperature:
+              type: string
+              format: date-time
+              nullable: true
+            dissolved_oxygen:
+              type: string
+              format: date-time
+              nullable: true
+            ph:
+              type: string
+              format: date-time
+              nullable: true
+            turbidity:
+              type: string
+              format: date-time
+              nullable: true
+            salinity:
+              type: string
+              format: date-time
+              nullable: true
+            signal:
+              type: string
+              format: date-time
+              nullable: true
+          additionalProperties: false
+        report_interval:
+          type: integer
+          enum:
+          - 60
+          - 300
+          default: 60
+          description: 秒，所选设备当前有效上报间隔
+      additionalProperties: false
+      nullable: true
+      description: 无可见有效属性时为 null；有影子时所有键存在，尚未采集指标及对应 timestamps 项为 null。按属性合并最新已知值，未上报或 JSON null 不清空旧值；ts 是最近一次有效属性更新时间，各属性时间见 timestamps。UI 按 now - timestamps[metric]
+        > 3×report_interval 标记字段过期。pond_id 为该影子当前所属塘；signal 单位 dBm。
+    Device:
+      type: object
+      required:
+      - id
+      - device_no
+      - pond_id
+      - name
+      - model
+      - status
+      - last_seen_at
+      - created_at
+      - disabled_at
+      - report_interval
+      properties:
+        id: *id006
+        device_no: &id008
+          type: string
+        pond_id: *id006
+        name: &id009
+          type: string
+        model: &id010
+          type: string
+        status: &id011
+          type: string
+          enum:
+          - online
+          - offline
+        last_seen_at: &id012
+          type: string
+          format: date-time
+          nullable: true
+        created_at: *id007
+        disabled_at: &id013
+          type: string
+          format: date-time
+          nullable: true
+        report_interval:
+          type: integer
+          enum:
+          - 60
+          - 300
+          description: 注册确定的预期上报周期，秒。
+      additionalProperties: false
+      description: 小程序只返回未停用设备，管理端可使用 include_disabled 查询停用设备。name/model 未设置时为空字符串；永不返回 secret 或摘要。
+    Alarm:
+      type: object
+      required:
+      - id
+      - device_no
+      - pond_id
+      - metric
+      - current_value
+      - threshold
+      - level
+      - message
+      - confirmed_at
+      - created_at
+      properties:
+        id: *id006
+        device_no:
+          type: string
+        pond_id: *id006
         metric:
           type: string
-          enum: [temperature, dissolved_oxygen, ph, turbidity, salinity]
-        min_value: { type: number, nullable: true }
-        max_value: { type: number, nullable: true }
-        level: { type: string, enum: [critical, warning] }
+          enum:
+          - temperature
+          - dissolved_oxygen
+          - ph
+          - turbidity
+          - salinity
+        current_value:
+          type: number
+        threshold:
+          type: number
+        level:
+          type: string
+          enum:
+          - critical
+          - warning
+        message:
+          type: string
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at: *id007
+      additionalProperties: false
+      description: pond_id 为触发时快照；level 来自命中的规则配置，不能按上/下阈值自动映射。
+    DeviceDetail:
+      type: object
+      required:
+      - id
+      - device_no
+      - pond_id
+      - name
+      - model
+      - status
+      - last_seen_at
+      - created_at
+      - disabled_at
+      - latest
+      - report_interval
+      properties:
+        id: *id006
+        device_no: *id008
+        pond_id: *id006
+        name: *id009
+        model: *id010
+        status: *id011
+        last_seen_at: *id012
+        created_at: *id007
+        disabled_at: *id013
+        latest:
+          $ref: '#/components/schemas/WaterLatest'
+        report_interval:
+          type: integer
+          enum:
+          - 60
+          - 300
+          description: 注册确定的预期上报周期，秒。
+      additionalProperties: false
+    Farm:
+      type: object
+      required:
+      - id
+      - owner_id
+      - name
+      - location
+      - created_at
+      properties:
+        id: *id004
+        owner_id:
+          type: integer
+          format: int64
+          minimum: 1
+          nullable: true
+        name:
+          type: string
+        location:
+          type: string
+        created_at: &id016
+          type: string
+          format: date-time
+      additionalProperties: false
+    FarmReq:
+      type: object
+      required:
+      - name
+      properties:
+        name: &id014
+          type: string
+          minLength: 1
+        location: &id015
+          type: string
+          default: ''
+      additionalProperties: false
+    FarmCreateReq:
+      type: object
+      required:
+      - name
+      properties:
+        name: *id014
+        location: *id015
+        owner_id:
+          type: integer
+          format: int64
+          minimum: 1
+          nullable: true
+          description: 可选，默认 null；非空必须指向已完成微信注册的 USER。
+      additionalProperties: false
+    Pond:
+      type: object
+      required:
+      - id
+      - farm_id
+      - name
+      - area_mu
+      - created_at
+      - status
+      - device_count
+      - latest
+      properties:
+        id: *id004
+        farm_id: *id004
+        name:
+          type: string
+        area_mu:
+          type: number
+          minimum: 0
+        created_at: *id016
+        status:
+          type: string
+          enum:
+          - normal
+          - warning
+          - critical
+          description: 所有未确认报警最高级别 critical > warning > normal；不得先截断报警列表。
+        device_count:
+          type: integer
+          minimum: 0
+        latest:
+          $ref: '#/components/schemas/WaterLatest'
+      additionalProperties: false
+    PondReq:
+      type: object
+      required:
+      - farm_id
+      - name
+      properties:
+        farm_id: *id004
+        name:
+          type: string
+          minLength: 1
+        area_mu:
+          type: number
+          minimum: 0
+          default: 0
+      additionalProperties: false
+    PondUpdateReq:
+      type: object
+      required:
+      - farm_id
+      - name
+      properties:
+        farm_id:
+          type: integer
+          format: int64
+          minimum: 1
+          description: 必须与原值一致；M0–M5 不支持池塘跨养殖场迁移，变化返回 400。
+        name:
+          type: string
+          minLength: 1
+        area_mu:
+          type: number
+          minimum: 0
+          default: 0
+      additionalProperties: false
+    RuleReq:
+      type: object
+      required:
+      - pond_id
+      - metric
+      - level
+      properties:
+        pond_id: *id004
+        metric: &id017
+          type: string
+          enum:
+          - temperature
+          - dissolved_oxygen
+          - ph
+          - turbidity
+          - salinity
+        min_value: &id018
+          type: number
+          nullable: true
+        max_value: &id019
+          type: number
+          nullable: true
+        level: &id020
+          type: string
+          enum:
+          - critical
+          - warning
+        enabled: &id021
+          type: boolean
+          default: true
+      additionalProperties: false
+      description: 上下阈值至少一个非 null；两者非 null 时必须 min_value < max_value（业务校验，否则 400）。严格小于下界或大于上界触发；等于边界不触发。level 使用本规则值。PUT 未传 enabled 按默认 true，未传阈值按 null。
+      anyOf:
+      - required:
+        - min_value
+        properties:
+          min_value:
+            type: number
+            nullable: false
+      - required:
+        - max_value
+        properties:
+          max_value:
+            type: number
+            nullable: false
+    Rule:
+      type: object
+      required:
+      - id
+      - pond_id
+      - metric
+      - min_value
+      - max_value
+      - level
+      - enabled
+      properties:
+        id: *id004
+        pond_id: *id004
+        metric: *id017
+        min_value: *id018
+        max_value: *id019
+        level: *id020
+        enabled: *id021
+      additionalProperties: false
     Stats:
       type: object
+      required:
+      - devices_total
+      - online
+      - offline
+      - open_alarms
       properties:
-        devices_total: { type: integer }
-        online: { type: integer }
-        offline: { type: integer }
-        open_alarms: { type: integer }
+        devices_total:
+          type: integer
+          minimum: 0
+        online:
+          type: integer
+          minimum: 0
+        offline:
+          type: integer
+          minimum: 0
+        open_alarms:
+          type: integer
+          minimum: 0
+      additionalProperties: false
+      description: 设备计数排除停用设备；devices_total=online+offline。open_alarms 统计全部未确认报警，包含停用设备的历史报警，不受列表分页影响。

@@ -29,11 +29,17 @@ func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.U
 	}
 	return nil, domain.ErrUnknownMetric // any error → 401
 }
+func (f *fakeStore) AdminTokenVersion(_ context.Context, _ int64) (int, error)       { return 0, nil }
+func (f *fakeStore) UpgradeAdminPassword(_ context.Context, _ int64, _ string) error { return nil }
 func (f *fakeStore) ListFarms(_ context.Context) ([]domain.Farm, error) {
 	return nil, nil
 }
-func (f *fakeStore) CreateFarm(_ context.Context, _ int64, name, _ string) (domain.Farm, error) {
+func (f *fakeStore) CreateFarm(_ context.Context, _ *int64, name, _ string) (domain.Farm, error) {
 	return domain.Farm{ID: 1, Name: name}, nil
+}
+func (f *fakeStore) SetFarmOwner(_ context.Context, _ int64, _ *int64) error { return nil }
+func (f *fakeStore) SearchUsers(_ context.Context, _ string, _, _ int) ([]domain.User, error) {
+	return nil, nil
 }
 func (f *fakeStore) UpdateFarm(_ context.Context, _ int64, _, _ string) error { return nil }
 func (f *fakeStore) DeleteFarm(_ context.Context, _ int64) error              { return nil }
@@ -44,19 +50,26 @@ func (f *fakeStore) CreatePond(_ context.Context, _ int64, name string, _ float6
 func (f *fakeStore) UpdatePond(_ context.Context, _ int64, _ string, _ float64) error { return nil }
 func (f *fakeStore) DeletePond(_ context.Context, _ int64) error                      { return nil }
 
-func (f *fakeStore) RegisterDevice(_ context.Context, pondID int64, model string) (domain.Device, string, error) {
+func (f *fakeStore) RegisterDevice(_ context.Context, pondID int64, _ string, model string, _ int) (domain.Device, string, error) {
 	no := "dev-abc12345"
-	secret := strings.Repeat("ab", 16) // 32 hex chars, like the real generator
+	secret := strings.Repeat("ab", 32) // 64 hex chars, like the real generator
 	f.devices[no] = domain.Device{ID: 1, PondID: pondID, DeviceNo: no, Model: model, Status: domain.DeviceOffline}
 	return f.devices[no], secret, nil
 }
-func (f *fakeStore) ListDevices(_ context.Context) ([]domain.Device, error) {
+func (f *fakeStore) ListDevices(_ context.Context, _ bool, _ int64, _, _ int) ([]domain.Device, error) {
 	out := make([]domain.Device, 0, len(f.devices))
 	for _, d := range f.devices {
 		out = append(out, d)
 	}
 	return out, nil
 }
+func (f *fakeStore) GetDevice(_ context.Context, no string) (domain.Device, error) {
+	if d, ok := f.devices[no]; ok {
+		return d, nil
+	}
+	return domain.Device{}, domain.ErrNotFound
+}
+func (f *fakeStore) MoveDevice(_ context.Context, _ string, _ int64) error { return nil }
 func (f *fakeStore) DeleteDevice(_ context.Context, no string) error {
 	delete(f.devices, no)
 	return nil
@@ -212,7 +225,7 @@ func TestRegisterDeviceSecretOnce(t *testing.T) {
 	if out.DeviceNo == "" || out.Secret == "" {
 		t.Fatalf("device_no/secret required: %+v", out)
 	}
-	if len(out.Secret) < 24 {
+	if len(out.Secret) != 64 {
 		t.Fatalf("secret too weak: %q", out.Secret)
 	}
 }
@@ -290,5 +303,28 @@ func TestChangeAdminPassword(t *testing.T) {
 	defer resp2.Body.Close()
 	if resp2.StatusCode != http.StatusNoContent {
 		t.Fatalf("valid change should 204, got %d", resp2.StatusCode)
+	}
+}
+
+func TestRejectInvertedRuleBounds(t *testing.T) {
+	ts := newTestServer(t)
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	for _, method := range []string{"POST", "PUT"} {
+		path := "/admin/v1/alarm-rules"
+		if method == "PUT" {
+			path += "/1"
+		}
+		req, _ := http.NewRequest(method, ts.URL+path, strings.NewReader(`{"pond_id":1,"metric":"ph","min_value":8,"max_value":4,"level":"warning"}`))
+		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set("Content-Type", "application/json")
+		response, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		response.Body.Close()
+		if response.StatusCode != 400 {
+			t.Fatal("inverted range accepted", method, response.StatusCode)
+		}
 	}
 }

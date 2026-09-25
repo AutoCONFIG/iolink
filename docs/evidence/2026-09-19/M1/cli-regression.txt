@@ -1,0 +1,4 @@
+PASS CLI: pending schema/no admin rejected; migration idempotent; long stdin and repeat bootstrap rejected
+PASS process: login/health/JSON404; real MQTT -> Timescale signal -> admin latest; restart persists; SIGTERM exits zero; no tested secret in logs
+Environment: 16.15; Timescale 2.30.0
+CLEANUP: removed this run UUID test database

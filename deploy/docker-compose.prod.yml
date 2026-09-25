@@ -1,7 +1,7 @@
 # 生产部署: iolinkd + TimescaleDB。TLS 由前置反代(nginx/caddy)终结。
 services:
   db:
-    image: timescale/timescaledb:latest-pg16
+    image: timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76
     restart: unless-stopped
     environment:
       POSTGRES_USER: iolink
@@ -9,23 +9,27 @@ services:
       POSTGRES_DB: iolink
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ../docs/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U iolink"]
       interval: 5s
       retries: 10
 
   iolinkd:
-    image: iolinkd:latest        # docker build -t iolinkd:latest .
+    # 服务器 .env 里设 IOLINKD_IMAGE=registry.gitlab.com/<组>/<项目>/iolinkd:<tag>，
+    # 然后用 Deploy Token docker login 后 docker compose pull 拉取 CI 发布的镜像；
+    # 不设则回退到本地手工构建：docker build -t iolinkd:latest .
+    image: ${IOLINKD_IMAGE:-iolinkd:latest}
     restart: unless-stopped
     depends_on:
       db: { condition: service_healthy }
     ports:
-      - "8080:8080"              # HTTP(/api/v1,/admin/v1,SPA,/metrics)
-      - "1883:1883"              # MQTT
+      - "127.0.0.1:8080:8080"              # HTTP(/api/v1,/admin/v1,SPA,/metrics)
+      - "127.0.0.1:1883:1883"              # MQTT
     environment:
       IOLINK_PG_DSN: postgres://iolink:${IOLINK_PG_PASSWORD}@db:5432/iolink
       IOLINK_SECRET_KEY: ${IOLINK_SECRET_KEY:?set in .env}
+      IOLINK_REPORT_INTERVAL: ${IOLINK_REPORT_INTERVAL:-60}
+      IOLINK_OFFLINE_GRACE: ${IOLINK_OFFLINE_GRACE:-3}
       IOLINK_WX_APPID: ${IOLINK_WX_APPID:-}
       IOLINK_WX_SECRET: ${IOLINK_WX_SECRET:-}
       IOLINK_WX_TEMPLATE_ID: ${IOLINK_WX_TEMPLATE_ID:-}

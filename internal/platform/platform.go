@@ -2,6 +2,7 @@ package platform
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"time"
 
@@ -17,7 +18,9 @@ type Config struct {
 	PgMaxConns   int32
 	QueryTimeout time.Duration
 
-	SecretKey string // JWT signing key (production: env only)
+	SecretKey      string // JWT signing key (production: env only)
+	ReportInterval time.Duration
+	OfflineGrace   int
 
 	WXAppID      string // WeChat mini program; empty = notifier off
 	WXSecret     string
@@ -28,12 +31,18 @@ type Config struct {
 func DB(ctx context.Context, cfg Config) (*pgxpool.Pool, error) {
 	pcfg, err := pgxpool.ParseConfig(cfg.PgDSN)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("invalid database configuration")
 	}
 	pcfg.MaxConns = cfg.PgMaxConns
 	pool, err := pgxpool.NewWithConfig(ctx, pcfg)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("cannot create database pool")
+	}
+	pingCtx, cancel := context.WithTimeout(ctx, cfg.QueryTimeout)
+	defer cancel()
+	if err := pool.Ping(pingCtx); err != nil {
+		pool.Close()
+		return nil, errors.New("database unavailable; check connection configuration")
 	}
 	return pool, nil
 }

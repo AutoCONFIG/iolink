@@ -2,7 +2,6 @@ package access
 
 import (
 	"testing"
-	"time"
 
 	packets "github.com/mochi-mqtt/server/v2/packets"
 
@@ -44,22 +43,6 @@ func TestHandleReportNormalizes(t *testing.T) {
 	}
 	if _, ok := e.Properties["turbidity"]; ok {
 		t.Fatal("absent field must stay absent")
-	}
-}
-
-func TestStatusChange(t *testing.T) {
-	fh := &fakeHandler{}
-	s := New(Config{ReportInterval: 60}, fh, nil, testLogger())
-	s.connectCh <- "dev-001"
-	go s.Run(t.Context())
-	time.Sleep(50 * time.Millisecond)
-	s.disconnectCh <- "dev-001"
-	time.Sleep(50 * time.Millisecond)
-	if len(fh.events) < 2 ||
-		fh.events[0].Kind != iolinkcontracts.KindStatusChange ||
-		fh.events[0].Online != true ||
-		fh.events[1].Online != false {
-		t.Fatalf("bad status events: %+v", fh.events)
 	}
 }
 

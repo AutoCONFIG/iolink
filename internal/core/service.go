@@ -8,8 +8,8 @@ package core
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -20,13 +20,23 @@ import (
 // Service is the assembled core. cmd/iolinkd constructs it and hands the
 // same instance to access (as event.Handler) and appapi (as repositories).
 type Service struct {
-	pool *pgxpool.Pool
-	log  *slog.Logger
-	al   *alarmEngine
+	pool            *pgxpool.Pool
+	log             *slog.Logger
+	al              *alarmEngine
+	defaultInterval time.Duration
 }
 
-func New(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger) (*Service, error) {
-	s := &Service{pool: pool, log: log, al: &alarmEngine{pool: pool, log: log}}
+func New(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger, interval ...time.Duration) (*Service, error) {
+	d := time.Minute
+	if len(interval) > 0 && interval[0] > 0 {
+		d = interval[0]
+	}
+	s := &Service{pool: pool, log: log, al: &alarmEngine{log: log}, defaultInterval: d}
+	// MQTT sessions do not survive a process restart. Retain last_seen timestamps.
+	if _, err := pool.Exec(ctx, "UPDATE devices SET status='offline' WHERE status='online'"); err != nil {
+		return nil, err
+	}
+	MetricDevicesOnline.Set(0)
 	return s, nil
 }
 
@@ -34,10 +44,7 @@ func New(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger) (*Service, e
 func (s *Service) HandleEvent(e event.Event) error {
 	switch e.Kind {
 	case event.KindProperties:
-		if err := s.storeReading(e); err != nil {
-			return fmt.Errorf("store reading: %w", err)
-		}
-		return s.al.evaluate(e)
+		return s.storeReading(e)
 	case event.KindStatusChange:
 		return s.storeStatus(e)
 	default:
@@ -50,6 +57,6 @@ func (s *Service) HandleEvent(e event.Event) error {
 
 func (s *Service) Ponds() domain.PondRepo           { return &pondRepo{s.pool} }
 func (s *Service) Devices() domain.DeviceRepo       { return &deviceRepo{s.pool} }
-func (s *Service) Telemetry() domain.TelemetryRepo  { return &telemetryRepo{s.pool} }
+func (s *Service) Telemetry() domain.TelemetryRepo  { return &telemetryRepo{s.pool, s.defaultInterval} }
 func (s *Service) Alarms() domain.AlarmRepo         { return &alarmRepo{s.pool} }
 func (s *Service) AlarmRules() domain.AlarmRuleRepo { return &alarmRuleRepo{s.pool} }

@@ -1,1 +1,5 @@
 upstream/
+.venv/
+.env
+deploy/.env
+coverage.out

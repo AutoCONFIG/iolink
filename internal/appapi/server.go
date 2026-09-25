@@ -40,6 +40,7 @@ type Deps struct {
 type UserStore interface {
 	FindByOpenID(ctx context.Context, openID string) (*iolinkcontractsdomain.User, error)
 	EnsureUser(ctx context.Context, openID string) (*iolinkcontractsdomain.User, error)
+	UserTokenVersion(ctx context.Context, id int64) (int, error)
 }
 
 // Server is the appapi HTTP server.
@@ -135,7 +136,11 @@ var WechatExchanger = func(code string) (openID string, err error) {
 }
 
 func (s *Server) signToken(userID int64) (string, error) {
-	claims := jwt.MapClaims{"uid": userID, "exp": time.Now().Add(s.cfg.JWT).Unix()}
+	version := 0
+	if s.deps.Users != nil {
+		version, _ = s.deps.Users.UserTokenVersion(context.Background(), userID)
+	}
+	claims := jwt.MapClaims{"uid": userID, "ver": version, "exp": time.Now().Add(s.cfg.JWT).Unix()}
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(s.cfg.SecretKey))
 }
 
@@ -162,6 +167,16 @@ func (s *Server) authRequired(c *gin.Context) {
 		return
 	}
 	c.Set("uid", int64(uid))
+	version, ok := tok.Claims.(jwt.MapClaims)["ver"].(float64)
+	if !ok || s.deps.Users == nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
+		return
+	}
+	current, err := s.deps.Users.UserTokenVersion(c.Request.Context(), int64(uid))
+	if err != nil || int64(version) != int64(current) {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token revoked"})
+		return
+	}
 	c.Next()
 }
 

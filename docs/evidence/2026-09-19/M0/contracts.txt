@@ -1,0 +1,3 @@
+docs/api/admin-openapi.yaml: standard schema and 25 operation fixtures PASS
+docs/api/openapi.yaml: standard schema and 10 operation fixtures PASS
+35 target operations, 159 synthetic request/response fixtures PASS; live handler verification is R02.c

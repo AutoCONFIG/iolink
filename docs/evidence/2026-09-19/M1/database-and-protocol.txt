@@ -1,0 +1,54 @@
+=== RUN   TestHistoryHTTPWithRealDatabase
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN] 2026/09/19 - 17:34:21 | 200 |     731.161µs |       127.0.0.1 | POST     "/api/v1/auth/login"
+[GIN] 2026/09/19 - 17:34:21 | 200 |     1.81301ms |       127.0.0.1 | GET      "/api/v1/water/history?device_no=one&metric=temperature&range=7d&max_points=1"
+[GIN] 2026/09/19 - 17:34:21 | 200 |     570.295µs |       127.0.0.1 | GET      "/api/v1/water/history?device_no=one&metric=ph&range=30d&max_points=200"
+[GIN] 2026/09/19 - 17:34:21 | 400 |      16.687µs |       127.0.0.1 | GET      "/api/v1/water/history?device_no=one&metric=bad"
+[GIN] 2026/09/19 - 17:34:21 | 400 |        9.85µs |       127.0.0.1 | GET      "/api/v1/water/history?device_no=one&metric=temperature&range=invalid"
+[GIN] 2026/09/19 - 17:34:21 | 400 |      17.228µs |       127.0.0.1 | GET      "/api/v1/water/history?device_no=one&metric=temperature&max_points=201"
+--- PASS: TestHistoryHTTPWithRealDatabase (0.12s)
+=== RUN   TestTelemetryShadowDedupAndPondSnapshot
+--- PASS: TestTelemetryShadowDedupAndPondSnapshot (0.11s)
+=== RUN   TestAlarmThresholdConcurrencyConfirmationAndMove
+--- PASS: TestAlarmThresholdConcurrencyConfirmationAndMove (0.45s)
+=== RUN   TestRollbackAcrossReadingShadowAlarmOutbox
+--- PASS: TestRollbackAcrossReadingShadowAlarmOutbox (0.12s)
+=== RUN   TestHistoryBoundedAndInvalidRules
+--- PASS: TestHistoryBoundedAndInvalidRules (0.11s)
+=== RUN   TestAuthenticationStatusAndRestart
+--- PASS: TestAuthenticationStatusAndRestart (0.10s)
+=== RUN   TestDeviceSecretIsRandomAndReturnedOnlyOnCreation
+--- PASS: TestDeviceSecretIsRandomAndReturnedOnlyOnCreation (0.10s)
+=== RUN   TestConfiguredAndDeviceIntervals
+--- PASS: TestConfiguredAndDeviceIntervals (0.10s)
+=== RUN   TestSingleAndDoubleThresholdRules
+=== RUN   TestSingleAndDoubleThresholdRules/min-only
+=== RUN   TestSingleAndDoubleThresholdRules/max-only
+=== RUN   TestSingleAndDoubleThresholdRules/both-low
+=== RUN   TestSingleAndDoubleThresholdRules/both-high
+--- PASS: TestSingleAndDoubleThresholdRules (0.42s)
+    --- PASS: TestSingleAndDoubleThresholdRules/min-only (0.10s)
+    --- PASS: TestSingleAndDoubleThresholdRules/max-only (0.10s)
+    --- PASS: TestSingleAndDoubleThresholdRules/both-low (0.11s)
+    --- PASS: TestSingleAndDoubleThresholdRules/both-high (0.10s)
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence/will-v4
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence/will-v5
+--- PASS: TestRealMQTTAuthenticationACLAndPersistence (0.66s)
+    --- PASS: TestRealMQTTAuthenticationACLAndPersistence/will-v4 (0.00s)
+    --- PASS: TestRealMQTTAuthenticationACLAndPersistence/will-v5 (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	2.275s

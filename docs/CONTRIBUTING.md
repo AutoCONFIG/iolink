@@ -1,32 +1,27 @@
-# 协作规范(单仓)
+# 单仓协作与验收规范
 
-> 2026-09-16 起:原跨仓(模块仓+contracts 版本依赖)流程已废止,代码全部在主仓。
+主干受保护，开发分支→MR→评审→合并；新分支默认codex/前缀。业务代码边界按access/core/appapi/adminapi/domain/web组织，不恢复跨仓contracts/tag流程。
 
-## 分支与 MR
+## 契约和实现
 
-- `main` 为受保护主干;开发走 feature 分支(`feat/xxx`、`fix/xxx`)→ MR → 负责人 review → 合并
-- 提交信息:动词开头,英文或中文均可,如 `feat(adminapi): pond CRUD`
-- 接口变更(/api/v1、/admin/v1)= 契约变更:先改 docs/ 下对应文档,随同一 MR 提交
+先引用Rxx，再修改目标契约/迁移设计/页面规格；同一变更提交实现和验证证据。需求与实现不一致时登记缺陷，不用“以代码为准”覆盖用户需求。
 
-## 代码所有权(按 package,评审归属)
+M0–M5目标契约已放docs/api，但当前handler仍有差异，不能声称实时接口完全匹配。M6–M8每个子阶段先补扩展OpenAPI、迁移与负面用例，独立审查后编码。
 
-| Package | Owner |
-|---|---|
-| internal/access、cmd/mqtt-sim | 设备接入线 |
-| internal/core、internal/adminapi | 主程 |
-| internal/appapi + 小程序 | 小程序线 |
-| web/admin | 管理前端线 |
+## 测试分层
 
-## 开发环境(一次性)
+- 单元测试用fake/确定性时钟验证纯逻辑和HTTP边界。
+- 真实数据库测试验证SQL、事务、并发、迁移、权限过滤和恢复；禁止只用fake就宣称存储正确。
+- broker/双API集成使用隔离数据库和MQTT客户端；UI用浏览器/小程序工具；真实微信与硬件独立记录。
+- 不机械要求每个纯类型包都有测试；所有关键行为和安全/持久化边界必须有有意义的测试。
+- 阶段门槛是ACCEPTANCE对应行，不以单一覆盖率替代业务验收。
 
-```bash
-git clone https://git.hyhy.fun/rsplab/iolink.git
-# 推送凭据:首次 push 输入一次账号密码/token(git credential store 自动保存)
-# 跑起来:
-make dev
-```
+统一入口为 `make verify`（全部Go包build/vet/test）；静态契约用 `make docs-tools && make verify-contracts`。接口测试需本机临时端口权限。真实数据库测试设置 `IOLINK_TEST_PG_DSN` 指向专用隔离Timescale实例，测试自动创建/删除自己命名的数据库，角色须有CREATEDB权限；`make integration` 拒绝未提供DSN，普通 `make verify` 未提供DSN会跳过这些用例。CI的Go任务提供该变量，远程执行结果另行取证。
 
-## 测试纪律
+M0可运行 `scripts/smoke_m0.py`，所需环境和二进制见脚本头部；该脚本仅在指定测试容器中创建并删除随机命名数据库。它证明当前装配链路，不替代全部目标HTTP契约验收。
 
-- internal/* 每个包必须有测试;appapi 类接口测试用 fake(参考 internal/appapi/server_test.go),不连数据库
-- MR 前本地:`make verify`(build+vet+test)
+## 证据和复审
+
+证据记录包含Rxx、提交/树摘要、环境、命令、预期与实际、日志、日期和审阅人。测试数据脱敏，密钥/微信凭据不能提交仓库。
+
+计划/契约双审由两位未参与该次编辑的审阅员独立检查同一快照。只要任一仍有阻断项，修订后重新双审；通过是明确结论而不是沉默。文档通过仅代表可实施，功能交付另按R55验收。

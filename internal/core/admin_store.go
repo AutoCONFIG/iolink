@@ -6,9 +6,9 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgconn"
 	"time"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
@@ -28,6 +28,17 @@ func (s *Service) FindAdminByLogin(ctx context.Context, login string) (*domain.U
 		return nil, fmt.Errorf("admin by login: %w", err)
 	}
 	return u, nil
+}
+
+func (s *Service) AdminTokenVersion(ctx context.Context, id int64) (int, error) {
+	var version int
+	err := s.pool.QueryRow(ctx, `SELECT token_version FROM users WHERE id=$1 AND authority='ADMIN'`, id).Scan(&version)
+	return version, err
+}
+
+func (s *Service) UpgradeAdminPassword(ctx context.Context, id int64, hash string) error {
+	_, err := s.pool.Exec(ctx, `UPDATE users SET password_hash=$2 WHERE id=$1 AND authority='ADMIN'`, id, hash)
+	return err
 }
 
 // ---- farms ----
@@ -50,17 +61,66 @@ func (s *Service) ListFarms(ctx context.Context) ([]domain.Farm, error) {
 	return out, rows.Err()
 }
 
-func (s *Service) CreateFarm(ctx context.Context, ownerID int64, name, location string) (domain.Farm, error) {
+func (s *Service) CreateFarm(ctx context.Context, ownerID *int64, name, location string) (domain.Farm, error) {
+	if ownerID != nil {
+		var ok bool
+		if err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE id=$1 AND authority='USER' AND open_id<>'')`, *ownerID).Scan(&ok); err != nil {
+			return domain.Farm{}, err
+		}
+		if !ok {
+			return domain.Farm{}, domain.ErrNotFound
+		}
+	}
 	var f domain.Farm
 	err := s.pool.QueryRow(ctx,
 		`INSERT INTO farms (owner_id, name, location) VALUES ($1,$2,$3)
 		 RETURNING id, owner_id, name, coalesce(location,''), created_at`,
 		ownerID, name, location).Scan(&f.ID, &f.OwnerID, &f.Name, &f.Location, &f.CreatedAt)
-	return f, err
+	return f, normalizeDBError(err)
+}
+
+func (s *Service) SearchUsers(ctx context.Context, query string, limit, offset int) ([]domain.User, error) {
+	rows, err := s.pool.Query(ctx, `SELECT id, open_id, coalesce(nickname,''), token_version FROM users WHERE authority='USER' AND (id::text=$1 OR nickname ILIKE '%'||$1||'%') ORDER BY id LIMIT $2 OFFSET $3`, query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []domain.User{}
+	for rows.Next() {
+		var u domain.User
+		if err := rows.Scan(&u.ID, &u.OpenID, &u.Nickname, &u.TokenVersion); err != nil {
+			return nil, err
+		}
+		out = append(out, u)
+	}
+	return out, rows.Err()
+}
+
+func (s *Service) SetFarmOwner(ctx context.Context, id int64, ownerID *int64) error {
+	if ownerID != nil {
+		var ok bool
+		if err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE id=$1 AND authority='USER' AND open_id<>'')`, *ownerID).Scan(&ok); err != nil {
+			return err
+		}
+		if !ok {
+			return domain.ErrNotFound
+		}
+	}
+	ct, err := s.pool.Exec(ctx, `UPDATE farms SET owner_id=$2 WHERE id=$1`, id, ownerID)
+	if err != nil {
+		return err
+	}
+	if ct.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
 }
 
 func (s *Service) UpdateFarm(ctx context.Context, id int64, name, location string) error {
-	_, err := s.pool.Exec(ctx, `UPDATE farms SET name=$2, location=$3 WHERE id=$1`, id, name, location)
+	ct, err := s.pool.Exec(ctx, `UPDATE farms SET name=$2, location=$3 WHERE id=$1`, id, name, location)
+	if err == nil && ct.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
 	return err
 }
 
@@ -85,7 +145,7 @@ func (s *Service) ChangeAdminPassword(ctx context.Context, id int64, oldPassword
 	if u.PasswordHash == nil || !platform.CheckPassword(*u.PasswordHash, oldPassword) {
 		return domain.ErrOldPasswordMismatch
 	}
-	_, err = s.pool.Exec(ctx, `UPDATE users SET password_hash=$2 WHERE id=$1`,
+	_, err = s.pool.Exec(ctx, `UPDATE users SET password_hash=$2, token_version=token_version+1, must_change_password=false WHERE id=$1`,
 		id, platform.HashPassword(newPassword))
 	return err
 }
@@ -123,22 +183,32 @@ func (s *Service) ListPonds(ctx context.Context) ([]domain.Pond, error) {
 }
 
 func (s *Service) CreatePond(ctx context.Context, farmID int64, name string, areaMu float64) (domain.Pond, error) {
+	var ok bool
+	if err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM farms WHERE id=$1)`, farmID).Scan(&ok); err != nil {
+		return domain.Pond{}, err
+	}
+	if !ok {
+		return domain.Pond{}, domain.ErrNotFound
+	}
 	var p domain.Pond
 	err := s.pool.QueryRow(ctx,
 		`INSERT INTO ponds (farm_id, name, area_mu) VALUES ($1,$2,$3)
 		 RETURNING id, farm_id, name, coalesce(area_mu,0), created_at`,
 		farmID, name, areaMu).Scan(&p.ID, &p.FarmID, &p.Name, &p.AreaMu, &p.CreatedAt)
-	return p, err
+	return p, normalizeDBError(err)
 }
 
 func (s *Service) UpdatePond(ctx context.Context, id int64, name string, areaMu float64) error {
-	_, err := s.pool.Exec(ctx, `UPDATE ponds SET name=$2, area_mu=$3 WHERE id=$1`, id, name, areaMu)
+	ct, err := s.pool.Exec(ctx, `UPDATE ponds SET name=$2, area_mu=$3 WHERE id=$1`, id, name, areaMu)
+	if err == nil && ct.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
 	return err
 }
 
 func (s *Service) DeletePond(ctx context.Context, id int64) error {
 	var n int
-	if err := s.pool.QueryRow(ctx, `SELECT count(*) FROM devices WHERE pond_id=$1`, id).Scan(&n); err != nil {
+	if err := s.pool.QueryRow(ctx, `SELECT count(*) FROM devices WHERE pond_id=$1 OR EXISTS(SELECT 1 FROM sensor_data WHERE pond_id=$1) OR EXISTS(SELECT 1 FROM alarms WHERE pond_id=$1) OR EXISTS(SELECT 1 FROM alarm_rules WHERE pond_id=$1)`, id).Scan(&n); err != nil {
 		return err
 	}
 	if n > 0 {
@@ -152,10 +222,23 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 
 // RegisterDevice generates a unique device_no and a one-time secret
 // (only sha256 is persisted).
-func (s *Service) RegisterDevice(ctx context.Context, pondID int64, model string) (domain.Device, string, error) {
-	secret := make([]byte, 16)
-	if _, err := rand.Read(secret); err != nil {
+func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (domain.Device, string, error) {
+	if reportInterval != 0 && reportInterval != 60 && reportInterval != 300 {
+		return domain.Device{}, "", domain.ErrInvalidRange
+	}
+	if reportInterval == 0 {
+		reportInterval = int(s.defaultInterval.Seconds())
+	}
+	var ok bool
+	if err := s.pool.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM ponds WHERE id=$1)`, pondID).Scan(&ok); err != nil {
 		return domain.Device{}, "", err
+	}
+	if !ok {
+		return domain.Device{}, "", domain.ErrNotFound
+	}
+	secret := make([]byte, 32)
+	if _, err := rand.Read(secret); err != nil {
+		return domain.Device{}, "", normalizeDBError(err)
 	}
 	secHex := hex.EncodeToString(secret)
 	sum := sha256.Sum256([]byte(secHex))
@@ -183,21 +266,43 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, model string
 
 	var d domain.Device
 	err := s.pool.QueryRow(ctx,
-		`INSERT INTO devices (pond_id, device_no, secret_hash, model)
-		 VALUES ($1,$2,$3,$4)
-		 RETURNING id, pond_id, device_no, coalesce(model,''), status, last_seen_at, created_at`,
-		pondID, no, hash, model).
-		Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt)
+		`INSERT INTO devices (pond_id, device_no, secret_hash, name, model, report_interval)
+		 VALUES ($1,$2,$3,$4,$5,$6)
+		 RETURNING id, pond_id, device_no, coalesce(name,''), coalesce(model,''), status, last_seen_at, created_at, disabled_at, coalesce(report_interval,$6)`,
+		pondID, no, hash, name, model, reportInterval).
+		Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
 	if err != nil {
 		return domain.Device{}, "", err
 	}
 	return d, secHex, nil
 }
 
-func (s *Service) ListDevices(ctx context.Context) ([]domain.Device, error) {
+func normalizeDBError(err error) error {
+	if err == nil {
+		return nil
+	}
+	var pgerr *pgconn.PgError
+	if errors.As(err, &pgerr) {
+		if pgerr.Code == "23505" {
+			return domain.ErrConflict
+		}
+		if pgerr.Code == "23503" {
+			return domain.ErrNotFound
+		}
+	}
+	return err
+}
+
+func (s *Service) ListDevices(ctx context.Context, includeDisabled bool, pondID int64, limit, offset int) ([]domain.Device, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 50
+	}
+	if offset < 0 {
+		offset = 0
+	}
 	rows, err := s.pool.Query(ctx,
-		`SELECT id, pond_id, device_no, coalesce(model,''), status, last_seen_at, created_at
-		 FROM devices ORDER BY id`)
+		`SELECT id, pond_id, device_no, coalesce(name,''), coalesce(model,''), status, last_seen_at, created_at, disabled_at, coalesce(report_interval,$1)
+		 FROM devices WHERE ($2 OR disabled_at IS NULL) AND ($3=0 OR pond_id=$3) ORDER BY id LIMIT $4 OFFSET $5`, int(s.defaultInterval.Seconds()), includeDisabled, pondID, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +310,7 @@ func (s *Service) ListDevices(ctx context.Context) ([]domain.Device, error) {
 	var out []domain.Device
 	for rows.Next() {
 		var d domain.Device
-		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt); err != nil {
+		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval); err != nil {
 			return nil, err
 		}
 		out = append(out, d)
@@ -213,8 +318,44 @@ func (s *Service) ListDevices(ctx context.Context) ([]domain.Device, error) {
 	return out, rows.Err()
 }
 
+func (s *Service) GetDevice(ctx context.Context, deviceNo string) (domain.Device, error) {
+	var d domain.Device
+	err := s.pool.QueryRow(ctx, `SELECT id,pond_id,device_no,coalesce(name,''),coalesce(model,''),status,last_seen_at,created_at,disabled_at,coalesce(report_interval,$2) FROM devices WHERE device_no=$1`, deviceNo, int(s.defaultInterval.Seconds())).Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
+	return d, err
+}
+
+func (s *Service) MoveDevice(ctx context.Context, deviceNo string, pondID int64) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	var id int64
+	var disabled *time.Time
+	if err = tx.QueryRow(ctx, `SELECT id,disabled_at FROM devices WHERE device_no=$1 FOR UPDATE`, deviceNo).Scan(&id, &disabled); err != nil {
+		return err
+	}
+	if disabled != nil {
+		return domain.ErrConflict
+	}
+	var exists bool
+	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM ponds WHERE id=$1)`, pondID).Scan(&exists); err != nil {
+		return err
+	}
+	if !exists {
+		return domain.ErrNotFound
+	}
+	if _, err = tx.Exec(ctx, `UPDATE devices SET pond_id=$2,status='offline',last_seen_at=NULL,session_version=session_version+1 WHERE id=$1`, id, pondID); err != nil {
+		return err
+	}
+	if _, err = tx.Exec(ctx, `DELETE FROM device_shadows WHERE device_no=$1`, deviceNo); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
+}
+
 func (s *Service) DeleteDevice(ctx context.Context, deviceNo string) error {
-	_, err := s.pool.Exec(ctx, `DELETE FROM devices WHERE device_no=$1`, deviceNo)
+	_, err := s.pool.Exec(ctx, `UPDATE devices SET disabled_at=coalesce(disabled_at,now()),status='offline',session_version=session_version+1 WHERE device_no=$1`, deviceNo)
 	return err
 }
 
@@ -246,22 +387,29 @@ func (s *Service) ListRules(ctx context.Context) ([]domain.AlarmRule, error) {
 }
 
 func (s *Service) CreateRule(ctx context.Context, rule domain.AlarmRule) (domain.AlarmRule, error) {
+	if err := validateRule(rule); err != nil {
+		return domain.AlarmRule{}, err
+	}
 	q := `INSERT INTO alarm_rules (pond_id, metric, min_value, max_value, level)
 	      VALUES ($1,$2,$3,$4,$5) RETURNING ` + ruleCols
-	return scanRule(s.pool.QueryRow(ctx, q,
+	r,err:=scanRule(s.pool.QueryRow(ctx, q,
 		rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level)))
+	if err!=nil{return domain.AlarmRule{},normalizeDBError(err)};return r,nil
 }
 
 func (s *Service) UpdateRule(ctx context.Context, rule domain.AlarmRule) error {
-	_, err := s.pool.Exec(ctx,
+	if err := validateRule(rule); err != nil {
+		return err
+	}
+	ct, err := s.pool.Exec(ctx,
 		`UPDATE alarm_rules SET pond_id=$2, metric=$3, min_value=$4, max_value=$5, level=$6, enabled=$7 WHERE id=$1`,
 		rule.ID, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level), rule.Enabled)
-	return err
+	if err==nil&&ct.RowsAffected()==0{return domain.ErrNotFound};return normalizeDBError(err)
 }
 
 func (s *Service) DeleteRule(ctx context.Context, id int64) error {
-	_, err := s.pool.Exec(ctx, `DELETE FROM alarm_rules WHERE id=$1`, id)
-	return err
+	ct, err := s.pool.Exec(ctx, `DELETE FROM alarm_rules WHERE id=$1`, id)
+	if err==nil&&ct.RowsAffected()==0{return domain.ErrNotFound};return err
 }
 
 // ---- alarms (admin view) ----
@@ -288,15 +436,35 @@ func (s *Service) ListAllAlarms(ctx context.Context, limit int) ([]domain.Alarm,
 }
 
 func (s *Service) ConfirmAlarm(ctx context.Context, id int64) error {
-	_, err := s.pool.Exec(ctx,
+	ct, err := s.pool.Exec(ctx,
 		`UPDATE alarms SET confirmed_at=now() WHERE id=$1 AND confirmed_at IS NULL`, id)
+	if err == nil && ct.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
 	return err
 }
 
 func (s *Service) BatchConfirm(ctx context.Context, ids []int64) (int64, error) {
-	ct, err := s.pool.Exec(ctx,
-		`UPDATE alarms SET confirmed_at=now() WHERE id=ANY($1) AND confirmed_at IS NULL`, ids)
+	if len(ids) == 0 {
+		return 0, domain.ErrInvalidRange
+	}
+	tx, err := s.pool.Begin(ctx)
 	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback(ctx)
+	var total, open int
+	if err = tx.QueryRow(ctx, `SELECT count(*),count(*) FILTER(WHERE confirmed_at IS NULL) FROM alarms WHERE id=ANY($1)`, ids).Scan(&total, &open); err != nil {
+		return 0, err
+	}
+	if total != len(ids) || open != len(ids) {
+		return 0, domain.ErrConflict
+	}
+	ct, err := tx.Exec(ctx, `UPDATE alarms SET confirmed_at=now() WHERE id=ANY($1) AND confirmed_at IS NULL`, ids)
+	if err != nil {
+		return 0, err
+	}
+	if err = tx.Commit(ctx); err != nil {
 		return 0, err
 	}
 	return ct.RowsAffected(), nil
@@ -317,23 +485,4 @@ func (s *Service) Stats(ctx context.Context) (domain.Stats, error) {
 		return st, nil
 	}
 	return st, err
-}
-
-// shadowUpsert keeps the latest reading per device (device_shadows).
-func (s *Service) shadowUpsert(deviceNo string, props map[string]float64, ts time.Time) error {
-	raw, err := json.Marshal(props)
-	if err != nil {
-		return err
-	}
-	var sig *int
-	if v, ok := props["signal"]; ok {
-		i := int(v)
-		sig = &i
-	}
-	_, err = s.pool.Exec(context.Background(),
-		`INSERT INTO device_shadows (device_no, last, signal, ts)
-		 VALUES ($1,$2,$3,$4)
-		 ON CONFLICT (device_no) DO UPDATE SET last=$2, signal=$3, ts=$4`,
-		deviceNo, raw, sig, ts)
-	return err
 }

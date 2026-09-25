@@ -3,6 +3,8 @@ package core
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"math"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -44,11 +46,17 @@ func (r *pondRepo) Get(ctx context.Context, id int64) (domain.Pond, error) {
 	return p, err
 }
 
+func (r *pondRepo) GetByUser(ctx context.Context, id, userID int64) (domain.Pond, error) {
+	var p domain.Pond
+	err := r.pool.QueryRow(ctx, `SELECT p.id,p.farm_id,p.name,coalesce(p.area_mu,0),p.created_at FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND f.owner_id=$2`, id, userID).Scan(&p.ID, &p.FarmID, &p.Name, &p.AreaMu, &p.CreatedAt)
+	return p, err
+}
+
 type deviceRepo struct{ pool *pgxpool.Pool }
 
 func (r *deviceRepo) ListByPond(ctx context.Context, pondID int64) ([]domain.Device, error) {
-	const q = `SELECT id, pond_id, device_no, coalesce(model,''), status, last_seen_at, created_at
-		FROM devices WHERE pond_id=$1 ORDER BY id`
+	const q = `SELECT id, pond_id, device_no, coalesce(name,''), coalesce(model,''), status, last_seen_at, created_at, disabled_at, coalesce(report_interval,60)
+		FROM devices WHERE pond_id=$1 AND disabled_at IS NULL ORDER BY id`
 	rows, err := r.pool.Query(ctx, q, pondID)
 	if err != nil {
 		return nil, err
@@ -57,7 +65,7 @@ func (r *deviceRepo) ListByPond(ctx context.Context, pondID int64) ([]domain.Dev
 	var out []domain.Device
 	for rows.Next() {
 		var d domain.Device
-		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt); err != nil {
+		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval); err != nil {
 			return nil, err
 		}
 		out = append(out, d)
@@ -68,9 +76,15 @@ func (r *deviceRepo) ListByPond(ctx context.Context, pondID int64) ([]domain.Dev
 func (r *deviceRepo) GetByDeviceNo(ctx context.Context, no string) (domain.Device, error) {
 	var d domain.Device
 	err := r.pool.QueryRow(ctx,
-		`SELECT id, pond_id, device_no, coalesce(model,''), status, last_seen_at, created_at
-		 FROM devices WHERE device_no=$1`, no).
-		Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt)
+		`SELECT id, pond_id, device_no, coalesce(name,''), coalesce(model,''), status, last_seen_at, created_at,disabled_at,coalesce(report_interval,$2)
+		 FROM devices WHERE device_no=$1`, no, int(60)).
+		Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
+	return d, err
+}
+
+func (r *deviceRepo) GetByDeviceNoForUser(ctx context.Context, no string, userID int64) (domain.Device, error) {
+	var d domain.Device
+	err := r.pool.QueryRow(ctx, `SELECT d.id,d.pond_id,d.device_no,coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,60) FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1 AND f.owner_id=$2 AND d.disabled_at IS NULL`, no, userID).Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
 	return d, err
 }
 
@@ -80,22 +94,37 @@ func (r *deviceRepo) UpdateStatus(ctx context.Context, no string, s domain.Devic
 	return err
 }
 
-type telemetryRepo struct{ pool *pgxpool.Pool }
+type telemetryRepo struct {
+	pool            *pgxpool.Pool
+	defaultInterval time.Duration
+}
 
 // Latest reads the device shadow (kept fresh by every report) instead of
 // scanning the wide time-series table.
 func (r *telemetryRepo) Latest(ctx context.Context, no string) (domain.Reading, error) {
 	var raw []byte
 	var ts time.Time
+	var stamps []byte
+	var pond int64
+	var interval int
 	err := r.pool.QueryRow(ctx,
-		`SELECT last, ts FROM device_shadows WHERE device_no=$1`, no).
-		Scan(&raw, &ts)
+		`SELECT s.last,s.ts,s.timestamps,s.pond_id,coalesce(d.report_interval,$2) FROM device_shadows s JOIN devices d ON d.device_no=s.device_no AND d.pond_id=s.pond_id WHERE s.device_no=$1 AND d.disabled_at IS NULL`, no, int(r.defaultInterval.Seconds())).
+		Scan(&raw, &ts, &stamps, &pond, &interval)
 	if err != nil {
 		return domain.Reading{}, err
 	}
 	var m map[string]float64
 	if err := json.Unmarshal(raw, &m); err != nil {
 		return domain.Reading{}, err
+	}
+	var timestamps map[string]time.Time
+	if err := json.Unmarshal(stamps, &timestamps); err != nil {
+		return domain.Reading{}, err
+	}
+	var signal *int
+	if v, ok := m["signal"]; ok {
+		x := int(v)
+		signal = &x
 	}
 	ptr := func(k string) *float64 {
 		if v, ok := m[k]; ok {
@@ -104,7 +133,8 @@ func (r *telemetryRepo) Latest(ctx context.Context, no string) (domain.Reading, 
 		return nil
 	}
 	return domain.Reading{
-		DeviceNo:    no,
+		DeviceNo: no,
+		PondID:   pond, Timestamps: timestamps, ReportInterval: interval, Battery: ptr("battery"), Signal: signal,
 		Timestamp:   ts,
 		Temperature: ptr("temperature"),
 		DO:          ptr("dissolved_oxygen"),
@@ -119,24 +149,22 @@ func (r *telemetryRepo) History(ctx context.Context, no, metric string, from, to
 	if !ok {
 		return nil, domain.ErrUnknownMetric
 	}
-	// bucket to keep points bounded for charting
-	bucket := "1 minute"
-	if d := to.Sub(from); d > 48*time.Hour {
-		bucket = "1 hour"
+	if maxPoints < 1 || maxPoints > 200 || !to.After(from) {
+		return nil, domain.ErrInvalidRange
 	}
-	if d := to.Sub(from); d > 30*24*time.Hour {
-		bucket = "1 day"
+	// Origin at from avoids an extra bucket at either endpoint; [from,to).
+	width := int64(math.Ceil(float64(to.Sub(from).Microseconds()) / float64(maxPoints)))
+	if width < 1 {
+		width = 1
 	}
-	q := `SELECT time_bucket($4, ts), avg(` + col + `)
-		FROM sensor_data
-		WHERE device_no=$1 AND ts BETWEEN $2 AND $3 AND ` + col + ` IS NOT NULL
-		GROUP BY 1 ORDER BY 1`
-	rows, err := r.pool.Query(ctx, q, no, from, to, bucket)
+	bucket := fmt.Sprintf("%d microseconds", width)
+	q := `SELECT date_bin($4::interval,ts,$2::timestamptz),avg(` + col + `) FROM sensor_data WHERE device_no=$1 AND pond_id=(SELECT pond_id FROM devices WHERE device_no=$1) AND ts >= $2 AND ts < $3 AND ` + col + ` IS NOT NULL GROUP BY 1 ORDER BY 1 LIMIT $5`
+	rows, err := r.pool.Query(ctx, q, no, from, to, bucket, maxPoints)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var out []domain.MetricPoint
+	out := []domain.MetricPoint{}
 	for rows.Next() {
 		var p domain.MetricPoint
 		if err := rows.Scan(&p.Ts, &p.Value); err != nil {
@@ -178,6 +206,17 @@ func (r *alarmRepo) Confirm(ctx context.Context, id int64) error {
 	_, err := r.pool.Exec(ctx,
 		`UPDATE alarms SET confirmed_at=now() WHERE id=$1 AND confirmed_at IS NULL`, id)
 	return err
+}
+
+func (r *alarmRepo) ConfirmByUser(ctx context.Context, id, userID int64) error {
+	ct, err := r.pool.Exec(ctx, `UPDATE alarms a SET confirmed_at=now() FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE a.id=$1 AND a.pond_id=p.id AND f.owner_id=$2 AND a.confirmed_at IS NULL`, id, userID)
+	if err != nil {
+		return err
+	}
+	if ct.RowsAffected() == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
 }
 
 type alarmRuleRepo struct{ pool *pgxpool.Pool }

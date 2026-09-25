@@ -1,237 +1,727 @@
 openapi: 3.0.3
 info:
-  title: IoLink App API
-  version: v0.1
-  description: >
-    微信小程序使用的业务 API。稳定契约:小程序只依赖本文,后端实现
-    (FunctionGraph 阶段 / 未来 ECS Go 服务)必须保持路径与响应结构兼容。
+  title: IoLink App API — TARGET
+  version: 1.0.0-planned
+  description: TARGET / 待实现、待验收：本文件为 M0–M5 修订目标契约，并非现有实现已通过验收的声明。原有 31 个操作的路径保留；新增目标操作见各 summary。所有 JSON 字段 snake_case；集合始终返回数组，无结果为 []，不得返回 null。时间统一返回 UTC RFC3339
+    字符串。所有参数越界/非法值返回 400，不静默回退。所有受保护操作必须逐请求校验身份及资源归属。微信登录使用uid claim和由IOLINK_SECRET_KEY以用户标签派生的逻辑签名密钥；不接受管理 JWT。登录按 openid 幂等创建 USER，但每次登录可签发新 token。无分配场的用户可登录并获得空集合/零统计。除登录外，所有列表、详情、统计、历史和确认以当前
+    farm.owner_id=uid 为权限边界；资源不存在/越权均 404，不能先读影子或历史再验权。历史样本和报警按发生时 pond_id 快照验证该池塘当前 owner；设备调塘不将旧数据交给新塘 owner。集合为空时 []，不输出 openid/secret/密码。
 servers:
-  - url: https://api.example.com/api/v1
-    description: 占位,部署后替换
+- url: http://localhost:8080/api/v1
 tags:
-  - name: auth
-  - name: ponds
-  - name: devices
-  - name: water
-  - name: alarms
+- name: auth
+- name: ponds
+- name: devices
+- name: water
+- name: alarms
+- name: stats
 security:
-  - BearerAuth: []
+- BearerAuth: []
 paths:
   /auth/login:
     post:
-      tags: [auth]
-      security: []
-      summary: 微信 code 登录,换取 JWT
+      tags:
+      - auth
+      summary: 微信 code 登录
+      description: 微信交换成功后按 openid 查找或创建 USER。code 无效或失效 401，微信不可用 502；不泄露 openid/session_key。不接收客户端声称的用户身份。非幂等，code 为一次性凭据，失败后重新 wx.login。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - token
+                - expires_in
+                - user
+                properties:
+                  token:
+                    type: string
+                  expires_in:
+                    type: integer
+                    minimum: 1
+                    description: 秒
+                  user:
+                    $ref: '#/components/schemas/User'
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '502':
+          $ref: '#/components/responses/UpstreamError'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [code]
+              required:
+              - code
               properties:
-                code: { type: string, description: wx.login() 的 code }
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token: { type: string }
-                  expires_in: { type: integer, description: 秒 }
-                  user:
-                    $ref: "#/components/schemas/User"
+                code:
+                  type: string
+                  minLength: 1
+                  description: wx.login() code
+              additionalProperties: false
+      security: []
   /ponds:
     get:
-      tags: [ponds]
-      summary: 当前用户的池塘列表(含最新状态)
+      tags:
+      - ponds
+      summary: 当前用户池塘列表
+      description: 当前 owner 的全部池塘，按 pond_id 升序；未分配时 []。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/PondSummary"
+                  $ref: '#/components/schemas/PondSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /ponds/{id}:
     get:
-      tags: [ponds]
+      tags:
+      - ponds
       summary: 池塘详情
-      parameters:
-        - { name: id, in: path, required: true, schema: { type: integer } }
+      description: 按目标契约实现并以集成测试验收。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PondSummary"
+                $ref: '#/components/schemas/PondSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - &id001
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
   /devices:
     get:
-      tags: [devices]
-      summary: 设备列表(可按池塘过滤)
-      parameters:
-        - { name: pond_id, in: query, schema: { type: integer } }
+      tags:
+      - devices
+      summary: 当前用户设备列表
+      description: 按 device_no 升序；不返回停用设备。指定 pond_id 不存在/越权为 404；未指定时聚合全部可见池塘，无设备 []。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Device"
+                  $ref: '#/components/schemas/Device'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: pond_id
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+          minimum: 1
   /devices/{device_no}:
     get:
-      tags: [devices]
-      summary: 设备详情(含最新一条数据)
-      parameters:
-        - { name: device_no, in: path, required: true, schema: { type: string } }
+      tags:
+      - devices
+      summary: 设备详情及当前塘最新数据
+      description: 必须校验当前设备池塘归属；停用或越权为 404。latest 仅设备当前 pond_id 样本，没有数据 null。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DeviceDetail"
+                $ref: '#/components/schemas/DeviceDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: device_no
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
   /water/latest:
     get:
-      tags: [water]
-      summary: 指定设备最新水质数据
-      parameters:
-        - { name: device_no, in: query, required: true, schema: { type: string } }
+      tags:
+      - water
+      summary: 设备当前塘最新影子
+      description: 先校验当前设备归属及未停用，再查询当前 pond_id 样本；无数据 200 null，资源不存在/越权 404。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/WaterLatest"
+                $ref: '#/components/schemas/WaterLatest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: device_no
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
   /water/history:
     get:
-      tags: [water]
-      summary: 历史曲线数据
-      parameters:
-        - { name: device_no, in: query, required: true, schema: { type: string } }
-        - { name: metric, in: query, required: true, schema: { type: string, enum: [temperature, dissolved_oxygen, ph, turbidity, salinity] } }
-        - { name: range, in: query, schema: { type: string, enum: [today, 7d, 30d], default: today } }
-        - { name: max_points, in: query, schema: { type: integer, default: 200 } }
+      tags:
+      - water
+      summary: 设备历史曲线
+      description: 请求时刻为右端点，左闭右开。today 从 Asia/Shanghai 当日零点开始，7d/30d 为此前连续 7×24/30×24 小时。按样本 pond_id 所属养殖场当前 owner 过滤；允许旧 owner 查看仍归其池塘的历史，即使设备已调走或停用。若当前设备不归用户且无归属本用户池塘的历史样本，统一
+        404；可见设备无数据返回 points=[]。非法 metric/range/max_points 返回 400；禁止仅以 device_no 查询全部历史。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  metric: { type: string }
-                  unit: { type: string }
-                  points:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        ts: { type: string, format: date-time }
-                        value: { type: number }
+                $ref: '#/components/schemas/History'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: device_no
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: metric
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - temperature
+          - dissolved_oxygen
+          - ph
+          - turbidity
+          - salinity
+      - name: range
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - today
+          - 7d
+          - 30d
+          default: today
+      - name: max_points
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 200
   /alarms:
     get:
-      tags: [alarms]
-      summary: 报警列表(报警中心)
-      parameters:
-        - { name: limit, in: query, schema: { type: integer, default: 50 } }
-        - { name: only_unconfirmed, in: query, schema: { type: boolean } }
+      tags:
+      - alarms
+      summary: 当前用户报警列表
+      description: 按报警 pond_id 快照的当前 owner 过滤，包括已停用或调走设备的历史报警。按 created_at DESC,id DESC 排序；先过滤再分页。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Alarm"
+                  $ref: '#/components/schemas/Alarm'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - name: level
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - critical
+          - warning
+      - name: only_unconfirmed
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 50
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+          default: 0
   /stats/summary:
     get:
-      tags: [stats]
-      summary: 首页汇总(在线/离线/报警设备数 + 池塘状态)
+      tags:
+      - stats
+      summary: 首页统计及池塘状态
+      description: 按目标契约实现并以集成测试验收。
       responses:
-        "200":
+        '200':
+          description: 成功
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StatsSummary"
+                $ref: '#/components/schemas/StatsSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
   /alarms/{id}/confirm:
     post:
-      tags: [alarms]
-      summary: 确认(消除)报警
-      parameters:
-        - { name: id, in: path, required: true, schema: { type: integer } }
+      tags:
+      - alarms
+      summary: 确认报警
+      description: 事务内校验报警快照 pond_id 的当前 owner 并确认。不存在或越权统一 404。幂等：重复确认返回 204 并保留首次 confirmed_at。确认不删除报警、不停止仍持续异常时的后续规则处理。
       responses:
-        "204": { description: 已确认 }
-
+        '204':
+          description: 成功；响应无正文
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id001
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  responses:
+    BadRequest:
+      description: 参数、JSON 或业务校验失败；error=invalid_request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: 凭据缺失/过期/错误、错误 token 类型或权限主体失效；error=unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 资源不存在或当前主体无权访问；统一 error=not_found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: 关联依赖阻止删除等状态冲突；error=conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalError:
+      description: 内部故障；error=internal_error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UpstreamError:
+      description: 微信上游故障；error=upstream_error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          minLength: 1
+          description: 稳定错误码；不得返回数据库、口令、密钥或内部堆栈。
+      additionalProperties: false
     User:
       type: object
+      required:
+      - id
+      - nickname
       properties:
-        id: { type: integer }
-        nickname: { type: string }
-    PondSummary:
-      type: object
-      properties:
-        pond_id: { type: integer }
-        pond_name: { type: string }
-        status: { type: string, enum: [normal, warning, critical] }
-        device_count: { type: integer }
-        latest:
-          $ref: "#/components/schemas/WaterLatest"
-    Device:
-      type: object
-      properties:
-        device_no: { type: string }
-        pond_id: { type: integer }
-        model: { type: string }
-        status: { type: string, enum: [online, offline] }
-        last_seen_at: { type: string, format: date-time, nullable: true }
-    DeviceDetail:
-      allOf:
-        - $ref: "#/components/schemas/Device"
-        - type: object
-          properties:
-            latest: { $ref: "#/components/schemas/WaterLatest" }
+        id: &id002
+          type: integer
+          format: int64
+          minimum: 1
+        nickname:
+          type: string
+      additionalProperties: false
+      description: 仅公开这两个字段；不返回 openid、用户名、手机号或密码摘要。
     WaterLatest:
       type: object
-      nullable: true
+      required:
+      - device_no
+      - pond_id
+      - ts
+      - temperature
+      - dissolved_oxygen
+      - ph
+      - turbidity
+      - salinity
+      - signal
+      - timestamps
+      - report_interval
       properties:
-        ts: { type: string, format: date-time }
-        temperature: { type: number, nullable: true }
-        dissolved_oxygen: { type: number, nullable: true }
-        ph: { type: number, nullable: true }
-        turbidity: { type: number, nullable: true }
-        salinity: { type: number, nullable: true }
+        device_no:
+          type: string
+        pond_id: *id002
+        ts: &id003
+          type: string
+          format: date-time
+        temperature:
+          type: number
+          nullable: true
+        dissolved_oxygen:
+          type: number
+          nullable: true
+        ph:
+          type: number
+          nullable: true
+        turbidity:
+          type: number
+          nullable: true
+        salinity:
+          type: number
+          nullable: true
+        signal:
+          type: integer
+          nullable: true
+        timestamps:
+          type: object
+          required:
+          - temperature
+          - dissolved_oxygen
+          - ph
+          - turbidity
+          - salinity
+          - signal
+          properties:
+            temperature:
+              type: string
+              format: date-time
+              nullable: true
+            dissolved_oxygen:
+              type: string
+              format: date-time
+              nullable: true
+            ph:
+              type: string
+              format: date-time
+              nullable: true
+            turbidity:
+              type: string
+              format: date-time
+              nullable: true
+            salinity:
+              type: string
+              format: date-time
+              nullable: true
+            signal:
+              type: string
+              format: date-time
+              nullable: true
+          additionalProperties: false
+        report_interval:
+          type: integer
+          enum:
+          - 60
+          - 300
+          default: 60
+          description: 秒，所选设备当前有效上报间隔
+      additionalProperties: false
+      nullable: true
+      description: 无可见有效属性时为 null；有影子时所有键存在，尚未采集指标及对应 timestamps 项为 null。按属性合并最新已知值，未上报或 JSON null 不清空旧值；ts 是最近一次有效属性更新时间，各属性时间见 timestamps。UI 按 now - timestamps[metric]
+        > 3×report_interval 标记字段过期。pond_id 为该影子当前所属塘；signal 单位 dBm。
+    Device:
+      type: object
+      required:
+      - id
+      - device_no
+      - pond_id
+      - name
+      - model
+      - status
+      - last_seen_at
+      - created_at
+      - disabled_at
+      - report_interval
+      properties:
+        id: *id002
+        device_no: &id004
+          type: string
+        pond_id: *id002
+        name: &id005
+          type: string
+        model: &id006
+          type: string
+        status: &id007
+          type: string
+          enum:
+          - online
+          - offline
+        last_seen_at: &id008
+          type: string
+          format: date-time
+          nullable: true
+        created_at: *id003
+        disabled_at: &id009
+          type: string
+          format: date-time
+          nullable: true
+        report_interval:
+          type: integer
+          enum:
+          - 60
+          - 300
+          description: 注册确定的预期上报周期，秒。
+      additionalProperties: false
+      description: 小程序只返回未停用设备，管理端可使用 include_disabled 查询停用设备。name/model 未设置时为空字符串；永不返回 secret 或摘要。
+    Alarm:
+      type: object
+      required:
+      - id
+      - device_no
+      - pond_id
+      - metric
+      - current_value
+      - threshold
+      - level
+      - message
+      - confirmed_at
+      - created_at
+      properties:
+        id: *id002
+        device_no:
+          type: string
+        pond_id: *id002
+        metric:
+          type: string
+          enum:
+          - temperature
+          - dissolved_oxygen
+          - ph
+          - turbidity
+          - salinity
+        current_value:
+          type: number
+        threshold:
+          type: number
+        level:
+          type: string
+          enum:
+          - critical
+          - warning
+        message:
+          type: string
+        confirmed_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at: *id003
+      additionalProperties: false
+      description: pond_id 为触发时快照；level 来自命中的规则配置，不能按上/下阈值自动映射。
+    DeviceDetail:
+      type: object
+      required:
+      - id
+      - device_no
+      - pond_id
+      - name
+      - model
+      - status
+      - last_seen_at
+      - created_at
+      - disabled_at
+      - latest
+      - report_interval
+      properties:
+        id: *id002
+        device_no: *id004
+        pond_id: *id002
+        name: *id005
+        model: *id006
+        status: *id007
+        last_seen_at: *id008
+        created_at: *id003
+        disabled_at: *id009
+        latest:
+          $ref: '#/components/schemas/WaterLatest'
+        report_interval:
+          type: integer
+          enum:
+          - 60
+          - 300
+          description: 注册确定的预期上报周期，秒。
+      additionalProperties: false
+    PondSummary:
+      type: object
+      required:
+      - pond_id
+      - pond_name
+      - status
+      - device_count
+      - latest
+      properties:
+        pond_id: &id010
+          type: integer
+          format: int64
+          minimum: 1
+        pond_name:
+          type: string
+        status: &id011
+          type: string
+          enum:
+          - normal
+          - warning
+          - critical
+          description: 所有未确认报警最高级别 critical > warning > normal；不得先截断报警列表。
+        device_count:
+          type: integer
+          minimum: 0
+        latest:
+          $ref: '#/components/schemas/WaterLatest'
+      additionalProperties: false
+      description: device_count 排除停用设备；latest 为当前池塘未停用设备中 ts 最新的一个设备影子，时间相同按 device_no 升序取首个；无数据 null。
     StatsSummary:
       type: object
+      required:
+      - online_devices
+      - offline_devices
+      - alarm_devices
+      - ponds
       properties:
-        online_devices: { type: integer }
-        offline_devices: { type: integer }
-        alarm_devices: { type: integer, description: 有未确认报警的设备相关计数 }
+        online_devices:
+          type: integer
+          minimum: 0
+        offline_devices:
+          type: integer
+          minimum: 0
+        alarm_devices:
+          type: integer
+          minimum: 0
+          description: 当前用户可见未停用设备中，当前池塘有未确认报警的 device_no 去重计数；不等于报警条数。
         ponds:
           type: array
           items:
             type: object
+            required:
+            - pond_id
+            - pond_name
+            - status
             properties:
-              pond_id: { type: integer }
-              pond_name: { type: string }
-              status: { type: string, enum: [normal, warning, critical] }
-    Alarm:
+              pond_id: *id010
+              pond_name:
+                type: string
+              status: *id011
+            additionalProperties: false
+      additionalProperties: false
+      description: 统计不受报警列表 limit 影响。池塘状态含该池塘全部可见未确认历史报警。
+    History:
       type: object
+      required:
+      - metric
+      - unit
+      - points
       properties:
-        id: { type: integer }
-        device_no: { type: string }
-        pond_id: { type: integer }
-        metric: { type: string }
-        current_value: { type: number }
-        threshold: { type: number }
-        level: { type: string, enum: [critical, warning] }
-        message: { type: string }
-        confirmed_at: { type: string, format: date-time, nullable: true }
-        created_at: { type: string, format: date-time }
+        metric:
+          type: string
+          enum:
+          - temperature
+          - dissolved_oxygen
+          - ph
+          - turbidity
+          - salinity
+        unit:
+          type: string
+          enum:
+          - ℃
+          - mg/L
+          - ''
+          - NTU
+          - ppt
+        points:
+          type: array
+          items:
+            type: object
+            required:
+            - ts
+            - value
+            properties:
+              ts:
+                type: string
+                format: date-time
+              value:
+                type: number
+            additionalProperties: false
+      additionalProperties: false
+      description: 单位映射：temperature=℃、dissolved_oxygen=mg/L、ph=空字符串（无量纲）、turbidity=NTU、salinity=ppt。points 时间升序且数量 <= max_points；剔除所选指标 null 的样本，等宽时间桶取平均，空桶省略，ts
+        为桶起点；无数据 points=[]。

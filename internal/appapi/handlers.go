@@ -2,6 +2,7 @@ package appapi
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -77,8 +78,12 @@ func (s *Server) pondLatest(ctx context.Context, pondID int64, devs []iolinkcont
 }
 
 func (s *Server) getPond(c *gin.Context) {
-	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
-	p, err := s.deps.Ponds.Get(c.Request.Context(), id)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+		return
+	}
+	p, err := s.deps.Ponds.GetByUser(c.Request.Context(), id, uid(c))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
 		return
@@ -105,7 +110,7 @@ func (s *Server) listDevices(c *gin.Context) {
 		for _, d := range devs {
 			out = append(out, gin.H{
 				"device_no": d.DeviceNo, "pond_id": d.PondID,
-				"model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt,
+				"name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "report_interval": d.ReportInterval,
 			})
 		}
 	}
@@ -114,14 +119,14 @@ func (s *Server) listDevices(c *gin.Context) {
 
 func (s *Server) getDevice(c *gin.Context) {
 	no := c.Param("device_no")
-	d, err := s.deps.Devices.GetByDeviceNo(c.Request.Context(), no)
+	d, err := s.deps.Devices.GetByDeviceNoForUser(c.Request.Context(), no, uid(c))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
 		return
 	}
 	resp := gin.H{
 		"device_no": d.DeviceNo, "pond_id": d.PondID,
-		"model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt,
+		"name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "report_interval": d.ReportInterval,
 	}
 	if rd, err := s.deps.Telemetry.Latest(c.Request.Context(), no); err == nil {
 		resp["latest"] = waterLatestJSON(rd)
@@ -133,6 +138,10 @@ func (s *Server) waterLatest(c *gin.Context) {
 	no := c.Query("device_no")
 	if no == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "device_no required"})
+		return
+	}
+	if _, err := s.deps.Devices.GetByDeviceNoForUser(c.Request.Context(), no, uid(c)); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "no data"})
 		return
 	}
 	rd, err := s.deps.Telemetry.Latest(c.Request.Context(), no)
@@ -150,30 +159,48 @@ func (s *Server) waterHistory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "device_no and metric required"})
 		return
 	}
-	to := time.Now()
-	switch c.DefaultQuery("range", "today") {
-	case "7d":
-		from := to.AddDate(0, 0, -7)
-		s.history(c, no, metric, from, to)
-	case "30d":
-		from := to.AddDate(0, 0, -30)
-		s.history(c, no, metric, from, to)
-	default:
-		from := time.Date(to.Year(), to.Month(), to.Day(), 0, 0, 0, 0, to.Location())
-		s.history(c, no, metric, from, to)
+	if _, err := s.deps.Devices.GetByDeviceNoForUser(c.Request.Context(), no, uid(c)); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+		return
 	}
-}
-
-func (s *Server) history(c *gin.Context, no, metric string, from, to time.Time) {
-	points, err := s.deps.Telemetry.History(c.Request.Context(), no, metric, from, to, 200)
+	if !iolinkcontractsdomain.ValidMetric(metric) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid metric"})
+		return
+	}
+	maxPoints, err := strconv.Atoi(c.DefaultQuery("max_points", "200"))
+	if err != nil || maxPoints < 1 || maxPoints > 200 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid max_points"})
+		return
+	}
+	from, to, err := historyWindow(c.DefaultQuery("range", "today"), time.Now())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid range"})
+		return
+	}
+	points, err := s.deps.Telemetry.History(c.Request.Context(), no, metric, from, to, maxPoints)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "history query failed"})
 		return
 	}
 	if points == nil {
 		points = []iolinkcontractsdomain.MetricPoint{}
 	}
-	c.JSON(http.StatusOK, gin.H{"metric": metric, "points": points})
+	c.JSON(http.StatusOK, gin.H{"metric": metric, "unit": iolinkcontractsdomain.MetricUnits[metric], "points": points})
+}
+func historyWindow(name string, now time.Time) (time.Time, time.Time, error) {
+	// Asia/Shanghai has used UTC+8 since 1991; current business-day bounds.
+	local := now.In(time.FixedZone("Asia/Shanghai", 8*60*60))
+	to := now.UTC()
+	switch name {
+	case "today":
+		return time.Date(local.Year(), local.Month(), local.Day(), 0, 0, 0, 0, local.Location()).UTC(), to, nil
+	case "7d":
+		return to.AddDate(0, 0, -7), to, nil
+	case "30d":
+		return to.AddDate(0, 0, -30), to, nil
+	default:
+		return time.Time{}, time.Time{}, iolinkcontractsdomain.ErrInvalidRange
+	}
 }
 
 func (s *Server) listAlarms(c *gin.Context) {
@@ -195,7 +222,11 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
 		return
 	}
-	if err := s.deps.Alarms.Confirm(c.Request.Context(), id); err != nil {
+	if err := s.deps.Alarms.ConfirmByUser(c.Request.Context(), id, uid(c)); err != nil {
+		if errors.Is(err, iolinkcontractsdomain.ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "alarm not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -205,7 +236,9 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 // ---- JSON shaping (keeps OpenAPI field names) ----
 
 func waterLatestJSON(rd iolinkcontractsdomain.Reading) gin.H {
-	h := gin.H{"ts": rd.Timestamp}
+	h := gin.H{"ts": rd.Timestamp, "pond_id": rd.PondID, "report_interval": rd.ReportInterval, "timestamps": rd.Timestamps}
+	h["battery"] = rd.Battery
+	h["signal"] = rd.Signal
 	h["temperature"] = rd.Temperature
 	h["dissolved_oxygen"] = rd.DO
 	h["ph"] = rd.PH
@@ -253,26 +286,28 @@ func (s *Server) statsSummary(c *gin.Context) {
 			"pond_id": p.ID, "pond_name": p.Name, "status": "normal",
 		})
 	}
-	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 200)
-	openByPond := map[int64]bool{}
-	alarmDevices := 0
+	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 5000)
+	openByPond := map[int64]iolinkcontractsdomain.AlarmLevel{}
+	alarmDevices := map[string]struct{}{}
 	if err == nil {
 		for _, a := range alarms {
 			if a.ConfirmedAt == nil {
-				alarmDevices++
-				openByPond[a.PondID] = true
+				alarmDevices[a.DeviceNo] = struct{}{}
+				if openByPond[a.PondID] != iolinkcontractsdomain.AlarmCritical {
+					openByPond[a.PondID] = a.Level
+				}
 			}
 		}
 	}
 	for _, item := range pondItems {
-		if openByPond[item["pond_id"].(int64)] {
-			item["status"] = "warning"
+		if level := openByPond[item["pond_id"].(int64)]; level != "" {
+			item["status"] = string(level)
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"online_devices":  online,
 		"offline_devices": offline,
-		"alarm_devices":   alarmDevices,
+		"alarm_devices":   len(alarmDevices),
 		"ponds":           pondItems,
 	})
 }

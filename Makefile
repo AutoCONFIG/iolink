@@ -1,32 +1,53 @@
-GIT_BASE := https://git.hyhy.fun/rsplab
+GO ?= go
+PYTHON ?= python3
+DOCS_PYTHON ?= .venv/contracts/bin/python
+DEV_COMPOSE = docker compose -p iolink-dev -f deploy/docker-compose.yml
 
-.PHONY: bootstrap dev work test verify clean
+.PHONY: bootstrap build test verify verify-contracts docs-tools integration dev migrate admin-init stop clean
 
-bootstrap: ## resolve all Go module deps (access/appapi/contracts pulled by version)
-	go mod download all
-	go build ./...
+bootstrap:
+	git submodule update --init
+	$(GO) mod download
+	$(GO) build ./...
 
-work: ## optional: local cross-repo dev workspace (expects sibling clones)
-	@repos="."; \
-	[ -d ../iolink-access ]  && repos="$$repos ../iolink-access"; \
-	[ -d ../iolink-appapi ]  && repos="$$repos ../iolink-appapi"; \
-	go work init $${repos}; \
-	echo "go.work created for: $$repos"
-
-dev: ## run db + iolinkd locally
-	docker compose -f deploy/docker-compose.yml up -d
-	go run ./cmd/iolinkd
+build:
+	$(GO) build ./...
 
 test:
-	go vet ./...
-	go test ./internal/...
-	cd contracts && go test ./...
+	$(GO) test ./... -count=1
 
-verify: ## release gate: everything builds/tests without local replaces
-	go build ./...
-	go vet ./...
-	go test ./internal/...
-	cd contracts && go test ./...
+verify: build
+	$(GO) vet ./...
+	$(GO) test ./... -count=1
 
-clean:
-	docker compose -f deploy/docker-compose.yml down -v
+# R02.a; kept separate so a Go-only build does not install Python dependencies.
+docs-tools:
+	$(PYTHON) -m venv .venv/contracts
+	$(DOCS_PYTHON) -m pip install -r scripts/requirements-docs.txt
+
+verify-contracts:
+	$(DOCS_PYTHON) scripts/check_contracts.py
+
+integration:
+	@test -n "$(IOLINK_TEST_PG_DSN)" || (echo 'Set IOLINK_TEST_PG_DSN to an isolated test instance'; exit 1)
+	$(GO) test ./internal/migrate ./internal/core -count=1 -v
+
+# Export IOLINK_PG_DSN and a random IOLINK_SECRET_KEY before serving.
+# The first start requires: make migrate; make admin-init ADMIN_USERNAME=... < protected-password-file.
+dev:
+	$(DEV_COMPOSE) up -d --wait
+	$(GO) run ./cmd/iolinkd migrate up
+	$(GO) run ./cmd/iolinkd serve
+
+migrate:
+	$(GO) run ./cmd/iolinkd migrate up
+
+admin-init:
+	@test -n "$(ADMIN_USERNAME)" || (echo 'Set ADMIN_USERNAME'; exit 1)
+	$(GO) run ./cmd/iolinkd admin init "$(ADMIN_USERNAME)"
+
+stop:
+	$(DEV_COMPOSE) down
+
+# Intentionally preserves the database volume; data removal is an explicit operator action.
+clean: stop

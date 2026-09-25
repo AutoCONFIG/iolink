@@ -1,97 +1,43 @@
-# 管理后台前端 · 开发交接文档
+# 管理前端和小程序交接基线
 
-> 给前端工程师的自足上手文档。读完本文即可开工,不需要读后端代码。
-> 你的工作对应 PLAN.md 的 **L2 线(管理前端)**;契约如有变动会在此文档与 admin-openapi.yaml 同步更新。
+2026-09-19，目标规格。当前管理前端仅占位页，小程序未交付。先读PLAN、PLAN-DETAILS、ACCEPTANCE；两份OpenAPI是目标契约，必须在M2契约测试通过后才能声称后端联调就绪。
 
-## 1. 你要做什么
+## 管理前端
 
-为智慧水产监测平台开发 **Web 管理后台**(Vue3),部署形态是编译后嵌入后端二进制
-(`go:embed`),生产环境与后端**同源同端口**,无需处理 CORS。
+固定Vue3 + TypeScript + Vite + Element Plus，自建脚手架。源码在独立仓库 https://git.hyhy.fun/rsplab/iolink-webui.git ，以 git 子模块形式挂载在 web/admin（仓库根 = web/admin，构建产物输出到其 dist/，即 web/admin/dist，go:embed 会打入 iolinkd 单二进制；主仓库 clone 后需执行 `git submodule update --init` 或 `make bootstrap`）。下表页面ID是唯一范围，不再用“6+1/6+2”描述。
 
-技术栈(已定,不纠结):**Vue3 + TypeScript + Vite + Element Plus**,
-推荐从 [soybean-admin](https://github.com/soybeanjs/soybean-admin) 或 vben 模板起步
-(布局/菜单/登录页/请求封装开箱即得),只写业务页面。
+| 页面ID | 页面/建议路由 | 接口与验收要点 |
+|---|---|---|
+| A01 | 登录 /login | POST /admin/v1/login；401回登录，首启/强制改密另有引导 |
+| A02 | 总览 /dashboard | GET /stats + /ponds；critical/warning/normal及latest；无数据和过期属性明确显示 |
+| A03 | 农场和用户分配 /farms | farms CRUD、users检索、PUT farms/{id}/owner；未分配提示；转交/解除二次确认并说明历史权限变化 |
+| A04 | 池塘 /ponds | ponds CRUD；有任何设备（含停用）/历史/规则/报警引用409时显示具体原因，不提示直接删历史 |
+| A05 | 设备 /devices | 注册（可选60/300秒周期）、列表、详情、调塘、停用；secret一次性展示与复制，关闭后不再请求明文；调塘提示历史保留原塘 |
+| A06 | 规则 /alarms/rules | alarm-rules CRUD；metric/上下限/level/enabled；min<max及至少一端；level由规则选择 |
+| A07 | 报警 /alarms | 列表level/only_unconfirmed/分页，单条/批量确认；批量失败整批不更新 |
+| A08 | 系统 /system | POST /password；更改后清理旧token重新登录；版本、依赖与通知状态 |
 
-## 2. 页面清单(6+1 个)
+A03与A04是独立业务页面；后续M6增加产品/模型、组织/成员/角色、License/首启、开放Key管理，M7增加视频/地图/大屏，M8增加协议/网关/命令/转发/调度/联动/调试/报表页面，对应R34–R54。不能以完成A01–A08就宣称M0–M8所有UI完成。
 
-| 页面 | 路由建议 | 核心接口 | 要点 |
-|---|---|---|---|
-| 登录 | /login | `POST /admin/v1/login` | 用户名+密码;token 存 localStorage,请求头 `Authorization: Bearer <token>` |
-| 总览 | /dashboard | `GET /stats` + `GET /api` 数据 | 统计卡(devices_total/online/offline/open_alarms)+ 池塘状态墙(每池塘一卡:🟢🟡🔴 + 四参数) |
-| 池塘管理 | /ponds | `/farms` `/ponds` CRUD | 删除有设备绑定的池塘会 409,前端提示先移除设备 |
-| 设备管理 | /devices | `/devices` | **注册成功弹窗展示 secret,明确提示"仅显示一次"**(关掉就再也拿不到) |
-| 报警规则 | /alarms/rules | `/alarm-rules` CRUD | metric 下拉固定五项;min/max 至少填一个;level: critical(红)/warning(黄) |
-| 报警中心 | /alarms | `/alarms` + confirm/batch-confirm | 列表按级别标色;单条确认 + 批量确认 |
-| 系统设置 | /system | `POST /admin/v1/password` | 管理员改密(旧密码校验;新密码≥8位) |
+## 接口与状态
 
-池塘状态色规则(与小程序一致):有 critical 未确认报警=🔴;只有 warning=🟡;否则 🟢。
-(当前 `/stats` 只有计数,状态墙数据可先用 `GET /ponds` + 前端组合,M2 收尾会加聚合字段——见 §6 待办)
+- 管理前缀/admin/v1，小程序/api/v1；成功JSON不包code/data，失败{error}，空列表[]，时间UTC RFC3339，UI按Asia/Shanghai显示。
+- 管理集合limit/offset，稳定排序，过滤再分页；无效参数400。认证无效401，资源不存在/跨范围404；M6已认证动作不足403。无数据latest为null，不能当成0。
+- latest按属性合并，timestamps给逐字段时间，report_interval给设备周期；超过3倍周期标过期，即使包ts较新也不能把旧字段显示为新值。
+- 表单按目标OpenAPI校验；响应契约检查失败视为联调缺陷，不在前端静默改名猜字段。
+- 管理鉴权token仅保存在运行时内存，页面刷新重新登录；不在日志/URL保存token。小程序使用平台安全存储并在登出/过期清除。
+- Vue开发用Vite代理/admin和/api到本机后端；生产同源，管理路由避免与/admin/v1冲突；不为开发直接放开生产CORS。
 
-## 3. 接口文档(权威)
+## 小程序
 
-**[api/admin-openapi.yaml](api/admin-openapi.yaml)** —— OpenAPI 3.0,全部端点/参数/响应/错误码。
-常用端点速查:
+页面P01登录、P02首页、P03池塘、P04实时、P05历史、P06报警。微信登录先建档，未分配显示联系管理员；由A03分配后才出现数据。实时30秒轮询、切后台暂停，回前台刷新；历史范围today/7d/30d，max_points<=200、展示unit；报警支持确认和订阅引导，拒绝订阅仍可查看。
 
-```
-POST /admin/v1/login                     {username, password} → {token, expires_in}
-GET  /admin/v1/stats                     → {devices_total, online, offline, open_alarms}
-GET/POST /admin/v1/farms                 养殖场
-GET/POST /admin/v1/ponds                 池塘 {farm_id, name, area_mu}
-GET/POST /admin/v1/devices               注册: {pond_id, model} → {device_no, secret, ...}
-GET/POST/PUT/DELETE /admin/v1/alarm-rules 规则 {pond_id, metric, min_value?, max_value?, level}
-GET  /admin/v1/alarms?limit=             报警列表
-POST /admin/v1/alarms/{id}/confirm       确认 → 204
-POST /admin/v1/alarms/batch-confirm      {ids:[...]} → {confirmed: n}
-```
+M7增加定位/视频入口，真实微信播放资质和地图Key按EXTENSIONS外部输入表验收；PC mock不能替代真机结果。
 
-## 4. 接口约定(重要,与常见后端风格略有差异)
+## 联调与构建关卡
 
-- **REST 原生风格**:成功 = 2xx + 业务 JSON(无 `{code,message,data}` 包裹);失败 = 4xx/5xx + `{"error":"原因"}`
-- **时间格式**:RFC3339,如 `"2026-09-16T11:08:14.943963+08:00"`
-- **字段命名**:snake_case(`device_no`、`min_value`、`area_mu`)
-- **鉴权失败**一律 401 → 前端统一拦截跳登录
-- **删除冲突**:池塘删除 409(有设备)、养殖场删除 409(有池塘);前端捕获并提示
-- 枚举值:status=`online|offline`;level=`critical|warning`;metric 五项白名单
-  `temperature | dissolved_oxygen | ph | turbidity | salinity`(单位见 §6)
-
-## 5. 本地开发环境
-
-后端一条命令起(含数据库):
-
-```bash
-git clone https://git.hyhy.fun/rsplab/iolink.git && cd iolink
-make dev        # 起 PostgreSQL/TimescaleDB + iolinkd(:8080)
-# 首次启动自带种子数据: 管理员 admin/admin123、示范农场/池塘、模拟设备 dev-001
-```
-
-前端 dev server 与后端跨端口,**用 Vite 代理**解决(后端不做 CORS,生产同源也不需要):
-
-```ts
-// vite.config.ts
-server: { proxy: { '/admin': 'http://localhost:8080', '/api': 'http://localhost:8080' } }
-```
-
-模拟数据自造:让后端同学给你一条注册好的设备,或自己调 `POST /devices` 注册后,
-用主仓的模拟器打数据:`go run ./cmd/mqtt-sim -device <device_no> -secret <secret> -interval 5s`
-(需本机 1883 端口空闲;`make dev` 起的 iolinkd 自带 broker)。
-
-演示种子账号:`admin / admin123`(本地开发;生产会强制修改)。
-
-## 6. 已知边界与近期变动(防踩坑)
-
-1. `GET /ponds` 暂不带状态/latest 聚合字段——总览状态墙先前端组合,M2 收尾后端会补 `status/latest` 字段(字段名会提前在群里同步)
-2. 设备 `signal`(RSSI)已在影子中,设备详情后续会暴露;先不用
-3. metric 单位对照:temperature ℃ / dissolved_oxygen mg/L / ph 无 / turbidity NTU / salinity ppt —— 图表 y 轴标注用
-4. 管理后台路由前缀 `/admin/v1`,与小程序 `/api/v1` 完全独立,token 不互通
-
-## 7. 验收标准(= M3 完成)
-
-浏览器从零走通:**登录 → 建养殖场/池塘 → 注册设备(拿到 secret)→ 配一条阈值规则 →
-看到模拟器数据出现在设备列表 → 人为触发报警(sensor_data 低于阈值)→ 报警中心出现并确认 →
-系统设置里改一次密码**。
-
-## 8. 协作方式
-
-- 仓库:`git.hyhy.fun/rsplab/iolink`,前端代码放 `web/admin/`,feature 分支 → MR
-- 契约问题先提 MR 改 `docs/api/admin-openapi.yaml`(后端 review 后同步实现),不要先写代码后补文档
-- 后端接口有 bug/缺失 → GitLab issue 或直接找主程
+1. M0/M2先修复旧schema和契约差异，建立隔离数据库及管理员/微信用户A/B测试样本；不依赖旧文档不存在的dev-001种子数据。
+2. 页面mock直接按目标schema生成；对真实后端完成A01–A08和P01–P06，每一步记录网络响应与页面证据。
+3. `注册设备→mqtt-sim使用新secret→看属性→触发阈值→确认报警→转交农场→验证A失权B可见`作为共同验收。
+4. 前端构建锁定依赖，dist来自源码，不提交凭据；CI先构建前端再go:embed。刷新非API路由能显示页面，未知API返回JSON404而不是SPA HTML。
+5. 整体通过R23–R27后记录证据；当前make dev/verify均不是已经完成整改的保证，先看IMPLEMENTED当前限制。

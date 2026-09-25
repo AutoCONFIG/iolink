@@ -1,0 +1,18 @@
+go build ./...
+go vet ./...
+go test ./... -count=1
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	0.010s
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-once	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-sim	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/tp-spike-pub	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	0.004s
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	1.085s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	0.011s
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	1.593s
+?   	git.hyhy.fun/rsplab/iolink/internal/domain	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	1.382s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	0.388s
+?   	git.hyhy.fun/rsplab/iolink/internal/testdb	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/web	[no test files]

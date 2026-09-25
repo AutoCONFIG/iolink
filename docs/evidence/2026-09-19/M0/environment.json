@@ -1,0 +1,13 @@
+{
+  "go": "go version go1.26.8 linux/amd64",
+  "python": "Python 3.14.6",
+  "docker": "Docker version 29.8.1, build 4a63305",
+  "compose": "Docker Compose version v5.5.1",
+  "kernel": "Linux 7.0.0-111030-tuxedo x86_64 GNU/Linux",
+  "compose_config_assertion": {
+    "IOLINK_REPORT_INTERVAL": "300",
+    "IOLINK_OFFLINE_GRACE": "4"
+  },
+  "database": "PostgreSQL 16.15; TimescaleDB 2.30.0",
+  "timescale_image": "timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76"
+}

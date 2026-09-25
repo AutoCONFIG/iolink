@@ -1,0 +1,45 @@
+stages: [verify, publish]
+
+variables:
+  # web/admin 是 iolink-webui 的子模块，不拉取则 go:embed 缺目录、编译失败
+  GIT_SUBMODULE_STRATEGY: recursive
+
+go-and-database:
+  stage: verify
+  image: golang:1.26.5-bookworm
+  services:
+    - name: timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76
+      alias: database
+  variables:
+    POSTGRES_USER: iolink_test
+    POSTGRES_PASSWORD: isolated-ci-only
+    POSTGRES_DB: iolink_test
+    IOLINK_TEST_PG_DSN: postgres://iolink_test:isolated-ci-only@database:5432/iolink_test
+  script:
+    - make verify
+
+contracts:
+  stage: verify
+  image: python:3.12-slim
+  script:
+    - pip install -r scripts/requirements-docs.txt
+    - python scripts/check_contracts.py
+
+# 打 tag 时构建 iolinkd 镜像并推送到 GitLab Container Registry。
+# git tag 请用 v1.2.3 这类 Docker tag 合法字符（避免 + / 空格）；
+# CI_REGISTRY / CI_REGISTRY_IMAGE / CI_REGISTRY_USER / CI_REGISTRY_PASSWORD
+# 由 GitLab 预注入，无需配置 secret。
+build-image:
+  stage: publish
+  image: docker:27
+  services:
+    - docker:27-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
+    - docker build -t "$CI_REGISTRY_IMAGE/iolinkd:$CI_COMMIT_TAG" -t "$CI_REGISTRY_IMAGE/iolinkd:latest" .
+    - docker push "$CI_REGISTRY_IMAGE/iolinkd:$CI_COMMIT_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/iolinkd:latest"
+  rules:
+    - if: $CI_COMMIT_TAG

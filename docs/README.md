@@ -1,30 +1,24 @@
-# 文档地图
+# 文档地图与使用规则
 
-> 想了解项目,按下面的顺序读。任何文档与代码不一致时,以代码 + 本地图为准并回报。
+2026-09-19 重建实施基线。用户确认 M0–M8 全部纳入，按阶段实施。需求基线已双审通过，正在分阶段实施；文档通过不等于实现通过。实施记录见 [M0证据](evidence/2026-09-19/M0/README.md)、[M1证据](evidence/2026-09-19/M1/README.md)。
 
-## 现役文档(评审/开发用)
+权威关系：用户范围 → PLAN/设计附件 → 版本契约 → ACCEPTANCE验收。代码是实现证据，不能覆盖需求；文档冲突必须修订并复审。状态仅由 IMPLEMENTED维护。
 
-| 文档 | 内容 | 读者 |
-|---|---|---|
-| [IMPLEMENTED.md](IMPLEMENTED.md) | **已实现功能总表**(按模块分组,标注验证方式与待完成项) | 想知道"现在有什么" |
-| [PLAN.md](PLAN.md) | **计划主文档**:已定决策、里程碑 M0-M8、分工、升级触发器 | 全员,先读这个 |
-| [PLAN-DETAILS.md](PLAN-DETAILS.md) | **计划细节**:三段式架构与商业云职责映射、需求追溯矩阵、API/数据库/MQTT/前端/报警/安全全部设计、各里程碑验收清单 | 全员评审;负责人重点读自己模块的节 |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | 协作规范(⚠️ 其中跨仓版本流程将随 M2 并仓改版,以 PLAN.md §3 为准) | 模块负责人 |
-| [FRONTEND-HANDOVER.md](FRONTEND-HANDOVER.md) | **管理前端交接文档**(页面清单/约定/环境/验收) | 前端工程师,先读这个 |
-| [api/admin-openapi.yaml](api/admin-openapi.yaml) | 管理后台 API 契约(/admin/v1,权威) | 前端工程师 |
-| [api/openapi.yaml](api/openapi.yaml) | 小程序 API 契约(/api/v1,权威) | appapi 负责人、小程序开发 |
-| [mqtt-spec.md](mqtt-spec.md) | 设备接入规范(topic/载荷/取值范围,权威) | access 负责人、硬件方 |
-| [schema.sql](schema.sql) | 数据库 DDL(PG+TimescaleDB) | core 负责人 |
-
-## 留档(历史决策依据,不再更新)
-
-| 文档 | 内容 |
+| 文件 | 用途/阅读顺序 |
 |---|---|
-| [baseline-spike-report.md](baseline-spike-report.md) | ThingsPanel 基座实测报告(2026-09-16)——路线 C 决策的依据 |
-| [archive/proposal-baseline-final.md](archive/proposal-baseline-final.md) | 基座路线提案 v1/v2(已否决,决策记录见 PLAN.md §0) |
+| [PLAN.md](PLAN.md) | 先读：范围、阶段、依赖、质量目标 |
+| [ACCEPTANCE.md](ACCEPTANCE.md) | 每项R01–R55的验收与证据要求 |
+| [IMPLEMENTED.md](IMPLEMENTED.md) | 当前状态、已执行检查、已知差异；不继承旧勾选 |
+| [PLAN-DETAILS.md](PLAN-DETAILS.md) | M0–M5身份、数据、报警、接口和迁移目标 |
+| [EXTENSIONS.md](EXTENSIONS.md) | M6–M8产品模型/权限/授权/视频/协议/任务，外部输入清单 |
+| [api/admin-openapi.yaml](api/admin-openapi.yaml)、[api/openapi.yaml](api/openapi.yaml) | M0–M5目标契约，已标待实现；扩展契约在各阶段入口补齐后复核 |
+| [mqtt-spec.md](mqtt-spec.md) | 基础MQTT及命令、网关阶段目标 |
+| [schema.sql](schema.sql) | 遗留初始化脚本，有已登记缺陷；不是新目标DDL或升级入口 |
+| [FRONTEND-HANDOVER.md](FRONTEND-HANDOVER.md) | 页面ID、交互与联调关卡 |
+| [DEPLOY.md](DEPLOY.md) | 安装、TLS、备份恢复的目标流程及当前限制 |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | 契约先行、测试与证据规范 |
+| [FEATURE-MATRIX.md](FEATURE-MATRIX.md)、[FEATURE-CHECKLIST.md](FEATURE-CHECKLIST.md) | 功能到Rxx的速查，不重复维护完成计数 |
+| [PLAN-REVIEW-FINAL.md](PLAN-REVIEW-FINAL.md) | 当前修订版双审过程与结论 |
+| [PLAN-REVIEW-2026-09-19.md](PLAN-REVIEW-2026-09-19.md) | 初次双审未通过记录，行号对应原始commit，不随改文档重写历史 |
 
-## 决策一句话
-
-**彻底原生开发**:三段式(传感器含终端 → 本服务器 iolinkd 自研独立进程 → 小程序),
-单程序单仓交付;商业云(IoTDA/FunctionGraph 等)只保留职责映射,不引入其机制;
-ThingsPanel 仅作功能设计参照。
+原始需求附件、baseline-spike-report.md、proposal-baseline-final.md 未在仓库文档中找到，不设置假链接或当作已存在证据。历史方案可从Git历史寻找，当前基线以用户本次指令和上述重建文档为准。upstream/README 是参考材料，其旧基座候选描述不属于本项目当前决策。

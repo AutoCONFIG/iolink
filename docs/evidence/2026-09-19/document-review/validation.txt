@@ -1,0 +1,11 @@
+2026-09-19 document baseline validation
+Scope: README.md and docs plan/design/target contracts; business implementation not modified.
+Snapshot canonical JSON SHA256: cf8d496093d7eef6941bc57bc60a670de6e7c405aab50dfd36cef2c66bdb7c16
+Canonical algorithm: json.dumps(manifest, sort_keys=True) encoded UTF-8, SHA256.
+openapi-spec-validator 0.9.0: both OpenAPI 3.0.3 files PASS.
+openapi-schema-validator 0.9.0: component schema syntax PASS (round1); full specification validation repeated PASS (round2).
+Supplementary checks: all internal refs resolve; path parameters complete; response schemas/descriptions; 31 original operations preserved, 35 target operations total; rule threshold null/missing/single-bound cases PASS.
+Markdown relative links: PASS.
+ACCEPTANCE primary IDs: R01 through R55 unique and complete; staged subitems recorded separately.
+git diff --check: PASS.
+No business integration, database restore, WeChat, hardware, media or load acceptance implied by these checks.

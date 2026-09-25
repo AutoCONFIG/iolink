@@ -1,0 +1,18 @@
+Clean working-tree copy, empty GOCACHE; downloaded module cache reused.
+go build ./...
+go vet ./...
+go test ./... -count=1
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	0.014s
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-once	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-sim	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/tp-spike-pub	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	0.109s
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	0.993s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	0.012s
+?   	git.hyhy.fun/rsplab/iolink/internal/core	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/internal/domain	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	1.165s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	0.385s
+?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/web	[no test files]

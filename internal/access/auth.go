@@ -30,7 +30,7 @@ func ParseUplinkTopic(topic string) (deviceNo, kind string, err error) {
 	if len(parts) != 4 || parts[0] != "iolink" || parts[1] != "up" {
 		return "", "", fmt.Errorf("%w: %q", ErrBadTopic, topic)
 	}
-	if parts[2] == "" {
+	if parts[2] == "" || strings.ContainsAny(parts[2], "+#") {
 		return "", "", fmt.Errorf("%w: empty device_no in %q", ErrBadTopic, topic)
 	}
 	switch parts[3] {
@@ -47,10 +47,12 @@ func DownlinkTopic(deviceNo string) string { return "iolink/down/" + deviceNo + 
 // CheckACL enforces the per-device topic sandbox:
 // publish allowed only on iolink/up/{own}/#, subscribe only iolink/down/{own}/#.
 func CheckACL(deviceNo, topic string, write bool) bool {
+	if deviceNo == "" || strings.ContainsAny(deviceNo, "/+#") {
+		return false
+	}
 	if write {
-		d, kind, err := ParseUplinkTopic(topic)
-		return err == nil && d == deviceNo && kind == "properties" || //nolint:errcheck
-			(err == nil && d == deviceNo && kind == "ack")
+		d, _, err := ParseUplinkTopic(topic)
+		return err == nil && d == deviceNo
 	}
 	return topic == DownlinkTopic(deviceNo)
 }

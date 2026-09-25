@@ -5,6 +5,7 @@ package wire
 
 // Report is the property-uplink payload (topic: iolink/up/{device_no}/properties).
 type Report struct {
+	MessageID   *string  `json:"message_id,omitempty"`
 	Temperature *float64 `json:"temperature,omitempty"`      // ℃
 	DO          *float64 `json:"dissolved_oxygen,omitempty"` // mg/L
 	PH          *float64 `json:"ph,omitempty"`               // pH

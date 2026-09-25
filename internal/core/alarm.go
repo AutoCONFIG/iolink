@@ -2,144 +2,87 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log/slog"
-	"time"
-
-	"github.com/jackc/pgx/v5/pgxpool"
-
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/event"
+	"github.com/jackc/pgx/v5"
+	"log/slog"
+	"math"
 )
 
-// alarmEngine evaluates pond-scoped threshold rules against each incoming
-// properties event. Rules live in alarm_rules (per pond per metric); this
-// keeps threshold tuning a data change, not a code change.
 type alarmEngine struct {
-	pool     *pgxpool.Pool
 	log      *slog.Logger
-	notifier func(domain.Alarm) // late-bound by Service.SetNotifier; nil = off
+	notifier func(domain.Alarm)
 }
-
 type rule struct {
-	id       int64
-	metric   string
-	minValue *float64
-	maxValue *float64
-	level    string
-}
-
-func (a *alarmEngine) evaluate(e event.Event) error {
-	if len(e.Properties) == 0 {
-		return nil
-	}
-	rules, err := a.rulesForDevice(e.DeviceNo)
-	if err != nil {
-		return fmt.Errorf("load rules: %w", err)
-	}
-	for _, r := range rules {
-		v, ok := e.Properties[r.metric]
-		if !ok {
-			continue
-		}
-		if breached(r, v) {
-			if err := a.raise(e, r, v); err != nil {
-				a.log.Error("raise alarm", "device", e.DeviceNo, "metric", r.metric, "err", err)
-			}
-		}
-	}
-	return nil
+	metric             string
+	minValue, maxValue *float64
+	level              string
 }
 
 func breached(r rule, v float64) bool {
-	if r.minValue != nil && v < *r.minValue {
-		return true
-	}
-	if r.maxValue != nil && v > *r.maxValue {
-		return true
-	}
-	return false
+	return r.minValue != nil && v < *r.minValue || r.maxValue != nil && v > *r.maxValue
 }
-
-func (a *alarmEngine) rulesForDevice(deviceNo string) ([]rule, error) {
-	const q = `SELECT r.id, r.metric, r.min_value, r.max_value, r.level
-		FROM alarm_rules r
-		JOIN devices d ON d.pond_id = r.pond_id
-		WHERE d.device_no = $1 AND r.enabled`
-	rows, err := a.pool.Query(context.Background(), q, deviceNo)
+func (a *alarmEngine) evaluate(ctx context.Context, tx pgx.Tx, e event.Event, pond int64) ([]domain.Alarm, error) {
+	rows, err := tx.Query(ctx, "SELECT metric,min_value,max_value,level FROM alarm_rules WHERE pond_id=$1 AND enabled", pond)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	var out []rule
+	var rules []rule
 	for rows.Next() {
 		var r rule
-		if err := rows.Scan(&r.id, &r.metric, &r.minValue, &r.maxValue, &r.level); err != nil {
+		if err = rows.Scan(&r.metric, &r.minValue, &r.maxValue, &r.level); err != nil {
+			rows.Close()
 			return nil, err
 		}
-		out = append(out, r)
+		rules = append(rules, r)
 	}
-	return out, rows.Err()
-}
-
-// raise inserts an alarm unless an unconfirmed alarm for the same
-// device+metric is already open (dedup, avoid notification storms).
-func (a *alarmEngine) raise(e event.Event, r rule, v float64) error {
-	const q = `INSERT INTO alarms
-		(device_no, pond_id, metric, current_value, threshold, level, message)
-		SELECT $1::varchar, d.pond_id, $2::varchar, $3, $4, $5::varchar, $6::varchar
-		FROM devices d WHERE d.device_no = $1::varchar
-		  AND NOT EXISTS (
-			SELECT 1 FROM alarms a
-			WHERE a.device_no = $1::varchar AND a.metric = $2::varchar AND a.confirmed_at IS NULL)`
-	threshold := 0.0
-	msg := ""
-	if r.minValue != nil {
-		threshold = *r.minValue
-		msg = fmt.Sprintf("%s 低于阈值 %.1f", r.metric, *r.minValue)
-	}
-	if r.maxValue != nil {
-		threshold = *r.maxValue
-		msg = fmt.Sprintf("%s 高于阈值 %.1f", r.metric, *r.maxValue)
-	}
-	ct, err := a.pool.Exec(context.Background(), q,
-		e.DeviceNo, r.metric, v, threshold, r.level, msg)
+	err = rows.Err()
+	rows.Close()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if ct.RowsAffected() > 0 {
-		MetricAlarmsTotal.Inc()
-		a.log.Warn("ALARM raised", "device", e.DeviceNo, "metric", r.metric, "value", v, "ts", time.Now())
-		a.notify(e, r, v)
+	var out []domain.Alarm
+	for _, r := range rules {
+		v, ok := e.Properties[r.metric]
+		if !ok || !breached(r, v) {
+			continue
+		}
+		threshold := 0.0
+		direction := "低于"
+		if r.minValue != nil && v < *r.minValue {
+			threshold = *r.minValue
+		} else {
+			threshold = *r.maxValue
+			direction = "高于"
+		}
+		al := domain.Alarm{DeviceNo: e.DeviceNo, PondID: pond, Metric: r.metric, CurrentValue: v, Threshold: threshold, Level: domain.AlarmLevel(r.level), Message: fmt.Sprintf("%s %s阈值 %g", r.metric, direction, threshold)}
+		err = tx.QueryRow(ctx, `INSERT INTO alarms(device_no,pond_id,metric,current_value,threshold,level,message,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(device_no,pond_id,metric) WHERE confirmed_at IS NULL DO NOTHING RETURNING id,created_at`, al.DeviceNo, pond, al.Metric, v, threshold, r.level, al.Message, e.Ts).Scan(&al.ID, &al.CreatedAt)
+		if errors.Is(err, pgx.ErrNoRows) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		if _, err = tx.Exec(ctx, "INSERT INTO notification_outbox(alarm_id) VALUES($1)", al.ID); err != nil {
+			return nil, err
+		}
+		out = append(out, al)
+	}
+	return out, nil
+}
+func validateRule(r domain.AlarmRule) error {
+	if !domain.ValidMetric(r.Metric) || (r.Level != domain.AlarmWarning && r.Level != domain.AlarmCritical) || (r.Min == nil && r.Max == nil) {
+		return domain.ErrInvalidRule
+	}
+	for _, p := range []*float64{r.Min, r.Max} {
+		if p != nil && (math.IsNaN(*p) || math.IsInf(*p, 0)) {
+			return domain.ErrInvalidRule
+		}
+	}
+	if r.Min != nil && r.Max != nil && *r.Min >= *r.Max {
+		return domain.ErrInvalidRule
 	}
 	return nil
-}
-
-// notify resolves the alarm row we just inserted and hands it to the
-// notifier (asynchronous; never blocks the ingest path).
-
-// notify resolves the just-inserted alarm row and hands it to the notifier
-// asynchronously (never blocks the ingest path). openIDs are resolved by the
-// Service wrapper via dispatchAlarmNotifications.
-func (a *alarmEngine) notify(e event.Event, r rule, v float64) {
-	if a.notifier == nil {
-		return
-	}
-	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		var al domain.Alarm
-		err := a.pool.QueryRow(ctx, `
-			SELECT id, device_no, pond_id, metric, current_value, threshold, level,
-			       coalesce(message,''), created_at
-			FROM alarms WHERE device_no=$1 AND metric=$2 AND confirmed_at IS NULL
-			ORDER BY created_at DESC LIMIT 1`, e.DeviceNo, r.metric).
-			Scan(&al.ID, &al.DeviceNo, &al.PondID, &al.Metric, &al.CurrentValue,
-				&al.Threshold, &al.Level, &al.Message, &al.CreatedAt)
-		if err != nil {
-			a.log.Warn("notify: load alarm", "err", err)
-			return
-		}
-		a.notifier(al)
-	}()
 }

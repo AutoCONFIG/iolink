@@ -1,0 +1,335 @@
+=== RUN   TestHandleReportNormalizes
+--- PASS: TestHandleReportNormalizes (0.00s)
+=== RUN   TestParseUplinkTopic
+--- PASS: TestParseUplinkTopic (0.00s)
+=== RUN   TestCheckACL
+--- PASS: TestCheckACL (0.00s)
+=== RUN   TestAuthHook
+--- PASS: TestAuthHook (0.00s)
+=== RUN   TestRangeValidation
+2026/09/19 17:30:54 WARN field out of range device=dev-001 field=temperature
+2026/09/19 17:30:54 WARN field out of range device=dev-001 field=ph
+--- PASS: TestRangeValidation (0.00s)
+=== RUN   TestAuthenticatedLifecycleWatchdogAndTakeover
+=== RUN   TestAuthenticatedLifecycleWatchdogAndTakeover/1m0s
+=== RUN   TestAuthenticatedLifecycleWatchdogAndTakeover/5m0s
+--- PASS: TestAuthenticatedLifecycleWatchdogAndTakeover (0.00s)
+    --- PASS: TestAuthenticatedLifecycleWatchdogAndTakeover/1m0s (0.00s)
+    --- PASS: TestAuthenticatedLifecycleWatchdogAndTakeover/5m0s (0.00s)
+=== RUN   TestPayloadValidationAndACL
+2026/09/19 17:30:54 WARN field out of range device=one field=temperature
+2026/09/19 17:30:54 ERROR properties rejected device=one err="invalid message_id"
+--- PASS: TestPayloadValidationAndACL (0.00s)
+=== RUN   TestSlowDeviceDoesNotBlockOthersOrCancellation
+--- PASS: TestSlowDeviceDoesNotBlockOthersOrCancellation (0.00s)
+=== RUN   TestAllDocumentedMetricBoundaries
+2026/09/19 17:30:54 WARN field out of range device=one field=temperature
+2026/09/19 17:30:54 WARN field out of range device=one field=temperature
+2026/09/19 17:30:54 WARN field out of range device=one field=dissolved_oxygen
+2026/09/19 17:30:54 WARN field out of range device=one field=dissolved_oxygen
+2026/09/19 17:30:54 WARN field out of range device=one field=ph
+2026/09/19 17:30:54 WARN field out of range device=one field=ph
+2026/09/19 17:30:54 WARN field out of range device=one field=turbidity
+2026/09/19 17:30:54 WARN field out of range device=one field=turbidity
+2026/09/19 17:30:54 WARN field out of range device=one field=salinity
+2026/09/19 17:30:54 WARN field out of range device=one field=salinity
+2026/09/19 17:30:54 WARN field out of range device=one field=battery
+2026/09/19 17:30:54 WARN field out of range device=one field=battery
+2026/09/19 17:30:54 WARN field out of range device=one field=signal
+2026/09/19 17:30:54 WARN field out of range device=one field=signal
+--- PASS: TestAllDocumentedMetricBoundaries (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	0.004s
+=== RUN   TestTelemetryShadowDedupAndPondSnapshot
+--- PASS: TestTelemetryShadowDedupAndPondSnapshot (0.14s)
+=== RUN   TestAlarmThresholdConcurrencyConfirmationAndMove
+--- PASS: TestAlarmThresholdConcurrencyConfirmationAndMove (0.44s)
+=== RUN   TestRollbackAcrossReadingShadowAlarmOutbox
+--- PASS: TestRollbackAcrossReadingShadowAlarmOutbox (0.14s)
+=== RUN   TestHistoryBoundedAndInvalidRules
+--- PASS: TestHistoryBoundedAndInvalidRules (0.13s)
+=== RUN   TestAuthenticationStatusAndRestart
+--- PASS: TestAuthenticationStatusAndRestart (0.33s)
+=== RUN   TestDeviceSecretIsRandomAndReturnedOnlyOnCreation
+--- PASS: TestDeviceSecretIsRandomAndReturnedOnlyOnCreation (0.10s)
+=== RUN   TestConfiguredAndDeviceIntervals
+--- PASS: TestConfiguredAndDeviceIntervals (0.10s)
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence/will-v4
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence/will-v5
+--- PASS: TestRealMQTTAuthenticationACLAndPersistence (0.66s)
+    --- PASS: TestRealMQTTAuthenticationACLAndPersistence/will-v4 (0.00s)
+    --- PASS: TestRealMQTTAuthenticationACLAndPersistence/will-v5 (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	2.038s
+=== RUN   TestHistoryHTTPBoundsAndUnits
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+--- PASS: TestHistoryHTTPBoundsAndUnits (0.00s)
+=== RUN   TestHistoryBusinessDay
+--- PASS: TestHistoryBusinessDay (0.00s)
+=== RUN   TestLoginAndListPonds
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN] 2026/09/19 - 17:30:54 | 200 |     135.299µs |       127.0.0.1 | POST     "/api/v1/auth/login"
+[GIN] 2026/09/19 - 17:30:54 | 200 |      40.434µs |       127.0.0.1 | GET      "/api/v1/ponds"
+--- PASS: TestLoginAndListPonds (0.00s)
+=== RUN   TestWaterLatest
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN] 2026/09/19 - 17:30:54 | 200 |       63.89µs |       127.0.0.1 | POST     "/api/v1/auth/login"
+[GIN] 2026/09/19 - 17:30:54 | 200 |      21.764µs |       127.0.0.1 | GET      "/api/v1/water/latest?device_no=dev-001"
+--- PASS: TestWaterLatest (0.00s)
+=== RUN   TestAuthRequired
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN] 2026/09/19 - 17:30:54 | 401 |      11.243µs |       127.0.0.1 | GET      "/api/v1/ponds"
+--- PASS: TestAuthRequired (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	0.008s
+=== RUN   TestAdminLoginAndAuth
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (3 handlers)
+--- PASS: TestAdminLoginAndAuth (0.19s)
+=== RUN   TestAdminRejectsAppJWTAndBadPassword
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (3 handlers)
+--- PASS: TestAdminRejectsAppJWTAndBadPassword (0.14s)
+=== RUN   TestRegisterDeviceSecretOnce
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (3 handlers)
+--- PASS: TestRegisterDeviceSecretOnce (0.13s)
+=== RUN   TestRuleValidation
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (3 handlers)
+--- PASS: TestRuleValidation (0.12s)
+=== RUN   TestChangeAdminPassword
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (3 handlers)
+--- PASS: TestChangeAdminPassword (0.34s)
+=== RUN   TestRejectInvertedRuleBounds
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (3 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (3 handlers)
+--- PASS: TestRejectInvertedRuleBounds (0.11s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	1.042s
+=== RUN   TestEmbeddedMigrations
+--- PASS: TestEmbeddedMigrations (0.00s)
+=== RUN   TestFreshUpAndBootstrap
+--- PASS: TestFreshUpAndBootstrap (0.47s)
+=== RUN   TestLegacyAdoptionAndPreservation
+--- PASS: TestLegacyAdoptionAndPreservation (0.24s)
+=== RUN   TestRejectLegacyDrift
+--- PASS: TestRejectLegacyDrift (0.13s)
+=== RUN   TestAtomicFailureAndChecksum
+--- PASS: TestAtomicFailureAndChecksum (0.23s)
+=== RUN   TestConcurrentUp
+--- PASS: TestConcurrentUp (0.11s)
+=== RUN   TestRejectHistoryGapAndNewerVersion
+=== RUN   TestRejectHistoryGapAndNewerVersion/DELETE_FROM_schema_migrations_WHERE_version=1
+=== RUN   TestRejectHistoryGapAndNewerVersion/INSERT_INTO_schema_migrations(version,name,checksum)_VALUES(99,'future','future')
+--- PASS: TestRejectHistoryGapAndNewerVersion (0.20s)
+    --- PASS: TestRejectHistoryGapAndNewerVersion/DELETE_FROM_schema_migrations_WHERE_version=1 (0.10s)
+    --- PASS: TestRejectHistoryGapAndNewerVersion/INSERT_INTO_schema_migrations(version,name,checksum)_VALUES(99,'future','future') (0.10s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	1.383s

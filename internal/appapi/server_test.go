@@ -29,6 +29,9 @@ func (f *fakeRepos) Get(_ context.Context, id int64) (iolinkcontractsdomain.Pond
 	}
 	return iolinkcontractsdomain.Pond{}, iolinkcontractsdomain.ErrUnknownMetric
 }
+func (f *fakeRepos) GetByUser(ctx context.Context, id, _ int64) (iolinkcontractsdomain.Pond, error) {
+	return f.Get(ctx, id)
+}
 
 type fakeDevices struct{}
 
@@ -37,6 +40,9 @@ func (fakeDevices) ListByPond(_ context.Context, _ int64) ([]iolinkcontractsdoma
 }
 func (fakeDevices) GetByDeviceNo(_ context.Context, no string) (iolinkcontractsdomain.Device, error) {
 	return iolinkcontractsdomain.Device{ID: 1, PondID: 1, DeviceNo: no, Status: iolinkcontractsdomain.DeviceOnline}, nil
+}
+func (f fakeDevices) GetByDeviceNoForUser(ctx context.Context, no string, _ int64) (iolinkcontractsdomain.Device, error) {
+	return f.GetByDeviceNo(ctx, no)
 }
 func (fakeDevices) UpdateStatus(_ context.Context, _ string, _ iolinkcontractsdomain.DeviceStatus) error {
 	return nil
@@ -57,7 +63,8 @@ type fakeAlarms struct{ list []iolinkcontractsdomain.Alarm }
 func (f *fakeAlarms) ListByUser(_ context.Context, _ int64, _ int) ([]iolinkcontractsdomain.Alarm, error) {
 	return f.list, nil
 }
-func (f *fakeAlarms) Confirm(_ context.Context, _ int64) error { return nil }
+func (f *fakeAlarms) Confirm(_ context.Context, _ int64) error          { return nil }
+func (f *fakeAlarms) ConfirmByUser(_ context.Context, _, _ int64) error { return nil }
 
 type fakeRules struct{}
 
@@ -73,6 +80,7 @@ func (fakeUsers) FindByOpenID(_ context.Context, _ string) (*iolinkcontractsdoma
 func (fakeUsers) EnsureUser(_ context.Context, openID string) (*iolinkcontractsdomain.User, error) {
 	return &iolinkcontractsdomain.User{ID: 1, OpenID: openID}, nil
 }
+func (fakeUsers) UserTokenVersion(_ context.Context, _ int64) (int, error) { return 0, nil }
 
 func newTestServer(t *testing.T) *httptest.Server {
 	t.Helper()

@@ -32,3 +32,9 @@ func (s *Service) EnsureUser(ctx context.Context, openID string) (*domain.User, 
 	}
 	return u, nil
 }
+
+func (s *Service) UserTokenVersion(ctx context.Context, id int64) (int, error) {
+	var version int
+	err := s.pool.QueryRow(ctx, `SELECT token_version FROM users WHERE id=$1 AND authority='USER'`, id).Scan(&version)
+	return version, err
+}

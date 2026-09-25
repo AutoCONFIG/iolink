@@ -1,0 +1,21 @@
+# R02.a: pinned validation tooling; install into an isolated venv.
+openapi-spec-validator==0.9.0
+openapi-schema-validator==0.9.0
+jsonschema==4.26.0
+jsonschema-path==0.5.0
+pathable==0.6.0
+lazy-object-proxy==1.12.0
+PyYAML==6.0.3
+rfc3339-validator==0.1.4
+six==1.17.0
+attrs==26.1.0
+jsonschema-specifications==2025.9.1
+referencing==0.37.0
+rpds-py==0.28.0
+pydantic==2.13.4
+pydantic-core==2.46.4
+pydantic-settings==2.14.2
+annotated-types==0.7.0
+typing_extensions==4.16.0
+typing-inspection==0.4.2
+python-dotenv==1.2.1
