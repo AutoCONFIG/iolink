@@ -1,10 +1,13 @@
-# IoLink single-binary build. Frontend dist (web/admin/dist) is committed or
-# built by CI before this stage; go:embed picks it up.
+# IoLink single-binary build. web/ is the iolink-webui submodule; its built
+# dist/ is mirrored into internal/web/dist by scripts/embed-frontend.sh (which
+# falls back to a placeholder page when the submodule has no dist yet) so that
+# go:embed picks it up.
 FROM golang:1.26-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
+RUN sh scripts/embed-frontend.sh
 RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/iolinkd ./cmd/iolinkd
 
 FROM alpine:3.20

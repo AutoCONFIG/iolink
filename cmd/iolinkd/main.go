@@ -25,7 +25,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
-	"git.hyhy.fun/rsplab/iolink/web"
+	"git.hyhy.fun/rsplab/iolink/internal/web"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )

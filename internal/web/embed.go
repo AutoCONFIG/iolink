@@ -1,6 +1,7 @@
 // Package web embeds the compiled admin frontend so iolinkd ships as a
-// single binary. The frontend engineer builds web/admin → web/admin/dist;
-// the placeholder index.html keeps the Go build green before that happens.
+// single binary. go:embed cannot reach outside this package directory, so
+// scripts/embed-frontend.sh mirrors the web/ submodule's dist/ here before
+// every build; without a frontend build it falls back to a placeholder page.
 package web
 
 import (
@@ -8,12 +9,12 @@ import (
 	"io/fs"
 )
 
-//go:embed all:admin/dist
+//go:embed all:dist
 var embedded embed.FS
 
 // Admin returns the admin console filesystem rooted at its index.html.
 func Admin() (fs.FS, error) {
-	sub, err := fs.Sub(embedded, "admin/dist")
+	sub, err := fs.Sub(embedded, "dist")
 	if err != nil {
 		return nil, err
 	}

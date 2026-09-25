@@ -3,3 +3,4 @@ upstream/
 .env
 deploy/.env
 coverage.out
+internal/web/dist/
