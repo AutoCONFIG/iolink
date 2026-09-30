@@ -13,4 +13,4 @@ The green run uses the dedicated test-only PostgreSQL/Timescale DSN (credentials
 - Explicit time-limited support plus farm assignment works; expiry and revocation reject requests.
 - ADMIN cannot become farm owner through scoped or unscoped `SetFarmOwnerByActor`; `EnsureUser` does not create an ordinary membership for an ADMIN identity.
 
-The migration/HTTP and core red/green logs are copied from `.omo/evidence/m6b-platform-owner-fix/` when this snapshot is reviewed. Hardware, external WeChat, and production migration acceptance remain `external_blocked`.
+The migration/HTTP and core red/green logs are committed in this directory: `red-migration-http.log`, `red-core.log`, `green-regressions.log`, `full-relevant-race.log`, `verify-contracts.log`, `docs-tools.log`, and `architecture.log`. Their source evidence was captured under `.omo/evidence/m6b-platform-owner-fix/`. Hardware, external WeChat, and production migration acceptance remain `external_blocked`.
