@@ -8,6 +8,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+const systemTenantQuery = `SELECT id FROM tenants WHERE name='__iolink_system__' AND active FOR UPDATE`
+const auditAdminQuery = `INSERT INTO audit_events(tenant_id,action,resource_type,resource_id) VALUES($1,$2,'user',$3)`
+
 // BootstrapAdmin is deliberately a local CLI operation. Credentials arrive over
 // stdin, not command arguments/environment variables, and are never logged.
 func BootstrapAdmin(ctx context.Context, pool *pgxpool.Pool, username, password string, reset bool) error {
@@ -25,6 +28,10 @@ func BootstrapAdmin(ctx context.Context, pool *pgxpool.Pool, username, password 
 	defer tx.Rollback(context.Background())
 	if _, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(1232047152)"); err != nil {
 		return err
+	}
+	var systemTenantID int64
+	if err = tx.QueryRow(ctx, systemTenantQuery).Scan(&systemTenantID); err != nil {
+		return errors.New("system tenant unavailable; run migrations before bootstrap")
 	}
 	if reset {
 		ct, e := tx.Exec(ctx, `UPDATE users SET password_hash=$2,must_change_password=false,token_version=token_version+1 WHERE username=$1 AND authority='ADMIN'`, username, hash)
@@ -50,7 +57,7 @@ func BootstrapAdmin(ctx context.Context, pool *pgxpool.Pool, username, password 
 	if reset {
 		action = "admin.local-password-reset"
 	}
-	if _, err = tx.Exec(ctx, `INSERT INTO audit_events(action,resource_type,resource_id) VALUES($1,'user',$2)`, action, username); err != nil {
+	if _, err = tx.Exec(ctx, auditAdminQuery, systemTenantID, action, username); err != nil {
 		return err
 	}
 	return tx.Commit(ctx)

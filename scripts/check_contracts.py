@@ -33,7 +33,17 @@ def fixture(schema):
         return s['enum'][0]
     kind = s.get('type', 'object')
     if kind == 'object':
-        return {key: fixture(s['properties'][key]) for key in s.get('required', [])}
+        value = {key: fixture(s['properties'][key]) for key in s.get('required', [])}
+        minimum = s.get('minProperties', 0)
+        if len(value) < minimum:
+            extra_schema = s.get('additionalProperties')
+            if isinstance(extra_schema, dict):
+                extra_value = fixture(extra_schema)
+            else:
+                extra_value = 'x'
+            for index in range(minimum - len(value)):
+                value[f'fixture_{index}'] = extra_value
+        return value
     if kind == 'array':
         return [fixture(s['items']) for _ in range(max(s.get('minItems', 0), 1))]
     if kind in ('integer', 'number'):
@@ -77,7 +87,7 @@ def main():
             assert checker.is_valid(dict(base, max_value=9))
         counts.append(count)
         print(f'{path.relative_to(ROOT)}: standard schema and {count} operation fixtures PASS')
-    assert sorted(counts) == [10, 25], counts
+    assert sorted(counts) == [15, 38], counts
     print(f'{sum(counts)} target operations, {samples} synthetic request/response fixtures PASS; live handler verification is R02.c')
 
 if __name__ == '__main__':

@@ -1,0 +1,43 @@
+Todo 6: durable notification intent, outbox delivery, and WeChat adapter
+Date: 2026-09-27
+Scope: R28-R29 supporting delivery path. Real WeChat delivery remains external_blocked.
+
+Environment
+- Go: go1.26.8
+- PostgreSQL: 16
+- TimescaleDB: 2.30.0
+- Dedicated container: iolink-todo6-pg (timescale/timescaledb:latest-pg16)
+- DSN: postgres://iolink:<redacted>@127.0.0.1:55439/postgres?sslmode=disable
+- Working tree manifest input: shared uncommitted tree; phase digest recorded after final edits.
+
+Implementation
+- Alarm and notification_outbox intent remain inserted in the same alarm transaction.
+- Added migration 006 with pending/processing/sent/retryable/failed/disabled/unknown states, lease fields, recipient and error fields, and claim index.
+- Added notifications worker port with bounded concurrency, row-lock/SKIP LOCKED claim, lease owner token, expired lease takeover, current owner and active tenant membership revalidation, post-commit send, 1/2/4/8/16-minute retry backoff, terminal failure and unknown outcomes.
+- Added persistence NotificationStore for transactional claim/finish and lease-loss detection.
+- Added WeChat sender with disabled configuration, non-2xx and malformed JSON failures, nonzero errcode handling, synchronized token cache, one token-expiry refresh, configurable message/value/time template fields, and internal-admin exclusion.
+- Added explicit `users.wechat_subscribed` consent predicate; an owner with no current consent is disabled rather than sent a message.
+- Main starts the worker and waits for bounded shutdown.
+
+Commands and results
+1. `GOCACHE=/tmp/iolink-gocache go test ./internal/notifications ./internal/wechat ./internal/persistence ./cmd/iolinkd -count=1`: PASS.
+2. `GOCACHE=/tmp/iolink-gocache go test ./... -run '^$' -count=1`: PASS (all packages compile).
+3. `GOCACHE=/tmp/iolink-gocache go vet ./...`: PASS.
+4. `IOLINK_TEST_PG_DSN=postgres://iolink:<redacted>@127.0.0.1:55439/postgres?sslmode=disable GOCACHE=/tmp/iolink-gocache go test ./internal/migrate ./internal/core ./internal/notifications -race -shuffle=on -count=1`: PASS after test fixture correction.
+5. `IOLINK_TEST_PG_DSN=... GOCACHE=/tmp/iolink-gocache make integration`: PASS. Migration, core atomic alarm/outbox, ownership, MQTT, notification claim/lease/retry/owner-transfer/disabled/duplicate-worker/unknown-result, persistence, and WeChat adapter suites passed.
+6. `GOCACHE=/tmp/iolink-gocache go test ./internal/notifications -race -shuffle=on -count=1` without `IOLINK_TEST_PG_DSN`: unit-only PASS; database tests are skipped and not counted as integration evidence. The DSN-backed result is item 4 and the verbose output is in `.omo/evidence/todo6-raw-qa.log`.
+7. `git diff --check`: PASS.
+8. Final gate review: APPROVE on shared-tree digest `ef5bf5cff614339c255d2846a7631af042a45417bce16186f2a02c3cdd2ab6e2`; code review receipt is bound to the same digest.
+
+Negative and boundary coverage
+- No credentials -> disabled state; internal-admin is never selected.
+- HTTP 400/500, malformed JSON, missing errcode, provider errcode, transport/deadline and token refresh are not reported as sent.
+- Current owner is resolved after claim; owner transfer routes to the new open_id; missing owner/subscription disables.
+- Concurrent workers claim one row; expired processing leases are reclaimed; retry attempts terminate at initial send plus five retries.
+- Commit and send are separate; a send timeout is recorded unknown.
+
+External status
+- Real WeChat credentials, user consent, and device/hardware evidence were not available. Real external delivery is `external_blocked`; no real receipt is claimed.
+
+Review gate
+- Two independent reviewers must inspect this same final worktree and explicitly return APPROVE before Todo 6 is marked complete.

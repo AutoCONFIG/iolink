@@ -3,6 +3,7 @@ package core_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
@@ -26,7 +27,7 @@ func setup(t *testing.T) (*core.Service, *pgxpool.Pool) {
 	if err := migrate.Up(ctx, p); err != nil {
 		t.Fatal(err)
 	}
-	execute(t, p, `INSERT INTO users(id,open_id) VALUES(1,'test-user');INSERT INTO farms(id,owner_id,name) VALUES(1,1,'farm');INSERT INTO ponds(id,farm_id,name) VALUES(1,1,'A'),(2,1,'B')`)
+	execute(t, p, `INSERT INTO users(id,open_id) VALUES(1,'test-user'); INSERT INTO tenants(name) VALUES ('test-tenant'); INSERT INTO tenant_memberships(tenant_id,user_id,role) SELECT id,1,'owner' FROM tenants WHERE name='test-tenant'; INSERT INTO farms(id,owner_id,tenant_id,name) SELECT 1,1,id,'farm' FROM tenants WHERE name='test-tenant'; INSERT INTO ponds(id,farm_id,name) VALUES(1,1,'A'),(2,1,'B')`)
 	execute(t, p, `INSERT INTO devices(pond_id,device_no,secret_hash) VALUES(1,'one',$1)`, core.HashDeviceSecret("test-secret"))
 	s, err := core.New(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	if err != nil {
@@ -66,6 +67,29 @@ func TestTelemetryShadowDedupAndPondSnapshot(t *testing.T) {
 	}
 	if count(t, p, "SELECT count(*) FROM sensor_data") != 3 {
 		t.Fatal("message_id dedup failed")
+	}
+	if count(t, p, "SELECT count(*) FROM telemetry WHERE device_no='one'") != 3 {
+		t.Fatal("legacy water event was not projected to generic telemetry")
+	}
+	var tenantID, sensorTenantID, shadowTenantID int64
+	if err := p.QueryRow(ctx, "SELECT id FROM tenants WHERE name='test-tenant'").Scan(&tenantID); err != nil {
+		t.Fatal(err)
+	}
+	if err := p.QueryRow(ctx, "SELECT tenant_id FROM sensor_data WHERE device_no='one' ORDER BY ts LIMIT 1").Scan(&sensorTenantID); err != nil || sensorTenantID != tenantID {
+		t.Fatalf("sensor tenant=%d want=%d err=%v", sensorTenantID, tenantID, err)
+	}
+	if err := p.QueryRow(ctx, "SELECT tenant_id FROM device_shadows WHERE device_no='one'").Scan(&shadowTenantID); err != nil || shadowTenantID != tenantID {
+		t.Fatalf("shadow tenant=%d want=%d err=%v", shadowTenantID, tenantID, err)
+	}
+	var shadowModel, telemetryModel int
+	if err := p.QueryRow(ctx, "SELECT model_version FROM device_shadows WHERE device_no='one'").Scan(&shadowModel); err != nil {
+		t.Fatal(err)
+	}
+	if err := p.QueryRow(ctx, "SELECT model_version FROM telemetry WHERE device_no='one' ORDER BY ts LIMIT 1").Scan(&telemetryModel); err != nil {
+		t.Fatal(err)
+	}
+	if shadowModel != 1 || telemetryModel != 1 {
+		t.Fatalf("model versions shadow=%d telemetry=%d", shadowModel, telemetryModel)
 	}
 	rd, err := s.Telemetry().Latest(ctx, "one")
 	if err != nil || rd.Temperature == nil || *rd.Temperature != 26 || rd.PH == nil || *rd.PH != 7 || rd.Signal == nil || *rd.Signal != -65 || !rd.Timestamps["temperature"].Equal(now) || !rd.Timestamps["ph"].Equal(now.Add(time.Second)) || rd.PondID != 1 || rd.ReportInterval != 60 {
@@ -163,6 +187,30 @@ func TestAlarmThresholdConcurrencyConfirmationAndMove(t *testing.T) {
 	}
 	if count(t, p, "SELECT count(*) FROM alarms") != 3 {
 		t.Fatal("confirmed alarm prevents new one")
+	}
+}
+func TestUserAlarmConfirmationIsIdempotent(t *testing.T) {
+	s, p := setup(t)
+	ctx := context.Background()
+	min := 4.0
+	if _, err := s.CreateRule(ctx, domain.AlarmRule{PondID: 1, Metric: "dissolved_oxygen", Min: &min, Level: domain.AlarmCritical}); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.HandleEvent(sample(time.Now().UTC(), "user-confirm", map[string]float64{"dissolved_oxygen": 3})); err != nil {
+		t.Fatal(err)
+	}
+	var id int64
+	if err := p.QueryRow(ctx, "SELECT id FROM alarms").Scan(&id); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Alarms().ConfirmByUser(ctx, id, 1); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Alarms().ConfirmByUser(ctx, id, 1); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Alarms().ConfirmByUser(ctx, id, 999); !errors.Is(err, domain.ErrNotFound) {
+		t.Fatalf("foreign confirmation error = %v, want not found", err)
 	}
 }
 func TestRollbackAcrossReadingShadowAlarmOutbox(t *testing.T) {

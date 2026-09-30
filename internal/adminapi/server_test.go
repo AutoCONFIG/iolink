@@ -9,18 +9,22 @@ import (
 	"testing"
 	"time"
 
+	"git.hyhy.fun/rsplab/iolink/internal/authorization"
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // ---- fake store ----
 
 type fakeStore struct {
-	admin   *domain.User
-	devices map[string]domain.Device
-	rules   map[int64]domain.AlarmRule
-	ruleSeq int64
-	stats   domain.Stats
+	admin            *domain.User
+	tenantRole       string
+	defaultTenantErr error
+	devices          map[string]domain.Device
+	rules            map[int64]domain.AlarmRule
+	ruleSeq          int64
+	stats            domain.Stats
 }
 
 func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.User, error) {
@@ -29,11 +33,13 @@ func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.U
 	}
 	return nil, domain.ErrUnknownMetric // any error → 401
 }
+
 func (f *fakeStore) AdminTokenVersion(_ context.Context, _ int64) (int, error)       { return 0, nil }
 func (f *fakeStore) UpgradeAdminPassword(_ context.Context, _ int64, _ string) error { return nil }
 func (f *fakeStore) ListFarms(_ context.Context) ([]domain.Farm, error) {
 	return nil, nil
 }
+
 func (f *fakeStore) CreateFarm(_ context.Context, _ *int64, name, _ string) (domain.Farm, error) {
 	return domain.Farm{ID: 1, Name: name}, nil
 }
@@ -56,6 +62,7 @@ func (f *fakeStore) RegisterDevice(_ context.Context, pondID int64, _ string, mo
 	f.devices[no] = domain.Device{ID: 1, PondID: pondID, DeviceNo: no, Model: model, Status: domain.DeviceOffline}
 	return f.devices[no], secret, nil
 }
+
 func (f *fakeStore) ListDevices(_ context.Context, _ bool, _ int64, _, _ int) ([]domain.Device, error) {
 	out := make([]domain.Device, 0, len(f.devices))
 	for _, d := range f.devices {
@@ -63,6 +70,7 @@ func (f *fakeStore) ListDevices(_ context.Context, _ bool, _ int64, _, _ int) ([
 	}
 	return out, nil
 }
+
 func (f *fakeStore) GetDevice(_ context.Context, no string) (domain.Device, error) {
 	if d, ok := f.devices[no]; ok {
 		return d, nil
@@ -82,16 +90,19 @@ func (f *fakeStore) ListRules(_ context.Context) ([]domain.AlarmRule, error) {
 	}
 	return out, nil
 }
+
 func (f *fakeStore) CreateRule(_ context.Context, r domain.AlarmRule) (domain.AlarmRule, error) {
 	f.ruleSeq++
 	r.ID = f.ruleSeq
 	f.rules[r.ID] = r
 	return r, nil
 }
+
 func (f *fakeStore) UpdateRule(_ context.Context, r domain.AlarmRule) error {
 	f.rules[r.ID] = r
 	return nil
 }
+
 func (f *fakeStore) DeleteRule(_ context.Context, id int64) error {
 	delete(f.rules, id)
 	return nil
@@ -103,6 +114,7 @@ func (f *fakeStore) FindAdminByID(_ context.Context, id int64) (*domain.User, er
 	}
 	return nil, domain.ErrUnknownMetric
 }
+
 func (f *fakeStore) ChangeAdminPassword(_ context.Context, id int64, oldPW, newPW string) error {
 	if f.admin == nil || f.admin.ID != id {
 		return domain.ErrUnknownMetric
@@ -119,27 +131,69 @@ func (f *fakeStore) ListAllAlarms(_ context.Context, _ int) ([]domain.Alarm, err
 	return nil, nil
 }
 func (f *fakeStore) ConfirmAlarm(_ context.Context, _ int64) error            { return nil }
+func (f *fakeStore) ConfirmAlarmByActor(_ context.Context, _, _ int64) error  { return nil }
 func (f *fakeStore) BatchConfirm(_ context.Context, _ []int64) (int64, error) { return 0, nil }
-func (f *fakeStore) Stats(_ context.Context) (domain.Stats, error)            { return f.stats, nil }
+func (f *fakeStore) BatchConfirmByActor(_ context.Context, _ []int64, _ int64) (int64, error) {
+	return 0, nil
+}
+func (f *fakeStore) Stats(_ context.Context) (domain.Stats, error) { return f.stats, nil }
+
+func (f *fakeStore) DefaultTenantForUser(context.Context, int64) (int64, error) {
+	if f.defaultTenantErr != nil {
+		return 0, f.defaultTenantErr
+	}
+	return 7, nil
+}
+
+func (f *fakeStore) TenantMembershipVersion(context.Context, int64, int64) (int64, error) {
+	return 0, nil
+}
+
+func (f *fakeStore) TenantRole(context.Context, int64, int64) (string, error) {
+	if f.tenantRole != "" {
+		return f.tenantRole, nil
+	}
+	return "admin", nil
+}
+
+func (f *fakeStore) ListTenants(context.Context) ([]domain.Tenant, error) {
+	return []domain.Tenant{{ID: 7, Name: "tenant", Active: true}}, nil
+}
+func (f *fakeStore) SetTenantActive(context.Context, int64, bool, int64) error { return nil }
+func (f *fakeStore) ListTenantMembers(context.Context, int64) ([]domain.TenantMembership, error) {
+	return []domain.TenantMembership{{TenantID: 7, UserID: 9, Role: "admin", Active: true}}, nil
+}
+
+func (f *fakeStore) SetTenantMember(context.Context, int64, int64, string, bool, *time.Time, int64) error {
+	return nil
+}
 
 // ---- helpers ----
 
 func newTestServer(t *testing.T) *httptest.Server {
+	return newTestServerWithRole(t, "ADMIN", "admin")
+}
+
+func newTestServerWithRole(t *testing.T, authority, tenantRole string) *httptest.Server {
 	t.Helper()
 	hash := platform.HashPassword("admin123")
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
 	s := New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: &fakeStore{
-		admin:   &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "ADMIN"},
-		devices: map[string]domain.Device{},
-		rules:   map[int64]domain.AlarmRule{},
-		stats:   domain.Stats{DevicesTotal: 3, Online: 2, Offline: 1, OpenAlarms: 4},
-	}})
+		admin:      &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: authority},
+		tenantRole: tenantRole,
+		devices:    map[string]domain.Device{},
+		rules:      map[int64]domain.AlarmRule{},
+		stats:      domain.Stats{DevicesTotal: 3, Online: 2, Offline: 1, OpenAlarms: 4},
+	}, Policy: policy})
 	return httptest.NewServer(s.Routes())
 }
 
 func strptr(s string) *string { return &s }
 
 func adminLogin(t *testing.T, ts *httptest.Server) string {
-	t.Helper()
 	resp, err := http.Post(ts.URL+"/admin/v1/login", "application/json",
 		strings.NewReader(`{"username":"admin","password":"admin123"}`))
 	if err != nil {
@@ -183,6 +237,131 @@ func TestAdminLoginAndAuth(t *testing.T) {
 	_ = json.NewDecoder(resp.Body).Decode(&st)
 	if st.DevicesTotal != 3 || st.OpenAlarms != 4 {
 		t.Fatalf("bad stats: %+v", st)
+	}
+}
+
+func TestPlatformAdminCannotGrantTenantMembership(t *testing.T) {
+	ts := newTestServer(t)
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	req, _ := http.NewRequest(http.MethodPut, ts.URL+"/admin/v1/tenants/7/members/9", strings.NewReader(`{"role":"owner","active":true}`))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("platform membership mutation status=%d, want 403", resp.StatusCode)
+	}
+}
+
+func TestPlatformAdminCanLoginAfterTenantMembershipExpires(t *testing.T) {
+	hash := platform.HashPassword("admin123")
+	s := New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: &fakeStore{
+		admin:            &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "ADMIN"},
+		defaultTenantErr: domain.ErrInactiveTenant,
+		devices:          map[string]domain.Device{},
+		rules:            map[int64]domain.AlarmRule{},
+	}})
+	ts := httptest.NewServer(s.Routes())
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	req, _ := http.NewRequest(http.MethodPut, ts.URL+"/admin/v1/tenants/7/status", strings.NewReader(`{"active":true}`))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusNoContent {
+		t.Fatalf("platform restore status=%d, want 204", resp.StatusCode)
+	}
+}
+
+func TestSupportCanReadTenantBusinessRoutes(t *testing.T) {
+	ts := newTestServerWithRole(t, "USER", "support")
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	resp := authGet(t, ts, token, "/admin/v1/farms")
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("support farms status=%d, want 200", resp.StatusCode)
+	}
+}
+
+func TestTenantRoleActionMatrix(t *testing.T) {
+	for _, tc := range []struct {
+		role             string
+		confirmStatus    int
+		batchStatus      int
+		memberStatus     int
+		memberListStatus int
+	}{
+		{"owner", http.StatusNoContent, http.StatusOK, http.StatusNoContent, http.StatusOK},
+		{"admin", http.StatusNoContent, http.StatusOK, http.StatusNoContent, http.StatusOK},
+		{"member", http.StatusNoContent, http.StatusOK, http.StatusForbidden, http.StatusForbidden},
+		{"viewer", http.StatusForbidden, http.StatusForbidden, http.StatusForbidden, http.StatusForbidden},
+		{"support", http.StatusNoContent, http.StatusOK, http.StatusForbidden, http.StatusForbidden},
+	} {
+		t.Run(tc.role, func(t *testing.T) {
+			ts := newTestServerWithRole(t, "USER", tc.role)
+			defer ts.Close()
+			token := adminLogin(t, ts)
+			for _, path := range []string{"/admin/v1/farms", "/admin/v1/ponds", "/admin/v1/devices", "/admin/v1/alarms"} {
+				resp := authGet(t, ts, token, path)
+				resp.Body.Close()
+				if resp.StatusCode != http.StatusOK {
+					t.Fatalf("%s GET status=%d", path, resp.StatusCode)
+				}
+			}
+			resp := authGet(t, ts, token, "/admin/v1/tenants/7/members")
+			resp.Body.Close()
+			if resp.StatusCode != tc.memberListStatus {
+				t.Fatalf("tenant members GET status=%d want=%d", resp.StatusCode, tc.memberListStatus)
+			}
+			for _, action := range []struct {
+				method, path, body string
+				want               int
+			}{
+				{http.MethodPost, "/admin/v1/alarms/1/confirm", "", tc.confirmStatus},
+				{http.MethodPost, "/admin/v1/alarms/batch-confirm", `{"ids":[1]}`, tc.batchStatus},
+				{http.MethodPut, "/admin/v1/tenants/7/members/9", `{"role":"viewer","active":true}`, tc.memberStatus},
+			} {
+				req, _ := http.NewRequest(action.method, ts.URL+action.path, strings.NewReader(action.body))
+				req.Header.Set("Authorization", "Bearer "+token)
+				req.Header.Set("Content-Type", "application/json")
+				resp, err := http.DefaultClient.Do(req)
+				if err != nil {
+					t.Fatal(err)
+				}
+				resp.Body.Close()
+				if resp.StatusCode != action.want {
+					t.Fatalf("%s %s status=%d want=%d", action.method, action.path, resp.StatusCode, action.want)
+				}
+			}
+		})
+	}
+}
+
+func TestAdminAuthRejectsMissingExpiry(t *testing.T) {
+	ts := newTestServer(t)
+	defer ts.Close()
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"aid": 9, "ver": 0}).SignedString(platform.DeriveAdminKey("test-key"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req, _ := http.NewRequest("GET", ts.URL+"/admin/v1/stats", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("missing-exp status = %d", resp.StatusCode)
 	}
 }
 

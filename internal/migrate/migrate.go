@@ -32,6 +32,7 @@ type Version struct {
 	Name     string `json:"name"`
 	Checksum string `json:"checksum"`
 	Applied  bool   `json:"applied"`
+	Dirty    bool   `json:"dirty"`
 }
 
 func load() ([]migration, error) {
@@ -110,12 +111,12 @@ func apply(ctx context.Context, pool *pgxpool.Pool, ms []migration, adopt bool) 
 		} else if count != 0 {
 			return errors.New("unmanaged schema: back up and run migrate adopt-legacy; no changes applied")
 		}
-		if _, err = tx.Exec(ctx, `CREATE TABLE schema_migrations(version INTEGER PRIMARY KEY,name TEXT NOT NULL,checksum TEXT NOT NULL,applied_at TIMESTAMPTZ NOT NULL DEFAULT now())`); err != nil {
+		if _, err = tx.Exec(ctx, `CREATE TABLE schema_migrations(version INTEGER PRIMARY KEY,name TEXT NOT NULL,checksum TEXT NOT NULL,dirty BOOLEAN NOT NULL DEFAULT FALSE,applied_at TIMESTAMPTZ NOT NULL DEFAULT now())`); err != nil {
 			return err
 		}
 		if adopt {
 			m := ms[0]
-			if _, err = tx.Exec(ctx, `INSERT INTO schema_migrations(version,name,checksum) VALUES($1,$2,$3)`, m.version, m.name, m.checksum); err != nil {
+			if _, err = tx.Exec(ctx, `INSERT INTO schema_migrations(version,name,checksum,dirty) VALUES($1,$2,$3,FALSE)`, m.version, m.name, m.checksum); err != nil {
 				return err
 			}
 		}
@@ -130,7 +131,7 @@ func apply(ctx context.Context, pool *pgxpool.Pool, ms []migration, adopt bool) 
 		if _, err = tx.Exec(ctx, m.sql); err != nil {
 			return fmt.Errorf("migration %s rolled back: %w", m.name, err)
 		}
-		if _, err = tx.Exec(ctx, `INSERT INTO schema_migrations(version,name,checksum) VALUES($1,$2,$3)`, m.version, m.name, m.checksum); err != nil {
+		if _, err = tx.Exec(ctx, `INSERT INTO schema_migrations(version,name,checksum,dirty) VALUES($1,$2,$3,FALSE)`, m.version, m.name, m.checksum); err != nil {
 			return err
 		}
 	}
@@ -148,7 +149,7 @@ func hasHistory(ctx context.Context, q queryer) (bool, error) {
 	return ok, err
 }
 func history(ctx context.Context, q queryer, ms []migration) ([]Version, error) {
-	rows, err := q.Query(ctx, `SELECT version,name,checksum FROM public.schema_migrations ORDER BY version`)
+	rows, err := q.Query(ctx, `SELECT version,name,checksum,dirty FROM public.schema_migrations ORDER BY version`)
 	if err != nil {
 		return nil, err
 	}
@@ -156,8 +157,11 @@ func history(ctx context.Context, q queryer, ms []migration) ([]Version, error) 
 	var out []Version
 	for rows.Next() {
 		var v Version
-		if err = rows.Scan(&v.Version, &v.Name, &v.Checksum); err != nil {
+		if err = rows.Scan(&v.Version, &v.Name, &v.Checksum, &v.Dirty); err != nil {
 			return nil, err
+		}
+		if v.Dirty {
+			return nil, fmt.Errorf("migration %d is dirty; refuse startup until operator recovery", v.Version)
 		}
 		i := len(out)
 		if i >= len(ms) || v.Version != ms[i].version || v.Name != ms[i].name || v.Checksum != ms[i].checksum {
@@ -187,7 +191,7 @@ func Status(ctx context.Context, pool *pgxpool.Pool) ([]Version, error) {
 	out := make([]Version, 0, len(ms))
 	out = append(out, applied...)
 	for _, m := range ms[len(applied):] {
-		out = append(out, Version{m.version, m.name, m.checksum, false})
+		out = append(out, Version{Version: m.version, Name: m.name, Checksum: m.checksum, Applied: false})
 	}
 	return out, nil
 }

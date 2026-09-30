@@ -1,0 +1,10 @@
+.git
+.venv
+.pytest_cache
+.codegraph
+web/node_modules
+web-mini/node_modules
+web/.playwright
+web/test-results
+web/playwright-report
+tmp

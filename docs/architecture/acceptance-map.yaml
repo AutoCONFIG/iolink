@@ -1,0 +1,560 @@
+schema_version: 1
+source: docs/ACCEPTANCE.md
+status_semantics: "not_run means verification has not been evidenced; planned commands are not results"
+gate_scope:
+  M0: [R01, R03, R04]
+  M5: [R28, R29, R30, R31, R32, R33]
+  M6a: [R34, R35]
+  M6b: [R36, R37]
+provider_operations:
+  - {id: R01, provider: go-toolchain, operation: reproducible_build, required_level: L3, status: not_run, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R02, provider: embedded-http, operation: contract_validation, required_level: L3, status: not_run, command: "make verify-contracts", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R03, provider: postgres-timescale, operation: migration_safety, required_level: L3, status: not_run, command: "go test ./internal/migrate/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R04, provider: postgres-timescale, operation: startup_configuration, required_level: L3, status: not_run, command: "go test ./internal/platform/... ./cmd/iolinkd/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R05, provider: embedded-mqtt, operation: device_authentication, required_level: L3, status: not_run, command: "go test ./internal/access/... ./internal/core/deviceauth/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R06, provider: embedded-mqtt, operation: topic_acl, required_level: L3, status: not_run, command: "go test ./internal/access/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R07, provider: embedded-mqtt, operation: telemetry_field_validation, required_level: L3, status: not_run, command: "go test ./internal/access/... ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R08, provider: embedded-mqtt, operation: status_watchdog, required_level: L3, status: not_run, command: "go test ./internal/access/... ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R09, provider: postgres-timescale, operation: telemetry_persistence, required_level: L3, status: not_run, command: "go test ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R10, provider: postgres-timescale, operation: device_shadow, required_level: L3, status: not_run, command: "go test ./internal/core/... ./internal/adminapi/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R11, provider: postgres-timescale, operation: historical_queries, required_level: L3, status: not_run, command: "go test ./internal/appapi/... ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R12, provider: postgres-timescale, operation: threshold_alarm_rules, required_level: L3, status: not_run, command: "go test ./internal/core/... ./internal/adminapi/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R13, provider: postgres-timescale, operation: alarm_deduplication, required_level: L3, status: not_run, command: "go test ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R14, provider: embedded-http, operation: login_and_password_change, required_level: L3, status: not_run, command: "go test ./internal/adminapi/... ./internal/platform/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R15, provider: embedded-http, operation: user_assignment, required_level: L3, status: external_blocked, command: "go test ./internal/adminapi/... ./internal/appapi/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R16, provider: embedded-http, operation: farm_and_pond_management, required_level: L3, status: not_run, command: "go test ./internal/adminapi/... ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R17, provider: embedded-http, operation: device_registration, required_level: L3, status: not_run, command: "go test ./internal/adminapi/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R18, provider: embedded-http, operation: device_reassignment, required_level: L3, status: not_run, command: "go test ./internal/adminapi/... ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R19, provider: embedded-http, operation: alarm_rule_management, required_level: L3, status: not_run, command: "go test ./internal/adminapi/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R20, provider: embedded-http, operation: resource_isolation, required_level: L3, status: not_run, command: "go test ./internal/appapi/... ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R21, provider: embedded-http, operation: alarm_center, required_level: L3, status: not_run, command: "go test ./internal/adminapi/... ./internal/appapi/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R22, provider: embedded-http, operation: status_wall, required_level: L3, status: not_run, command: "go test ./internal/adminapi/... ./internal/appapi/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R23, provider: embedded-http, operation: admin_web_flow, required_level: L3, status: not_run, command: "npm --prefix web/admin run build", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R24, provider: embedded-http, operation: embedded_frontend_build, required_level: L3, status: not_run, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R25, provider: wechat, operation: mini_program_login, required_level: L3, status: external_blocked, command: "python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software", evidence_path: docs/evidence/rebuild/m4-mini-program.txt}
+  - {id: R26, provider: wechat, operation: mini_program_pages, required_level: L3, status: external_blocked, command: "python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software", evidence_path: docs/evidence/rebuild/m4-mini-program.txt}
+  - {id: R27, provider: wechat, operation: subscription_authorization, required_level: L3, status: external_blocked, command: "python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software", evidence_path: docs/evidence/rebuild/m4-mini-program.txt}
+  - {id: R28, provider: wechat, operation: notification_delivery, required_level: L3, status: external_blocked, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R29, provider: embedded-http, operation: health_metrics_shutdown, required_level: L3, status: passed, command: "make verify", evidence_path: docs/evidence/rebuild/m5-operations.txt}
+  - {id: R30, provider: tls-reverse-proxy, operation: tls_deployment, required_level: L3, status: external_blocked, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R31, provider: postgres-timescale, operation: backup_restore, required_level: L3, status: passed, command: "deploy/backup.sh; deploy/restore.sh", evidence_path: docs/evidence/rebuild/m5-operations.txt}
+  - {id: R32, provider: postgres-timescale, operation: upgrade_rollback, required_level: L3, status: passed, command: "go test ./internal/migrate/... -count=1", evidence_path: docs/evidence/rebuild/m5-operations.txt}
+  - {id: R33, provider: postgres-timescale, operation: capacity_test, required_level: L3, status: passed, command: "make capacity", evidence_path: docs/evidence/rebuild/m5-operations.txt}
+  - {id: R34, provider: postgres-timescale, operation: product_models, required_level: L4, status: passed, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R34/README.md}
+  - {id: R35, provider: postgres-timescale, operation: compatibility_projection, required_level: L4, status: passed, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R35/README.md}
+  - {id: R36, provider: postgres-timescale, operation: tenant_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R36/README.md}
+  - {id: R37, provider: postgres-timescale, operation: rbac_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R37/README.md}
+  - {id: R38, provider: tls-reverse-proxy, operation: license_verification, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R39, provider: tls-reverse-proxy, operation: feature_quota_guards, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R40, provider: tls-reverse-proxy, operation: offline_install, required_level: L4, status: external_blocked, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R41, provider: embedded-http, operation: open_api_keys, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R42, provider: embedded-http, operation: signed_requests_and_rate_limits, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R43, provider: gb28181-adapter, operation: video_signaling, required_level: L4, status: external_blocked, command: "go test ./... -run TestM7a -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R44, provider: map-provider, operation: map_contract, required_level: L4, status: external_blocked, command: "go test ./... -run TestM7b -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R45, provider: embedded-http, operation: read_only_dashboard, required_level: L4, status: not_run, command: "go test ./... -run TestM7b -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R46, provider: embedded-mqtt, operation: durable_commands, required_level: L4, status: not_run, command: "go test ./... -run TestM8a -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R47, provider: gateway-firmware, operation: http_and_tcp_bridge, required_level: L4, status: external_blocked, command: "go test ./... -run TestM8b -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R48, provider: modbus-adapters, operation: modbus_registers, required_level: L4, status: external_blocked, command: "go test ./... -run TestM8b -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R49, provider: gateway-firmware, operation: gateway_subdevices, required_level: L4, status: external_blocked, command: "go test ./... -run TestM8b -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R50, provider: postgres-timescale, operation: forwarding_jobs, required_level: L4, status: not_run, command: "go test ./... -run TestM8c -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R51, provider: postgres-timescale, operation: automation, required_level: L4, status: not_run, command: "go test ./... -run TestM8c -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R52, provider: postgres-timescale, operation: scheduling, required_level: L4, status: not_run, command: "go test ./... -run TestM8c -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R53, provider: embedded-http, operation: debug_console, required_level: L4, status: not_run, command: "go test ./... -run TestM8c -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R54, provider: postgres-timescale, operation: reports_and_downloads, required_level: L4, status: not_run, command: "go test ./... -run TestM8d -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R55, provider: postgres-timescale, operation: full_release_audit, required_level: L4, status: external_blocked, command: "make verify && make verify-contracts && make docs-tools", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+requirements:
+  - id: R01
+    wave: M0
+    owner: 1
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: make verify"
+    evidence: docs/evidence/acceptance/R01/
+  - id: R02
+    wave: M0-M2
+    owner: 1
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: make verify-contracts"
+    evidence: docs/evidence/acceptance/R02/
+  - id: R03
+    wave: M0
+    owner: 3
+    provider: software
+    required_level: software
+    software_status: passed
+    external_status: not_applicable
+    verification: "planned: go test ./internal/migrate/..."
+    evidence: docs/evidence/acceptance/R03/
+  - id: R04
+    wave: M0
+    owner: 1
+    provider: software
+    required_level: software
+    software_status: passed
+    external_status: not_applicable
+    verification: "planned: go test ./internal/platform/... ./cmd/iolinkd/..."
+    evidence: docs/evidence/acceptance/R04/
+  - id: R05
+    wave: M1
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/access/... ./internal/core/deviceauth/..."
+    evidence: docs/evidence/acceptance/R05/
+  - id: R06
+    wave: M1
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/access/..."
+    evidence: docs/evidence/acceptance/R06/
+  - id: R07
+    wave: M1
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/access/... ./internal/core/..."
+    evidence: docs/evidence/acceptance/R07/
+  - id: R08
+    wave: M1
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/access/... ./internal/core/..."
+    evidence: docs/evidence/acceptance/R08/
+  - id: R09
+    wave: M1
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/core/..."
+    evidence: docs/evidence/acceptance/R09/
+  - id: R10
+    wave: M1-M2
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/core/... ./internal/adminapi/..."
+    evidence: docs/evidence/acceptance/R10/
+  - id: R11
+    wave: M1
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/appapi/... ./internal/core/..."
+    evidence: docs/evidence/acceptance/R11/
+  - id: R12
+    wave: M1
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/core/... ./internal/adminapi/..."
+    evidence: docs/evidence/acceptance/R12/
+  - id: R13
+    wave: M1
+    owner: 4
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/core/..."
+    evidence: docs/evidence/acceptance/R13/
+  - id: R14
+    wave: M2
+    owner: 5
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/adminapi/... ./internal/platform/..."
+    evidence: docs/evidence/acceptance/R14/
+  - id: R15
+    wave: M2
+    owner: 5
+    provider: software+external
+    required_level: software_and_external
+    software_status: not_run
+    external_status: blocked
+    verification: "planned: go test ./internal/adminapi/... ./internal/appapi/...; external: verify real WeChat user assignment flow"
+    evidence: docs/evidence/acceptance/R15/
+  - id: R16
+    wave: M2
+    owner: 5
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/adminapi/... ./internal/core/..."
+    evidence: docs/evidence/acceptance/R16/
+  - id: R17
+    wave: M2
+    owner: 5
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/adminapi/..."
+    evidence: docs/evidence/acceptance/R17/
+  - id: R18
+    wave: M2
+    owner: 5
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/adminapi/... ./internal/core/..."
+    evidence: docs/evidence/acceptance/R18/
+  - id: R19
+    wave: M2
+    owner: 5
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/adminapi/..."
+    evidence: docs/evidence/acceptance/R19/
+  - id: R20
+    wave: M2
+    owner: 5
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/appapi/... ./internal/core/..."
+    evidence: docs/evidence/acceptance/R20/
+  - id: R21
+    wave: M2
+    owner: 5
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/adminapi/... ./internal/appapi/..."
+    evidence: docs/evidence/acceptance/R21/
+  - id: R22
+    wave: M2
+    owner: 5
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/adminapi/... ./internal/appapi/..."
+    evidence: docs/evidence/acceptance/R22/
+  - id: R23
+    wave: M3
+    owner: 7
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: npm --prefix web/admin run build"
+    evidence: docs/evidence/acceptance/R23/
+  - id: R24
+    wave: M3
+    owner: 7
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: make verify"
+    evidence: docs/evidence/acceptance/R24/
+  - id: R25
+    wave: M4
+    owner: 8
+    provider: software+external
+    required_level: software_and_external
+    software_status: passed
+    external_status: blocked
+    verification: "python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software; external: validate real WeChat code2session on device"
+    evidence: docs/evidence/acceptance/R25/
+  - id: R26
+    wave: M4
+    owner: 8
+    provider: software+external
+    required_level: software_and_external
+    software_status: passed
+    external_status: blocked
+    verification: "python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software; external: exercise all six pages on WeChat device"
+    evidence: docs/evidence/acceptance/R26/
+  - id: R27
+    wave: M4
+    owner: 8
+    provider: software+external
+    required_level: software_and_external
+    software_status: passed
+    external_status: blocked
+    verification: "python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software; external: verify subscribe allow/deny/cancel on WeChat device"
+    evidence: docs/evidence/acceptance/R27/
+  - id: R28
+    wave: M5
+    owner: 9
+    provider: software+external
+    required_level: software_and_external
+    software_status: passed
+    external_status: blocked
+    verification: "go test ./internal/notifications ./internal/wechat; external: verify notification delivery using real WeChat credentials"
+    evidence: docs/evidence/acceptance/R28/
+  - id: R29
+    wave: M5
+    owner: 9
+    provider: software
+    required_level: software
+    software_status: passed
+    external_status: not_applicable
+    verification: "make verify; curl /healthz /readyz /metrics; SIGTERM drain"
+    evidence: docs/evidence/acceptance/R29/
+  - id: R30
+    wave: M5
+    owner: 9
+    provider: software+external
+    required_level: software_and_external
+    software_status: passed
+    external_status: blocked
+    verification: "deployment artifact checks and localhost-only Compose bindings; external: execute TLS/network exposure checks in isolated environment"
+    evidence: docs/evidence/acceptance/R30/
+  - id: R31
+    wave: M5
+    owner: 9
+    provider: software+external
+    required_level: software_and_external
+    software_status: passed
+    external_status: blocked
+    verification: "dedicated TimescaleDB container backup/restore and checksum failure case; external: 100GiB RTO rehearsal"
+    evidence: docs/evidence/acceptance/R31/
+  - id: R32
+    wave: M5
+    owner: 9
+    provider: software+external
+    required_level: software_and_external
+    software_status: passed
+    external_status: blocked
+    verification: "migration checksum, dirty-state, failure rollback and restart checks; external: non-production release interruption rehearsal"
+    evidence: docs/evidence/acceptance/R32/
+  - id: R33
+    wave: M5
+    owner: 9
+    provider: software+external
+    required_level: software_and_external
+    software_status: passed
+    external_status: blocked
+    verification: "capacity harness smoke with 20 clients and bounded p95/error budget; external: 24-hour 500-device and 90-day fixture run"
+    evidence: docs/evidence/acceptance/R33/
+  - id: R34
+    wave: M6a
+    owner: 10
+    provider: software
+    required_level: software
+    software_status: passed
+    external_status: not_applicable
+    verification: "PG race/shuffle integration, contracts, admin browser workflow, and two independent reviews"
+    evidence: docs/evidence/acceptance/R34/
+  - id: R35
+    wave: M6a
+    owner: 10
+    provider: software
+    required_level: software
+    software_status: passed
+    external_status: not_applicable
+    verification: "PG race/shuffle integration, MQTT/history/backfill probes, contracts, and two independent reviews"
+    evidence: docs/evidence/acceptance/R35/
+  - id: R36
+    wave: M6b
+    owner: 10
+    provider: software
+    required_level: software
+    software_status: passed
+    external_status: not_applicable
+    verification: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1; verify resource-boundary authorization integration cases"
+    evidence: docs/evidence/acceptance/R36/
+  - id: R37
+    wave: M6b
+    owner: 10
+    provider: software
+    required_level: software
+    software_status: passed
+    external_status: not_applicable
+    verification: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1; verify role and revocation integration cases"
+    evidence: docs/evidence/acceptance/R37/
+  - id: R38
+    wave: M6c
+    owner: 10
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; exercise license status table and signing-key packaging check"
+    evidence: docs/evidence/acceptance/R38/
+  - id: R39
+    wave: M6c
+    owner: 10
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; verify concurrent quota registration cases"
+    evidence: docs/evidence/acceptance/R39/
+  - id: R40
+    wave: M6c
+    owner: 10
+    provider: software+external
+    required_level: software_and_external
+    software_status: not_run
+    external_status: blocked
+    verification: "planned: validate offline package; external: first-boot on clean disconnected x86_64 host with Docker"
+    evidence: docs/evidence/acceptance/R40/
+  - id: R41
+    wave: M6d
+    owner: 10
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; verify key issuance, rotation, revocation, and scope cases"
+    evidence: docs/evidence/acceptance/R41/
+  - id: R42
+    wave: M6d
+    owner: 10
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; verify fixed signature vectors, replay, and rate-limit cases"
+    evidence: docs/evidence/acceptance/R42/
+  - id: R43
+    wave: M7a
+    owner: 11
+    provider: software+external
+    required_level: software_and_external
+    software_status: not_run
+    external_status: blocked
+    verification: "planned: software tests for camera/signaling; external: validate RTSP and GB28181 streams on browser and WeChat device"
+    evidence: docs/evidence/acceptance/R43/
+  - id: R44
+    wave: M7b
+    owner: 11
+    provider: software+external
+    required_level: software_and_external
+    software_status: not_run
+    external_status: blocked
+    verification: "planned: run backend/frontend tests; external: verify map positioning and selection with configured provider and device"
+    evidence: docs/evidence/acceptance/R44/
+  - id: R45
+    wave: M7b
+    owner: 11
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: run dashboard tests and load check for 20 concurrent readers"
+    evidence: docs/evidence/acceptance/R45/
+  - id: R46
+    wave: M8a
+    owner: 12
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; exercise command state, duplicate receipt, timeout, and restart cases"
+    evidence: docs/evidence/acceptance/R46/
+  - id: R47
+    wave: M8b
+    owner: 12
+    provider: software+external
+    required_level: software_and_external
+    software_status: not_run
+    external_status: blocked
+    verification: "planned: run ingest tests; external: verify TCP gateway bridge against supplied gateway sample/device"
+    evidence: docs/evidence/acceptance/R47/
+  - id: R48
+    wave: M8b
+    owner: 12
+    provider: software+external
+    required_level: software_and_external
+    software_status: not_run
+    external_status: blocked
+    verification: "planned: run Modbus adapter tests; external: verify TCP/RTU register samples against physical device"
+    evidence: docs/evidence/acceptance/R48/
+  - id: R49
+    wave: M8b
+    owner: 12
+    provider: software+external
+    required_level: software_and_external
+    software_status: not_run
+    external_status: blocked
+    verification: "planned: go test ./internal/...; external: verify gateway/subdevice topology and downlink using hardware"
+    evidence: docs/evidence/acceptance/R49/
+  - id: R50
+    wave: M8c
+    owner: 12
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; exercise forwarding retry, dead-letter, replay, and address restrictions"
+    evidence: docs/evidence/acceptance/R50/
+  - id: R51
+    wave: M8c
+    owner: 12
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; exercise automation cycle, hop-limit, disable, and restart cases"
+    evidence: docs/evidence/acceptance/R51/
+  - id: R52
+    wave: M8c
+    owner: 12
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; exercise cron timezone, duplicate worker, and restart cases"
+    evidence: docs/evidence/acceptance/R52/
+  - id: R53
+    wave: M8c
+    owner: 12
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; verify debugging redaction, retention, and authorization cases"
+    evidence: docs/evidence/acceptance/R53/
+  - id: R54
+    wave: M8d
+    owner: 12
+    provider: software
+    required_level: software
+    software_status: not_run
+    external_status: not_applicable
+    verification: "planned: go test ./internal/...; verify CSV/XLSX boundaries, async retry, and download authorization"
+    evidence: docs/evidence/acceptance/R54/
+  - id: R55
+    wave: full-delivery
+    owner: 13
+    provider: software+external
+    required_level: software_and_external
+    software_status: not_run
+    external_status: blocked
+    verification: "planned: make verify && make verify-contracts && make docs-tools; then execute all R01-R54 software and applicable external acceptance checks against the release"
+    evidence: docs/evidence/acceptance/R55/

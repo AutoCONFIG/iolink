@@ -1,0 +1,40 @@
+Todo 4: protocol adapters and ingestion application flow
+Date: 2026-09-27
+Tree: working tree after Todo 4 implementation; pre-existing Todo 1-3 changes preserved
+Tree manifest SHA256: d0dc8a9cac5d0a291972aae6e1538108078300cb6d989831b3b4768d52ae8510
+Environment: Go 1.26.8; PostgreSQL 16.15; TimescaleDB 2.30.0; Docker container `iolink-todo4-pg` mapped to 127.0.0.1:32997; DSN redacted.
+Raw output: `.omo/evidence/todo4-raw-qa.log`
+Defect IDs: T4-REVISION-FAIL-CLOSED (fixed before final review); no open Todo 4 defect.
+Reviewers: `.omo/evidence/todo4-independent-code-review.md` and `.omo/evidence/todo4-independent-gate-review.md`, both APPROVE for the reviewed snapshot.
+
+Scope
+
+- R05-R13 software scope: MQTT 3.1.1/5 authentication and ACL, normalized event validation, telemetry transaction, shadow merge/freshness, message-id deduplication, lifecycle/watchdog, alarm evaluation, historical pond snapshot behavior.
+- First-release providers: embedded Mochi MQTT and PostgreSQL 16 + TimescaleDB 2.30.0.
+- No hardware or external WeChat evidence is claimed.
+
+Implementation
+
+- `internal/ingestion` is the application validation boundary for normalized events. It rejects invalid device identities, timestamps, unknown metrics, non-finite/out-of-range values, fractional signal values, malformed message IDs, and status events carrying property payloads.
+- `internal/access` and `internal/core` consume the same metric range source. Access still applies protocol-specific filtering and ACL before dispatch; core validates again at the application boundary before persistence.
+- `internal/ingestion/integration_test.go` drives the real core service against an isolated database and proves tenant attribution plus message-id deduplication.
+
+Commands and actual results
+
+1. `IOLINK_TEST_PG_DSN=postgres://postgres:<redacted>@127.0.0.1:32997/postgres?sslmode=disable GOCACHE=/tmp/iolink-gocache go test ./internal/access ./internal/ingestion ./internal/persistence -run 'TestMQTT|TestIngestion|TestTelemetry' -count=1 -v`
+   Expected: real DB-backed ingestion test executes without skip and valid package tests pass. Actual: PASS. Access had no matching tests for this exact filter; ingestion unit and real DB dedup/tenant tests passed; persistence tenant snapshot tests passed. Raw output: `.omo/evidence/todo4-raw-qa.log`.
+2. `IOLINK_TEST_PG_DSN=postgres://postgres:<redacted>@127.0.0.1:32997/postgres?sslmode=disable IOLINK_TEST_CONTAINER=iolink-todo4-pg IOLINK_TEST_BINARY=/tmp/iolink-todo4d IOLINK_TEST_MQTT_BINARY=/tmp/iolink-todo4-mqtt python3 scripts/smoke_m0.py`
+   Expected: CLI migration/bootstrap, real MQTT to Timescale telemetry, admin latest, restart persistence, SIGTERM exit, and secret redaction pass. Actual: PASS. Reported environment: PostgreSQL 16.15, TimescaleDB 2.30.0. Raw output: `.omo/evidence/todo4-raw-qa.log`.
+3. `IOLINK_TEST_PG_DSN=postgres://postgres:<redacted>@127.0.0.1:32997/postgres?sslmode=disable GOCACHE=/tmp/iolink-gocache go test ./internal/access ./internal/ingestion ./internal/persistence ./internal/core -count=1 -v`
+   Expected: all applicable positive and error paths pass without partial writes. Actual: PASS. Access lifecycle/ACL/payload boundary tests, ingestion validation and persistence tests, history, shadow, rollback, alarm concurrency/confirmation, ownership, and real MQTT 3.1.1/5 integration passed.
+4. `IOLINK_TEST_PG_DSN=postgres://postgres:<redacted>@127.0.0.1:32997/postgres?sslmode=disable GOCACHE=/tmp/iolink-gocache go test -race -shuffle=on ./internal/access ./internal/ingestion ./internal/persistence ./internal/core -count=1`
+   Expected: no data races under randomized order with real integration DSN. Actual: PASS. All four packages passed with race detection and randomized order. Raw output: `.omo/evidence/todo4-raw-qa.log`.
+5. `python3 -m pytest -q scripts/test_check_architecture_manifests.py && python3 scripts/check_architecture_manifests.py --all && make docs-tools && make verify-contracts`
+   PASS. 28 manifest tests passed; architecture manifests passed; OpenAPI schemas and 35 operations/159 fixtures passed.
+
+Negative paths covered
+
+- Wrong secret, client ID mismatch, disabled device, Will flag, foreign topic, wildcard subscription, retained publish, non-QoS1 publish, malformed JSON, invalid UTF-8, type mismatch, unknown/case-variant fields, out-of-range fields, fractional signal, empty valid payload, and 64 KiB overflow.
+- Duplicate message IDs, stale shadow fields, pond moves, failed outbox insertion rollback, concurrent alarm reports, repeated confirmation, and cross-tenant telemetry snapshot reads.
+
+External status: hardware and external-provider acceptance is `external_blocked`; this artifact records software/provider evidence only.

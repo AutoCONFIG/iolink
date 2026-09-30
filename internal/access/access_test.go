@@ -1,6 +1,7 @@
 package access
 
 import (
+	"encoding/json"
 	"testing"
 
 	packets "github.com/mochi-mqtt/server/v2/packets"
@@ -14,6 +15,17 @@ type fakeHandler struct{ events []iolinkcontracts.Event }
 func (f *fakeHandler) HandleEvent(e iolinkcontracts.Event) error {
 	f.events = append(f.events, e)
 	return nil
+}
+
+func TestHandleGenericReportPreservesEnumAndNumberProperties(t *testing.T) {
+	fh := &fakeHandler{}
+	s := New(Config{ReportInterval: 60}, fh, nil, testLogger())
+	if err := s.HandleGenericReport("dev-generic", map[string]json.RawMessage{"temperature": json.RawMessage(`25`), "mode": json.RawMessage(`"auto"`)}); err != nil {
+		t.Fatal(err)
+	}
+	if len(fh.events) != 1 || fh.events[0].GenericProperties["mode"] == nil {
+		t.Fatalf("event=%+v", fh.events)
+	}
 }
 
 type fakeAuth struct{ ok bool }

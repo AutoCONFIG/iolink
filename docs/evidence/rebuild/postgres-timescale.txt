@@ -1,0 +1,42 @@
+Todo 3 persistence foundation evidence
+
+Environment: 2026-09-25, repository worktree. IOLINK_TEST_PG_DSN was not set; real PostgreSQL/Timescale integration is external_blocked and is not reported as passed.
+
+Unit/package checks
+  Invocation: GOCACHE=/tmp/iolink-gocache go test ./internal/migrate ./internal/persistence -count=1
+  Observable: exit 0; internal/migrate package passed; internal/persistence compiled.
+
+Static hygiene
+  Invocation: git diff --check
+  Observable: exit 0 with no whitespace errors.
+
+Implemented seams
+  internal/migrate/migrate.go: schema_migrations records dirty state; history and CheckLatest refuse dirty rows; migration DDL and history rows remain transactionally committed under advisory lock.
+  internal/migrate/sql/005_persistence_foundation.sql: tenant membership, tenant-attributed telemetry/shadows, audit_events, outbox_events, and durable jobs with ownership indexes and idempotency constraints.
+  internal/persistence/postgres.go: transaction Within boundary, tenant predicate helper, and tenant-scoped telemetry snapshot row mapping.
+
+Blocked scenarios requiring disposable PostgreSQL 16 + TimescaleDB DSN
+  IOLINK_TEST_PG_DSN="$DSN" go test ./internal/migrate ./internal/persistence -count=1 -v
+  Required observables: fresh install and repeat application, checksum drift refusal, concurrent advisory-lock serialization, dirty-state refusal, injected DDL rollback, tenant cross-access refusal, alarm uniqueness, and atomic outbox/job commit.
+
+Todo3 fixture repair validation (2026-09-26)
+
+Scenario: TestFreshUpAndBootstrap on a fresh PostgreSQL/Timescale database after adding a tenant, owner membership, and tenant_id to the farm fixture; ingestion rows are assigned the same tenant before tenant-scoped snapshot checks.
+Invocation: IOLINK_TEST_PG_DSN="postgres://postgres:<redacted>@127.0.0.1:32967/postgres?sslmode=disable" GOCACHE=/tmp/iolink-gocache go test ./internal/migrate ./internal/persistence ./internal/platform -count=1 -v
+Environment: PostgreSQL/Timescale endpoint 127.0.0.1:32967; credentials supplied out-of-band and redacted here; network-capable execution required for localhost access.
+Expected: exit 0; migration, persistence, and platform packages pass, including TestFreshUpAndBootstrap.
+Actual: exit 0. internal/migrate passed all 8 tests (including TestFreshUpAndBootstrap); internal/persistence passed all 3 tests; internal/platform passed all tests. The captured output excerpt below records the target fixture pass and package-level exit observables.
+
+Captured output:
+  === RUN   TestFreshUpAndBootstrap
+  --- PASS: TestFreshUpAndBootstrap (0.68s)
+  PASS
+  ok  git.hyhy.fun/rsplab/iolink/internal/migrate 64.214s
+  PASS
+  ok  git.hyhy.fun/rsplab/iolink/internal/persistence 0.003s
+  PASS
+  ok  git.hyhy.fun/rsplab/iolink/internal/platform 0.380s
+
+Compile and diff checks (2026-09-26)
+  Invocation: GOCACHE=/tmp/iolink-gocache go test ./internal/migrate ./internal/persistence ./internal/platform -run 'TestEmbeddedMigrations|TestPersistenceFoundationDeclaresFailClosedIdempotency|TestTelemetrySnapshotQuery|TestTenantPredicate|TestBootstrapAudit|TestConfig|TestAdminCommandsDoNotRequireServingKey|TestPasswordHash' -count=1 && git diff --check
+  Actual: exit 0; selected compile/unit checks passed and git diff --check reported no whitespace errors.

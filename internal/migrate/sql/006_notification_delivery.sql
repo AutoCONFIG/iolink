@@ -1,0 +1,10 @@
+ALTER TABLE notification_outbox ADD COLUMN IF NOT EXISTS next_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE notification_outbox ADD COLUMN IF NOT EXISTS leased_until TIMESTAMPTZ;
+ALTER TABLE notification_outbox ADD COLUMN IF NOT EXISTS lease_owner TEXT;
+ALTER TABLE notification_outbox ADD COLUMN IF NOT EXISTS last_error TEXT;
+ALTER TABLE notification_outbox ADD COLUMN IF NOT EXISTS recipient_open_id TEXT;
+ALTER TABLE notification_outbox ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
+ALTER TABLE users ADD COLUMN IF NOT EXISTS wechat_subscribed BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE notification_outbox DROP CONSTRAINT IF EXISTS notification_outbox_status_check;
+ALTER TABLE notification_outbox ADD CONSTRAINT notification_outbox_status_check CHECK (status IN ('pending','processing','sent','retryable','failed','disabled','unknown'));
+CREATE INDEX IF NOT EXISTS idx_notification_outbox_claim ON notification_outbox(status,next_at,leased_until);

@@ -4,10 +4,10 @@
 
 ## M6a：产品和物模型（R34–R35）
 
-- M6a先建立仅有default记录的tenants表作为外键基座，所有旧资源回填default；这不开放多租户。M6b再建立成员、隔离和多租户管理。products(id,tenant_id,name)、product_models(product_id,version,schema,published_at)，发布版本不可就地修改；设备固定 product_id/model_version。模型字段支持 number/integer/boolean/string，定义 identifier、单位、范围/枚举、可读/可写和 nullable；identifier 唯一且不得改变既有字段类型/单位。
+- M6a先建立仅有default记录的tenants表作为外键基座，非生产旧资源fixture回填default；这不开放多租户，也不承诺已部署客户数据迁移。M6b再建立成员、隔离和多租户管理。products(id,tenant_id,name)、product_models(product_id,version,schema,published_at)，发布版本不可就地修改；设备固定 product_id/model_version。模型字段支持 number/integer/boolean/string，定义 identifier、单位、范围/枚举、可读/可写和 nullable；identifier 唯一且不得改变既有字段类型/单位。
 - schema 变更新增版本；变更单位或类型须新 identifier，不覆写历史语义。设备升级显式执行并有审计，已入库历史记录 model_version。
 - 保留水质 sensor_data 宽表和 /api/v1 五指标接口，水质注册为内置产品 v1。新增通用 telemetry(ts,device_no,pond_id,tenant_id,model_version,properties JSONB) hypertable，记录有效属性；数值查询白名单来自模型，不能将任意 identifier 拼进 SQL。
-- 水质上报同时维护兼容宽表与通用数据，写入在同事务；旧数据迁移幂等回填且逐设备核对计数/区间/抽样值，迁移期间有高水位和切换记录，禁止双写造成重复计数。报表/动态 API 只读通用主数据，老 API 继续读兼容投影。
+- 水质上报同时维护兼容宽表与通用数据，写入在同事务；开发期兼容投影使用非生产旧水质fixture幂等回填，逐设备核对计数/区间/抽样值，迁移期间有高水位和切换记录，禁止双写造成重复计数。该fixture/中断恢复演练验证数据安全，不承诺已部署客户数据升级。报表/动态 API 只读通用主数据，老 API 继续读兼容投影。
 - 多产品报警去重键为(tenant_id,device_no,pond_id,product_id,metric_identifier)，仅约束未确认记录；model_version不入键，因为同identifier的类型/单位不允许改变。新identifier独立报警；调塘和跨产品重新配置不会被旧作用域报警压制。查询/插入/通知读取使用同一范围。
 - 影子字段按属性合并，携带 model_version 和逐字段时间。缺失不清空，显式 null 仅在模型允许时清空；水质旧协议的 null 保持缺失语义。
 - 新增 `/api/v2/devices/{no}/telemetry`、`/history?metric=...` 与管理 products/models/version/assignment 族契约；旧 v1 不要求前端升级，未知产品调用固定水质接口返回 400 unsupported product。
@@ -31,7 +31,7 @@
 
 farms/products/devices/shadows/telemetry/alarms/rules/cameras/keys/jobs/commands/reports 均可追溯 tenant_id，写入校验父子同租户；唯一键除全局 device_no 外以租户限定。队列/outbox/调度/导出/播放鉴权携带 tenant_id 并在执行或下载时重验权限。查询必须先限定租户再限定农场，索引支持该条件。
 
-旧库全部资源迁到默认租户，并生成 membership；记录关联清单与异常孤立资源，事务失败不部分开放。撤销 membership/角色或停租户立即拒绝新请求与未执行任务，通过权限版本避免旧 JWT 继续生效。后台增加组织/成员/角色页；casbin 管角色-资源-动作策略，数据库归属过滤不能被策略替代。
+非生产旧库fixture中的资源在 M6b 回填到默认租户并生成 membership；记录关联清单与异常孤立资源，事务失败不部分开放。该fixture回填验证归属完整性与隔离，不承诺已部署客户数据迁移。撤销 membership/角色或停租户立即拒绝新请求与未执行任务，通过权限版本避免旧 JWT 继续生效。后台增加组织/成员/角色页；casbin 管角色-资源-动作策略，数据库归属过滤不能被策略替代。
 
 租户停用：登录/Key/播放/任务/采集均停止并记录审计，保留数据；平台管理员可恢复。License 过期策略不同，见下文，不能混用。
 

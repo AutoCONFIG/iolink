@@ -3,6 +3,7 @@ package core_test
 import (
 	"context"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"git.hyhy.fun/rsplab/iolink/internal/access"
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
@@ -223,4 +224,61 @@ func TestRealMQTTAuthenticationACLAndPersistence(t *testing.T) {
 	waitCount("SELECT count(*) FROM devices WHERE status='online'", 0)
 	execute(t, pool, "UPDATE devices SET disabled_at=now()")
 	connect("one", "test-secret", false)
+}
+
+func TestRealMQTTSecondProductPreservesNumericAndEnumFields(t *testing.T) {
+	svc, pool := setup(t)
+	ctx := context.Background()
+	var tenantID, productID int64
+	if err := pool.QueryRow(ctx, `SELECT id FROM tenants WHERE name='test-tenant'`).Scan(&tenantID); err != nil {
+		t.Fatal(err)
+	}
+	if err := pool.QueryRow(ctx, `INSERT INTO products(tenant_id,name) VALUES($1,'generic-mqtt') RETURNING id`, tenantID).Scan(&productID); err != nil {
+		t.Fatal(err)
+	}
+	schema := `{"fields":[{"identifier":"flow","type":"number","unit":"L/min","minimum":0,"maximum":100,"readable":true,"nullable":false},{"identifier":"mode","type":"string","enum_values":["auto","manual"],"readable":true,"nullable":false}]}`
+	execute(t, pool, `INSERT INTO product_models(product_id,version,schema,published_at) VALUES($1,1,$2::jsonb,now())`, productID, schema)
+	execute(t, pool, `UPDATE devices SET product_id=$1,model_version=1 WHERE device_no='one'`, productID)
+	execute(t, pool, `INSERT INTO alarm_rules(pond_id,metric,max_value,level,enabled) VALUES(1,'flow',10,'warning',true)`)
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := listener.Addr().String()
+	listener.Close()
+	broker := access.New(access.Config{MQTTAddr: addr, ReportInterval: time.Minute, OfflineGraceFactor: 3}, svc, svc, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err = broker.Serve(); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { broker.Close() })
+	go broker.Run(t.Context())
+	opts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID("one").SetUsername("one").SetPassword("test-secret").SetAutoReconnect(false)
+	client := mqtt.NewClient(opts)
+	tok := client.Connect()
+	if !tok.WaitTimeout(3*time.Second) || tok.Error() != nil {
+		t.Fatalf("connect: %v", tok.Error())
+	}
+	t.Cleanup(func() { client.Disconnect(100) })
+	tok = client.Publish("iolink/up/one/properties", 1, false, `{"message_id":"generic-mqtt-1","flow":12,"mode":"auto"}`)
+	if !tok.WaitTimeout(3*time.Second) || tok.Error() != nil {
+		t.Fatalf("publish: %v", tok.Error())
+	}
+	deadline := time.Now().Add(3 * time.Second)
+	for time.Now().Before(deadline) && count(t, pool, "SELECT count(*) FROM telemetry WHERE device_no='one'") < 1 {
+		time.Sleep(10 * time.Millisecond)
+	}
+	var raw []byte
+	if err := pool.QueryRow(ctx, `SELECT properties FROM telemetry WHERE device_no='one' ORDER BY ts DESC LIMIT 1`).Scan(&raw); err != nil {
+		t.Fatal(err)
+	}
+	var props map[string]json.RawMessage
+	if err := json.Unmarshal(raw, &props); err != nil {
+		t.Fatal(err)
+	}
+	if props["flow"] == nil || props["mode"] == nil {
+		t.Fatalf("properties=%s", raw)
+	}
+	if count(t, pool, `SELECT count(*) FROM alarms WHERE device_no='one' AND metric='flow'`) != 1 {
+		t.Fatal("generic numeric alarm missing")
+	}
 }

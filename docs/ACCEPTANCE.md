@@ -29,7 +29,7 @@
 |---|---|---|---|
 | R01 AUDIT | M0 可复现构建测试 | 干净检出运行build/vet/tests通过；make verify无已删除目录；CI同命令；无缓存也可重现 | U/O；Makefile、CI |
 | R02 AUDIT | M0/M1/M2 分层契约验证 | M0仅R02.a静态标准/引用/合成fixture；M1完成R02.b真实MQTT字段/ACL回归；M2完成R02.c全部目标handler请求/响应回归；无空响应定义 | U；docs/api、mqtt-spec |
-| R03 AUDIT | M0 空库/旧库迁移 | 空库逐版迁移后正常上报；旧schema保数据升级；重复执行无副作用；checksum改变/并发迁移/故意失败均按设计拒绝或回滚 | D/O；internal/migrate、遗留schema |
+| R03 AUDIT | M0 空库/迁移安全 | 空库逐版迁移后正常上报；重复执行无副作用；checksum改变/并发迁移/故意失败/中断安装均按设计拒绝或回滚并可安全恢复。旧schema保数据迁移仅用非生产fixture验证迁移行为，不表示支持已部署客户数据升级 | D/O；internal/migrate、隔离fixture |
 | R04 AUDIT | M0 首启和配置 | 缺生产secret/非法配置拒绝；首启无公开默认密码；env中全局默认上报周期/离线阈值生效（逐设备注册由M2验收）；用户输入不入敏感日志 | U/I/O；platform、cmd/iolinkd |
 | R05 BASE | M1 设备认证 | 合法凭据连接；错secret、ClientID不匹配、已停用设备拒绝；第二会话按唯一身份规则替换并保持正确状态；注册secret仅一次返回 | U/D/I；access、core/deviceauth |
 | R06 BASE | M1 Topic ACL/伪造 | 自己properties/ack可发、cmd可订；跨设备/通配符/伪造子设备/非法topic拒绝；认证前不产生online | U/I；access/broker/auth |
@@ -63,7 +63,7 @@
 | R29 BASE | M5 健康/指标/关闭 | health反映DB连通，就绪检查迁移/依赖；online重启后正确，telemetry/alarm/通知成功计数可核对；SIGTERM有界关闭，不丢已提交数据 | D/I/O；main/metrics |
 | R30 BASE | M5 TLS部署 | 新机仅443/8883及授权视频端口开放，DB/内部API不可公网直达；HTTP/MQTT证书验证正确，错误证书拒绝；无默认密码 | I/O；deploy |
 | R31 AUDIT | M5 一致备份恢复 | 全库备份在隔离空库恢复；业务/时序行数、min/max时间、影子、报警、索引、retention核对；损坏备份明确失败；RPO<=24h，100GiB验收集RTO<=2h | D/O；backup/restore脚本（待修/建） |
-| R32 AUDIT | M5 升级/回退 | 旧版本数据升级保留；故意失败停止服务/保持旧库或恢复备份；二进制回退遵守schema兼容；文档每命令可重放 | D/O；迁移和发布工具 |
+| R32 AUDIT | M5 发布/恢复安全 | 在非生产旧版本fixture上验证迁移保留fixture数据；故意失败或中断时停止服务、保持旧库或恢复已验证备份；验证不兼容schema时禁止直接回退二进制，并演练恢复备份后回退；文档每命令可重放。此项不要求、也不承诺已部署客户数据升级兼容 | D/O；迁移和发布工具 |
 | R33 AUDIT | M5 容量 | 按PLAN的500设备/24h/20查询客户端/90天历史；查询p95<2s、错误<0.1%、无未解释数据丢失；13个月磁盘预算附测量依据 | I/D/O；负载工具（待建） |
 
 ## M6–M8：扩展交付
@@ -71,8 +71,8 @@
 | ID/来源 | 阶段与需求 | 成功与边界验收 | 环境；实现落点 |
 |---|---|---|---|
 | R34 EXT | M6a 产品/模型 | 发布/版本/设备分配后台可用；第二产品数值与枚举采集→影子→查询→报警；非法类型/单位变更拒绝；模型版本历史稳定 | U/D/I/W；products/models（待建） |
-| R35 EXT | M6a 旧水质兼容 | 旧固件与v1接口全回归；旧数据幂等回填计数与样本一致；迁移中断可恢复；动态API不能绕过指标白名单 | D/I；通用telemetry与兼容投影（待建） |
-| R36 EXT | M6b 多租户 | M6b先验R36.a现有资源互访拒绝；R36.b的Key/播放/命令/jobs/报表在所属阶段验证；默认租户迁移无丢失；一用户多组织切换检查membership；停租户阻断接入/任务 | D/I/W；tenant/membership（待建） |
+| R35 EXT | M6a 水质兼容投影 | 旧固件与v1接口全回归；开发期旧数据fixture幂等回填后逐设备计数/区间/抽样值一致；迁移中断可恢复；动态API不能绕过指标白名单；该fixture验证不承诺已部署客户数据升级 | D/I；通用telemetry与兼容投影（待建） |
+| R36 EXT | M6b 多租户 | M6b先验R36.a现有资源互访拒绝；R36.b的Key/播放/命令/jobs/报表在所属阶段验证；非生产默认租户fixture回填无丢失/错归属，membership生成完整且事务失败不部分开放；一用户多组织切换检查membership；停租户阻断接入/任务 | D/I/W；tenant/membership（待建） |
 | R37 EXT | M6b RBAC | EXTENSIONS权限表逐角色读写；R37.a撤权旧token及fake执行器失效；R37.b真实待执行job/播放/下载在所属阶段验证；平台管理员默认不可读租户数据；支持授权有期限与审计 | U/D/I/W；权限策略（待建） |
 | R38 EXT | M6c License | 有效/永久/伪造/缺失/未生效/过期/时钟回拨/错实例逐状态表；无效导入不替换有效证书；签发私钥不进运行包 | U/D/I/W；授权/离线签发（待建） |
 | R39 EXT | M6c 配额/功能 | R39.a并发注册不超设备数（网关/子设备用配额模型fixture）；真实网关/子设备计数随R49复验；停用释放、恢复重验；过期维持存量基础采集报警，控制/开放等按表拒绝；R39.b实际可选HTTP/worker随各功能阶段复验 | D/I；配额与feature守卫（待建） |

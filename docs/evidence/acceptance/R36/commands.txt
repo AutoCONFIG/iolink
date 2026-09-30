@@ -1,0 +1,61 @@
+Environment: Docker container iolink-todo9-pg; DSN omitted from stored evidence.
+
+$ IOLINK_TEST_PG_DSN=<dedicated-dsn> go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1
+ok  git.hyhy.fun/iolink/internal/core
+ok  git.hyhy.fun/iolink/internal/access
+ok  git.hyhy.fun/iolink/internal/migrate
+ok  git.hyhy.fun/iolink/internal/persistence
+ok  git.hyhy.fun/iolink/internal/adminapi
+ok  git.hyhy.fun/iolink/internal/appapi
+
+$ make verify
+go build ./...
+go vet ./...
+go test -race -shuffle=on ./... -count=1
+PASS
+
+$ make verify-contracts
+docs/api/admin-openapi.yaml: standard schema and 38 operation fixtures PASS
+docs/api/openapi.yaml: standard schema and 15 operation fixtures PASS
+53 target operations, 244 synthetic request/response fixtures PASS
+
+$ python3 scripts/check_architecture_manifests.py --all
+architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+
+$ cd web && npm run build && npm run e2e
+6 passed
+
+2026-09-30 final validation in dedicated Docker TimescaleDB container iolink-todo9-pg:
+An earlier full-suite run failed with PostgreSQL 40P01 while a Timescale retention
+worker raced a fresh test database fixture. The test database helper now sets
+timescaledb.restoring=on before migrations; production migrations are unchanged.
+
+$ IOLINK_TEST_PG_DSN=<dedicated-dsn> go test -race -shuffle=on ./internal/core -run '^TestSingleAndDoubleThresholdRules$' -count=10
+ok  git.hyhy.fun/rsplab/iolink/internal/core 17.312s
+
+$ IOLINK_TEST_PG_DSN=<dedicated-dsn> make verify
+go build ./...
+go vet ./...
+go test -race -shuffle=on ./... -count=1
+PASS: every Go package, including core, migrate, notifications, persistence and both APIs.
+
+$ make docs-tools && make verify-contracts && python3 scripts/check_architecture_manifests.py --all
+53 target operations, 244 synthetic request/response fixtures PASS
+architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+
+$ cd web && npm run build && npm run e2e
+production build PASS; 7 Playwright scenarios PASS.
+$ cd web && npm test
+9 unit tests PASS.
+
+$ cd web-mini && npm test && npm run typecheck && npm run build
+12 unit tests PASS; typecheck PASS; production build PASS.
+
+2026-09-30 R37 policy correction, same dedicated database container:
+$ IOLINK_TEST_PG_DSN=<dedicated-dsn> make verify
+PASS: go build, go vet and all Go packages with -race -shuffle=on -count=1,
+including new Casbin policy tests and direct core farm-member authorization checks.
+$ make verify-contracts && python3 scripts/check_architecture_manifests.py --all && git diff --check
+53 operations / 244 fixtures PASS; 55 architecture requirements PASS; diff check PASS.
+$ cd web && npm test && npm run build && npm run e2e
+9 unit tests PASS; production build PASS; 7 Playwright scenarios PASS.

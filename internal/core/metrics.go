@@ -24,4 +24,12 @@ var (
 		Name: "iolink_notifications_total",
 		Help: "Alarm notifications dispatched to notifiers.",
 	})
+	MetricNotificationsFailed = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "iolink_notifications_failed_total",
+		Help: "Alarm notifications that ended in a non-success state.",
+	})
+	MetricPersistenceFailures = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "iolink_persistence_failures_total",
+		Help: "Telemetry or alarm persistence failures.",
+	})
 )

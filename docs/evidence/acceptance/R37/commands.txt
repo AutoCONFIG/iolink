@@ -1,0 +1,56 @@
+Environment: Docker container iolink-todo9-pg; browser E2E ran against the local web test server.
+
+$ IOLINK_TEST_PG_DSN=<dedicated-dsn> go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1
+PASS (six packages)
+
+$ make verify-contracts
+53 target operations, 244 synthetic request/response fixtures PASS
+
+$ python3 scripts/check_architecture_manifests.py --all
+architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+
+$ cd web && npm run build && npm run e2e
+6 passed
+
+Role/error cases exercised by tests:
+viewer confirm=403; foreign tenant switch=404; revoked tenant token=401;
+missing tenant claims=401; missing tenant role=401; expired farm assignment has no reads;
+cross-tenant farm assignment=404; support without expiry=invalid; inactive tenant ingestion rejected.
+
+2026-09-30 final validation uses the same worktree and dedicated Docker container
+as R36/commands.txt. The complete transcript and prior 40P01 diagnosis are there.
+
+$ IOLINK_TEST_PG_DSN=<dedicated-dsn> make verify
+PASS: build, vet and all Go packages with -race -shuffle=on -count=1 against real TimescaleDB.
+
+$ make verify-contracts && python3 scripts/check_architecture_manifests.py --all
+53 target operations / 244 fixtures PASS; 55 architecture requirements PASS.
+
+$ cd web && npm run build && npm run e2e
+production build PASS; all 7 Playwright scenarios PASS,
+including organization role change, support expiry and deactivation persistence.
+$ cd web && npm test
+9 unit tests PASS.
+
+2026-09-30 policy correction after independent REJECT:
+Casbin role/resource/action policy is injected at the composition root. The
+core farm-member operation checks policy and live membership before listing.
+$ IOLINK_TEST_PG_DSN=<dedicated-dsn> make verify
+PASS: go build, go vet, all race/shuffle Go tests against dedicated TimescaleDB.
+$ make verify-contracts && python3 scripts/check_architecture_manifests.py --all && git diff --check
+53 operations / 244 fixtures PASS; 55 architecture requirements PASS; diff check PASS.
+$ cd web && npm test && npm run build && npm run e2e
+9 unit tests PASS; production build PASS; 7 Playwright scenarios PASS.
+
+2026-10-01 final batch and HTTP isolation correction:
+Environment: same dedicated Docker container iolink-todo9-pg; no external credentials.
+All temporary test databases keep Timescale retention workers idle using the test-only
+timescaledb.restoring setting; retention job definitions and production migrations remain present.
+$ GIN_MODE=release IOLINK_TEST_PG_DSN=<dedicated-dsn> make verify
+Actual output: 2026-10-01-go.txt (build, vet, all race/shuffle packages).
+$ GIN_MODE=release IOLINK_TEST_PG_DSN=<dedicated-dsn> go test -race -shuffle=on ./internal/core -run '^TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation$' -count=1 -v
+Actual output: 2026-10-01-http.txt (member, viewer and support PASS).
+$ make verify-contracts
+Actual output: 2026-10-01-contracts.txt (53 operations / 244 fixtures PASS).
+$ python3 scripts/check_architecture_manifests.py --all && git diff --check
+55 requirements PASS; diff check PASS.

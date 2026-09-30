@@ -1,0 +1,11 @@
+-test.shuffle 1790784478025953486
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/member
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/viewer
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/support
+--- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation (1.03s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/member (0.20s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/viewer (0.18s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/support (0.16s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	2.088s

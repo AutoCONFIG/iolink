@@ -1,0 +1,19 @@
+events {}
+stream {
+  server {
+    listen 8883 ssl;
+    ssl_certificate /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    proxy_pass 127.0.0.1:1883;
+  }
+}
+http {
+  server {
+    listen 443 ssl;
+    server_name iolink.example.com;
+    ssl_certificate /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    location = /metrics { deny all; }
+    location / { proxy_pass http://127.0.0.1:8080; }
+  }
+}

@@ -5,7 +5,10 @@
 // either side.
 package event
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Kind enumerates event types emitted by access.
 type Kind string
@@ -19,10 +22,12 @@ const (
 type Event struct {
 	Kind      Kind
 	DeviceNo  string
+	ProductID int64
 	MessageID string
 	Ts        time.Time
 	// Properties payload (Kind == KindProperties): metric name -> value.
-	Properties map[string]float64
+	Properties        map[string]float64
+	GenericProperties map[string]json.RawMessage
 	// Status payload (Kind == KindStatusChange).
 	Online bool
 }

@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"time"
 
+	"git.hyhy.fun/rsplab/iolink/internal/platform"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
@@ -43,6 +44,20 @@ type UserStore interface {
 	UserTokenVersion(ctx context.Context, id int64) (int, error)
 }
 
+type tenantTokenStore interface {
+	DefaultTenantForUser(ctx context.Context, userID int64) (int64, error)
+	TenantMembershipVersion(ctx context.Context, userID, tenantID int64) (int64, error)
+}
+
+type tenantRoleStore interface {
+	TenantRole(ctx context.Context, userID, tenantID int64) (string, error)
+}
+
+type tenantMembershipStore interface {
+	ListUserTenants(ctx context.Context, userID int64) ([]iolinkcontractsdomain.TenantMembership, error)
+	TenantMembershipVersion(ctx context.Context, userID, tenantID int64) (int64, error)
+}
+
 // Server is the appapi HTTP server.
 type Server struct {
 	cfg  Config
@@ -69,6 +84,8 @@ func (s *Server) Routes() http.Handler {
 
 	auth := v1.Group("", s.authRequired)
 	{
+		auth.GET("/auth/tenants", s.listTenants)
+		auth.POST("/auth/tenant", s.switchTenant)
 		auth.GET("/ponds", s.listPonds)
 		auth.GET("/ponds/:id", s.getPond)
 		auth.GET("/devices", s.listDevices)
@@ -79,7 +96,68 @@ func (s *Server) Routes() http.Handler {
 		auth.GET("/stats/summary", s.statsSummary)
 		auth.POST("/alarms/:id/confirm", s.confirmAlarm)
 	}
+	v2 := r.Group("/api/v2", s.authRequired)
+	v2.POST("/devices/:device_no/telemetry", s.submitTelemetryV2)
+	v2.GET("/devices/:device_no/model/latest", s.modelLatestV2)
+	v2.GET("/devices/:device_no/history", s.telemetryHistoryV2)
 	return r
+}
+
+type tenantSwitchRequest struct {
+	TenantID int64 `json:"tenant_id" binding:"required"`
+}
+
+func (s *Server) listTenants(c *gin.Context) {
+	store, ok := s.deps.Users.(tenantMembershipStore)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant membership unavailable"})
+		return
+	}
+	tenants, err := store.ListUserTenants(c.Request.Context(), uid(c))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant query failed"})
+		return
+	}
+	c.JSON(http.StatusOK, tenants)
+}
+
+func (s *Server) switchTenant(c *gin.Context) {
+	var req tenantSwitchRequest
+	if err := c.ShouldBindJSON(&req); err != nil || req.TenantID < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	store, ok := s.deps.Users.(tenantMembershipStore)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant membership unavailable"})
+		return
+	}
+	tenants, err := store.ListUserTenants(c.Request.Context(), uid(c))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant query failed"})
+		return
+	}
+	found := false
+	for _, tenant := range tenants {
+		if tenant.TenantID == req.TenantID {
+			found = true
+			break
+		}
+	}
+	if !found {
+		c.JSON(http.StatusNotFound, gin.H{"error": "tenant not found"})
+		return
+	}
+	token, err := s.signTokenForTenant(c.Request.Context(), uid(c), req.TenantID)
+	if err != nil {
+		if errors.Is(err, iolinkcontractsdomain.ErrInactiveTenant) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant membership inactive"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "token issue failed"})
+		return
+	}
+	c.JSON(http.StatusOK, loginResp{Token: token, ExpiresIn: int(s.cfg.JWT.Seconds())})
 }
 
 // Run blocks serving until the http server returns.
@@ -121,8 +199,12 @@ func (s *Server) login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	token, err := s.signToken(u.ID)
+	token, err := s.signToken(c.Request.Context(), u.ID)
 	if err != nil {
+		if errors.Is(err, iolinkcontractsdomain.ErrInactiveTenant) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant membership inactive"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -135,13 +217,55 @@ var WechatExchanger = func(code string) (openID string, err error) {
 	return "", errWechatCodeInvalid
 }
 
-func (s *Server) signToken(userID int64) (string, error) {
-	version := 0
-	if s.deps.Users != nil {
-		version, _ = s.deps.Users.UserTokenVersion(context.Background(), userID)
+func (s *Server) signToken(ctx context.Context, userID int64) (string, error) {
+	tenants, ok := s.deps.Users.(tenantTokenStore)
+	if !ok {
+		return "", errors.New("tenant store unavailable")
+	}
+	tenantID, err := tenants.DefaultTenantForUser(ctx, userID)
+	if err != nil {
+		if errors.Is(err, iolinkcontractsdomain.ErrNotFound) {
+			return "", iolinkcontractsdomain.ErrInactiveTenant
+		}
+		return "", err
+	}
+	if tenantID <= 0 {
+		return "", iolinkcontractsdomain.ErrInactiveTenant
+	}
+	return s.signTokenForTenant(ctx, userID, tenantID)
+}
+
+func (s *Server) signTokenForTenant(ctx context.Context, userID, tenantID int64) (string, error) {
+	if s.deps.Users == nil {
+		return "", errors.New("user store unavailable")
+	}
+	version, err := s.deps.Users.UserTokenVersion(ctx, userID)
+	if err != nil {
+		return "", err
 	}
 	claims := jwt.MapClaims{"uid": userID, "ver": version, "exp": time.Now().Add(s.cfg.JWT).Unix()}
-	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(s.cfg.SecretKey))
+	if tenantID > 0 {
+		tenants, ok := s.deps.Users.(tenantTokenStore)
+		if !ok {
+			return "", errors.New("tenant store unavailable")
+		}
+		membershipVersion, err := tenants.TenantMembershipVersion(ctx, userID, tenantID)
+		if err != nil {
+			return "", err
+		}
+		claims["tenant_id"] = tenantID
+		claims["tenant_ver"] = membershipVersion
+		roles, ok := s.deps.Users.(tenantRoleStore)
+		if !ok {
+			return "", errors.New("tenant role store unavailable")
+		}
+		role, roleErr := roles.TenantRole(ctx, userID, tenantID)
+		if roleErr != nil {
+			return "", roleErr
+		}
+		claims["tenant_role"] = role
+	}
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(platform.DeriveAppKey(s.cfg.SecretKey))
 }
 
 func (s *Server) authRequired(c *gin.Context) {
@@ -155,19 +279,24 @@ func (s *Server) authRequired(c *gin.Context) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("bad signing method")
 		}
-		return []byte(s.cfg.SecretKey), nil
+		return platform.DeriveAppKey(s.cfg.SecretKey), nil
 	})
 	if err != nil || !tok.Valid {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 		return
 	}
-	uid, ok := tok.Claims.(jwt.MapClaims)["uid"].(float64)
+	claims := tok.Claims.(jwt.MapClaims)
+	if _, ok := claims["exp"].(float64); !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing exp"})
+		return
+	}
+	uid, ok := claims["uid"].(float64)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
 		return
 	}
 	c.Set("uid", int64(uid))
-	version, ok := tok.Claims.(jwt.MapClaims)["ver"].(float64)
+	version, ok := claims["ver"].(float64)
 	if !ok || s.deps.Users == nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
 		return
@@ -176,6 +305,43 @@ func (s *Server) authRequired(c *gin.Context) {
 	if err != nil || int64(version) != int64(current) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token revoked"})
 		return
+	}
+	tenants, tenantStoreOK := s.deps.Users.(tenantTokenStore)
+	if !tenantStoreOK {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant store unavailable"})
+		return
+	}
+	{
+		tenantRaw, tenantOK := claims["tenant_id"].(float64)
+		membershipRaw, membershipOK := claims["tenant_ver"].(float64)
+		if !tenantOK && !membershipOK {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+			return
+		}
+		if !tenantOK || !membershipOK {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+			return
+		}
+		membershipVersion, err := tenants.TenantMembershipVersion(c.Request.Context(), int64(uid), int64(tenantRaw))
+		if err != nil || int64(membershipRaw) != membershipVersion {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant membership revoked"})
+			return
+		}
+		roles, roleStoreOK := s.deps.Users.(tenantRoleStore)
+		if !roleStoreOK {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant role unavailable"})
+			return
+		}
+		role, roleErr := roles.TenantRole(c.Request.Context(), int64(uid), int64(tenantRaw))
+		claimRole, roleOK := claims["tenant_role"].(string)
+		if roleErr != nil || !roleOK || claimRole != role {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant role invalid"})
+			return
+		}
+		c.Set("tenant_id", int64(tenantRaw))
+		requestContext := iolinkcontractsdomain.WithTenantID(c.Request.Context(), int64(tenantRaw))
+		requestContext = iolinkcontractsdomain.WithTenantRole(requestContext, role)
+		c.Request = c.Request.WithContext(requestContext)
 	}
 	c.Next()
 }

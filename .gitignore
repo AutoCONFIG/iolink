@@ -4,3 +4,5 @@ upstream/
 deploy/.env
 coverage.out
 internal/web/dist/
+.omo/
+__pycache__/

@@ -24,7 +24,11 @@ func (s *Server) listPonds(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	alarms, _ := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 200)
+	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 0)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "alarm query failed"})
+		return
+	}
 	worst := pondWorstLevel(alarms)
 
 	out := make([]gin.H, 0, len(ponds))
@@ -34,9 +38,11 @@ func (s *Server) listPonds(c *gin.Context) {
 			item["status"] = string(lvl)
 		}
 		devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
-		if err == nil {
-			item["device_count"] = len(devs)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+			return
 		}
+		item["device_count"] = len(devs)
 		item["latest"] = s.pondLatest(c.Request.Context(), p.ID, devs)
 		out = append(out, item)
 	}
@@ -66,7 +72,7 @@ func (s *Server) pondLatest(ctx context.Context, pondID int64, devs []iolinkcont
 		if err != nil {
 			continue
 		}
-		if best == nil || rd.Timestamp.After(best.Timestamp) {
+		if best == nil || rd.Timestamp.After(best.Timestamp) || (rd.Timestamp.Equal(best.Timestamp) && rd.DeviceNo < best.DeviceNo) {
 			cp := rd
 			best = &cp
 		}
@@ -88,31 +94,61 @@ func (s *Server) getPond(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"pond_id": p.ID, "pond_name": p.Name})
+	devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+		return
+	}
+	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 0)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "alarm query failed"})
+		return
+	}
+	status := "normal"
+	worst := pondWorstLevel(alarms)
+	if level, ok := worst[p.ID]; ok {
+		status = string(level)
+	}
+	c.JSON(http.StatusOK, gin.H{"pond_id": p.ID, "pond_name": p.Name, "status": status, "device_count": len(devs), "latest": s.pondLatest(c.Request.Context(), p.ID, devs)})
 }
 
 func (s *Server) listDevices(c *gin.Context) {
-	pondID, _ := strconv.ParseInt(c.Query("pond_id"), 10, 64)
+	pondID := int64(0)
+	if raw := c.Query("pond_id"); raw != "" {
+		var err error
+		pondID, err = strconv.ParseInt(raw, 10, 64)
+		if err != nil || pondID < 1 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pond_id"})
+			return
+		}
+	}
 	ponds, err := s.deps.Ponds.ListByUser(c.Request.Context(), uid(c))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	out := make([]gin.H, 0)
+	foundPond := pondID == 0
 	for _, p := range ponds {
 		if pondID != 0 && p.ID != pondID {
 			continue
 		}
+		foundPond = true
 		devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
 		if err != nil {
-			continue
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+			return
 		}
 		for _, d := range devs {
 			out = append(out, gin.H{
-				"device_no": d.DeviceNo, "pond_id": d.PondID,
-				"name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "report_interval": d.ReportInterval,
+				"id": d.ID, "device_no": d.DeviceNo, "pond_id": d.PondID,
+				"name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval,
 			})
 		}
+	}
+	if !foundPond {
+		c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
+		return
 	}
 	c.JSON(http.StatusOK, out)
 }
@@ -125,8 +161,9 @@ func (s *Server) getDevice(c *gin.Context) {
 		return
 	}
 	resp := gin.H{
-		"device_no": d.DeviceNo, "pond_id": d.PondID,
-		"name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "report_interval": d.ReportInterval,
+		"id": d.ID, "device_no": d.DeviceNo, "pond_id": d.PondID,
+		"name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt,
+		"created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval, "latest": nil,
 	}
 	if rd, err := s.deps.Telemetry.Latest(c.Request.Context(), no); err == nil {
 		resp["latest"] = waterLatestJSON(rd)
@@ -146,7 +183,11 @@ func (s *Server) waterLatest(c *gin.Context) {
 	}
 	rd, err := s.deps.Telemetry.Latest(c.Request.Context(), no)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "no data"})
+		if errors.Is(err, iolinkcontractsdomain.ErrInvalidProductModel) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported_product"})
+			return
+		}
+		c.JSON(http.StatusOK, nil)
 		return
 	}
 	c.JSON(http.StatusOK, waterLatestJSON(rd))
@@ -159,7 +200,9 @@ func (s *Server) waterHistory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "device_no and metric required"})
 		return
 	}
-	if _, err := s.deps.Devices.GetByDeviceNoForUser(c.Request.Context(), no, uid(c)); err != nil {
+	_, currentOwner := s.deps.Devices.GetByDeviceNoForUser(c.Request.Context(), no, uid(c))
+	_, scopedHistory := s.deps.Telemetry.(iolinkcontractsdomain.UserTelemetryRepo)
+	if currentOwner != nil && !scopedHistory {
 		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
 		return
 	}
@@ -177,9 +220,22 @@ func (s *Server) waterHistory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid range"})
 		return
 	}
-	points, err := s.deps.Telemetry.History(c.Request.Context(), no, metric, from, to, maxPoints)
+	scoped, ok := s.deps.Telemetry.(iolinkcontractsdomain.UserTelemetryRepo)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "history authorization unavailable"})
+		return
+	}
+	points, err := scoped.HistoryForUser(c.Request.Context(), no, uid(c), metric, from, to, maxPoints)
 	if err != nil {
+		if errors.Is(err, iolinkcontractsdomain.ErrInvalidProductModel) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported_product"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "history query failed"})
+		return
+	}
+	if currentOwner != nil && len(points) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
 		return
 	}
 	if points == nil {
@@ -204,11 +260,50 @@ func historyWindow(name string, now time.Time) (time.Time, time.Time, error) {
 }
 
 func (s *Server) listAlarms(c *gin.Context) {
-	limit := 50
-	if l, err := strconv.Atoi(c.DefaultQuery("limit", "50")); err == nil && l > 0 && l <= 200 {
-		limit = l
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "50"))
+	if err != nil || limit < 1 || limit > 200 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid limit"})
+		return
 	}
-	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), limit)
+	offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
+	if err != nil || offset < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid offset"})
+		return
+	}
+	level := c.Query("level")
+	if level != "" && level != string(iolinkcontractsdomain.AlarmCritical) && level != string(iolinkcontractsdomain.AlarmWarning) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid level"})
+		return
+	}
+	onlyUnconfirmed, err := strconv.ParseBool(c.DefaultQuery("only_unconfirmed", "false"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid only_unconfirmed"})
+		return
+	}
+	var alarms []iolinkcontractsdomain.Alarm
+	if filtered, ok := s.deps.Alarms.(iolinkcontractsdomain.FilteredAlarmRepo); ok {
+		alarms, err = filtered.ListByUserFiltered(c.Request.Context(), uid(c), iolinkcontractsdomain.AlarmLevel(level), onlyUnconfirmed, limit, offset)
+	} else {
+		alarms, err = s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 0)
+		if err == nil {
+			filtered := make([]iolinkcontractsdomain.Alarm, 0, len(alarms))
+			for _, a := range alarms {
+				if level != "" && string(a.Level) != level || onlyUnconfirmed && a.ConfirmedAt != nil {
+					continue
+				}
+				filtered = append(filtered, a)
+			}
+			if offset >= len(filtered) {
+				alarms = []iolinkcontractsdomain.Alarm{}
+			} else {
+				end := offset + limit
+				if end > len(filtered) {
+					end = len(filtered)
+				}
+				alarms = filtered[offset:end]
+			}
+		}
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -217,6 +312,11 @@ func (s *Server) listAlarms(c *gin.Context) {
 }
 
 func (s *Server) confirmAlarm(c *gin.Context) {
+	role := iolinkcontractsdomain.TenantRole(c.Request.Context())
+	if role != "" && role != "owner" && role != "admin" && role != "member" && role != "support" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+		return
+	}
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
@@ -236,8 +336,15 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 // ---- JSON shaping (keeps OpenAPI field names) ----
 
 func waterLatestJSON(rd iolinkcontractsdomain.Reading) gin.H {
-	h := gin.H{"ts": rd.Timestamp, "pond_id": rd.PondID, "report_interval": rd.ReportInterval, "timestamps": rd.Timestamps}
-	h["battery"] = rd.Battery
+	timestamps := map[string]any{}
+	for _, key := range []string{"temperature", "dissolved_oxygen", "ph", "turbidity", "salinity", "signal"} {
+		if ts, ok := rd.Timestamps[key]; ok {
+			timestamps[key] = ts
+		} else {
+			timestamps[key] = nil
+		}
+	}
+	h := gin.H{"device_no": rd.DeviceNo, "ts": rd.Timestamp, "pond_id": rd.PondID, "report_interval": rd.ReportInterval, "timestamps": timestamps}
 	h["signal"] = rd.Signal
 	h["temperature"] = rd.Temperature
 	h["dissolved_oxygen"] = rd.DO
@@ -272,30 +379,34 @@ func (s *Server) statsSummary(c *gin.Context) {
 	pondItems := make([]gin.H, 0, len(ponds))
 	for _, p := range ponds {
 		devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
-		if err == nil {
-			for _, d := range devs {
-				switch d.Status {
-				case iolinkcontractsdomain.DeviceOnline:
-					online++
-				case iolinkcontractsdomain.DeviceOffline:
-					offline++
-				}
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+			return
+		}
+		for _, d := range devs {
+			switch d.Status {
+			case iolinkcontractsdomain.DeviceOnline:
+				online++
+			case iolinkcontractsdomain.DeviceOffline:
+				offline++
 			}
 		}
 		pondItems = append(pondItems, gin.H{
 			"pond_id": p.ID, "pond_name": p.Name, "status": "normal",
 		})
 	}
-	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 5000)
+	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 0)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "alarm query failed"})
+		return
+	}
 	openByPond := map[int64]iolinkcontractsdomain.AlarmLevel{}
 	alarmDevices := map[string]struct{}{}
-	if err == nil {
-		for _, a := range alarms {
-			if a.ConfirmedAt == nil {
-				alarmDevices[a.DeviceNo] = struct{}{}
-				if openByPond[a.PondID] != iolinkcontractsdomain.AlarmCritical {
-					openByPond[a.PondID] = a.Level
-				}
+	for _, a := range alarms {
+		if a.ConfirmedAt == nil {
+			alarmDevices[a.DeviceNo] = struct{}{}
+			if openByPond[a.PondID] != iolinkcontractsdomain.AlarmCritical {
+				openByPond[a.PondID] = a.Level
 			}
 		}
 	}

@@ -22,10 +22,15 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/access"
 	"git.hyhy.fun/rsplab/iolink/internal/adminapi"
 	"git.hyhy.fun/rsplab/iolink/internal/appapi"
+	"git.hyhy.fun/rsplab/iolink/internal/authorization"
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
+	"git.hyhy.fun/rsplab/iolink/internal/notifications"
+	"git.hyhy.fun/rsplab/iolink/internal/operations"
+	"git.hyhy.fun/rsplab/iolink/internal/persistence"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 	"git.hyhy.fun/rsplab/iolink/internal/web"
+	"git.hyhy.fun/rsplab/iolink/internal/wechat"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -101,17 +106,34 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 		return err
 	}
 
-	svc, err := core.New(ctx, pool, log, cfg.ReportInterval)
+	policy, err := authorization.New()
+	if err != nil {
+		return fmt.Errorf("tenant policy: %w", err)
+	}
+	svc, err := core.NewWithPolicy(ctx, pool, log, policy, cfg.ReportInterval)
 	if err != nil {
 		return err
 	}
 
-	// notifier: WeChat subscribe message when configured
-	if cfg.WXAppID != "" && cfg.WXSecret != "" && cfg.WXTemplateID != "" {
-		svc.SetNotifier(core.NewWeChatNotifier(cfg.WXAppID, cfg.WXSecret, cfg.WXTemplateID,
-			envOr("IOLINK_WX_PAGE", "pages/alarms/index"), log))
-		log.Info("wechat notifier enabled")
+	notificationSender := wechat.NewSender(wechat.Config{
+		AppID: cfg.WXAppID, Secret: cfg.WXSecret, TemplateID: cfg.WXTemplateID,
+		Page:         envOr("IOLINK_WX_PAGE", "pages/alarms/index"),
+		MessageField: envOr("IOLINK_WX_MESSAGE_FIELD", "thing1"),
+		ValueField:   envOr("IOLINK_WX_VALUE_FIELD", "number2"),
+		TimeField:    envOr("IOLINK_WX_TIME_FIELD", "time3"),
+	})
+	notificationWorker, err := notifications.NewWorker(notifications.Config{
+		Store: persistence.NewNotificationStore(pool), Sender: notificationSender, Logger: log,
+		OnSent: core.MetricNotificationsSent.Inc, OnFailure: core.MetricNotificationsFailed.Inc,
+	})
+	if err != nil {
+		return err
 	}
+	notificationDone := make(chan struct{})
+	go func() {
+		defer close(notificationDone)
+		notificationWorker.Run(ctx)
+	}()
 
 	// --- access: embedded MQTT broker, events -> core ---
 	acc := access.New(access.Config{
@@ -132,7 +154,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 	admin := adminapi.New(adminapi.Config{
 		SecretKey: cfg.SecretKey,
 		JWT:       12 * time.Hour,
-	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry()}) // svc implements AdminStore
+	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy})
 
 	// --- appapi: /api/v1 for the mini program, backed by core repos ---
 	api := appapi.New(appapi.Config{
@@ -154,22 +176,30 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 	// single port: root mux mounts admin API, app API and health endpoint
 
 	root := http.NewServeMux()
-	root.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		pingCtx, cancel := context.WithTimeout(r.Context(), cfg.QueryTimeout)
-		defer cancel()
-		if err := pool.Ping(pingCtx); err != nil {
-			http.Error(w, "db down", http.StatusServiceUnavailable)
-			return
-		}
-		w.Write([]byte("ok"))
+	health := operations.NewHealth(operations.Checks{
+		Ping: func(ctx context.Context) error {
+			pingCtx, cancel := context.WithTimeout(ctx, cfg.QueryTimeout)
+			defer cancel()
+			return pool.Ping(pingCtx)
+		},
+		Ready: func(ctx context.Context) error {
+			checkCtx, cancel := context.WithTimeout(ctx, cfg.QueryTimeout)
+			defer cancel()
+			if err := pool.Ping(checkCtx); err != nil {
+				return err
+			}
+			return migrate.CheckLatest(checkCtx, pool)
+		},
 	})
+	root.Handle("/healthz", health.Healthz())
+	root.Handle("/readyz", health.Readyz())
 	root.Handle("/metrics", promhttp.Handler())
 	root.Handle("/admin/v1/", admin.Routes())
 	adminFS, err := web.Admin()
 	if err != nil {
 		return err
 	}
-	root.Handle("/api/v1/", api.Routes())
+	mountApplicationAPI(root, api.Routes())
 	root.Handle("/", spaHandler(adminFS))
 
 	srv := &http.Server{Addr: cfg.HTTPAddr, Handler: root, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second}
@@ -182,14 +212,20 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 	}()
 	<-ctx.Done()
 	log.Info("shutting down")
+	health.SetReady(false)
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+	if err := acc.CloseContext(shutdownCtx); err != nil {
+		log.Warn("mqtt close", "err", err)
+	}
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		_ = srv.Close()
 		log.Warn("http shutdown deadline", "err", err)
 	}
-	if err := acc.Close(); err != nil {
-		log.Warn("mqtt close", "err", err)
+	select {
+	case <-notificationDone:
+	case <-shutdownCtx.Done():
+		log.Warn("notification shutdown deadline")
 	}
 	select {
 	case err := <-serviceErrors:
@@ -197,6 +233,11 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 	default:
 		return nil
 	}
+}
+
+func mountApplicationAPI(root *http.ServeMux, handler http.Handler) {
+	root.Handle("/api/v1/", handler)
+	root.Handle("/api/v2/", handler)
 }
 
 func envOr(k, def string) string {

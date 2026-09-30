@@ -21,6 +21,9 @@ func (c *capturedHistory) History(_ context.Context, _, _ string, _, _ time.Time
 	c.calls++
 	return nil, nil
 }
+func (c *capturedHistory) HistoryForUser(ctx context.Context, deviceNo string, _ int64, metric string, from, to time.Time, max int) ([]domain.MetricPoint, error) {
+	return c.History(ctx, deviceNo, metric, from, to, max)
+}
 func TestHistoryHTTPBoundsAndUnits(t *testing.T) {
 	store := &capturedHistory{}
 	s := New(Config{}, Deps{Telemetry: store, Devices: fakeDevices{}}, testLogger())

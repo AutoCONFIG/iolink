@@ -47,6 +47,15 @@ func TestAdminCommandsDoNotRequireServingKey(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestConfigRejectsEnabledWechatWithoutTemplate(t *testing.T) {
+	env := validEnv()
+	env["IOLINK_WX_APPID"] = "appid"
+	env["IOLINK_WX_SECRET"] = "secret"
+	if _, err := LoadConfig(func(k string) string { return env[k] }, true); err == nil {
+		t.Fatal("WeChat credentials without template must fail closed")
+	}
+}
 func TestPasswordHash(t *testing.T) {
 	a, b := HashPassword("strong-password"), HashPassword("strong-password")
 	if a == b {

@@ -1,0 +1,143 @@
+version: 2
+scope: "M0-M8d approved reference providers; status reflects docs/IMPLEMENTED.md"
+status_vocabulary: [implemented, partial, not_implemented, external_blocked]
+level_vocabulary: [L0, L1, L2, L3, L4]
+providers:
+  - id: go-toolchain
+    name: Go toolchain and repository verification commands
+    role: build_and_test
+    operation: reproducible_build_and_contract_checks
+    required_level: L3
+    status: partial
+    command: make verify && make docs-tools && make verify-contracts
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M0]
+  - id: postgres-timescale
+    name: PostgreSQL 16 + TimescaleDB
+    role: database
+    operation: transactions_migrations_and_time_series
+    required_level: L4
+    status: partial
+    command: IOLINK_TEST_PG_DSN="$DSN" make integration
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M0, M1, M2, M5, M6a, M6b, M6d, M8a, M8b, M8c, M8d]
+  - id: embedded-mqtt
+    name: Embedded MQTT broker
+    role: device_messaging
+    operation: authenticated_device_ingress_and_acknowledgement
+    required_level: L4
+    status: implemented
+    command: go test ./internal/access ./internal/ingestion ./internal/persistence -run 'TestMQTT|TestIngestion|TestTelemetry' -count=1 -v
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M1, M8a]
+  - id: embedded-http
+    name: Built-in HTTP API
+    role: service_api
+    operation: authenticated_management_and_extension_operations
+    required_level: L4
+    status: partial
+    command: make verify-contracts
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M0, M1, M2, M3, M4, M5, M6a, M6b, M6d, M7b, M8a, M8b, M8c, M8d]
+  - id: wechat
+    name: WeChat adapter
+    role: login_and_notifications
+    operation: code_exchange_subscription_and_template_delivery
+    required_level: L4
+    status: partial
+    command: go test ./internal/notifications ./internal/appapi -run 'TestWeChat|TestNotification' -count=1 -v
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M2, M4, M5, M7a]
+    external_evidence: [wechat_credentials_and_qualification, real_device_login_authorization_and_notification]
+  - id: tls-reverse-proxy
+    name: TLS reverse proxy
+    role: deployment_edge
+    operation: tls_certificate_and_network_exposure
+    required_level: L4
+    status: partial
+    command: make verify
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M5, M6c, M7a]
+    external_evidence: [production_domain_and_certificates, isolated_installation_and_recovery]
+  - id: zlmediakit
+    name: ZLMediaKit
+    role: media_server
+    operation: rtsp_and_gb28181_media_relay
+    required_level: L4
+    status: not_implemented
+    command: go test ./... -run 'TestM7a' -count=1
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M7a]
+    external_evidence: [camera_and_gb_platform_samples, reachable_media_ports, browser_and_wechat_device_playback]
+  - id: gb28181-adapter
+    name: Built-in GB28181-2016 signaling adapter
+    role: video_signaling
+    operation: registration_keepalive_and_playback_authorization
+    required_level: L4
+    status: not_implemented
+    command: go test ./... -run 'TestM7a' -count=1
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M7a]
+    external_evidence: [camera_and_gb_platform_samples, registration_reconnect_and_playback_on_site]
+  - id: map-provider
+    name: Tencent Maps
+    role: maps
+    operation: coordinate_conversion_and_location_display
+    required_level: L4
+    status: not_implemented
+    command: go test ./... -run 'TestM7b' -count=1
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M7b]
+    external_evidence: [project_map_key_and_quota, real_location_display]
+  - id: modbus-adapters
+    name: Modbus TCP and serial RTU adapters
+    role: industrial_protocol
+    operation: register_read_write_and_scaling
+    required_level: L4
+    status: not_implemented
+    command: go test ./... -run 'TestM8b' -count=1
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M8b]
+    external_evidence: [device_models_and_register_maps, hardware_access_and_value_command_receipt_tests]
+  - id: gateway-firmware
+    name: External gateway firmware bridge
+    role: private_tcp_bridge
+    operation: gateway_identity_and_subdevice_mapping
+    required_level: L4
+    status: not_implemented
+    command: go test ./... -run 'TestM8b' -count=1
+    evidence_path: docs/evidence/rebuild/foundation-guidance.txt
+    supports: [M8b]
+    external_evidence: [gateway_firmware_and_protocol_samples, physical_device_bridge_validation]
+capabilities:
+  - {id: migrations_and_transactions, phase: M0, provider: postgres-timescale, operation: versioned_migrations_and_transaction_boundary, required_level: L3, status: implemented, command: "go test ./internal/migrate ./internal/persistence -count=1 -v", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [isolated_real_database_migration_tests]}
+  - {id: telemetry_shadow_history_alarm, phase: M1, provider: postgres-timescale, operation: telemetry_shadow_history_and_alarm_persistence, required_level: L3, status: implemented, command: "go test ./internal/core ./internal/persistence -run 'TestTelemetry|TestAlarm' -count=1 -v", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [real_database_and_mqtt_integration]}
+  - {id: authenticated_device_ingress, phase: M1, provider: embedded-mqtt, operation: authentication_acl_payload_and_watchdog, required_level: L3, status: implemented, command: "go test ./internal/access -run 'TestMQTT' -count=1 -v", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [real_mqtt_client_contract_tests]}
+  - {id: management_and_app_operations, phase: M2, provider: embedded-http, operation: ownership_scoped_management_and_app_handlers, required_level: L3, status: partial, command: "go test ./internal/adminapi ./internal/appapi -count=1 -v", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [handler_contract_and_authorization_tests]}
+  - {id: admin_web, phase: M3, provider: embedded-http, operation: admin_web_build_and_browser_flow, required_level: L3, status: not_implemented, command: "npm --prefix web/admin run build", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [browser_end_to_end_business_flow]}
+  - {id: mini_program_login_and_pages, phase: M4, provider: wechat, operation: mini_program_login_pages_and_subscription, required_level: L3, status: external_blocked, command: "npm test --prefix web-mini", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [wechat_credentials_and_real_device_flow]}
+  - {id: notifications_tls_backup_capacity, phase: M5, provider: postgres-timescale, operation: durable_notifications_tls_restore_and_capacity, required_level: L3, status: partial, command: "make verify && make integration", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [notification_delivery_restore_and_capacity_run]}
+  - {id: product_models_and_compatibility, phase: M6a, provider: postgres-timescale, operation: product_model_versions_and_compatibility_projection, required_level: L4, status: implemented, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R34/README.md, evidence: [second_product_and_legacy_reconciliation, dual_independent_approval]}
+  - {id: tenant_and_rbac_isolation, phase: M6b, provider: postgres-timescale, operation: tenant_membership_rbac_and_resource_isolation, required_level: L4, status: implemented, command: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable make verify", evidence_path: docs/evidence/acceptance/R36/README.md, evidence: [tenant_role_and_resource_isolation_tests, m6b_browser_and_contract_checks, dual_independent_approval]}
+  - {id: license_and_offline_install, phase: M6c, provider: tls-reverse-proxy, operation: offline_license_verification_and_install, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM6c' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [signed_license_import_and_clean_offline_install]}
+  - {id: open_api_keys_signing_rate_limits, phase: M6d, provider: embedded-http, operation: signed_keys_replay_protection_and_rate_limits, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM6d' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [signature_replay_revocation_and_rate_limit_tests]}
+  - {id: video_streaming_and_signaling, phase: M7a, provider: gb28181-adapter, operation: camera_signaling_and_playback_tokens, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM7a' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [camera_samples_and_browser_wechat_playback]}
+  - {id: map_and_read_only_dashboard, phase: M7b, provider: map-provider, operation: coordinate_map_and_tenant_filtered_dashboard, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM7b' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [map_key_location_and_dashboard_tests]}
+  - {id: durable_commands_and_acknowledgements, phase: M8a, provider: embedded-mqtt, operation: durable_command_state_and_acknowledgement, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM8a' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [simulated_firmware_command_receipts]}
+  - {id: http_modbus_and_gateway_subdevices, phase: M8b, provider: modbus-adapters, operation: http_modbus_gateway_and_subdevice_protocols, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM8b' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [register_maps_and_gateway_validation]}
+  - {id: forwarding_scheduling_automation_debug, phase: M8c, provider: postgres-timescale, operation: durable_jobs_forwarding_scheduling_automation_debug, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM8c' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [retry_restart_duplicate_and_authorization_tests]}
+  - {id: reports_and_download_authorization, phase: M8d, provider: postgres-timescale, operation: csv_xlsx_reports_and_download_scope, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM8d' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [database_reconciled_exports_and_download_permission_tests]}
+exclusions:
+  - {item: MySQL_or_other_timeseries_databases, reason: not_a_reference_provider_in_M0-M8}
+  - {item: QQ_Telegram_WhatsApp, reason: future_messaging_integrations_not_implemented}
+  - {item: arbitrary_raw_TCP_server, reason: private_TCP_sensors_require_external_gateway_firmware_bridge}
+  - {item: OTA_third_party_driver_market_runtime_database_switching, reason: outside_approved_M0-M8_scope}
+  - {item: video_recording_playback_PTZ_GB_cascading, reason: outside_M7a_scope}
+external_evidence_required:
+  - {phase: M4-M5, needs: [wechat_app_credentials_and_qualification, real_device_login_authorization_notification]}
+  - {phase: M1-M8b, needs: [terminal_firmware_models_register_maps_hardware_access, physical_collection_disconnect_recovery_and_command_receipts]}
+  - {phase: M6c, needs: [production_license_signing_keys_and_deployment_license_import]}
+  - {phase: M7a, needs: [camera_gb_platform_samples_and_reachable_ports, real_browser_and_wechat_device_playback]}
+  - {phase: M7b, needs: [project_map_key_quota_and_real_location_display]}
+  - {phase: M5-M6c, needs: [isolated_recovery_host_backup_media_domain_and_certificates]}
+  - {phase: M0-M8d, needs: [stage_specific_acceptance_evidence_per_docs_ACCEPTANCE_md_and_R55_full_release_review]}

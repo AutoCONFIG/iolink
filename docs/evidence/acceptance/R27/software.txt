@@ -1,0 +1,2 @@
+Software substitute: python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software
+Result: passed. Subscription adapter agree/deny/cancel semantics passed; real WeChat subscription prompt remains external_blocked.

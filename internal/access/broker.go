@@ -2,6 +2,7 @@ package access
 
 import (
 	"encoding/json"
+	"git.hyhy.fun/rsplab/iolink/internal/ingestion"
 	"git.hyhy.fun/rsplab/iolink/internal/wire"
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/packets"
@@ -28,7 +29,13 @@ func (h *brokerHook) OnConnectAuthenticate(cl *mqtt.Client, pk packets.Packet) b
 		return false
 	}
 	no := string(cl.Properties.Username)
-	return no != "" && cl.ID == no && !strings.ContainsAny(no, "/+#") && h.srv.auth.Authenticate(no, string(pk.Connect.Password))
+	if no == "" || cl.ID != no || strings.ContainsAny(no, "/+#") || !h.srv.auth.Authenticate(no, string(pk.Connect.Password)) {
+		return false
+	}
+	if p, ok := h.srv.auth.(interface{ DeviceRevision(string) int64 }); ok && p.DeviceRevision(no) < 0 {
+		return false
+	}
+	return true
 }
 func (h *brokerHook) OnACLCheck(cl *mqtt.Client, topic string, write bool) bool {
 	return cl != nil && h.srv.isCurrent(cl) && CheckACL(string(cl.Properties.Username), topic, write)
@@ -58,8 +65,18 @@ func (h *brokerHook) OnPublish(cl *mqtt.Client, pk packets.Packet) (packets.Pack
 		if json.Unmarshal(pk.Payload, &raw) != nil || raw == nil {
 			return reject("json")
 		}
+		kind, kindErr := h.srv.productKind(no)
+		if kindErr != nil {
+			return reject("dispatch")
+		}
+		if kind == "generic" {
+			if err := h.srv.HandleGenericReport(no, raw); err != nil {
+				return reject("dispatch")
+			}
+			return pk, nil
+		}
 		for key := range raw {
-			if _, ok := fieldRanges[key]; !ok && key != "message_id" {
+			if _, _, ok := ingestion.MetricRange(key); !ok && key != "message_id" {
 				MetricRejected.WithLabelValues("unknown_field").Inc()
 				delete(raw, key)
 			}

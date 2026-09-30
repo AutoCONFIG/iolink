@@ -1,0 +1,95 @@
+version: 1
+status: design_contract
+scope: "R01-R55 modular monolith domain/application contract"
+capability_levels:
+  L0: "type-only contract; no provider or persistence claim"
+  L1: "deterministic in-process behavior with fake ports"
+  L2: "consumer-owned port with conformance tests and durable semantics specified"
+  L3: "implemented software path with contract and integration evidence"
+  L4: "real declared provider or external surface evidence; absent evidence remains blocked"
+topology:
+  direction: "composition_root -> adapters -> application -> domain"
+  domain_packages: [identity, ownership, assets, telemetry, alarms, notifications, commands, jobs, tenancy]
+  application_packages: [identity_service, asset_service, telemetry_service, alarm_service, notification_service, command_service, job_service]
+  adapter_packages: [postgres, timescale, mqtt, http, wechat, modbus, media, maps]
+  consumer_owned_ports:
+    - {name: IdentityStore, owner: identity_service, capability: identity_lookup_and_session}
+    - {name: ResourceStore, owner: asset_service, capability: ownership_scoped_resources}
+    - {name: TelemetryStore, owner: telemetry_service, capability: telemetry_shadow_history}
+    - {name: AlarmStore, owner: alarm_service, capability: alarm_dedup_and_ack}
+    - {name: NotificationSender, owner: notification_service, capability: external_notification_delivery}
+    - {name: CommandTransport, owner: command_service, capability: command_delivery_and_receipts}
+    - {name: JobStore, owner: job_service, capability: durable_jobs_and_leases}
+    - {name: TransactionRunner, owner: application, capability: atomic_business_and_outbox_commit}
+  forbidden_port_names: [Repository, Service, Manager, Client, Provider, Store, UniversalPort]
+  provider_import_roots: [internal/domain, internal/application]
+typed_errors: [unauthenticated, forbidden, not_found, invalid_argument, conflict, unavailable, timeout, unknown_outcome, already_processed]
+cross_cutting_invariants:
+  authorization: "every application command/query receives AuthContext and checks tenant plus resource ownership at the operation boundary"
+  timestamps: "domain timestamps are UTC instants supplied by a Clock port; persisted event time is immutable"
+  idempotency: "external request and message keys are scoped by tenant and operation; duplicate effects return the original result"
+  unknown_outcomes: "timeouts after a possible side effect remain unknown and are never reported as success or blindly retried for physical writes"
+  transactions: "business state and outbox/job intent commit atomically; external effects execute after commit"
+  fail_closed: "missing capability, invalid configuration, or revoked authorization returns a typed error and leaves no partial state"
+state_machines:
+  alarm: [open, acknowledged, resolved]
+  notification: [pending, leased, delivered, retryable, failed, unknown]
+  command: [queued, sent, succeeded, failed, expired, cancelled, unknown]
+  job: [scheduled, running, succeeded, retryable, failed, cancelled]
+  migration: [clean, dirty, blocked, applied]
+invariants:
+  - {id: R01, domain_rule: "build inputs and checks are reproducible", port: TransactionRunner, transaction_boundary: "none; verification process", negative_test: "missing toolchain or stale generated output fails", invariant: reproducible_build}
+  - {id: R02, domain_rule: "wire/API schemas reject malformed requests and never emit undefined responses", port: IdentityStore, transaction_boundary: "handler validation before transaction", negative_test: "unknown field, wrong type, empty response", invariant: contract_schema}
+  - {id: R03, domain_rule: "migration versions/checksums and dirty state are monotonic and recoverable", port: TransactionRunner, transaction_boundary: "one migration transaction under advisory lock", negative_test: "checksum drift, concurrent runner, interrupted migration", invariant: migration_safety}
+  - {id: R04, domain_rule: "startup requires valid secrets/configuration and exposes no default credential", port: IdentityStore, transaction_boundary: "startup validation before serving", negative_test: "missing secret or invalid interval", invariant: fail_closed_startup}
+  - {id: R05, domain_rule: "device identity is unique, active, and authenticated before online state", port: ResourceStore, transaction_boundary: "device registration and status update atomically", negative_test: "wrong secret, client mismatch, disabled device", invariant: device_identity}
+  - {id: R06, domain_rule: "topic operations are restricted to the authenticated device and declared resources", port: CommandTransport, transaction_boundary: "ACL decision before publish/subscribe", negative_test: "wildcard, cross-device, forged subdevice", invariant: topic_ownership}
+  - {id: R07, domain_rule: "telemetry accepts only typed allowlisted fields within bounds", port: TelemetryStore, transaction_boundary: "validated report with shadow/history atomically", negative_test: "bad JSON, oversize payload, all-invalid fields", invariant: telemetry_validation}
+  - {id: R08, domain_rule: "device online/offline transitions are idempotent and interval-based", port: ResourceStore, transaction_boundary: "status transition persisted atomically", negative_test: "duplicate disconnect or restart negative count", invariant: lifecycle_watchdog}
+  - {id: R09, domain_rule: "telemetry, shadow and pond snapshot share one commit", port: TelemetryStore, transaction_boundary: "single telemetry transaction", negative_test: "injected write failure leaves no shadow-only row", invariant: telemetry_atomicity}
+  - {id: R10, domain_rule: "partial shadow updates preserve unrelated values and per-field timestamps", port: TelemetryStore, transaction_boundary: "shadow merge transaction", negative_test: "stale field overwrites newer value", invariant: shadow_merge}
+  - {id: R11, domain_rule: "history ranges and point limits are bounded and parameterized", port: TelemetryStore, transaction_boundary: "read-only query", negative_test: "invalid range, metric injection, max_points overflow", invariant: history_query}
+  - {id: R12, domain_rule: "threshold rules validate bounds and evaluate equality as non-triggering", port: AlarmStore, transaction_boundary: "rule write transaction", negative_test: "min>=max or missing threshold", invariant: alarm_rule}
+  - {id: R13, domain_rule: "same resource/metric has one open alarm and acknowledgement is idempotent", port: AlarmStore, transaction_boundary: "alarm plus outbox atomic transaction", negative_test: "100 concurrent reports or failed notification write", invariant: alarm_dedup}
+  - {id: R14, domain_rule: "sessions are typed, expiring, and invalidated by password change", port: IdentityStore, transaction_boundary: "credential mutation transaction", negative_test: "wrong token, missing exp, old token after change", invariant: session_security}
+  - {id: R15, domain_rule: "assignment and transfer change visible ownership atomically", port: ResourceStore, transaction_boundary: "membership and owner update transaction", negative_test: "cross-user visibility or partial transfer", invariant: ownership_transfer}
+  - {id: R16, domain_rule: "referenced assets cannot be silently deleted", port: ResourceStore, transaction_boundary: "delete with reference check transaction", negative_test: "unknown asset or referenced delete", invariant: asset_integrity}
+  - {id: R17, domain_rule: "device registration uses unique random secrets and valid pond ownership", port: ResourceStore, transaction_boundary: "registration transaction", negative_test: "duplicate device or invalid pond", invariant: registration_integrity}
+  - {id: R18, domain_rule: "move/disable revokes old access while preserving historical ownership", port: ResourceStore, transaction_boundary: "lifecycle and shadow reset transaction", negative_test: "old session controls after move", invariant: device_transfer}
+  - {id: R19, domain_rule: "one enabled rule per pond/metric with valid level and bounds", port: AlarmStore, transaction_boundary: "rule upsert transaction", negative_test: "invalid metric or duplicate rule", invariant: rule_uniqueness}
+  - {id: R20, domain_rule: "all resource reads and writes enforce current owner/tenant", port: ResourceStore, transaction_boundary: "authorization predicate in same transaction", negative_test: "A/B detail, history, acknowledgement cross-access", invariant: resource_isolation}
+  - {id: R21, domain_rule: "alarm listing and batch acknowledgement are bounded and atomic", port: AlarmStore, transaction_boundary: "batch acknowledgement transaction", negative_test: "one missing alarm rolls back whole batch", invariant: alarm_batch_atomicity}
+  - {id: R22, domain_rule: "status aggregation preserves critical ordering and deduplicates devices", port: ResourceStore, transaction_boundary: "consistent read snapshot", negative_test: "disabled device counted online or truncation", invariant: status_projection}
+  - {id: R23, domain_rule: "admin workflows expose explicit loading, empty, error and expired-session states", port: ResourceStore, transaction_boundary: "API command boundaries", negative_test: "expired session or API error leaves stale mutation", invariant: admin_state}
+  - {id: R24, domain_rule: "embedded assets and API 404 responses are separated", port: ResourceStore, transaction_boundary: "none; HTTP routing", negative_test: "unknown API path returns HTML", invariant: routing_contract}
+  - {id: R25, domain_rule: "external identity exchange is idempotent and unassigned users see no resources", port: IdentityStore, transaction_boundary: "identity upsert transaction after exchange", negative_test: "invalid code or duplicate login creates two users", invariant: external_identity}
+  - {id: R26, domain_rule: "client pages use authorized latest/history/alarm projections", port: TelemetryStore, transaction_boundary: "read-only query", negative_test: "stale token or transferred ownership exposes data", invariant: client_projection}
+  - {id: R27, domain_rule: "subscription consent is explicit and never inferred", port: NotificationSender, transaction_boundary: "consent state transaction", negative_test: "deny/cancel treated as consent", invariant: consent_boundary}
+  - {id: R28, domain_rule: "notification intent is committed with alarm and recipient is current owner", port: NotificationSender, transaction_boundary: "alarm/outbox atomic; delivery after commit", negative_test: "non-2xx, timeout, reassignment recipient", invariant: notification_outbox}
+  - {id: R29, domain_rule: "health/readiness reflects dependencies and shutdown is bounded", port: TransactionRunner, transaction_boundary: "readiness probe outside business transaction", negative_test: "unreachable DB reports ready", invariant: operational_readiness}
+  - {id: R30, domain_rule: "network exposure and TLS configuration fail closed", port: IdentityStore, transaction_boundary: "startup/configuration boundary", negative_test: "bad certificate or public DB port", invariant: tls_boundary}
+  - {id: R31, domain_rule: "backup restore preserves business/time-series consistency", port: TransactionRunner, transaction_boundary: "restore verification transaction", negative_test: "corrupt backup or row-count mismatch", invariant: backup_integrity}
+  - {id: R32, domain_rule: "release recovery refuses unsafe binary/schema rollback", port: TransactionRunner, transaction_boundary: "migration and release lock", negative_test: "dirty/interrupted migration or incompatible rollback", invariant: release_recovery}
+  - {id: R33, domain_rule: "capacity limits and query latency remain within declared budget", port: TelemetryStore, transaction_boundary: "bounded read transaction", negative_test: "oversized query or error budget breach", invariant: capacity_budget}
+  - {id: R34, domain_rule: "product/model versions are immutable once referenced", port: ResourceStore, transaction_boundary: "model publish and assignment transaction", negative_test: "invalid unit/type or mutation of referenced version", invariant: model_compatibility}
+  - {id: R35, domain_rule: "compatibility projection is allowlisted and idempotent", port: TelemetryStore, transaction_boundary: "fixture projection transaction", negative_test: "unknown metric or interrupted replay", invariant: compatibility_projection}
+  - {id: R36, domain_rule: "tenant membership scopes every resource and inactive tenants block work", port: ResourceStore, transaction_boundary: "membership/resource transaction", negative_test: "cross-tenant read or inactive tenant job", invariant: tenant_isolation}
+  - {id: R37, domain_rule: "role permissions and expiry are checked at execution time", port: IdentityStore, transaction_boundary: "authorization decision with resource read/write", negative_test: "revoked token or platform admin cross-read", invariant: rbac_enforcement}
+  - {id: R38, domain_rule: "license signatures, validity window and instance binding are verified before replacement", port: IdentityStore, transaction_boundary: "license import transaction", negative_test: "forged, expired, clock rollback or wrong instance", invariant: license_verification}
+  - {id: R39, domain_rule: "quota reservations are atomic and feature guards fail closed", port: ResourceStore, transaction_boundary: "reservation and release transaction", negative_test: "concurrent registration exceeds quota", invariant: quota_guard}
+  - {id: R40, domain_rule: "offline package verifies checksums and provisions no implicit secret", port: IdentityStore, transaction_boundary: "installation transaction", negative_test: "checksum mismatch or missing license", invariant: offline_install}
+  - {id: R41, domain_rule: "API keys are scoped, encrypted at rest, shown once and revocable", port: IdentityStore, transaction_boundary: "key issue/rotate/revoke transaction", negative_test: "replayed or cross-tenant key", invariant: api_key_scope}
+  - {id: R42, domain_rule: "signatures bind body/timestamp/nonce and rate limits are atomic", port: IdentityStore, transaction_boundary: "nonce consume and request authorization transaction", negative_test: "body tamper, stale request, nonce replay, burst", invariant: api_request_auth}
+  - {id: R43, domain_rule: "media credentials stay server-side and playback grants expire/revoke", port: CommandTransport, transaction_boundary: "grant issue/revoke transaction", negative_test: "expired grant or cross-tenant camera", invariant: media_authorization}
+  - {id: R44, domain_rule: "coordinates preserve source and tenant-local visibility", port: ResourceStore, transaction_boundary: "location write transaction", negative_test: "missing key/coordinate or cross-tenant point", invariant: location_contract}
+  - {id: R45, domain_rule: "dashboard is read-only and refreshes from authorized projections", port: TelemetryStore, transaction_boundary: "consistent read snapshot", negative_test: "write via read-only token or stale refresh", invariant: dashboard_readonly}
+  - {id: R46, domain_rule: "commands have durable states, idempotency and explicit unknown outcome", port: CommandTransport, transaction_boundary: "command enqueue plus outbox atomically", negative_test: "duplicate submit, timeout-after-execution, late receipt", invariant: command_state_machine}
+  - {id: R47, domain_rule: "ingest signatures and gateway identity precede normalized storage", port: TelemetryStore, transaction_boundary: "validated ingest transaction", negative_test: "replay, wrong secret or malformed model", invariant: ingest_auth}
+  - {id: R48, domain_rule: "Modbus scaling and writes use authorized command semantics", port: CommandTransport, transaction_boundary: "read snapshot or command enqueue", negative_test: "wrong register, disconnect, unknown write outcome", invariant: modbus_safety}
+  - {id: R49, domain_rule: "gateway subdevices have independent identity, shadow and alarm scope", port: ResourceStore, transaction_boundary: "topology registration transaction", negative_test: "forged subdevice or cross-gateway mapping", invariant: topology_integrity}
+  - {id: R50, domain_rule: "forwarding is deduplicated, bounded and credentials are redacted", port: NotificationSender, transaction_boundary: "event/outbox transaction", negative_test: "duplicate event, SSRF target or exhausted retries", invariant: forwarding_delivery}
+  - {id: R51, domain_rule: "automation graph is bounded, acyclic and authorization-aware", port: JobStore, transaction_boundary: "rule/job creation transaction", negative_test: "cycle, depth over four, disabled rule execution", invariant: automation_graph}
+  - {id: R52, domain_rule: "scheduled jobs are timezone-aware and single-claimed", port: JobStore, transaction_boundary: "lease claim transaction", negative_test: "duplicate worker, stale lease, revoked authorization", invariant: scheduler_claim}
+  - {id: R53, domain_rule: "debug records are tenant-scoped, redacted and cannot publish directly", port: ResourceStore, transaction_boundary: "debug read transaction", negative_test: "cross-tenant read or command bypass", invariant: debug_isolation}
+  - {id: R54, domain_rule: "reports are bounded, formula-safe, asynchronous and download-authorized", port: JobStore, transaction_boundary: "report job and artifact metadata transaction", negative_test: "over-million rows, formula injection, expired download", invariant: report_safety}
+  - {id: R55, domain_rule: "release evidence is complete and independently reviewed for one tree", port: TransactionRunner, transaction_boundary: "release manifest snapshot", negative_test: "missing evidence, altered tree or unclassified blocker", invariant: release_evidence}

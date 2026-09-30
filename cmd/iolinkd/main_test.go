@@ -2,10 +2,13 @@ package main
 
 import (
 	"io"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"testing/fstest"
+
+	"git.hyhy.fun/rsplab/iolink/internal/appapi"
 )
 
 func TestUnknownAPIDoesNotServeSPA(t *testing.T) {
@@ -18,11 +21,31 @@ func TestUnknownAPIDoesNotServeSPA(t *testing.T) {
 		}
 	}
 }
+
 func TestCLIHelpAndInvalidCommand(t *testing.T) {
 	if err := run([]string{"--help"}, strings.NewReader(""), io.Discard); err != nil {
 		t.Fatal(err)
 	}
 	if run([]string{"migrate", "typo"}, strings.NewReader(""), io.Discard) == nil {
 		t.Fatal("unknown command accepted")
+	}
+}
+
+func TestProductionMuxMountsBothApplicationAPIVersions(t *testing.T) {
+	root := http.NewServeMux()
+	api := appapi.New(appapi.Config{}, appapi.Deps{}, nil)
+	mountApplicationAPI(root, api.Routes())
+	root.Handle("/", spaHandler(fstest.MapFS{"index.html": {Data: []byte("app")}}))
+	for _, request := range []struct{ method, path string }{
+		{http.MethodGet, "/api/v1/ponds"},
+		{http.MethodPost, "/api/v2/devices/test/telemetry"},
+		{http.MethodGet, "/api/v2/devices/test/model/latest"},
+		{http.MethodGet, "/api/v2/devices/test/history"},
+	} {
+		response := httptest.NewRecorder()
+		root.ServeHTTP(response, httptest.NewRequest(request.method, request.path, nil))
+		if response.Code != http.StatusUnauthorized {
+			t.Fatalf("%s %s did not reach auth middleware: status=%d", request.method, request.path, response.Code)
+		}
 	}
 }

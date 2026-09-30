@@ -2,6 +2,8 @@
 
 基线代码：b71095bbb6b228caed74adf47c48ca4c6b07c92b，检查日期2026-09-19。文档双审通过后已实施M0及M1软件部分；旧文档的“全部完成/全绿”不构成本轮验收。需求细项见 ACCEPTANCE.md。
 
+重建 Todo 4 的实现与验证候选已完成，待双审门禁收据写入后登记完成；新增应用层 normalized event 边界与真实 ingestion 回归。命令、环境、负面路径和证据见 [Todo 4证据](evidence/rebuild/mqtt-ingestion.txt)。该证据只覆盖软件/provider 链路，硬件和外部 provider 仍按 `external_blocked` 处理。
+
 | 需求范围 | 当前状态 | 可确认的代码/产物 | 已知差异或验证缺口 |
 |---|---|---|---|
 | R01 | 实现待验收 | make verify统一入口、空构建缓存验证、GitLab CI配置 | 本地验证通过；远程CI未执行，不能登记全部验收通过 |
@@ -15,12 +17,14 @@
 | R16–R19 | 部分实现 | 管理CRUD/注册/规则代码 | 目标详情/调塘/软删除、校验和历史保留尚需实现验证 |
 | R20 | 部分实现 | 部分列表按owner过滤 | 池塘/设备详情、latest/history、确认报警缺用户归属检查；不得称数据隔离完成 |
 | R21–R22 | 部分实现 | 报警/统计/状态墙代码 | 筛选、去重统计、全量报警等级有差异；管理Telemetry依赖已补并通过单条MQTT实测，完整聚合契约仍待验 |
-| R23 | 未实现 | web/admin/dist仅占位页 | Vue3业务工程和页面未交付 |
-| R24 | 部分实现 | go:embed与SPA fallback代码 | 未构建真实前端、无前端CI/路由集成验收 |
+| R23 | 已实现（Todo 7 双审待登记） | web/dist 已构建并嵌入 internal/web/dist | 浏览器覆盖登录、总览、农场/池塘、设备、规则、报警、设置及错误/空/过期状态；证据见 docs/evidence/rebuild/admin-frontend.txt |
+| R24 | 已实现（Todo 7 双审待登记） | 真实 Vite dist 已 embed，SPA fallback 与 API JSON 404 代码及浏览器构建验收 | Playwright、Go compile/vet、契约和 manifest 检查通过；admin/app handler IPv6 httptest 受沙箱阻断 |
 | R25–R27 | 外部阻塞 | code2session客户端代码；小程序未实现 | 软件子项部分实现/未实现；需微信资质/真机，fake不是实发证据 |
-| R28 | 部分实现 | 微信Notifier代码 | outbox原子落库已通过M1；发送重试、状态推进、模板、HTTP失败、归属及真机实发待M5验 |
-| R29–R33 | 部分实现 | metrics/health/Dockerfile/Compose/backup脚本 | 状态/关闭、TLS、全库恢复、升级及容量未验收；旧脚本不作为生产保证 |
-| R34–R42 | 未实现 | 文档设计 | 产品模型、多租户/RBAC、License、离线包、开放平台待实施 |
+| R28 | 软件通过，外部阻塞 | durable outbox/worker、WeChat HTTP adapter、重试/lease/归属重验及失败状态 | 真微信凭据、授权和设备回执缺失，外部实发为 `external_blocked` |
+| R29–R33 | 软件通过，适用外部阻塞 | health/readiness、metrics、10秒有界排空、固定监听/TLS反代模板、整库custom备份恢复、容量烟测与CI | 真实TLS主机、100GiB恢复、发布中断和24小时500设备/90天容量演练为 `external_blocked` |
+| R34–R35 | 软件验收通过 | M6a 产品模型、版本发布/分配、通用遥测、兼容投影、fixture 回填 | 外部不适用；证据见 docs/evidence/acceptance/R34/ 与 R35/ |
+| R36–R37 | 软件验收通过 | 租户上下文、成员/RBAC、Casbin角色-资源-动作策略、资源归属过滤、权限版本撤销、组织与成员后台页；真实TimescaleDB与HTTP角色矩阵通过，双审明确通过 | R36.b/R37.b 的 Key、播放、命令、任务、报表等后续资源按对应阶段验收；硬件、公网MQTT和生产迁移仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [R37](evidence/acceptance/R37/) |
+| R38–R42 | 未实现 | 文档设计 | License、离线包、开放平台待实施 |
 | R43–R45 | 未实现 | 文档设计 | 视频/地图/大屏待实施；真实验收所需外部输入未就绪 |
 | R46–R54 | 未实现 | MQTT命令结构预留/调试CLI | 命令生命周期、HTTP/Modbus/网关/转发/调度/联动/Web调试/报表待实施 |
 | R55 | 未实现 | 无全量发布验收包 | 必须逐项通过后再判定 |
@@ -35,7 +39,7 @@ M0完整命令、版本、日志及双审结论见 [M0证据](evidence/2026-09-1
 - OpenAPI两份35操作/159合成fixture通过，不能代替真实handler验收。
 - 两位独立审阅员均明确通过M0代码；B首轮发现生产周期配置漏传，修复后复审通过。
 - M1真实数据库100并发、影子合并/时序、24h去重/过期、旧塘快照、故障整体回滚、历史1/200点上限及真实MQTT3/5链路通过；access/core竞态检测通过。M1两审首轮发现缺陷，修复后两审均明确通过。
-- 尚未执行远程CI、备份恢复、真微信、硬件、视频和容量验收。覆盖率未取得有效数字，不编造覆盖率。
+- GitHub/GitLab远程CI未由本地会话触发；本地CI等价命令、专属Timescale容器备份恢复和20客户端容量烟测已通过。真微信、真实TLS主机、100GiB恢复、24小时容量、硬件和视频仍为 `external_blocked`。覆盖率未取得有效数字，不编造覆盖率。
 
 ## 实施缺陷登记（待修）
 
@@ -48,9 +52,9 @@ M0完整命令、版本、日志及双审结论见 [M0证据](evidence/2026-09-1
 | D05 | R10/R22 | 已注入管理Telemetry；M1影子存储已验；完整API/统计语义待M2 |
 | D06 | R11/R21 | M1 unit/max_points已修并实测；M2报警筛选仍待修 |
 | D07 | R12/R13/R19 | M1双阈值、并发去重、事务已修；M2规则完整CRUD/权限另验 |
-| D08 | R08/R29 | M1状态幂等/重启/在线数已修；M5完整健康与有界排空仍待验 |
+| D08 | R08/R29 | M1状态幂等/重启/在线数和M5健康/就绪/有界排空已修并验证 |
 | D09 | R14/R04 | M0首启/密码存储已修；M2登录迁移及token撤销待修 |
-| D10 | R28 | 通知持久化、失败识别、接收人和真机验证 |
-| D11 | R30–R32 | TLS/备份恢复/升级/回退工具和演练 |
+| D10 | R28 | 通知持久化、失败识别、接收人和软件重试/lease已验证；真机仍阻塞 |
+| D11 | R30–R32 | TLS反代边界、custom整库备份恢复、迁移失败/回退文档和软件演练已完成；真实部署演练仍阻塞 |
 
 此表是审查已发现问题的起点，不声称已完成逐行代码审计；实施时新的问题继续编号，不用更改需求来掩盖缺陷。

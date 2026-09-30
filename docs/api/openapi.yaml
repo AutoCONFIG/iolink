@@ -2,13 +2,14 @@ openapi: 3.0.3
 info:
   title: IoLink App API — TARGET
   version: 1.0.0-planned
-  description: TARGET / 待实现、待验收：本文件为 M0–M5 修订目标契约，并非现有实现已通过验收的声明。原有 31 个操作的路径保留；新增目标操作见各 summary。所有 JSON 字段 snake_case；集合始终返回数组，无结果为 []，不得返回 null。时间统一返回 UTC RFC3339
+  description: TARGET / 待实现、待验收：本文件保留 M0–M5 v1 契约，并包含 M6a 的窄幅 v2 telemetry/history 增量；并非现有实现已通过验收的声明。原有 v1 操作路径保持不变；新增目标操作见各 summary。所有 JSON 字段 snake_case；集合始终返回数组，无结果为 []，不得返回 null。时间统一返回 UTC RFC3339
     字符串。所有参数越界/非法值返回 400，不静默回退。所有受保护操作必须逐请求校验身份及资源归属。微信登录使用uid claim和由IOLINK_SECRET_KEY以用户标签派生的逻辑签名密钥；不接受管理 JWT。登录按 openid 幂等创建 USER，但每次登录可签发新 token。无分配场的用户可登录并获得空集合/零统计。除登录外，所有列表、详情、统计、历史和确认以当前
     farm.owner_id=uid 为权限边界；资源不存在/越权均 404，不能先读影子或历史再验权。历史样本和报警按发生时 pond_id 快照验证该池塘当前 owner；设备调塘不将旧数据交给新塘 owner。集合为空时 []，不输出 openid/secret/密码。
 servers:
 - url: http://localhost:8080/api/v1
 tags:
 - name: auth
+- name: tenants
 - name: ponds
 - name: devices
 - name: water
@@ -67,6 +68,50 @@ paths:
                   description: wx.login() code
               additionalProperties: false
       security: []
+  /auth/tenants:
+    get:
+      tags: [tenants]
+      summary: 当前身份可用租户
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TenantMembership' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /auth/tenant:
+    post:
+      tags: [tenants]
+      summary: 切换当前租户并重新签发 token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tenant_id]
+              properties:
+                tenant_id: { type: integer, format: int64, minimum: 1 }
+              additionalProperties: false
+      responses:
+        '200':
+          description: 新 token
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [token, expires_in]
+                properties:
+                  token: { type: string }
+                  expires_in: { type: integer, minimum: 1 }
+                additionalProperties: false
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
   /ponds:
     get:
       tags:
@@ -348,6 +393,124 @@ paths:
           $ref: '#/components/responses/InternalError'
       parameters:
       - *id001
+  /devices/{device_no}/telemetry:
+    post:
+      servers:
+      - url: http://localhost:8080/api/v2
+      tags:
+      - devices
+      summary: 按设备物模型上报通用遥测
+      description: M6a v2 增量契约。服务端按设备固定 product_id/model_version 校验字段；未知字段或非法值返回 400，整批无有效字段不写入。通用 telemetry、影子和报警意图必须同一事务，历史记录携带 model_version。
+      operationId: submitDeviceTelemetryV2
+      parameters:
+      - name: device_no
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelemetryV2Request'
+      responses:
+        '202':
+          description: 已接受并完成事务写入
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryV2Result'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /devices/{device_no}/history:
+    get:
+      servers:
+      - url: http://localhost:8080/api/v2
+      tags:
+      - devices
+      summary: 查询物模型遥测历史
+      description: M6a v2 增量契约。metric 必须是该设备当前或历史模型的已发布 identifier；服务端从模型白名单映射属性查询，禁止把任意 identifier 拼入 SQL。结果保留每条样本的 model_version 和单位，旧版本模型修改不改变历史语义。
+      operationId: queryDeviceHistoryV2
+      parameters:
+      - name: device_no
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: metric
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: '^[a-z][a-z0-9_]{0,63}$'
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          default: 1000
+      responses:
+        '200':
+          description: 查询成功；无数据 points=[]
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryHistoryV2'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /devices/{device_no}/model/latest:
+    get:
+      servers:
+      - url: http://localhost:8080/api/v2
+      tags: [devices]
+      summary: 按已发布模型读取设备动态详情
+      description: M6a 动态详情；字段来自当前发布模型，属性来自同版本同池塘影子。仅设备所属农场用户可读。
+      operationId: getDeviceModelLatestV2
+      parameters:
+      - name: device_no
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+      responses:
+        '200':
+          description: 模型字段和最新属性
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeviceModelLatestV2' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
 components:
   securitySchemes:
     BearerAuth:
@@ -725,3 +888,109 @@ components:
       additionalProperties: false
       description: 单位映射：temperature=℃、dissolved_oxygen=mg/L、ph=空字符串（无量纲）、turbidity=NTU、salinity=ppt。points 时间升序且数量 <= max_points；剔除所选指标 null 的样本，等宽时间桶取平均，空桶省略，ts
         为桶起点；无数据 points=[]。
+    TelemetryV2Request:
+      type: object
+      required: [ts, properties]
+      properties:
+        ts:
+          type: string
+          format: date-time
+        properties:
+          type: object
+          minProperties: 1
+          maxProperties: 128
+          additionalProperties: true
+          description: 属性名必须是已发布模型的 identifier；服务端按字段类型、nullable、范围或枚举校验，未知字段拒绝。
+      additionalProperties: false
+    TelemetryV2Result:
+      type: object
+      required: [device_no, model_version, accepted, rejected]
+      properties:
+        device_no:
+          type: string
+        model_version:
+          type: integer
+          minimum: 1
+        accepted:
+          type: array
+          items:
+            type: string
+            pattern: '^[a-z][a-z0-9_]{0,63}$'
+        rejected:
+          type: array
+          items:
+            type: object
+            required: [identifier, reason]
+            properties:
+              identifier:
+                type: string
+              reason:
+                type: string
+                enum: [unknown_identifier, invalid_type, out_of_range, invalid_enum, not_nullable]
+            additionalProperties: false
+      additionalProperties: false
+    TelemetryHistoryV2:
+      type: object
+      required: [device_no, metric, unit, points]
+      properties:
+        device_no:
+          type: string
+        metric:
+          type: string
+          pattern: '^[a-z][a-z0-9_]{0,63}$'
+        unit:
+          type: string
+        points:
+          type: array
+          items:
+            type: object
+            required: [ts, value, model_version]
+            properties:
+              ts:
+                type: string
+                format: date-time
+              value: {}
+              model_version:
+                type: integer
+                minimum: 1
+              unit:
+                type: string
+            additionalProperties: false
+      additionalProperties: false
+    DeviceModelLatestV2:
+      type: object
+      required: [device_no, product_id, model_version, fields, ts, properties]
+      properties:
+        device_no: { type: string }
+        product_id: { type: integer, format: int64, minimum: 1 }
+        model_version: { type: integer, minimum: 1 }
+        fields:
+          type: array
+          items:
+            type: object
+            required: [identifier, type, unit, readable, writable, nullable]
+            properties:
+              identifier: { type: string }
+              type: { type: string, enum: [number, integer, boolean, string] }
+              unit: { type: string }
+              minimum: { type: number, nullable: true }
+              maximum: { type: number, nullable: true }
+              enum_values: { type: array, items: { type: string }, nullable: true }
+              readable: { type: boolean }
+              writable: { type: boolean }
+              nullable: { type: boolean }
+            additionalProperties: false
+        ts: { type: string, format: date-time, nullable: true }
+        properties: { type: object, additionalProperties: {} }
+      additionalProperties: false
+    TenantMembership:
+      type: object
+      required: [tenant_id, name, role, active]
+      properties:
+        tenant_id: { type: integer, format: int64, minimum: 1 }
+        user_id: { type: integer, format: int64, minimum: 1 }
+        name: { type: string, minLength: 1 }
+        role: { type: string, enum: [owner, admin, member, viewer, support] }
+        active: { type: boolean }
+        expires_at: { type: string, format: date-time, nullable: true }
+      additionalProperties: false

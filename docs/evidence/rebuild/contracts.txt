@@ -1,0 +1,46 @@
+Todo 2 contract evidence
+Date: 2026-09-25 (Asia/Shanghai)
+Scope: docs/architecture/invariants.yaml, scripts/check_architecture_manifests.py, scripts/test_check_architecture_manifests.py
+Tree state: shared worktree; unrelated pre-existing edits in .gitignore and docs scope files preserved.
+
+Scenario 1: positive manifest and architecture contract checks
+Invocation: python3 scripts/check_architecture_manifests.py
+Expected: exit 0 and PASS diagnostics.
+Actual: exit 0; "architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS".
+Artifact: this file and command output above.
+
+Scenario 2: checker unit and adversarial tests
+Invocation: python3 -m pytest -q scripts/test_check_architecture_manifests.py
+Expected: all baseline and Todo 2 malformed-manifest/import tests pass.
+Actual: exit 0; 23 passed.
+Coverage: missing invariant field, missing R55 entry, forbidden universal Repository port, provider SDK import under internal/domain, duplicate/missing acceptance IDs, invalid providers/capabilities, evidence and gate failures.
+
+Scenario 3: malformed manifest through a real temporary CLI copy
+Setup: copied checker and all manifests to a temporary directory, copied authority docs and fixture evidence, then replaced the first invariant's negative_test key with removed_field.
+Invocation: python3 <temporary-copy>/scripts/check_architecture_manifests.py
+Expected: nonzero with named invariant diagnostics.
+Actual: exit 1; "invariants.yaml: invariants[0]: missing fields negative_test" and "invariants.yaml: missing invariant R01".
+Positive temporary copy: exit 0 before mutation with the same PASS diagnostic as Scenario 1.
+Cleanup: temporary directory removed after capture.
+
+Scenario 4: repository documentation and API contract checks
+Invocation: make docs-tools; make verify-contracts
+Expected: both exit 0; static docs/API contracts remain valid.
+Actual: both exit 0. docs-tools completed dependency validation; verify-contracts reported 35 target operations and 159 synthetic request/response fixtures PASS and correctly noted live handler verification remains R02.c.
+
+Contract contents
+- Every R01-R55 has domain_rule, narrow consumer-owned port, transaction_boundary, negative_test, and invariant.
+- Identity/ownership/assets, telemetry, alarms, notifications, commands/jobs, tenant-ready authorization context, UTC timestamps, idempotency, typed errors, unknown outcomes, and alarm/notification/command/job/migration state machines are explicit.
+- Capability levels L0-L4 are defined. L4 requires real declared-provider/external evidence; the design manifest does not claim current implementation acceptance.
+- Topology is composition_root -> adapters -> application -> domain. Provider SDK imports are machine-checked under declared domain/application roots; universal port names are forbidden.
+
+Adversarial classes
+- malformed input: verified by temporary CLI mutation and pytest malformed-field/ID tests.
+- prompt injection in docs: repository docs treated as data; checker consumes only declared YAML fields and authority links.
+- stale state: checker reloads current files each invocation; no cached pass is used.
+- dirty worktree: shared unrelated changes were preserved and not used as evidence of Todo 2 behavior.
+- misleading output: positive and negative CLI exits/diagnostics were captured; no Rxx acceptance, real PG, MQTT, WeChat, hardware, or external pass is claimed.
+- other classes: N/A for this static manifest contract; no external side effect was performed.
+
+Limitations
+These are architecture/design contracts and static checks. Runtime domain/application packages are not rebuilt by Todo 2, so no runtime or external acceptance is claimed. Two independent reviewers are still required before stage completion.

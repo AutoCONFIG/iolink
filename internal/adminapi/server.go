@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -57,9 +58,28 @@ type AdminStore interface {
 
 	ListAllAlarms(ctx context.Context, limit int) ([]domain.Alarm, error)
 	ConfirmAlarm(ctx context.Context, id int64) error
+	ConfirmAlarmByActor(ctx context.Context, id, actorID int64) error
 	BatchConfirm(ctx context.Context, ids []int64) (int64, error)
 
 	Stats(ctx context.Context) (domain.Stats, error)
+}
+
+type TenantAdminStore interface {
+	ListTenants(context.Context) ([]domain.Tenant, error)
+	SetTenantActive(context.Context, int64, bool, int64) error
+	ListTenantMembers(context.Context, int64) ([]domain.TenantMembership, error)
+	SetTenantMember(context.Context, int64, int64, string, bool, *time.Time, int64) error
+}
+
+type FarmMembershipStore interface {
+	ListFarmMembers(context.Context, int64) ([]domain.FarmMembership, error)
+	SetFarmMember(context.Context, int64, int64, string, bool, *time.Time, int64) error
+}
+
+type adminTenantStore interface {
+	DefaultTenantForUser(context.Context, int64) (int64, error)
+	TenantMembershipVersion(context.Context, int64, int64) (int64, error)
+	TenantRole(context.Context, int64, int64) (string, error)
 }
 
 // Deps wires the store plus optional repos for pond enrichment
@@ -67,6 +87,21 @@ type AdminStore interface {
 type Deps struct {
 	Store     AdminStore           // required
 	Telemetry domain.TelemetryRepo // optional; enables pond latest readings
+	Catalog   ProductCatalog
+	Policy    domain.PermissionPolicy
+}
+
+type ProductCatalog interface {
+	DefaultTenantID(context.Context) (int64, error)
+	CreateProduct(context.Context, int64, string) (domain.Product, error)
+	ListProducts(context.Context, int64) ([]domain.Product, error)
+	CreateProductModel(context.Context, int64, int64, int, []domain.ModelField) (domain.ProductModel, error)
+	ListProductModels(context.Context, int64, int64) ([]domain.ProductModel, error)
+	PublishProductModel(context.Context, int64, int64, int) error
+	GetProductModel(context.Context, int64, int64, int) (domain.ProductModel, error)
+	AssignDeviceProduct(context.Context, int64, string, int64, int) error
+	AssignDeviceProductByActor(context.Context, int64, string, int64, int, int64) error
+	DeviceAssignment(context.Context, int64, string) (domain.ProductModel, error)
 }
 
 // Server is the adminapi HTTP server.
@@ -89,36 +124,51 @@ func (s *Server) Routes() http.Handler {
 
 	auth := v1.Group("", s.authRequired)
 	{
-		auth.GET("/farms", s.listFarms)
-		auth.POST("/farms", s.createFarm)
-		auth.GET("/users", s.listUsers)
-		auth.PUT("/farms/:id", s.updateFarm)
-		auth.DELETE("/farms/:id", s.deleteFarm)
-		auth.PUT("/farms/:id/owner", s.setFarmOwner)
-
-		auth.GET("/ponds", s.listPonds)
-		auth.POST("/ponds", s.createPond)
-		auth.PUT("/ponds/:id", s.updatePond)
-		auth.DELETE("/ponds/:id", s.deletePond)
-
-		auth.GET("/devices", s.listDevices)
-		auth.POST("/devices", s.registerDevice)
-		auth.GET("/devices/:device_no", s.getDevice)
-		auth.DELETE("/devices/:device_no", s.deleteDevice)
-		auth.PUT("/devices/:device_no/pond", s.moveDevice)
-
-		auth.GET("/alarm-rules", s.listRules)
-		auth.POST("/alarm-rules", s.createRule)
-		auth.PUT("/alarm-rules/:id", s.updateRule)
-		auth.DELETE("/alarm-rules/:id", s.deleteRule)
-
+		auth.GET("/tenants", s.listTenants)
+		auth.PUT("/tenants/:id/status", s.setTenantStatus)
+		auth.GET("/tenants/:id/members", s.listTenantMembers)
+		auth.PUT("/tenants/:id/members/:user_id", s.setTenantMember)
 		auth.POST("/password", s.changePassword)
+	}
+	tenantAuth := v1.Group("", s.authRequired, s.tenantRequired)
+	{
+		tenantAuth.GET("/farms", s.listFarms)
+		tenantAuth.POST("/farms", s.createFarm)
+		tenantAuth.GET("/users", s.listUsers)
+		tenantAuth.PUT("/farms/:id", s.updateFarm)
+		tenantAuth.DELETE("/farms/:id", s.deleteFarm)
+		tenantAuth.PUT("/farms/:id/owner", s.setFarmOwner)
+		tenantAuth.GET("/farms/:id/members", s.listFarmMembers)
+		tenantAuth.PUT("/farms/:id/members/:user_id", s.setFarmMember)
 
-		auth.GET("/alarms", s.listAlarms)
-		auth.POST("/alarms/:id/confirm", s.confirmAlarm)
-		auth.POST("/alarms/batch-confirm", s.batchConfirm)
+		tenantAuth.GET("/ponds", s.listPonds)
+		tenantAuth.POST("/ponds", s.createPond)
+		tenantAuth.PUT("/ponds/:id", s.updatePond)
+		tenantAuth.DELETE("/ponds/:id", s.deletePond)
 
-		auth.GET("/stats", s.stats)
+		tenantAuth.GET("/devices", s.listDevices)
+		tenantAuth.POST("/devices", s.registerDevice)
+		tenantAuth.GET("/devices/:device_no", s.getDevice)
+		tenantAuth.DELETE("/devices/:device_no", s.deleteDevice)
+		tenantAuth.PUT("/devices/:device_no/pond", s.moveDevice)
+
+		tenantAuth.GET("/alarm-rules", s.listRules)
+		tenantAuth.POST("/alarm-rules", s.createRule)
+		tenantAuth.PUT("/alarm-rules/:id", s.updateRule)
+		tenantAuth.DELETE("/alarm-rules/:id", s.deleteRule)
+
+		tenantAuth.GET("/alarms", s.listAlarms)
+		tenantAuth.POST("/alarms/:id/confirm", s.confirmAlarm)
+		tenantAuth.POST("/alarms/batch-confirm", s.batchConfirm)
+
+		tenantAuth.GET("/stats", s.stats)
+		tenantAuth.GET("/products", s.listProducts)
+		tenantAuth.POST("/products", s.createProduct)
+		tenantAuth.GET("/products/:product_id/models", s.listProductModels)
+		tenantAuth.POST("/products/:product_id/models", s.createProductModel)
+		tenantAuth.POST("/products/:product_id/models/:version/publish", s.publishProductModel)
+		tenantAuth.GET("/devices/:device_no/product", s.getDeviceProduct)
+		tenantAuth.PUT("/devices/:device_no/product", s.assignDeviceProduct)
 	}
 	return r
 }
@@ -151,6 +201,32 @@ func (s *Server) login(c *gin.Context) {
 	}
 	key := platform.DeriveAdminKey(s.cfg.SecretKey)
 	claims := jwt.MapClaims{"aid": u.ID, "ver": version, "exp": time.Now().Add(s.cfg.JWT).Unix()}
+	if tenants, ok := s.deps.Store.(adminTenantStore); ok {
+		if tenantID, tenantErr := tenants.DefaultTenantForUser(c.Request.Context(), u.ID); tenantErr == nil && tenantID > 0 {
+			membershipVersion, versionErr := tenants.TenantMembershipVersion(c.Request.Context(), u.ID, tenantID)
+			if versionErr != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant unavailable"})
+				return
+			}
+			claims["tenant_id"] = tenantID
+			claims["tenant_ver"] = membershipVersion
+			role, roleErr := tenants.TenantRole(c.Request.Context(), u.ID, tenantID)
+			if roleErr != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant role unavailable"})
+				return
+			}
+			claims["tenant_role"] = role
+		} else if tenantErr != nil && u.Authority != "ADMIN" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant membership required"})
+			return
+		} else if tenantErr != nil && !errors.Is(tenantErr, domain.ErrNotFound) && !errors.Is(tenantErr, domain.ErrInactiveTenant) {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant unavailable"})
+			return
+		}
+	} else if u.Authority != "ADMIN" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant store unavailable"})
+		return
+	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(key)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -176,13 +252,18 @@ func (s *Server) authRequired(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 		return
 	}
-	aid, ok := tok.Claims.(jwt.MapClaims)["aid"].(float64)
+	claims := tok.Claims.(jwt.MapClaims)
+	if _, ok := claims["exp"].(float64); !ok {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing exp"})
+		return
+	}
+	aid, ok := claims["aid"].(float64)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
 		return
 	}
 	c.Set("aid", int64(aid))
-	version, ok := tok.Claims.(jwt.MapClaims)["ver"].(float64)
+	version, ok := claims["ver"].(float64)
 	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
 		return
@@ -192,7 +273,93 @@ func (s *Server) authRequired(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token revoked"})
 		return
 	}
+	admin, adminErr := s.deps.Store.FindAdminByID(c.Request.Context(), int64(aid))
+	if adminErr != nil || (admin.Authority != "ADMIN" && admin.Authority != "USER") {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid admin"})
+		return
+	}
+	platformAdmin := admin.Authority == "ADMIN"
+	c.Set("platform_admin", platformAdmin)
+	if tenants, ok := s.deps.Store.(adminTenantStore); ok {
+		tenantRaw, tenantOK := claims["tenant_id"].(float64)
+		membershipRaw, membershipOK := claims["tenant_ver"].(float64)
+		if !tenantOK && !membershipOK {
+			_, membershipErr := tenants.DefaultTenantForUser(c.Request.Context(), int64(aid))
+			if membershipErr == nil {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+				return
+			}
+			if !errors.Is(membershipErr, domain.ErrNotFound) && !errors.Is(membershipErr, domain.ErrInactiveTenant) {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant unavailable"})
+				return
+			}
+			if !platformAdmin {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+				return
+			}
+			c.Next()
+			return
+		}
+		if !tenantOK || !membershipOK {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+			return
+		}
+		membershipVersion, err := tenants.TenantMembershipVersion(c.Request.Context(), int64(aid), int64(tenantRaw))
+		if err != nil || int64(membershipRaw) != membershipVersion {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant membership revoked"})
+			return
+		}
+		role, roleErr := tenants.TenantRole(c.Request.Context(), int64(aid), int64(tenantRaw))
+		claimRole, roleOK := claims["tenant_role"].(string)
+		if roleErr != nil || !roleOK || claimRole != role {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant role invalid"})
+			return
+		}
+		requestContext := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(c.Request.Context(), int64(tenantRaw)), role), int64(aid))
+		c.Set("tenant_id", int64(tenantRaw))
+		c.Request = c.Request.WithContext(requestContext)
+	}
 	c.Next()
+}
+
+func (s *Server) tenantRequired(c *gin.Context) {
+	if _, scopedStore := s.deps.Store.(adminTenantStore); !scopedStore {
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "tenant store unavailable"})
+		return
+	}
+	if _, ok := domain.TenantID(c.Request.Context()); !ok {
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "tenant context required"})
+		return
+	}
+	if s.deps.Policy == nil {
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "tenant policy unavailable"})
+		return
+	}
+	resource, action := tenantPermission(c.FullPath(), c.Request.Method)
+	allowed, err := s.deps.Policy.Allow(domain.TenantRole(c.Request.Context()), resource, action)
+	if err != nil || !allowed {
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "tenant action forbidden"})
+		return
+	}
+	c.Next()
+}
+
+func tenantPermission(path, method string) (string, string) {
+	relative := strings.TrimPrefix(path, "/admin/v1/")
+	resource, _, _ := strings.Cut(relative, "/")
+	if resource == "farms" && strings.Contains(relative, "/members") {
+		resource = "farm_members"
+	}
+	if resource == "alarm-rules" {
+		resource = "alarm_rules"
+	}
+	action := "write"
+	if method == http.MethodGet {
+		action = "read"
+	} else if method == http.MethodPost && resource == "alarms" && (strings.HasSuffix(relative, "/confirm") || strings.HasSuffix(relative, "/batch-confirm")) {
+		action = "confirm"
+	}
+	return resource, action
 }
 
 func aid(c *gin.Context) int64 { return c.MustGet("aid").(int64) }

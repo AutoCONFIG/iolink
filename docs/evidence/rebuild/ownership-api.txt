@@ -1,0 +1,36 @@
+Todo 5: identity, ownership, authorization, and API application services
+Date: 2026-09-27
+Scope: R14-R22 software acceptance; external WeChat and hardware are not claimed.
+Environment: Go 1.26.8; PostgreSQL 16; TimescaleDB 2.30.0; Docker container iolink-todo5-pg on 127.0.0.1:55433; DSN redacted.
+
+Implementation
+- App and admin JWT validation now requires exp, validates token version, and keeps app/admin signing keys and claims separate.
+- User history authorization can query telemetry by its recorded pond snapshot and current farm owner.
+- User alarm listing supports level, only_unconfirmed, limit, and offset before pagination in the provider query.
+- Stats and pond status read all authorized alarms instead of fixed 200/5000 row caps; device tie-breaking is deterministic.
+- Farm owner transfer locks and updates the farm in one transaction, validates the target user, and records farm.owner_changed audit metadata with actor and old/new owners.
+- Admin resource errors map missing farms and ponds/rules to 404; batch confirmation remains transactional and rejects any missing or already-confirmed ID without partial writes.
+- Admin pond filtering verifies farm existence; app device filtering verifies the requested pond is currently visible to the user and returns 404 otherwise. Invalid filter booleans and pagination values return 400.
+
+Commands and results
+1. `GOCACHE=/tmp/iolink-gocache go test ./internal/appapi ./internal/adminapi -count=1`: PASS.
+2. `IOLINK_TEST_PG_DSN=postgres://iolink:<redacted>@127.0.0.1:55433/iolink?sslmode=disable GOCACHE=/tmp/iolink-gocache go test ./internal/core -run 'TestM2|TestCreateFarm|TestHistoryAndAlarmFiltersUseSnapshotOwnership' -count=1 -v`: PASS. Real DB covered owner transfer, audit event, old/new owner visibility, token revocation, snapshot history, alarm filtering, and atomic batch confirmation.
+3. `IOLINK_TEST_PG_DSN=... GOCACHE=/tmp/iolink-gocache make integration`: PASS. Migration, history HTTP, telemetry snapshot, alarm concurrency/confirmation/move, rollback, authentication/restart, device secrets, interval, rules, ownership, and real MQTT tests passed.
+4. `IOLINK_TEST_PG_DSN=... GOCACHE=/tmp/iolink-gocache go test -race -shuffle=on ./internal/access ./internal/ingestion ./internal/persistence ./internal/core -count=1`: PASS.
+5. `GOCACHE=/tmp/iolink-gocache make verify`: PASS. Build, vet, and all Go tests passed.
+6. `python3 scripts/check_architecture_manifests.py --all && python3 -m pytest -q scripts/test_check_architecture_manifests.py`: PASS; 55 requirements and 28 manifest tests.
+7. `make docs-tools && make verify-contracts`: PASS; 35 operations and 159 fixtures.
+8. `git diff --check`: PASS.
+9. Final targeted re-run after review fixes: `GOCACHE=/tmp/iolink-gocache go test ./internal/appapi ./internal/adminapi ./internal/core -count=1`, `IOLINK_TEST_PG_DSN=<redacted> GOCACHE=/tmp/iolink-gocache go test ./internal/core -run 'TestM2|TestHistoryAndAlarmFilters' -count=1`, `go vet ./internal/appapi ./internal/adminapi ./internal/core`: PASS.
+
+Final candidate tree manifest: `c4a1c98e459d5d135bdf0121efd0e5b022ad9ee5944a0149d20ebd9f8a5fc43e`.
+
+Negative and boundary coverage
+- Missing/expired/invalid-signature/app-admin-mismatched/missing-exp JWTs return 401; password token-version revocation remains covered.
+- Cross-user pond/device/latest/history/alarm access is 404; transfer immediately changes owner visibility.
+- Invalid metric, range, max_points, level, limit, offset, and boolean filters return 400.
+- Missing farm/pond/rule/owner returns 404; pond references and duplicate rules return 409 where applicable.
+- Batch confirmation with any missing or already-confirmed ID leaves every row unchanged.
+- History uses pond_id snapshots after device moves; old owner can read old snapshots only while still owning that farm.
+
+Raw outputs are retained in the task execution log and the commands above are reproducible against the isolated container. No external WeChat or hardware acceptance is claimed; those remain external_blocked.

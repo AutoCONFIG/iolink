@@ -125,6 +125,28 @@ type blockedHandler struct {
 	release chan struct{}
 }
 
+type unavailableRevisionAuth struct{}
+
+func (unavailableRevisionAuth) Authenticate(string, string) bool { return true }
+func (unavailableRevisionAuth) DeviceRevision(string) int64      { return -1 }
+
+func TestRevisionLookupFailureFailsClosed(t *testing.T) {
+	f := &fakeHandler{}
+	s := New(Config{}, f, unavailableRevisionAuth{}, testLogger())
+	cl := client("one")
+	h := newBrokerHook(s)
+	if h.OnConnectAuthenticate(cl, packets.Packet{Connect: packets.ConnectParams{Password: []byte("secret")}}) {
+		t.Fatal("unavailable revision must reject CONNECT")
+	}
+	h.OnSessionEstablished(cl, packets.Packet{})
+	if s.isCurrent(cl) {
+		t.Fatal("session with unavailable revision must not pass ACL")
+	}
+	if len(f.events) != 0 {
+		t.Fatal("unavailable revision must not emit online")
+	}
+}
+
 func (h *blockedHandler) HandleEvent(e event.Event) error {
 	if e.DeviceNo == "slow" {
 		select {

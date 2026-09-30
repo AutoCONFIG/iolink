@@ -1,0 +1,38 @@
+Scope amendment evidence: R03/R32 non-production fixture clarification
+Date: 2026-09-25
+Working-tree base commit: 14bec065559a187571f9741dd2eaf812c8f48a41
+
+Files changed
+- docs/ACCEPTANCE.md
+- docs/DEPLOY.md
+
+Exact before/after: docs/ACCEPTANCE.md R03
+BEFORE:
+| R03 AUDIT | M0 空库/旧库迁移 | 空库逐版迁移后正常上报；旧schema保数据升级；重复执行无副作用；checksum改变/并发迁移/故意失败均按设计拒绝或回滚 | D/O；internal/migrate、遗留schema |
+AFTER:
+| R03 AUDIT | M0 空库/迁移安全 | 空库逐版迁移后正常上报；重复执行无副作用；checksum改变/并发迁移/故意失败/中断安装均按设计拒绝或回滚并可安全恢复。旧schema保数据迁移仅用非生产fixture验证迁移行为，不表示支持已部署客户数据升级 | D/O；internal/migrate、隔离fixture |
+
+Exact before/after: docs/ACCEPTANCE.md R32
+BEFORE:
+| R32 AUDIT | M5 升级/回退 | 旧版本数据升级保留；故意失败停止服务/保持旧库或恢复备份；二进制回退遵守schema兼容；文档每命令可重放 | D/O；迁移和发布工具 |
+AFTER:
+| R32 AUDIT | M5 发布/恢复安全 | 在非生产旧版本fixture上验证迁移保留fixture数据；故意失败或中断时停止服务、保持旧库或恢复已验证备份；验证不兼容schema时禁止直接回退二进制，并演练恢复备份后回退；文档每命令可重放。此项不要求、也不承诺已部署客户数据升级兼容 | D/O；迁移和发布工具 |
+
+Exact before/after: docs/DEPLOY.md scope statement
+BEFORE:
+2026-09-19，M0迁移/安全首启已实现并在隔离环境验收。以下明确区分可运行入口和M5/M6c目标；TLS、备份恢复、容量和离线安装尚未验收，不能声称生产就绪。旧docs/schema.sql仅用于历史基线，不是安装入口。
+AFTER:
+2026-09-19，M0迁移/安全首启已实现并在隔离环境验收。项目为绿地重建，没有正式生产部署或生产数据需要保留；以下旧schema升级和旧二进制回退只作为隔离非生产fixture/中断安装恢复演练，不承诺已部署客户数据升级兼容。空库安装、迁移checksum/锁/事务安全、失败与中断恢复、备份恢复仍是强制验收。以下明确区分可运行入口和M5/M6c目标；TLS、备份恢复、容量和离线安装尚未验收，不能声称生产就绪。旧docs/schema.sql仅用于历史基线，不是安装入口。
+
+Validation invocations and binary observables
+1. `make docs-tools && make verify-contracts`
+   Exit status: 0.
+   Observable output: docs/api/admin-openapi.yaml standard schema and 25 operation fixtures PASS; docs/api/openapi.yaml standard schema and 10 operation fixtures PASS; 35 target operations and 159 synthetic request/response fixtures PASS.
+   Limitation: this is static/synthetic contract validation, not live handler or external acceptance.
+2. `git diff --check -- docs/ACCEPTANCE.md docs/DEPLOY.md`
+   Exit status: 0; no whitespace errors emitted.
+3. Manual text QA invocation: `rg -n -i -C 2 '旧库|旧schema|旧版本|升级|回退|rollback|production data|客户数据|legacy' docs/ACCEPTANCE.md docs/DEPLOY.md` and `sed -n` of R03/R32 and the install/migration/recovery sections.
+   Observable: R03/R32 and each legacy adoption, migration-failure, and binary-rollback path render with explicit non-production fixture scope. Safety clauses for empty-database install, checksum/locking/transaction handling, interrupted/failed migration, and verified-backup recovery remain present. No remaining text in the two edited documents claims deployed-customer upgrade compatibility.
+   Conflict note: DEPLOY summary now calls R32 “发布/恢复安全” to match the amended acceptance row; production Compose commands remain documented for fresh deployment, while adopt-legacy is explicitly limited to fixture/recovery exercise.
+
+No production upgrade support or external acceptance is claimed. No implementation state was changed.

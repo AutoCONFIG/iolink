@@ -1,0 +1,40 @@
+Todo 7 / M3 admin frontend evidence
+Date: 2026-09-27 Asia/Shanghai
+Workspace: shared working tree; no commit created
+
+Scope: R23-R24. The Vue 3 + TypeScript + Vite + Element Plus frontend is in the web submodule.
+
+Design and source evidence
+- web/DESIGN.md records the existing navy/teal operations-console tokens, component rules, responsive behavior, accessibility constraints, and accepted demo/API adapter debt.
+- web/package.json test script is limited to tests/ so Vitest does not import Playwright specs.
+- web/playwright.config.ts uses the installed Chrome channel in this environment.
+- web/e2e/admin-pages.spec.ts covers all six protected pages at 1440, 768, and 375px, creation/Secret/alarm/password flows, and expired sessions.
+
+Commands and results
+- `cd web && npm ci`: PASS; 143 packages installed, 0 vulnerabilities. First sandbox-only attempt hit DNS EAI_AGAIN; the authorized retry completed.
+- `cd web && npm test`: PASS; 1 file, 9 tests.
+- `cd web && npm run typecheck`: PASS; vue-tsc -b exit 0.
+- `cd web && npm run build`: PASS; Vite produced web/dist with route chunks and no placeholder.
+- `cd web && npx playwright test e2e --config playwright.config.ts`: PASS; 5 tests, including 19 fresh screenshots. Chrome was used because msedge is not installed.
+- `sh scripts/embed-frontend.sh` (run from repository root after the final build): PASS; web/dist and internal/web/dist file inventories and bytes match. Current index SHA256 is `0b84686d3ea728314cb53a5ee8ea2b88f3e15c64a6e8b74c5543bdb42a3065e9`, and the placeholder text is absent.
+- `GOCACHE=/tmp/iolink-gocache go test ./... -run '^$' -count=1`: PASS compile sweep.
+- `GOCACHE=/tmp/iolink-gocache go vet ./...`: PASS.
+- `make verify-contracts`: PASS; 35 operations and 159 synthetic fixtures.
+- `python3 scripts/check_architecture_manifests.py --all`: PASS; 55 requirements.
+- `git diff --check`: PASS.
+- `GOCACHE=/tmp/iolink-gocache go test ./cmd/iolinkd ./internal/adminapi ./internal/appapi -count=1`: cmd/iolinkd passed, adminapi/appapi httptest cases were blocked by the sandbox refusing IPv6 [::1]:0 (`operation not permitted`); this is recorded as environment_blocked and is not counted as a pass.
+
+Browser evidence
+- `.omo/evidence/todo7-dashboard.png`
+- `.omo/evidence/todo7-dashboard-{1440,768,375}.png`
+- `.omo/evidence/todo7-{ponds,devices,alarms-rules,alarms,system}-{1440,768,375}.png`
+- Fresh browser run also exercised invalid pond submission, one-time device Secret dialog, alarm confirmation, password validation, and expired-token redirect.
+
+External status
+- No real WeChat, hardware, or external service is required by R23-R24; none is claimed here.
+
+Responsive review correction
+- Independent visual review initially found table-page screenshots wider than 375px because `.table-wrap` lacked overflow containment.
+- Fixed `web/src/styles/main.css` with `surface`/`table-wrap` min-width constraints, `overflow-x: auto`, and narrow-screen toolbar wrapping.
+- Rebuilt and mirrored assets again. Fresh Playwright run: 5/5 passed. Fresh screenshot dimensions are exactly 1440, 768, or 375px for every target viewport, including devices, rules, and alarms.
+- Current `web/dist` and `internal/web/dist` remain byte-identical after the fix; the embed command was rerun from the repository root after the final build.

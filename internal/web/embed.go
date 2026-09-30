@@ -1,7 +1,3 @@
-// Package web embeds the compiled admin frontend so iolinkd ships as a
-// single binary. go:embed cannot reach outside this package directory, so
-// scripts/embed-frontend.sh mirrors the web/ submodule's dist/ here before
-// every build; without a frontend build it falls back to a placeholder page.
 package web
 
 import (

@@ -1,0 +1,1 @@
+Existing Todo 1 and Todo 2 contract evidence is recorded in docs/evidence/rebuild/foundation-guidance.txt and contracts.txt.

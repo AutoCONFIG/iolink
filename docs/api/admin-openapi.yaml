@@ -2,13 +2,14 @@ openapi: 3.0.3
 info:
   title: IoLink Admin API — TARGET
   version: 1.0.0-planned
-  description: TARGET / 待实现、待验收：本文件为 M0–M5 修订目标契约，并非现有实现已通过验收的声明。原有 31 个操作的路径保留；新增目标操作见各 summary。所有 JSON 字段 snake_case；集合始终返回数组，无结果为 []，不得返回 null。时间统一返回 UTC RFC3339
+  description: TARGET / 待实现、待验收：本文件保留 M0–M5 管理 v1 契约，并包含 M6a products/models/assignment 增量；并非现有实现已通过验收的声明。原有 v1 操作路径保持不变；新增目标操作见各 summary。所有 JSON 字段 snake_case；集合始终返回数组，无结果为 []，不得返回 null。时间统一返回 UTC RFC3339
     字符串。所有参数越界/非法值返回 400，不静默回退。所有受保护操作必须逐请求校验身份及资源归属。管理员使用aid claim和管理签名密钥，小程序使用uid claim和用户签名密钥；均由IOLINK_SECRET_KEY以不同标签派生（逻辑密钥，不是新增环境变量），不得互验。管理权限覆盖本实例全部业务资源，管理员不会自动成为
     farm.owner_id。管理集合均支持 limit/offset，默认按 id 升序稳定排序；报警按 created_at DESC,id DESC。新增资源 POST 非幂等，网络结果未知时须查询核实，不能盲目重试；PUT 为完整字段替换且重复执行结果相同；确认操作及 DELETE 幂等，重复成功不产生新副作用。
 servers:
 - url: http://localhost:8080/admin/v1
 tags:
 - name: auth
+- name: tenants
 - name: users
 - name: farms
 - name: ponds
@@ -68,6 +69,83 @@ paths:
                   format: password
               additionalProperties: false
       security: []
+  /tenants:
+    get:
+      tags: [tenants]
+      summary: 租户列表或当前租户
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tenant' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /tenants/{id}/status:
+    put:
+      tags: [tenants]
+      summary: 启用或停用租户（平台管理员）
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [active]
+              properties: { active: { type: boolean } }
+              additionalProperties: false
+      responses:
+        '204': { description: 成功 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{id}/members:
+    get:
+      tags: [tenants]
+      summary: 租户成员列表
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TenantMembership' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /tenants/{id}/members/{user_id}:
+    put:
+      tags: [tenants]
+      summary: 更新租户成员角色或状态
+      parameters:
+      - { name: id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      - { name: user_id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role, active]
+              properties:
+                role: { type: string, enum: [owner, admin, member, viewer, support] }
+                active: { type: boolean }
+                expires_at: { type: string, format: date-time, nullable: true }
+                expires_at: { type: string, format: date-time, nullable: true }
+              additionalProperties: false
+      responses:
+        '204': { description: 成功 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
   /password:
     post:
       tags:
@@ -190,6 +268,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalError'
       requestBody:
@@ -282,6 +362,45 @@ paths:
                   minimum: 1
                   nullable: true
               additionalProperties: false
+  /farms/{id}/members:
+    get:
+      tags: [farms]
+      summary: 养殖场成员列表
+      parameters:
+      - *id003
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FarmMembership' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /farms/{id}/members/{user_id}:
+    put:
+      tags: [farms]
+      summary: 更新养殖场成员
+      parameters:
+      - *id003
+      - { name: user_id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role, active]
+              properties:
+                role: { type: string, enum: [owner, admin, member, viewer, support] }
+                active: { type: boolean }
+              additionalProperties: false
+      responses:
+        '204': { description: 成功 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
   /ponds:
     get:
       tags:
@@ -789,6 +908,157 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalError'
+  /products:
+    get:
+      tags: [products]
+      summary: 产品列表
+      description: M6a 管理契约。返回当前实例租户可管理的产品，内置水质产品固定为 v1；集合为空返回 []。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    post:
+      tags: [products]
+      summary: 创建产品
+      description: 创建产品及其归属；名称在同一租户内唯一。产品删除不在 M6a 提供，避免破坏设备历史。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreateReq'
+      responses:
+        '201':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /products/{product_id}/models:
+    get:
+      tags: [products]
+      summary: 产品模型版本列表
+      description: 版本按 version 升序返回；已发布版本不可就地修改，历史版本保留。
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema: { type: integer, format: int64, minimum: 1 }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProductModel' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    post:
+      tags: [products]
+      summary: 创建不可变模型版本
+      description: 自动分配递增 version；identifier 唯一。已存在 identifier 的 type 或 unit 不可改变，必须使用新 identifier；发布前可继续校验，发布后仅能新增版本。
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema: { type: integer, format: int64, minimum: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProductModelCreateReq' }
+      responses:
+        '201':
+          description: 创建成功；published_at 为 null
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductModel' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /products/{product_id}/models/{version}/publish:
+    post:
+      tags: [products]
+      summary: 发布模型版本
+      description: 发布操作幂等；发布后 schema 和 published_at 不可修改。模型必须至少一个字段，范围/枚举与类型一致。
+      parameters:
+      - name: product_id
+        in: path
+        required: true
+        schema: { type: integer, format: int64, minimum: 1 }
+      - name: version
+        in: path
+        required: true
+        schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: 发布后的模型
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProductModel' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /devices/{device_no}/product:
+    get:
+      tags: [products, devices]
+      summary: 查看设备产品模型分配
+      parameters:
+      - name: device_no
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeviceProductAssignment' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    put:
+      tags: [products, devices]
+      summary: 显式升级设备模型
+      description: 完整替换设备当前 product_id/model_version；目标模型必须已发布且属于同一租户。操作记录审计，旧遥测保留其 model_version；重复提交相同分配幂等。
+      parameters:
+      - name: device_no
+        in: path
+        required: true
+        schema: { type: string, minLength: 1 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DeviceProductAssignmentReq' }
+      responses:
+        '200':
+          description: 当前分配
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeviceProductAssignment' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
 components:
   securitySchemes:
     BearerAuth:
@@ -804,6 +1074,12 @@ components:
             $ref: '#/components/schemas/Error'
     Unauthorized:
       description: 凭据缺失/过期/错误、错误 token 类型或权限主体失效；error=unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: 当前租户角色或平台范围不允许该操作；error=forbidden
       content:
         application/json:
           schema:
@@ -1098,6 +1374,17 @@ components:
           type: string
           default: ''
       additionalProperties: false
+    FarmMembership:
+      type: object
+      required: [tenant_id, farm_id, user_id, role, active]
+      properties:
+        tenant_id: { type: integer, format: int64, minimum: 1 }
+        farm_id: { type: integer, format: int64, minimum: 1 }
+        user_id: { type: integer, format: int64, minimum: 1 }
+        role: { type: string, enum: [owner, admin, member, viewer, support] }
+        active: { type: boolean }
+        expires_at: { type: string, format: date-time, nullable: true }
+      additionalProperties: false
     FarmCreateReq:
       type: object
       required:
@@ -1265,3 +1552,112 @@ components:
           minimum: 0
       additionalProperties: false
       description: 设备计数排除停用设备；devices_total=online+offline。open_alarms 统计全部未确认报警，包含停用设备的历史报警，不受列表分页影响。
+    Product:
+      type: object
+      required: [id, tenant_id, name, builtin, current_version, created_at]
+      properties:
+        id: { type: integer, format: int64, minimum: 1 }
+        tenant_id: { type: integer, format: int64, minimum: 1 }
+        name: { type: string, minLength: 1, maxLength: 128 }
+        builtin: { type: boolean }
+        current_version: { type: integer, minimum: 1, nullable: true }
+        created_at: { type: string, format: date-time }
+      additionalProperties: false
+    ProductCreateReq:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 128 }
+      additionalProperties: false
+    ModelField:
+      type: object
+      required: [identifier, type, unit, readable, writable, nullable]
+      properties:
+        identifier:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: '^[a-z][a-z0-9_]{0,63}$'
+          description: 稳定字段名；同一产品已发布版本中唯一，改变语义必须新 identifier。
+        type:
+          type: string
+          enum: [number, integer, boolean, string]
+        unit:
+          type: string
+          maxLength: 32
+          description: 物理单位；同一 identifier 已发布版本不可改变，非数值字段可为空字符串。
+        minimum: { type: number, nullable: true }
+        maximum: { type: number, nullable: true }
+        enum_values:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items: {}
+          nullable: true
+          description: 枚举白名单；与 type 一致时可用，不能与 range 同时作为矛盾约束。
+        readable: { type: boolean }
+        writable: { type: boolean }
+        nullable: { type: boolean }
+      additionalProperties: false
+    ProductModel:
+      type: object
+      required: [product_id, version, fields, published_at, created_at]
+      properties:
+        product_id: { type: integer, format: int64, minimum: 1 }
+        version: { type: integer, minimum: 1 }
+        fields:
+          type: array
+          minItems: 1
+          maxItems: 256
+          items: { $ref: '#/components/schemas/ModelField' }
+          description: identifier 必须唯一；发布后整个 schema、字段 type/unit/约束和 published_at 不可修改。
+        published_at: { type: string, format: date-time, nullable: true }
+        created_at: { type: string, format: date-time }
+      additionalProperties: false
+    ProductModelCreateReq:
+      type: object
+      required: [fields]
+      properties:
+        fields:
+          type: array
+          minItems: 1
+          maxItems: 256
+          items: { $ref: '#/components/schemas/ModelField' }
+          description: identifier 不可重复；数值范围 minimum<=maximum；发布后不能原地编辑。
+      additionalProperties: false
+    DeviceProductAssignment:
+      type: object
+      required: [device_no, product_id, model_version, assigned_at]
+      properties:
+        device_no: { type: string, minLength: 1 }
+        product_id: { type: integer, format: int64, minimum: 1 }
+        model_version: { type: integer, minimum: 1 }
+        assigned_at: { type: string, format: date-time }
+      additionalProperties: false
+    DeviceProductAssignmentReq:
+      type: object
+      required: [product_id, model_version]
+      properties:
+        product_id: { type: integer, format: int64, minimum: 1 }
+        model_version: { type: integer, minimum: 1 }
+      additionalProperties: false
+    Tenant:
+      type: object
+      required: [id, name, active, permission_version]
+      properties:
+        id: { type: integer, format: int64, minimum: 1 }
+        name: { type: string, minLength: 1 }
+        active: { type: boolean }
+        permission_version: { type: integer, format: int64, minimum: 0 }
+      additionalProperties: false
+    TenantMembership:
+      type: object
+      required: [tenant_id, user_id, name, role]
+      properties:
+        tenant_id: { type: integer, format: int64, minimum: 1 }
+        user_id: { type: integer, format: int64, minimum: 1 }
+        name: { type: string, minLength: 1 }
+        role: { type: string, enum: [owner, admin, member, viewer, support] }
+        active: { type: boolean }
+        expires_at: { type: string, format: date-time, nullable: true }
+      additionalProperties: false

@@ -3,6 +3,7 @@ package access
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log/slog"
 	"math"
@@ -11,10 +12,49 @@ import (
 	"unicode/utf8"
 
 	"git.hyhy.fun/rsplab/iolink/internal/event"
+	"git.hyhy.fun/rsplab/iolink/internal/ingestion"
 	"git.hyhy.fun/rsplab/iolink/internal/wire"
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/listeners"
 )
+
+func (s *Server) HandleGenericReport(no string, raw map[string]json.RawMessage) error {
+	var messageID string
+	if value, ok := raw["message_id"]; ok {
+		if err := json.Unmarshal(value, &messageID); err != nil {
+			return errors.New("invalid message_id")
+		}
+		delete(raw, "message_id")
+	}
+	e := event.Event{Kind: event.KindProperties, DeviceNo: no, MessageID: messageID, Ts: s.now().UTC(), GenericProperties: raw}
+	if ss := s.lookup(no, false); ss != nil {
+		ss.mu.Lock()
+		if ss.client != nil {
+			ss.lastSeen = e.Ts
+			if err := s.transition(no, ss, true); err != nil {
+				ss.mu.Unlock()
+				return err
+			}
+		}
+		ss.mu.Unlock()
+	}
+	return s.handler.HandleEvent(e)
+}
+
+func (s *Server) genericProduct(no string) bool {
+	provider, ok := s.auth.(interface{ GenericProduct(string) bool })
+	return ok && provider.GenericProduct(no)
+}
+
+func (s *Server) productKind(no string) (string, error) {
+	if provider, ok := s.auth.(interface{ ProductKind(string) (string, error) }); ok {
+		return provider.ProductKind(no)
+	}
+	if s.genericProduct(no) {
+		return "generic", nil
+	}
+	return "water", nil
+}
 
 type Config struct {
 	MQTTAddr           string
@@ -73,9 +113,24 @@ func (s *Server) Serve() error {
 	}
 	return s.broker.Serve()
 }
-func (s *Server) Close() error { return s.broker.Close() }
+func (s *Server) Close() error { return s.CloseContext(context.Background()) }
 
-var fieldRanges = map[string][2]float64{"temperature": {0, 50}, "dissolved_oxygen": {0, 20}, "ph": {0, 14}, "turbidity": {0, 1000}, "salinity": {0, 50}, "battery": {0, 100}, "signal": {-120, 0}}
+func (s *Server) CloseContext(ctx context.Context) error {
+	err := s.broker.Close()
+	done := make(chan struct{})
+	go func() {
+		s.workers.Wait()
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-ctx.Done():
+		if err == nil {
+			err = ctx.Err()
+		}
+	}
+	return err
+}
 
 func (s *Server) HandleReport(no string, r wire.Report) error {
 	e := event.Event{Kind: event.KindProperties, DeviceNo: no, Ts: s.now().UTC(), Properties: map[string]float64{}}
@@ -94,8 +149,8 @@ func (s *Server) HandleReport(no string, r wire.Report) error {
 		e.Properties["signal"] = float64(*r.Signal)
 	}
 	for k, v := range e.Properties {
-		rg := fieldRanges[k]
-		if math.IsNaN(v) || math.IsInf(v, 0) || v < rg[0] || v > rg[1] {
+		low, high, ok := ingestion.MetricRange(k)
+		if !ok || math.IsNaN(v) || math.IsInf(v, 0) || v < low || v > high {
 			delete(e.Properties, k)
 			MetricRejected.WithLabelValues("range").Inc()
 			s.log.Warn("field out of range", "device", no, "field", k)
@@ -160,11 +215,15 @@ func (s *Server) connected(cl *mqtt.Client) {
 	if cl.IsTakenOver() {
 		return
 	}
+	if p, ok := s.auth.(interface{ DeviceRevision(string) int64 }); ok {
+		revision := p.DeviceRevision(no)
+		if revision < 0 {
+			return
+		}
+		ss.revision = revision
+	}
 	ss.client = cl
 	ss.interval = interval
-	if p, ok := s.auth.(interface{ DeviceRevision(string) int64 }); ok {
-		ss.revision = p.DeviceRevision(no)
-	}
 	ss.lastSeen = s.now()
 	if err := s.transition(no, ss, true); err != nil {
 		s.log.Error("online persistence", "device", no, "err", err)
@@ -196,8 +255,11 @@ func (s *Server) isCurrent(cl *mqtt.Client) bool {
 	if ss.client != cl {
 		return false
 	}
-	if p, ok := s.auth.(interface{ DeviceRevision(string) int64 }); ok && p.DeviceRevision(string(cl.Properties.Username)) != ss.revision {
-		return false
+	if p, ok := s.auth.(interface{ DeviceRevision(string) int64 }); ok {
+		revision := p.DeviceRevision(string(cl.Properties.Username))
+		if revision < 0 || revision != ss.revision {
+			return false
+		}
 	}
 	return true
 }

@@ -51,5 +51,8 @@ func LoadConfig(getenv func(string) string, serving bool) (Config, error) {
 	if c.WXTemplateID != "" && c.WXAppID == "" {
 		return c, errors.New("IOLINK_WX_TEMPLATE_ID requires WeChat credentials")
 	}
+	if c.WXAppID != "" && c.WXTemplateID == "" {
+		return c, errors.New("IOLINK_WX_TEMPLATE_ID is required when WeChat credentials are configured")
+	}
 	return c, nil
 }

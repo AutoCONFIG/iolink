@@ -1,0 +1,19 @@
+{
+  "gate": "M5",
+  "requirements": [
+    "R28",
+    "R29",
+    "R30",
+    "R31",
+    "R32",
+    "R33"
+  ],
+  "evidence": {
+    "R28": "docs/evidence/acceptance/R28/",
+    "R29": "docs/evidence/acceptance/R29/",
+    "R30": "docs/evidence/acceptance/R30/",
+    "R31": "docs/evidence/acceptance/R31/",
+    "R32": "docs/evidence/acceptance/R32/",
+    "R33": "docs/evidence/acceptance/R33/"
+  }
+}

@@ -1,0 +1,45 @@
+Todo 1 evidence: rebuild guidance and architecture manifests
+Date: 2026-09-25 (Asia/Shanghai)
+Scope: R01-R55 traceability and provider-operation manifest validation only; no acceptance claim.
+
+Baseline before edits
+- Command: python3 scripts/check_architecture_manifests.py
+- Observable: exit 0; "architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS"
+- Command: python3 -m pytest -q scripts/test_check_architecture_manifests.py
+- Observable: 14 passed.
+
+Implemented checks
+- acceptance-map.yaml contains exactly one provider_operations row for every R01-R55, with provider, operation, L3/L4 level, status, exact command, and evidence_path.
+- provider-matrix.yaml declares only finite first-release/reference providers and records operation-level status/command/evidence; future integrations are exclusions or external_blocked.
+- checker rejects duplicate/missing Rxx, undeclared providers, malformed operation rows, unsupported implemented provider/capability statuses, and contradictory AGENTS.md greenfield/provider rules.
+- AGENTS.md records the global positive/error-path, contract/integration/real-link evidence gate and two-independent-reviewer requirement without duplicating the Rxx ledger.
+
+Manual CLI QA (isolated temporary copy; source manifests preserved)
+- Temporary copy: created with `mktemp -d`; copied AGENTS.md, docs/architecture, docs/ACCEPTANCE.md, scripts/check_architecture_manifests.py.
+- Happy invocation: `python3 scripts/check_architecture_manifests.py --all`
+- Happy observable: exit 0; `architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS`.
+- Bad invocation: duplicate R01 in temporary acceptance-map.yaml, then `python3 scripts/check_architecture_manifests.py --all`.
+- Bad observable: exit 1; stderr contains `duplicate requirement R01`.
+- Cleanup: temporary directory removed after both invocations; repository manifests were not mutated.
+
+Validation
+- Command: python3 scripts/check_architecture_manifests.py
+- Observable: exit 0; `architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS`.
+- Command: python3 -m pytest -q scripts/test_check_architecture_manifests.py
+- Observable: exit 0; `15 passed`.
+- Manual QA happy observable: temporary-copy `--all` exit 0 with the same PASS line and empty stderr.
+- Manual QA bad observable: temporary-copy duplicate R01 `--all` exit 1; stderr `ERROR: acceptance-map.yaml: requirements[55]: duplicate requirement R01`.
+- Cleanup observable: temporary copy removed; repository acceptance-map.yaml still has 55 unique requirements.
+- This evidence records Todo 1 implementation checks only; it does not claim any Rxx acceptance or stage completion.
+
+Reviewer-B remediation verification
+- Checker now requires non-empty evidence files for `passed` provider operations, `implemented` providers, and `implemented` capabilities.
+- Provider-operation levels are checked against provider capability metadata; operation levels above the provider declaration fail.
+- Provider `supports` values are checked against the finite release-wave vocabulary; unsupported waves fail.
+- Command: `python3 scripts/check_architecture_manifests.py`; exit 0 with the 55-row PASS line.
+- Command: `python3 -m pytest -q scripts/test_check_architecture_manifests.py`; exit 0 with `19 passed`.
+- Isolated temporary-copy CLI happy path: exit 0 with the PASS line.
+- Isolated bad path, passed operation with missing evidence: exit 1; `passed provider operation lacks non-empty evidence file`.
+- Isolated bad path, R01 operation changed to L4: exit 1; `required_level exceeds provider capability metadata for go-toolchain`.
+- Isolated bad path, provider supports changed to M99: exit 1; `supports must contain only finite release waves`.
+- Temporary copy removed after all cases; repository manifests unchanged by mutations.

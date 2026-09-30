@@ -3,10 +3,8 @@ PYTHON ?= python3
 DOCS_PYTHON ?= .venv/contracts/bin/python
 DEV_COMPOSE = docker compose -p iolink-dev -f deploy/docker-compose.yml
 
-.PHONY: bootstrap build test verify verify-contracts docs-tools integration dev migrate admin-init stop clean embed-front
+.PHONY: bootstrap build test verify verify-contracts docs-tools integration capacity web-verify dev migrate admin-init stop clean embed-front
 
-# web/ 子模块的 dist 镜像到 internal/web/dist（go:embed 不能引用包目录外的文件）；
-# 子模块尚无前端构建产物时生成兜底占位页。
 embed-front:
 	@sh scripts/embed-frontend.sh
 
@@ -24,7 +22,16 @@ test: embed-front
 
 verify: build
 	$(GO) vet ./...
-	$(GO) test ./... -count=1
+	$(GO) test -race -shuffle=on ./... -count=1
+
+web-verify:
+	npm ci --prefix web
+	npm run typecheck --prefix web
+	npm run build --prefix web
+	npm ci --prefix web-mini
+	npm test --prefix web-mini
+	npm run typecheck --prefix web-mini
+	npm run build --prefix web-mini
 
 # R02.a; kept separate so a Go-only build does not install Python dependencies.
 docs-tools:
@@ -36,7 +43,10 @@ verify-contracts:
 
 integration: embed-front
 	@test -n "$(IOLINK_TEST_PG_DSN)" || (echo 'Set IOLINK_TEST_PG_DSN to an isolated test instance'; exit 1)
-	$(GO) test ./internal/migrate ./internal/core -count=1 -v
+	$(GO) test ./internal/migrate ./internal/core ./internal/notifications ./internal/persistence ./internal/wechat -count=1 -v
+
+capacity:
+	$(PYTHON) scripts/capacity_smoke.py --url "$${IOLINK_CAPACITY_URL:-http://127.0.0.1:8080/healthz}" --clients "$${IOLINK_CAPACITY_CLIENTS:-20}" --requests "$${IOLINK_CAPACITY_REQUESTS:-100}"
 
 # Export IOLINK_PG_DSN and a random IOLINK_SECRET_KEY before serving.
 # The first start requires: make migrate; make admin-init ADMIN_USERNAME=... < protected-password-file.

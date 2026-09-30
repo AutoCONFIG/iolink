@@ -1,0 +1,27 @@
+Todo 8 / M4 mini-program boundary evidence
+Date: 2026-09-27 Asia/Shanghai
+
+Software boundary
+- `web-mini/src/pages.ts` declares P01 login, P02 home, P03 ponds, P04 realtime, P05 history, P06 alarms.
+- Session rules cover signed_out, expired, offline, and unassigned users; expired sessions route to login and unassigned users remain in a recoverable empty state.
+- History rules enforce today/7d/30d, supported metrics, max_points 1..200, and three-report-interval stale fields.
+- Subscription decisions agreed/denied/cancelled all preserve alarm-center access; not_requested triggers the prompt.
+- `web-mini/src/api.ts` maps only to frozen `/api/v1` app routes (`auth/login`, ponds, water, alarms) and rejects invalid history queries before the request; subscription authorization stays behind the platform adapter.
+- `web-mini/src/app.ts` wires the six page registry and starts/stops 30-second realtime polling across foreground/background lifecycle.
+- `web-mini/src/pages/*.vue` provides six named page entry surfaces for uni-app integration.
+
+Commands
+- `npm install --prefix web-mini`: PASS; generated lockfile, 39 packages, 0 vulnerabilities.
+- `npm ci --prefix web-mini`: PASS; clean locked install, 0 vulnerabilities.
+- `npm test --prefix web-mini`: PASS; 1 file, 12 tests.
+- Latest source includes typed payloads, `WechatCode2SessionAdapter`, `WechatSubscriptionAdapter`, `createMiniApp` lifecycle, `App.vue`, `manifest.json`, and `pages.json`; static page entry templates still require a final uni-app runtime/build review before Todo 8 can close.
+- `npm run typecheck --prefix web-mini`: PASS; `tsc --noEmit` exit 0.
+- `python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software`: PASS; runs npm test and typecheck, reports software passed and external_blocked.
+- `npm run build --prefix web-mini`: PASS; Vue SFC typecheck plus Vite production build generated `web-mini/dist`.
+- Real local browser smoke against the Vite app: PASS; Chrome observed title `IoLink 小程序边界`, mounted `微信登录`, navigated to `首页`.
+
+External status
+- `external_blocked`: no WeChat AppID/Secret, HTTPS domain, subscription qualification, or real device was supplied. No real wx.login/code2session, subscription prompt, or six-page device evidence is claimed.
+
+Gate status
+- Todo 8 remains pending after independent review. The Vue runtime/build and mounted page smoke now pass; two fresh independent reviewers must still approve this final tree before completion.

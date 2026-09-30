@@ -42,6 +42,11 @@ func New(t *testing.T) *pgxpool.Pool {
 			t.Errorf("test database cleanup: %v", err)
 		}
 	})
+	// Retention workers can start as soon as migrations create hypertables and
+	// deadlock with fixture inserts. Keep jobs defined but idle in this test DB.
+	if _, err = admin.Exec(ctx, "ALTER DATABASE "+name+" SET timescaledb.restoring = on"); err != nil {
+		t.Fatal(err)
+	}
 	u.Path = "/" + name
 	pool, err = pgxpool.New(ctx, u.String())
 	if err != nil {

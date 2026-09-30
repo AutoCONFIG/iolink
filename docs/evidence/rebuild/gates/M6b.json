@@ -1,0 +1,11 @@
+{
+  "gate": "M6b",
+  "requirements": [
+    "R36",
+    "R37"
+  ],
+  "evidence": {
+    "R36": "docs/evidence/acceptance/R36/",
+    "R37": "docs/evidence/acceptance/R37/"
+  }
+}

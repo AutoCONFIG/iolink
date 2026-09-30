@@ -12,8 +12,7 @@ import (
 )
 
 type alarmEngine struct {
-	log      *slog.Logger
-	notifier func(domain.Alarm)
+	log *slog.Logger
 }
 type rule struct {
 	metric             string
@@ -25,6 +24,12 @@ func breached(r rule, v float64) bool {
 	return r.minValue != nil && v < *r.minValue || r.maxValue != nil && v > *r.maxValue
 }
 func (a *alarmEngine) evaluate(ctx context.Context, tx pgx.Tx, e event.Event, pond int64) ([]domain.Alarm, error) {
+	productID := e.ProductID
+	if productID == 0 {
+		if err := tx.QueryRow(ctx, `SELECT product_id FROM devices WHERE device_no=$1`, e.DeviceNo).Scan(&productID); err != nil {
+			return nil, err
+		}
+	}
 	rows, err := tx.Query(ctx, "SELECT metric,min_value,max_value,level FROM alarm_rules WHERE pond_id=$1 AND enabled", pond)
 	if err != nil {
 		return nil, err
@@ -58,7 +63,7 @@ func (a *alarmEngine) evaluate(ctx context.Context, tx pgx.Tx, e event.Event, po
 			direction = "高于"
 		}
 		al := domain.Alarm{DeviceNo: e.DeviceNo, PondID: pond, Metric: r.metric, CurrentValue: v, Threshold: threshold, Level: domain.AlarmLevel(r.level), Message: fmt.Sprintf("%s %s阈值 %g", r.metric, direction, threshold)}
-		err = tx.QueryRow(ctx, `INSERT INTO alarms(device_no,pond_id,metric,current_value,threshold,level,message,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(device_no,pond_id,metric) WHERE confirmed_at IS NULL DO NOTHING RETURNING id,created_at`, al.DeviceNo, pond, al.Metric, v, threshold, r.level, al.Message, e.Ts).Scan(&al.ID, &al.CreatedAt)
+		err = tx.QueryRow(ctx, `INSERT INTO alarms(device_no,pond_id,product_id,metric,current_value,threshold,level,message,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(device_no,pond_id,product_id,metric) WHERE confirmed_at IS NULL DO NOTHING RETURNING id,created_at`, al.DeviceNo, pond, productID, al.Metric, v, threshold, r.level, al.Message, e.Ts).Scan(&al.ID, &al.CreatedAt)
 		if errors.Is(err, pgx.ErrNoRows) {
 			continue
 		}
@@ -72,8 +77,9 @@ func (a *alarmEngine) evaluate(ctx context.Context, tx pgx.Tx, e event.Event, po
 	}
 	return out, nil
 }
+
 func validateRule(r domain.AlarmRule) error {
-	if !domain.ValidMetric(r.Metric) || (r.Level != domain.AlarmWarning && r.Level != domain.AlarmCritical) || (r.Min == nil && r.Max == nil) {
+	if !validAlarmMetric(r.Metric) || (r.Level != domain.AlarmWarning && r.Level != domain.AlarmCritical) || (r.Min == nil && r.Max == nil) {
 		return domain.ErrInvalidRule
 	}
 	for _, p := range []*float64{r.Min, r.Max} {
@@ -85,4 +91,19 @@ func validateRule(r domain.AlarmRule) error {
 		return domain.ErrInvalidRule
 	}
 	return nil
+}
+
+func validAlarmMetric(metric string) bool {
+	if domain.ValidMetric(metric) {
+		return true
+	}
+	if len(metric) == 0 || len(metric) > 64 || metric[0] < 'a' || metric[0] > 'z' {
+		return false
+	}
+	for _, r := range metric[1:] {
+		if !(r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '_') {
+			return false
+		}
+	}
+	return true
 }
