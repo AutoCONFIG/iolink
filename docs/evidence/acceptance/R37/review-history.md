@@ -1,6 +1,6 @@
 # M6b independent review history
 
-Latest review status: pending. No earlier approval is reused after source changes.
+Latest review status: pending. No earlier approval is reused after source changes or the platform-admin owner fix.
 
 ## 2026-09-30, before Casbin correction
 
@@ -30,4 +30,10 @@ Reviewed final main tracked-diff digest: `d28c8429fd9d38deabc517e91593c5d711f25b
 - `/root/m6b_release_review_a`: APPROVE. Traced tenant filtering, Casbin injection, JWT revalidation, actor-scoped batch confirmation, production V2 mux, and current evidence.
 - `/root/m6b_release_review_b`: APPROVE. Re-ran real Timescale migration rollback/backfill and HTTP member/viewer/support isolation plus atomic batch confirmation; no blocker found.
 
-These two approvals refer to the same final worktree. R36/R37 software status and the M6b gate were updated only after both approvals.
+These two approvals referred to the pre-fix final worktree. They are stale/rejected because the platform-admin legacy-owner boundary bug was then fixed in source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`. The new regression evidence is [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/). Fresh independent double review on the exact release snapshot is required before R36/R37 software status or the M6b gate can be marked passed.
+
+## 2026-10-01 platform-admin owner fix
+
+- Fix commit: `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule: `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`.
+- The previous approvals are stale/rejected due to the platform-admin legacy-owner bug. Raw red/green regression commands and outputs are recorded in [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/).
+- Status: fixed, pending fresh independent double review on this exact snapshot; no R36/R37 final software gate pass is claimed.

@@ -1,6 +1,6 @@
 # R37 platform-admin owner backfill regression (2026-10-01)
 
-Scope: M6b R37.a / EXTENSIONS platform-admin boundary. Base source snapshot: `7770856`.
+Scope: M6b R37.a / EXTENSIONS platform-admin boundary. Exact release source snapshot: `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule: `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`.
 
 The pre-fix regression is captured in `red-migration-http.log` and `red-core.log`: a legacy `ADMIN` farm owner was backfilled as an ordinary tenant/farm owner, admin login selected that tenant, and `GET /admin/v1/farms` returned 200. Stored ordinary ADMIN memberships and owner assignment also bypassed the boundary.
 

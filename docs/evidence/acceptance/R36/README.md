@@ -44,8 +44,8 @@ External hardware, public MQTT exposure and production migration are not claimed
 
 ## Run metadata
 
-- Requirement/version: R36.a, M6b tenant isolation, base `14bec065559a187571f9741dd2eaf812c8f48a41` plus the uncommitted final working tree under review.
+- Requirement/version: R36.a, M6b tenant isolation, exact release source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`.
 - Dependencies: Go 1.26.8; PostgreSQL/Timescale image `timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76`; Node v24.21.0; npm 11.19.0; Playwright 1.63.0.
 - Test data: isolated migrations create default tenant; M6b fixture uses tenants 601/602, users 601/603/604/605, farms 601/602, farm assignment 603→601, revoked user 605, and cross-tenant alarm/device rows.
 - Browser artifacts: `.omo/evidence/todo10-m6a-products-created.png`, `.omo/evidence/todo10-m6a-products-model-draft.png`, `.omo/evidence/todo10-m6a-products-published-assigned.png` and the tenant-page screenshots emitted by `web/e2e/admin-pages.spec.ts`.
-- Review state: software gate passed on 2026-10-01. Two independent read-only reviewers approved the same final worktree snapshot; future R36.b resources and external inputs remain deferred by the acceptance matrix.
+- Review state: fixed on source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12` after the platform-admin legacy-owner bug. Earlier approvals are stale/rejected for this exact snapshot; fresh independent double review is pending. Do not mark the R36 software gate passed yet. Future R36.b resources and external inputs remain deferred by the acceptance matrix.
