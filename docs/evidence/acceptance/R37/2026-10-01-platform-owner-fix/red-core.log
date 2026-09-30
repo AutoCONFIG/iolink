@@ -1,0 +1,43 @@
+-test.shuffle 1790787337128102919
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner
+    platform_membership_test.go:60: ADMIN default tenant role=owner err=<nil>
+    platform_membership_test.go:63: ADMIN ordinary membership version accepted
+    platform_membership_test.go:66: ADMIN ordinary tenant role accepted
+    platform_membership_test.go:70: ADMIN selectable tenants=[{TenantID:9301 UserID:9301 Name:stored Role:owner Active:true ExpiresAt:<nil>}] err=<nil>
+    platform_membership_test.go:72: GET /admin/v1/farms status=200 want=401
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/admin
+    platform_membership_test.go:60: ADMIN default tenant role=admin err=<nil>
+    platform_membership_test.go:63: ADMIN ordinary membership version accepted
+    platform_membership_test.go:66: ADMIN ordinary tenant role accepted
+    platform_membership_test.go:70: ADMIN selectable tenants=[{TenantID:9301 UserID:9301 Name:stored Role:admin Active:true ExpiresAt:<nil>}] err=<nil>
+    platform_membership_test.go:72: GET /admin/v1/farms status=200 want=401
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/member
+    platform_membership_test.go:60: ADMIN default tenant role=member err=<nil>
+    platform_membership_test.go:63: ADMIN ordinary membership version accepted
+    platform_membership_test.go:66: ADMIN ordinary tenant role accepted
+    platform_membership_test.go:70: ADMIN selectable tenants=[{TenantID:9301 UserID:9301 Name:stored Role:member Active:true ExpiresAt:<nil>}] err=<nil>
+    platform_membership_test.go:72: GET /admin/v1/farms status=200 want=401
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/viewer
+    platform_membership_test.go:60: ADMIN default tenant role=viewer err=<nil>
+    platform_membership_test.go:63: ADMIN ordinary membership version accepted
+    platform_membership_test.go:66: ADMIN ordinary tenant role accepted
+    platform_membership_test.go:70: ADMIN selectable tenants=[{TenantID:9301 UserID:9301 Name:stored Role:viewer Active:true ExpiresAt:<nil>}] err=<nil>
+    platform_membership_test.go:72: GET /admin/v1/farms status=200 want=401
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_false
+    platform_membership_test.go:86: platform farm owner assignment err=<nil>
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_true
+    platform_membership_test.go:86: platform farm owner assignment err=<nil>
+--- FAIL: TestM6bStoredPlatformMembershipFailsClosed (0.54s)
+    --- FAIL: TestM6bStoredPlatformMembershipFailsClosed/owner (0.01s)
+    --- FAIL: TestM6bStoredPlatformMembershipFailsClosed/admin (0.00s)
+    --- FAIL: TestM6bStoredPlatformMembershipFailsClosed/member (0.00s)
+    --- FAIL: TestM6bStoredPlatformMembershipFailsClosed/viewer (0.00s)
+    --- FAIL: TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_false (0.00s)
+    --- FAIL: TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_true (0.00s)
+=== RUN   TestM6bEnsurePlatformUserDoesNotCreateOrdinaryMembership
+    platform_membership_test.go:112: EnsureUser platform identity err=<nil>
+--- FAIL: TestM6bEnsurePlatformUserDoesNotCreateOrdinaryMembership (0.39s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	0.979s
+FAIL

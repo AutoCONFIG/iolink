@@ -31,7 +31,7 @@ func tenantFilter(ctx context.Context, alias string, argIndex int) (string, []an
 		if !actorOK {
 			return clause + " AND FALSE", args
 		}
-		clause += fmt.Sprintf(" AND EXISTS (SELECT 1 FROM farm_memberships fm WHERE fm.farm_id=%s.id AND fm.tenant_id=%s.tenant_id AND fm.user_id=$%d AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))", alias, alias, argIndex+1)
+		clause += fmt.Sprintf(" AND EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=%s.id AND fm.tenant_id=%s.tenant_id AND fm.user_id=$%d AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))", alias, alias, argIndex+1)
 		args = append(args, actorID)
 	}
 	return clause, args
@@ -267,7 +267,7 @@ func (s *Service) SetFarmMember(ctx context.Context, farmID, userID int64, role 
 		return err
 	}
 	var userExists bool
-	if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE id=$1 AND authority IN ('USER','ADMIN'))`, userID).Scan(&userExists); err != nil {
+	if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM users WHERE id=$1 AND (authority='USER' OR (authority='ADMIN' AND $2='support')))`, userID, role).Scan(&userExists); err != nil {
 		return err
 	}
 	if !userExists {
@@ -316,10 +316,10 @@ func (s *Service) SetFarmOwnerByActor(ctx context.Context, id int64, ownerID *in
 	}
 	if ownerID != nil {
 		var ok bool
-		ownerQ := `SELECT EXISTS(SELECT 1 FROM users WHERE id=$1 AND authority IN ('USER','ADMIN') AND open_id<>'')`
+		ownerQ := `SELECT EXISTS(SELECT 1 FROM users WHERE id=$1 AND authority='USER' AND open_id<>'')`
 		ownerArgs := []any{*ownerID}
 		if scopedTenant, scoped := domain.TenantID(ctx); scoped {
-			ownerQ = `SELECT EXISTS(SELECT 1 FROM users u JOIN tenant_memberships tm ON tm.user_id=u.id WHERE u.id=$1 AND u.authority IN ('USER','ADMIN') AND u.open_id<>'' AND tm.tenant_id=$2 AND tm.active AND (tm.expires_at IS NULL OR tm.expires_at>now()))`
+			ownerQ = `SELECT EXISTS(SELECT 1 FROM users u JOIN tenant_memberships tm ON tm.user_id=u.id WHERE u.id=$1 AND u.authority='USER' AND u.open_id<>'' AND tm.tenant_id=$2 AND tm.active AND (tm.expires_at IS NULL OR tm.expires_at>now()))`
 			ownerArgs = append(ownerArgs, scopedTenant)
 		}
 		if err := tx.QueryRow(ctx, ownerQ, ownerArgs...).Scan(&ok); err != nil {
@@ -927,7 +927,7 @@ func (s *Service) batchConfirm(ctx context.Context, ids []int64, actorID int64) 
 		countArgs = append(countArgs, tenantID)
 	}
 	if actorID > 0 {
-		countQ += ` AND EXISTS (SELECT 1 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.tenant_id=f.tenant_id AND tm.user_id=$3 AND tm.role=$4 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())) AND EXISTS (SELECT 1 FROM farm_memberships fm WHERE fm.tenant_id=f.tenant_id AND fm.farm_id=f.id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
+		countQ += ` AND EXISTS (SELECT 1 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.tenant_id=f.tenant_id AND tm.user_id=$3 AND tm.role=$4 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())) AND EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.tenant_id=f.tenant_id AND fm.farm_id=f.id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
 		countArgs = append(countArgs, actorID, domain.TenantRole(ctx))
 	}
 	rows, err := tx.Query(ctx, countQ+` ORDER BY a.id FOR UPDATE OF a`, countArgs...)
@@ -960,7 +960,7 @@ func (s *Service) batchConfirm(ctx context.Context, ids []int64, actorID int64) 
 		updateArgs = append(updateArgs, tenantID)
 	}
 	if actorID > 0 {
-		updateQ += ` AND EXISTS (SELECT 1 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.tenant_id=f.tenant_id AND tm.user_id=$3 AND tm.role=$4 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())) AND EXISTS (SELECT 1 FROM farm_memberships fm WHERE fm.tenant_id=f.tenant_id AND fm.farm_id=f.id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
+		updateQ += ` AND EXISTS (SELECT 1 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.tenant_id=f.tenant_id AND tm.user_id=$3 AND tm.role=$4 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())) AND EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.tenant_id=f.tenant_id AND fm.farm_id=f.id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
 		updateArgs = append(updateArgs, actorID, domain.TenantRole(ctx))
 	}
 	ct, err := tx.Exec(ctx, updateQ, updateArgs...)

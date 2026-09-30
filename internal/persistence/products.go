@@ -38,7 +38,7 @@ func (s *ProductStore) DeviceAssignment(ctx context.Context, tenantID int64, dev
 	args := []any{deviceNo, tenantID}
 	role := domain.TenantRole(ctx)
 	if actorID, ok := domain.TenantUserID(ctx); ok && role != "owner" && role != "admin" {
-		q += ` AND EXISTS (SELECT 1 FROM farm_memberships fm WHERE fm.farm_id=f.id AND fm.tenant_id=f.tenant_id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
+		q += ` AND EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.tenant_id=f.tenant_id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
 		args = append(args, actorID)
 	}
 	err := s.pool.QueryRow(ctx, q, args...).

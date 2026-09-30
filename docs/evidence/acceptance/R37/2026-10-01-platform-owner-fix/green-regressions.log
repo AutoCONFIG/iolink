@@ -1,0 +1,40 @@
+-test.shuffle 1790787437802046806
+=== RUN   TestM6bLegacyPlatformOwnerBusinessBoundary
+    platform_owner_test.go:57: POST /admin/v1/login status=200 expected=200
+    platform_owner_test.go:58: GET /admin/v1/farms status=403 expected=403
+    platform_owner_test.go:66: migration platform memberships=0 reconciliation=1 legacy farm/owner preserved=1
+    platform_owner_test.go:67: POST /admin/v1/login status=200 expected=200
+    platform_owner_test.go:69: GET /admin/v1/farms status=200 expected=200
+    platform_owner_test.go:91: POST /admin/v1/login status=200 expected=200
+    platform_owner_test.go:92: GET /admin/v1/farms status=200 expected=200
+    platform_owner_test.go:99: GET /admin/v1/farms status=401 expected=401
+    platform_owner_test.go:100: POST /admin/v1/login status=200 expected=200
+    platform_owner_test.go:101: GET /admin/v1/farms status=403 expected=403
+    platform_owner_test.go:105: POST /admin/v1/login status=200 expected=200
+    platform_owner_test.go:109: GET /admin/v1/farms status=401 expected=401
+--- PASS: TestM6bLegacyPlatformOwnerBusinessBoundary (1.37s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	2.433s
+-test.shuffle 1790787438001093435
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner
+    platform_membership_test.go:76: ADMIN stored role=owner old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/admin
+    platform_membership_test.go:76: ADMIN stored role=admin old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/member
+    platform_membership_test.go:76: ADMIN stored role=member old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/viewer
+    platform_membership_test.go:76: ADMIN stored role=viewer old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_false
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_true
+--- PASS: TestM6bStoredPlatformMembershipFailsClosed (1.18s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner (0.18s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/admin (0.16s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/member (0.15s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/viewer (0.15s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_false (0.00s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_true (0.00s)
+=== RUN   TestM6bEnsurePlatformUserDoesNotCreateOrdinaryMembership
+--- PASS: TestM6bEnsurePlatformUserDoesNotCreateOrdinaryMembership (0.34s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	2.590s

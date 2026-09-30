@@ -1,0 +1,51 @@
+-test.shuffle 1790787067630573616
+=== RUN   TestM6bLegacyPlatformOwnerBusinessBoundary
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/tenants         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listTenants-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/tenants/:id/status --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setTenantStatus-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/tenants/:id/members --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listTenantMembers-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/tenants/:id/members/:user_id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setTenantMember-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/users           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listUsers-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id/owner --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setFarmOwner-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/farms/:id/members --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarmMembers-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id/members/:user_id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setFarmMember-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/devices/:device_no/pond --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).moveDevice-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/products        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listProducts-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createProduct-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/products/:product_id/models --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listProductModels-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products/:product_id/models --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createProductModel-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products/:product_id/models/:version/publish --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).publishProductModel-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices/:device_no/product --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDeviceProduct-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/devices/:device_no/product --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).assignDeviceProduct-fm (4 handlers)
+    platform_owner_test.go:57: POST /admin/v1/login status=200 expected=200
+    platform_owner_test.go:58: GET /admin/v1/farms status=200 expected=403
+    platform_owner_test.go:58: GET /admin/v1/farms status=200 want=403
+--- FAIL: TestM6bLegacyPlatformOwnerBusinessBoundary (0.74s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/migrate	0.810s
+FAIL

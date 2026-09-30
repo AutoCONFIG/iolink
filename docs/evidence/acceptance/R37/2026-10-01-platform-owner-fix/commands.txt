@@ -1,0 +1,6 @@
+Environment: Go 1.26.8; dedicated PostgreSQL/Timescale test DSN postgres://***@127.0.0.1:55439/iolink?sslmode=disable; GIN_MODE=release; base 7770856.
+Red: IOLINK_TEST_PG_DSN=*** go test -race -shuffle=on -count=1 -v ./internal/migrate -run TestM6bLegacyPlatformOwnerBusinessBoundary (fails: GET /admin/v1/farms status=200 want=403)
+Red: IOLINK_TEST_PG_DSN=*** go test -race -shuffle=on -count=1 -v ./internal/core -run 'TestM6bStoredPlatformMembershipFailsClosed|TestM6bEnsurePlatformUserDoesNotCreateOrdinaryMembership' (fails on ordinary ADMIN membership, owner assignment, EnsureUser)
+Green: IOLINK_TEST_PG_DSN=*** GIN_MODE=release go test -race -shuffle=on -count=1 -v ./internal/migrate ./internal/core -run 'TestM6bLegacyPlatformOwnerBusinessBoundary|TestM6bStoredPlatformMembershipFailsClosed|TestM6bEnsurePlatformUserDoesNotCreateOrdinaryMembership'
+Full relevant: IOLINK_TEST_PG_DSN=*** GIN_MODE=release go test -race -shuffle=on -count=1 ./internal/core ./internal/migrate ./internal/persistence
+Contract: make docs-tools; make verify-contracts
