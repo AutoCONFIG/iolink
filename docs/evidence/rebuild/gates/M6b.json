@@ -1,11 +1,18 @@
 {
   "gate": "M6b",
-  "requirements": [
-    "R36",
-    "R37"
-  ],
+  "status": "pending",
+  "blocked_by": ["D13", "fresh QA", "two independent reviews on the exact post-fix snapshot"],
+  "requirements": ["R36", "R37"],
   "evidence": {
     "R36": "docs/evidence/acceptance/R36/",
-    "R37": "docs/evidence/acceptance/R37/"
-  }
+    "R37": "docs/evidence/acceptance/R37/",
+    "D13_reproduction": ".omo/evidence/m6b-review-764-retry1-viewer-repro.log"
+  },
+  "historical_snapshot": "764c5eb01dcbee0d015bf7153ded74f3881ba07f",
+  "historical_review": {
+    "m6b_review_764_retry1": "REQUEST_CHANGES",
+    "m6b_review_764_a": "inconclusive: API429",
+    "m6b_review_764_b": "inconclusive: API429"
+  },
+  "note": "R36/R37 software_status is pending (not_run) until D13 is fixed, fresh relevant verification completes, and two independent reviewers approve the same exact snapshot. Earlier approvals and passing test outputs remain historical only."
 }

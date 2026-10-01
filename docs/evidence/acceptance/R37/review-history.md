@@ -37,3 +37,10 @@ These two approvals referred to the pre-fix final worktree. They are stale/rejec
 - Fix commit: `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule: `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`.
 - The previous approvals are stale/rejected due to the platform-admin legacy-owner bug. Raw red/green regression commands and outputs are recorded in [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/).
 - Status: fixed, pending fresh independent double review on this exact snapshot; no R36/R37 final software gate pass is claimed.
+
+## 2026-10-01 re-review of snapshot 764c5eb
+
+- Snapshot reviewed: `764c5eb01dcbee0d015bf7153ded74f3881ba07f`.
+- `/root/m6b_review_764_retry1`: REQUEST_CHANGES. Evidence in `.omo/evidence/m6b-review-764-retry1-viewer-repro.log` shows owner and viewer `POST /api/v2/devices/review-device/telemetry` both returned HTTP 202; viewer increased telemetry rows from 1 to 2 and changed shadow temperature from the owner control value 20 to 25.
+- `/root/m6b_review_764_a` and `/root/m6b_review_764_b`: inconclusive because API returned 429; neither is an approval.
+- Current state: D13 is open. R36/R37 software status is pending (`not_run` in the requirement manifest); previous approvals and prior passing checks remain historical evidence for their own source snapshots only. M6b gate is pending until D13 is fixed, fresh relevant verification completes, and two independent reviewers approve the same exact post-fix snapshot.

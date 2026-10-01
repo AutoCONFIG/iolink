@@ -8,10 +8,10 @@ Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale 
 
 Raw command transcript: [`commands.txt`](commands.txt).
 Latest raw outputs: [full Go verification](2026-10-01-go.txt), [real HTTP and database role scenarios](2026-10-01-http.txt), and [contract checks](2026-10-01-contracts.txt).
-Review corrections and expired verdicts are recorded in [the review history](review-history.md). The platform-admin owner fix regression evidence is captured under [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/).
+Review corrections and expired verdicts are recorded in [the review history](review-history.md). The platform-admin owner fix regression evidence is captured under [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/). Later re-review of snapshot `764c5eb01dcbee0d015bf7153ded74f3881ba07f` reproduced an unauthorized viewer telemetry mutation; see `.omo/evidence/m6b-review-764-retry1-viewer-repro.log`.
 
 ```text
-$ IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1
+$ IOLINK_TEST_PG_DSN="$IOLINK_TEST_PG_DSN" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1
 PASS (owner/admin/member/viewer/support expiry, transaction audit, cross-tenant alarm and revocation assertions)
 
 $ make verify-contracts
@@ -48,8 +48,8 @@ Future Key, video, command, job and report role checks remain assigned to their 
 
 ## Run metadata
 
-- Requirement/version: R37.a, M6b RBAC and revocation, exact release source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`.
+- Requirement/version: R37.a, M6b RBAC and revocation, historical regression verification was run on source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`. Later review found D13 on snapshot `764c5eb01dcbee0d015bf7153ded74f3881ba07f`; the earlier outputs remain historical evidence only.
 - Dependencies: Go 1.26.8; PostgreSQL/Timescale image `timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76`; Node v24.21.0; npm 11.19.0; Playwright 1.63.0.
 - Test data: owner/admin/member/viewer/support roles, future and missing support expiry, inactive tenant/membership, cross-tenant alarm, farm reassignment, and failed authorization paths.
 - Browser artifacts: tenant organization/member page screenshots emitted under `.omo/evidence/` by `web/e2e/admin-pages.spec.ts`; build and seven Playwright scenarios passed.
-- Review state: fixed on source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12` after the platform-admin legacy-owner bug; raw regression evidence is in `2026-10-01-platform-owner-fix/`. Earlier approvals are stale/rejected for this exact snapshot, and fresh independent double review is pending. Do not mark the R37 software gate passed yet. Future R37.b resources and external inputs remain deferred by the acceptance matrix.
+- Review state: platform-admin legacy-owner fix was historically verified, with raw regression evidence in `2026-10-01-platform-owner-fix/`, but D13 was later found on snapshot `764c5eb01dcbee0d015bf7153ded74f3881ba07f`. Reviewer `/root/m6b_review_764_retry1` returned REQUEST_CHANGES; a/b API429 review attempts were inconclusive. R37 status is pending; earlier approvals are stale and do not satisfy the current gate. Future R37.b resources and external inputs remain deferred by the acceptance matrix.
