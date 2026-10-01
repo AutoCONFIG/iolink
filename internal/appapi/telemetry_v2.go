@@ -50,6 +50,8 @@ func (s *Server) submitTelemetryV2(c *gin.Context) {
 	result, err := repo.SubmitTelemetry(c.Request.Context(), c.Param("device_no"), uid(c), req.Timestamp, req.Properties)
 	if err != nil {
 		switch {
+		case errors.Is(err, domain.ErrForbidden):
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		case errors.Is(err, domain.ErrNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 		case errors.Is(err, domain.ErrInvalidProductModel):

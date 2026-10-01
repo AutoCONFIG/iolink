@@ -1,0 +1,79 @@
+package core_test
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"log/slog"
+	"net/http"
+	"net/http/httptest"
+	"os/exec"
+	"strconv"
+	"strings"
+	"testing"
+	"time"
+
+	"git.hyhy.fun/rsplab/iolink/internal/appapi"
+)
+
+func TestManualAppTelemetryCurl(t *testing.T) {
+	for _, role := range []string{"owner", "admin", "viewer", "member", "support"} {
+		t.Run(role, func(t *testing.T) {
+			f := newTelemetryPermissionFixture(t)
+			f.role(t, role, true)
+			old := appapi.WechatExchanger
+			appapi.WechatExchanger = func(string) (string, error) { return "v2-actor", nil }
+			defer func() { appapi.WechatExchanger = old }()
+			server := httptest.NewServer(appapi.New(appapi.Config{SecretKey: strings.Repeat("m", 32), JWT: time.Hour}, appapi.Deps{Users: f.svc, Telemetry: f.svc.Telemetry()}, slog.New(slog.NewTextHandler(io.Discard, nil))).Routes())
+			defer server.Close()
+			request := func(path, token, body string) (int, string) {
+				args := []string{"--silent", "--show-error", "--max-time", "10", "--request", http.MethodPost, "--header", "Content-Type: application/json", "--data", body, "--write-out", "\n%{http_code}", server.URL + path}
+				if token != "" {
+					args = append(args, "--header", "Authorization: Bearer "+token)
+				}
+				raw, err := exec.Command("curl", args...).CombinedOutput()
+				if err != nil {
+					t.Fatal(err)
+				}
+				split := strings.LastIndexByte(string(raw), '\n')
+				if split < 0 {
+					t.Fatal("curl returned no status")
+				}
+				status, err := strconv.Atoi(string(raw[split+1:]))
+				if err != nil {
+					t.Fatal(err)
+				}
+				return status, string(raw[:split])
+			}
+			status, body := request("/api/v1/auth/login", "", `{"code":"fixture"}`)
+			if status != 200 {
+				t.Fatalf("login=%d", status)
+			}
+			var login struct{ Token string }
+			if err := json.Unmarshal([]byte(body), &login); err != nil {
+				t.Fatal(err)
+			}
+			status, body = request("/api/v1/auth/tenant", login.Token, `{"tenant_id":9401}`)
+			if status != 200 {
+				t.Fatalf("switch=%d", status)
+			}
+			if err := json.Unmarshal([]byte(body), &login); err != nil {
+				t.Fatal(err)
+			}
+			before := f.snapshot(t)
+			status, body = request("/api/v2/devices/v2-permission/telemetry", login.Token, fmt.Sprintf(`{"ts":%q,"properties":{"temperature":25}}`, telemetryTimestamp().Format(time.RFC3339)))
+			after := f.snapshot(t)
+			t.Logf("curl role=%s login=200 switch=200 telemetry_status=%d response=%s before=%s after=%s", role, status, body, before, after)
+			want := 403
+			if role == "owner" || role == "admin" {
+				want = 202
+			}
+			if status != want {
+				t.Errorf("status=%d want=%d", status, want)
+			}
+			if want == 403 && before != after {
+				t.Error("forbidden request changed business rows")
+			}
+		})
+	}
+}

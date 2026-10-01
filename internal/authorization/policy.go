@@ -31,7 +31,7 @@ func New() (*Policy, error) {
 		return nil, err
 	}
 	for _, role := range []string{"owner", "admin"} {
-		for _, resource := range []string{"farms", "farm_members", "users", "ponds", "devices", "alarm_rules", "alarms", "stats", "products", "tenant_members"} {
+		for _, resource := range []string{"farms", "farm_members", "users", "ponds", "devices", "alarm_rules", "alarms", "stats", "products", "tenant_members", "telemetry"} {
 			if _, err := e.AddPolicy(role, resource, "*"); err != nil {
 				return nil, err
 			}

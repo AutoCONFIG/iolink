@@ -121,6 +121,7 @@ func (r *deviceRepo) UpdateStatus(ctx context.Context, no string, s domain.Devic
 type telemetryRepo struct {
 	pool            *pgxpool.Pool
 	defaultInterval time.Duration
+	policy          domain.PermissionPolicy
 }
 
 var telemetryMetricRE = regexp.MustCompile(`^[a-z][a-z0-9_]{0,63}$`)
@@ -206,6 +207,9 @@ func (r *telemetryRepo) SubmitTelemetry(ctx context.Context, deviceNo string, us
 		return result, domain.ErrNotFound
 	}
 	if err != nil {
+		return result, err
+	}
+	if err := r.authorizeTelemetryWrite(ctx, tx, tenantID, userID); err != nil {
 		return result, err
 	}
 	var decoded struct {

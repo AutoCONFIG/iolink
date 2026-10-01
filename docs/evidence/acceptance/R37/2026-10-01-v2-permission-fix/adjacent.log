@@ -1,0 +1,24 @@
+-test.shuffle 1790821330177468589
+=== RUN   TestRealMQTTSecondProductPreservesNumericAndEnumFields
+--- PASS: TestRealMQTTSecondProductPreservesNumericAndEnumFields (0.39s)
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence/will-v4
+=== RUN   TestRealMQTTAuthenticationACLAndPersistence/will-v5
+--- PASS: TestRealMQTTAuthenticationACLAndPersistence (0.98s)
+    --- PASS: TestRealMQTTAuthenticationACLAndPersistence/will-v4 (0.00s)
+    --- PASS: TestRealMQTTAuthenticationACLAndPersistence/will-v5 (0.00s)
+=== RUN   TestGenericTelemetryV2PersistsValidatedPropertiesAndScopedHistory
+--- PASS: TestGenericTelemetryV2PersistsValidatedPropertiesAndScopedHistory (0.45s)
+=== RUN   TestWaterBackfillReconcilesEveryFixtureDevice
+--- PASS: TestWaterBackfillReconcilesEveryFixtureDevice (0.41s)
+=== RUN   TestWaterBackfillInterruptionRollsBackAndResumes
+--- PASS: TestWaterBackfillInterruptionRollsBackAndResumes (0.40s)
+=== RUN   TestGenericTelemetryBackfillResumesFromCheckpoint
+--- PASS: TestGenericTelemetryBackfillResumesFromCheckpoint (0.41s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	4.079s
+-test.shuffle 1790821330162720105
+=== RUN   TestHandleGenericReportPreservesEnumAndNumberProperties
+--- PASS: TestHandleGenericReportPreservesEnumAndNumberProperties (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.016s

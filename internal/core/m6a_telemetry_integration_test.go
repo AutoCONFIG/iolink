@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"git.hyhy.fun/rsplab/iolink/internal/authorization"
 	corepkg "git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/event"
@@ -41,10 +42,15 @@ func TestGenericTelemetryV2PersistsValidatedPropertiesAndScopedHistory(t *testin
 	if _, err := p.Exec(ctx, `INSERT INTO alarm_rules(pond_id,metric,max_value,level,enabled) VALUES(21,'temperature',20,'warning',true)`); err != nil {
 		t.Fatal(err)
 	}
-	s, err := corepkg.New(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	policy, err := authorization.New()
 	if err != nil {
 		t.Fatal(err)
 	}
+	s, err := corepkg.NewWithPolicy(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)), policy)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx = domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(ctx, tenantID), "owner"), 21)
 	repo := s.Telemetry().(domain.GenericTelemetryRepo)
 	ts := time.Now().UTC().Truncate(time.Microsecond)
 	if err := s.HandleEvent(event.Event{Kind: event.KindProperties, DeviceNo: "m6a-device", MessageID: "generic-1", Ts: ts.Add(-time.Second), GenericProperties: map[string]json.RawMessage{"temperature": json.RawMessage(`25`), "mode": json.RawMessage(`"auto"`)}}); err != nil {

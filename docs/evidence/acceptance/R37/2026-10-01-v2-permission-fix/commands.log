@@ -1,0 +1,26 @@
+Working directory: /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink-wt/m6b-telemetry-permission-fix
+Environment for RED/GREEN/CURL_RED/CURL_GREEN/ADJACENT/VERIFY:
+IOLINK_TEST_PG_DSN points to dedicated iolink-todo9-pg, 127.0.0.1:55439, iolink role/seed DB, sslmode=disable. Password is the explicit test-only fixture value provided by caller; excluded from committed logs.
+RED: go test -overlay=.omo/evidence/m6b-v2-permission-fix/red-overlay.json ./internal/core -run 'Test(AppTelemetryWrite|TelemetryWrite)' -count=1 -v
+exit=1 (expected); stdout+stderr=red.log
+GREEN: go test -race -shuffle=on ./internal/core ./internal/appapi ./internal/authorization -run 'Test(AppTelemetryWrite|TelemetryWrite|GenericTelemetryV2|TenantRoleResourceActionPolicy|SubmitTelemetryV2)' -count=1 -v
+exit=0; stdout+stderr=green.log
+CURL_RED: go test -overlay=.omo/evidence/m6b-v2-permission-fix/manual-red-overlay.json ./internal/core -run TestManualAppTelemetryCurl -count=1 -v
+exit=1 (expected); stdout+stderr=manual-red.log
+CURL_GREEN: go test -overlay=.omo/evidence/m6b-v2-permission-fix/manual-overlay.json ./internal/core -run TestManualAppTelemetryCurl -count=1 -v
+exit=0; stdout+stderr=manual-green.log
+ADJACENT: go test -race -shuffle=on ./internal/core ./internal/access -run 'Test(RealMQTT|GenericTelemetry|WaterBackfill|HandleGenericReport)' -count=1 -v
+exit=0; stdout+stderr=adjacent.log
+VERIFY: make verify
+exit=0; stdout+stderr=verify.log (actual go build, go vet, race/shuffle commands included)
+DOCS_TOOLS: make docs-tools
+exit=0; stdout+stderr=docs-tools.log
+CONTRACTS: make verify-contracts
+exit=0; stdout+stderr=contracts.log
+ARCHITECTURE: .venv/contracts/bin/python scripts/check_architecture_manifests.py --all
+exit=0; stdout+stderr=architecture.log
+
+VERIFY_FAILED: make verify
+exit=2; stdout+stderr=verify-harness-failure.log (evidence harness extension discovered as a package; renamed replay text)
+VERIFY_FINAL: make verify
+exit=0; stdout+stderr=verify.log (full relevant scenario rerun after harness correction)

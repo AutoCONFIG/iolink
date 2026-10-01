@@ -400,7 +400,7 @@ paths:
       tags:
       - devices
       summary: 按设备物模型上报通用遥测
-      description: M6a v2 增量契约。服务端按设备固定 product_id/model_version 校验字段；未知字段或非法值返回 400，整批无有效字段不写入。通用 telemetry、影子和报警意图必须同一事务，历史记录携带 model_version。
+      description: M6a v2 增量契约；M6b 仅有效 owner/admin 成员可在授权农场上报，其他已认证可见资源的角色返回 403。服务端按设备固定 product_id/model_version 校验字段；未知字段或非法值返回 400，整批无有效字段不写入。通用 telemetry、影子和报警意图必须同一事务，历史记录携带 model_version。
       operationId: submitDeviceTelemetryV2
       parameters:
       - name: device_no
@@ -426,6 +426,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
@@ -526,6 +528,12 @@ components:
             $ref: '#/components/schemas/Error'
     Unauthorized:
       description: 凭据缺失/过期/错误、错误 token 类型或权限主体失效；error=unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: 已认证主体无此动作权限；error=forbidden
       content:
         application/json:
           schema:
