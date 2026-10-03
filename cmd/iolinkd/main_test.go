@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -10,6 +12,25 @@ import (
 
 	"git.hyhy.fun/rsplab/iolink/internal/appapi"
 )
+
+func TestFailureOutputHidesUntrustedErrors(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		err  error
+		want string
+	}{
+		{"configuration", &startupError{errors.New("IOLINK_LOG_LEVEL must be debug, info, warn or error")}, "IOLINK_LOG_LEVEL must be debug, info, warn or error\n"},
+		{"runtime", errors.New("postgres://user:secret@host/database"), "iolinkd stopped; check configuration and diagnostics\n"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var output bytes.Buffer
+			printFailure(&output, tc.err)
+			if output.String() != tc.want {
+				t.Fatalf("unexpected failure output: %q", output.String())
+			}
+		})
+	}
+}
 
 func TestUnknownAPIDoesNotServeSPA(t *testing.T) {
 	h := spaHandler(fstest.MapFS{"index.html": {Data: []byte("app")}})
