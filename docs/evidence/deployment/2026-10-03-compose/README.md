@@ -28,7 +28,7 @@ Secrets generated in memory and redacted before preserving artifacts.
 | Repeat migration | exit0 |
 | make verify with real isolated DSN | build/vet/all race/shuffle tests exit0, no DB skips |
 | make docs-tools && make verify-contracts | 53 operations/244 fixtures pass |
-| git diff --check | exit0 |
+| git diff --check on the implementation tree before raw Docker capture | exit0; captured Docker CLI lines retain terminal padding in archived logs |
 
 Exact Docker commands/output and metadata are in `logs/verification.json`;
 `verify.mjs` preserves the executable orchestrator. Initial verification used
