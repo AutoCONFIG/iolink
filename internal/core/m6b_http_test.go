@@ -151,6 +151,28 @@ func TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation(t *testing.T) {
 			}
 		})
 	}
+	for _, role := range []string{"owner", "admin"} {
+		t.Run("tenant_manager_without_farm_assignment_"+role, func(t *testing.T) {
+			if _, err := p.Exec(ctx, `UPDATE tenant_memberships SET role=$1,permission_version=permission_version+1 WHERE user_id=802`, role); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := p.Exec(ctx, `DELETE FROM farm_memberships WHERE user_id=802; UPDATE alarms SET confirmed_at=NULL`); err != nil {
+				t.Fatal(err)
+			}
+			var login struct{ Token string }
+			m6bHTTPRequest(t, server.URL, "", http.MethodPost, "/admin/v1/login", `{"username":"scoped-user","password":"M6b-http-password!"}`, http.StatusOK, &login)
+			batch := fmt.Sprintf(`{"ids":[%d,%d]}`, visibleID, hiddenID)
+			var result struct{ Confirmed int64 }
+			m6bHTTPRequest(t, server.URL, login.Token, http.MethodPost, "/admin/v1/alarms/batch-confirm", batch, http.StatusOK, &result)
+			if result.Confirmed != 2 {
+				t.Fatalf("tenant manager role=%s confirmed=%d, want 2", role, result.Confirmed)
+			}
+			var confirmed int
+			if err := p.QueryRow(ctx, `SELECT count(*) FROM alarms WHERE id IN ($1,$2) AND confirmed_at IS NOT NULL`, visibleID, hiddenID).Scan(&confirmed); err != nil || confirmed != 2 {
+				t.Fatalf("tenant manager role=%s confirmed rows=%d err=%v", role, confirmed, err)
+			}
+		})
+	}
 }
 
 func m6bHTTPRequest(t *testing.T, baseURL, token, method, path, body string, want int, output any) {

@@ -27,7 +27,8 @@ The browser suite covers Asia/Shanghai, UTC and America/New_York displays,
 unchanged saves with whole and fractional seconds, edited UTC conversion and
 reload. The focused Go suite covers owner/admin tenant-wide scope, assigned
 lower-role scope, platform-admin exclusion, stale-token rejection, cross-tenant
-404s, live role checks and atomic no-partial-write behavior.
+404s, live role checks, singular and batch alarm confirmation, and atomic
+no-partial-write behavior.
 
 The M6b gate remains `pending` until two independent reviewers explicitly
 approve this exact source snapshot.

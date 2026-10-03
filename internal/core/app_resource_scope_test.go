@@ -138,3 +138,43 @@ func TestAppAlarmConfirmDeniedWhenLiveRoleCannotConfirm(t *testing.T) {
 		})
 	}
 }
+
+func TestAppAlarmBatchConfirmAllowsTenantManagerWithoutFarmAssignment(t *testing.T) {
+	for _, role := range []string{"owner", "admin"} {
+		t.Run(role, func(t *testing.T) {
+			// Given: a tenant manager with no farm assignment and alarms on two same-tenant farms.
+			f := newTelemetryPermissionFixture(t)
+			seedAppScopeReadings(t, f)
+			f.role(t, role, true)
+			if _, err := f.pool.Exec(context.Background(), `DELETE FROM farm_memberships WHERE user_id=9402`); err != nil {
+				t.Fatal(err)
+			}
+			var ids []int64
+			rows, err := f.pool.Query(context.Background(), `SELECT id FROM alarms WHERE device_no IN ('v2-permission','v2-hidden') ORDER BY id`)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for rows.Next() {
+				var id int64
+				if err := rows.Scan(&id); err != nil {
+					rows.Close()
+					t.Fatal(err)
+				}
+				ids = append(ids, id)
+			}
+			rows.Close()
+			if len(ids) != 2 {
+				t.Fatalf("alarm ids=%v, want two", ids)
+			}
+			before := f.snapshot(t)
+			// When: the core actor-scoped batch operation confirms both alarms.
+			confirmed, err := f.svc.BatchConfirmByActor(telemetryActor(role, 9402), ids, 9402)
+			// Then: tenant-wide manager scope applies atomically to both same-tenant alarms.
+			after := f.snapshot(t)
+			t.Logf("scenario=batch_confirm_manager_%s confirmed=%d error=%v before=%s after=%s", role, confirmed, err, before, after)
+			if err != nil || confirmed != 2 || before == after {
+				t.Fatalf("confirmed=%d error=%v state_changed=%t", confirmed, err, before != after)
+			}
+		})
+	}
+}

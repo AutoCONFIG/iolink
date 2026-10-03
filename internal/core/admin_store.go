@@ -927,8 +927,8 @@ func (s *Service) batchConfirm(ctx context.Context, ids []int64, actorID int64) 
 		countArgs = append(countArgs, tenantID)
 	}
 	if actorID > 0 {
-		countQ += ` AND EXISTS (SELECT 1 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.tenant_id=f.tenant_id AND tm.user_id=$3 AND tm.role=$4 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())) AND EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.tenant_id=f.tenant_id AND fm.farm_id=f.id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
-		countArgs = append(countArgs, actorID, domain.TenantRole(ctx))
+		countQ += ` AND ` + appFarmConfirmScope(ctx, "f", 3)
+		countArgs = append(countArgs, actorID)
 	}
 	rows, err := tx.Query(ctx, countQ+` ORDER BY a.id FOR UPDATE OF a`, countArgs...)
 	if err != nil {
@@ -960,8 +960,8 @@ func (s *Service) batchConfirm(ctx context.Context, ids []int64, actorID int64) 
 		updateArgs = append(updateArgs, tenantID)
 	}
 	if actorID > 0 {
-		updateQ += ` AND EXISTS (SELECT 1 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.tenant_id=f.tenant_id AND tm.user_id=$3 AND tm.role=$4 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())) AND EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.tenant_id=f.tenant_id AND fm.farm_id=f.id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
-		updateArgs = append(updateArgs, actorID, domain.TenantRole(ctx))
+		updateQ += ` AND ` + appFarmConfirmScope(ctx, "f", 3)
+		updateArgs = append(updateArgs, actorID)
 	}
 	ct, err := tx.Exec(ctx, updateQ, updateArgs...)
 	if err != nil {

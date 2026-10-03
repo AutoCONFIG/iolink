@@ -59,6 +59,6 @@ M0完整命令、版本、日志及双审结论见 [M0证据](evidence/2026-09-1
 | D13 | R36/R37 | 已修复：viewer/member/support 遥测写入返回 403，owner/admin 保持授权写入；拒绝请求无部分状态。原始复现与修复证据见 [D13](evidence/acceptance/R37/2026-10-01-v2-permission-fix/)；阶段门待最终快照双审 |
 | D15 | R37 | 支持到期时间在 Asia/Shanghai、UTC、America/New_York 环境下显示、编辑、保存和重载保持同一瞬间；已由 web `483cb2cecc4a368fdf6fc3406fa682207b514aea` 修复并有三场景 Playwright 证据，R36/R37 阶段门仍待新快照双审 |
 | D16 | R37 | 已修复：未编辑授权保存保留原始秒与小数秒；web `e84092326d9979e066c611e2be8eb6b9736e09f3`；证据见 [D16](evidence/rebuild/M6b-D16/)；阶段门待最终快照双审 |
-| D17 | R36/R37 | 已修复：本租户 owner/admin 无农场分配仍可访问全部业务资源，其他角色保持农场范围；实时授权和跨租户拒绝无部分写入；源提交 `62acecee62160d48efcd48f0e161a927ad583ef6`；证据见 [D17](evidence/acceptance/R37/2026-10-03-d17-app-scope/)；阶段门待最终快照双审 |
+| D17 | R36/R37 | 已修复：本租户 owner/admin 无农场分配仍可访问全部业务资源和批量确认报警，其他角色保持农场范围；实时授权和跨租户拒绝无部分写入；批量确认路径补丁与回归测试随最终候选提交；证据见 [D17](evidence/acceptance/R37/2026-10-03-d17-app-scope/)；阶段门待最终快照双审 |
 
 此表是审查已发现问题的起点，不声称已完成逐行代码审计；实施时新的问题继续编号，不用更改需求来掩盖缺陷。
