@@ -4,7 +4,7 @@
 
 ## 配套服务与版本
 
-核心iolinkd（含构建后的管理前端）、PG16+TimescaleDB、TLS反代；M7另有流媒体。发布包固定镜像版本和digest，Go/Node/前端依赖锁文件及扩展版本写manifest；不能用latest作为可复现证据。起始验收机4vCPU/8GiB/SSD、Linux x86_64、Docker Engine+Compose v2，记录精确版本；ARM64另验。
+核心iolinkd（含构建后的管理前端）、PG16+TimescaleDB、TLS反代；M7另有流媒体。应用镜像按发布标签或 `latest` 拉取，数据库镜像固定为当前 `latest-pg16` 多架构 digest，持续跟踪 PG16 最新版本并避免跨到 PG17；每次 digest 更新仍需执行迁移和恢复验证。Go/Node/前端依赖锁文件及扩展版本写manifest；不能用未锁定的数据库标签作为可复现证据。起始验收机4vCPU/8GiB/SSD、Linux x86_64、Docker Engine+Compose v2，记录精确版本；ARM64另验。
 
 配置包含HTTP/MQTT监听地址、PG_DSN、SECRET_KEY（至少32字节随机）、微信三项和模板字段映射、每设备上报周期/离线倍数、日志级别；生产缺关键配置拒绝启动。凭据用受限权限文件或secret注入，日志/备份清单脱敏。首次安装由本地CLI设置管理员，旧默认密码必须变更后才能开放业务入口。
 
