@@ -1,6 +1,7 @@
 services:
   db:
-    image: timescale/timescaledb@sha256:6f139d56042989bd35f50ba5986e492cd32e35cc6778c50be2659add298dc09f
+    image: timescale/timescaledb:latest-pg16
+    pull_policy: always
     restart: unless-stopped
     environment:
       POSTGRES_USER: iolink
