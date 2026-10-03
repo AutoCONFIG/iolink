@@ -3,7 +3,7 @@
 This receipt records the assembled M6b candidate before independent review. It is
 not a gate approval by itself.
 
-- Source candidate: `fd1f2ab7dd9852a158b26a280c49c6fc284f426b`
+- Source candidate: `336f184dc4a4dd68c4441440a1fd184571b80523`
 - Web submodule: `e84092326d9979e066c611e2be8eb6b9736e09f3`
 - Date: 2026-10-03 Asia/Shanghai
 - Database: dedicated Docker container `iolink-todo9-pg`, PostgreSQL 16.15,
@@ -31,4 +31,5 @@ lower-role scope, platform-admin exclusion, stale-token rejection, cross-tenant
 no-partial-write behavior.
 
 The M6b gate remains `pending` until two independent reviewers explicitly
-approve this exact source snapshot.
+approve this exact source snapshot. The batch confirmation regression was
+added after the first review and is covered by the focused Go run above.
