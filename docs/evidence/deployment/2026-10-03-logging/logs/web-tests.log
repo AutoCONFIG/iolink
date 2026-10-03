@@ -1,0 +1,12 @@
+
+> iolink-admin-ui@0.1.0 test
+> vitest run tests
+
+
+ RUN  v5.0.1 /tmp/iolink-logging-final/web
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  17:25:10
+   Duration  190ms (transform 87%, import 8%, tests 3%, worker 2%)
