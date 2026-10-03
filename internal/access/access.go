@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"log/slog"
 	"math"
 	"sync"
@@ -97,7 +98,7 @@ func New(cfg Config, handler event.Handler, auth Authenticator, log *slog.Logger
 	caps := mqtt.NewDefaultServerCapabilities()
 	// Bound allocations before decoding, allowing MQTT headers beyond 64KiB payload.
 	caps.MaximumPacketSize = 65536 + 1024
-	s.broker = mqtt.New(&mqtt.Options{InlineClient: true, Capabilities: caps, Logger: log})
+	s.broker = mqtt.New(&mqtt.Options{InlineClient: true, Capabilities: caps, Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
 	return s
 }
 

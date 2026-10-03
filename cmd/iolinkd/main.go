@@ -26,6 +26,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
 	"git.hyhy.fun/rsplab/iolink/internal/notifications"
+	"git.hyhy.fun/rsplab/iolink/internal/observability"
 	"git.hyhy.fun/rsplab/iolink/internal/operations"
 	"git.hyhy.fun/rsplab/iolink/internal/persistence"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
@@ -56,7 +57,20 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
-	log := slog.Default()
+	logConfig, err := observability.FromEnv(os.Getenv)
+	if err != nil {
+		return err
+	}
+	log, logSink, err := observability.New(logConfig, os.Stderr)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := logSink.Close(); err != nil {
+			fmt.Fprintln(os.Stderr, "diagnostic log close failed")
+		}
+	}()
+	slog.SetDefault(log)
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	pool, err := platform.DB(ctx, cfg)
@@ -183,6 +197,9 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 			return pool.Ping(pingCtx)
 		},
 		Ready: func(ctx context.Context) error {
+			if !logSink.Healthy() {
+				return errors.New("diagnostic log unavailable")
+			}
 			checkCtx, cancel := context.WithTimeout(ctx, cfg.QueryTimeout)
 			defer cancel()
 			if err := pool.Ping(checkCtx); err != nil {

@@ -6,6 +6,7 @@ package adminapi
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/operations"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 )
 
@@ -117,7 +119,7 @@ func New(cfg Config, deps Deps) *Server {
 // Routes builds the gin engine with all /admin/v1 routes.
 func (s *Server) Routes() http.Handler {
 	r := gin.New()
-	r.Use(gin.Recovery())
+	r.Use(operations.RequestLogging(slog.Default()))
 
 	v1 := r.Group("/admin/v1")
 	v1.POST("/login", s.login)

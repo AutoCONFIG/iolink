@@ -47,7 +47,15 @@ func NewWithPolicy(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger, po
 }
 
 // HandleEvent implements event.Handler: validate, persist, evaluate alarms.
-func (s *Service) HandleEvent(e event.Event) error {
+func (s *Service) HandleEvent(e event.Event) (err error) {
+	started := time.Now()
+	defer func() {
+		if err != nil {
+			s.log.Warn("device event rejected", "device", e.DeviceNo, "stage", "ingestion", "err", err, "duration_ms", time.Since(started).Milliseconds())
+		} else {
+			s.log.Debug("device event persisted", "device", e.DeviceNo, "kind", e.Kind, "fields", len(e.Properties)+len(e.GenericProperties), "duration_ms", time.Since(started).Milliseconds())
+		}
+	}()
 	if err := ingestion.Validate(e); err != nil {
 		return err
 	}
