@@ -1,12 +1,13 @@
 # R37 M6b RBAC and revocation evidence
 
-Date: 2026-10-01 (latest verification; earlier transcripts retained)
+Date: 2026-10-03 (latest verification; earlier transcripts retained)
 
 Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN used verbatim below.
 
 ## Executed checks and captured output
 
 Raw command transcript: [`commands.txt`](commands.txt).
+The D15 support-expiry timezone fix is covered by the targeted browser transcript in [`2026-10-03-v2-timezone/`](2026-10-03-v2-timezone/), run against source commit `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a` with web submodule `483cb2cecc4a368fdf6fc3406fa682207b514aea`.
 Latest raw outputs: [full Go verification](2026-10-01-go.txt), [real HTTP and database role scenarios](2026-10-01-http.txt), and [contract checks](2026-10-01-contracts.txt).
 Review corrections and expired verdicts are recorded in [the review history](review-history.md). The platform-admin owner fix regression evidence is captured under [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/). Later re-review of snapshot `764c5eb01dcbee0d015bf7153ded74f3881ba07f` reproduced an unauthorized viewer telemetry mutation; see `.omo/evidence/m6b-review-764-retry1-viewer-repro.log`.
 
@@ -52,4 +53,4 @@ Future Key, video, command, job and report role checks remain assigned to their 
 - Dependencies: Go 1.26.8; PostgreSQL/Timescale image `timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76`; Node v24.21.0; npm 11.19.0; Playwright 1.63.0.
 - Test data: owner/admin/member/viewer/support roles, future and missing support expiry, inactive tenant/membership, cross-tenant alarm, farm reassignment, and failed authorization paths.
 - Browser artifacts: tenant organization/member page screenshots emitted under `.omo/evidence/` by `web/e2e/admin-pages.spec.ts`; build and seven Playwright scenarios passed.
-- Review state: platform-admin legacy-owner fix was historically verified, with raw regression evidence in `2026-10-01-platform-owner-fix/`, but D13 was later found on snapshot `764c5eb01dcbee0d015bf7153ded74f3881ba07f`. D15 is fixed in source `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a` with web `483cb2cecc4a368fdf6fc3406fa682207b514aea`; targeted three-timezone evidence is under `2026-10-03-v2-timezone/`. Reviewer `/root/m6b_review_764_retry1` returned REQUEST_CHANGES; a/b API429 review attempts were inconclusive. R37 status is pending; earlier approvals are stale and do not satisfy the current gate. Future R37.b resources and external inputs remain deferred by the acceptance matrix.
+- Review state: pending final assembled-candidate verification and fresh independent double review. D13 telemetry authorization and D15/D16 support-expiry fixes are implemented; previous verdicts and command outputs remain historical evidence only. Future R37.b resources and external inputs remain deferred by the acceptance matrix.

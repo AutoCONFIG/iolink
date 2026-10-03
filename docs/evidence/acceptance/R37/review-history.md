@@ -48,4 +48,10 @@ These two approvals referred to the pre-fix final worktree. They are stale/rejec
 ## 2026-10-03 D15 support-expiry timezone fix
 
 - Source candidate commit: `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a`; web submodule candidate: `483cb2cecc4a368fdf6fc3406fa682207b514aea`.
-- D15 targeted Playwright evidence covers Asia/Shanghai, UTC, and America/New_York in `2026-10-03-v2-timezone/`. This fixes D15 only; D13 remains open and R36/R37/M6b remain pending.
+- D15 targeted Playwright evidence covers Asia/Shanghai, UTC, and America/New_York in `2026-10-03-v2-timezone/`. D13 was already fixed in `96de9abc5cafdb7bf574e431f21686ecb7ca625f`; stale earlier wording incorrectly called it open. R36/R37/M6b remained pending final assembled-snapshot review.
+
+## 2026-10-03 candidate ce23 review and corrections
+
+- Candidate `ce23acdeb9d450b48649f0279e1f6c3b02afc3f2` was rejected by two independent reviewers: unchanged support expiry lost seconds (D16), and a tenant administrator without farm membership could not access same-tenant app resources (D17). Neither earlier approval can be reused.
+- D16 fix: web `e84092326d9979e066c611e2be8eb6b9736e09f3`, assembled in parent `8197c590dfaa1eb1bdd3b7c7606f5b95c05896da`; evidence in [`../../rebuild/M6b-D16/`](../../rebuild/M6b-D16/).
+- D17 integration and fresh review of the combined candidate are pending. No current software-gate pass is claimed.

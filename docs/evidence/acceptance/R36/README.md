@@ -1,6 +1,6 @@
 # R36 M6b tenant isolation evidence
 
-Date: 2026-10-01 (latest verification; earlier transcripts retained)
+Date: 2026-10-03 (latest verification; earlier transcripts retained)
 
 Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN used verbatim below. No production data or external service credentials were used.
 
@@ -48,4 +48,4 @@ External hardware, public MQTT exposure and production migration are not claimed
 - Dependencies: Go 1.26.8; PostgreSQL/Timescale image `timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76`; Node v24.21.0; npm 11.19.0; Playwright 1.63.0.
 - Test data: isolated migrations create default tenant; M6b fixture uses tenants 601/602, users 601/603/604/605, farms 601/602, farm assignment 603→601, revoked user 605, and cross-tenant alarm/device rows.
 - Browser artifacts: `.omo/evidence/todo10-m6a-products-created.png`, `.omo/evidence/todo10-m6a-products-model-draft.png`, `.omo/evidence/todo10-m6a-products-published-assigned.png` and the tenant-page screenshots emitted by `web/e2e/admin-pages.spec.ts`.
-- Review state: platform-admin legacy-owner fix was historically verified, but D13 was later found on snapshot `764c5eb01dcbee0d015bf7153ded74f3881ba07f`; viewer mutation reproduction is recorded in `.omo/evidence/m6b-review-764-retry1-viewer-repro.log`. D15 support-expiry timezone fix is recorded in the shared R37 evidence (`62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a`, web `483cb2cecc4a368fdf6fc3406fa682207b514aea`). Reviewer `/root/m6b_review_764_retry1` returned REQUEST_CHANGES; a/b API429 review attempts were inconclusive. R36 status is pending; earlier approvals are stale and do not satisfy the current gate. Future R36.b resources and external inputs remain deferred by the acceptance matrix.
+- Review state: pending final assembled-candidate verification and fresh independent double review. D13 telemetry authorization and D15/D16 support-expiry fixes are recorded in shared R37 evidence. Earlier approvals are stale after source changes. Future R36.b resources and external inputs remain deferred by the acceptance matrix.
