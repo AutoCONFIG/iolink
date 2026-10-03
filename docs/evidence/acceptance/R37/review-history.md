@@ -37,3 +37,9 @@ These two approvals referred to the pre-fix final worktree. They are stale/rejec
 - Fix commit: `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule: `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`.
 - The previous approvals are stale/rejected due to the platform-admin legacy-owner bug. Raw red/green regression commands and outputs are recorded in [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/).
 - Status: fixed, pending fresh independent double review on this exact snapshot; no R36/R37 final software gate pass is claimed.
+
+## 2026-10-03 D15 support-expiry timezone fix
+
+- Source candidate commit: `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a`; web submodule candidate: `483cb2cecc4a368fdf6fc3406fa682207b514aea`.
+- D15 was fixed in the web support-expiry editor. The targeted Playwright command exercised Asia/Shanghai, UTC, and America/New_York and passed all three scenarios; raw output is in [`2026-10-03-v2-timezone/`](2026-10-03-v2-timezone/).
+- This evidence records the fix only. Earlier R36/R37 approvals remain stale after source changes; fresh independent double review of the exact final snapshot is still required. No R36/R37 or M6b gate pass is claimed.

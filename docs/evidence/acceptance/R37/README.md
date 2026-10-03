@@ -1,12 +1,13 @@
 # R37 M6b RBAC and revocation evidence
 
-Date: 2026-10-01 (latest verification; earlier transcripts retained)
+Date: 2026-10-03 (latest verification; earlier transcripts retained)
 
 Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN used verbatim below.
 
 ## Executed checks and captured output
 
 Raw command transcript: [`commands.txt`](commands.txt).
+The D15 support-expiry timezone fix is covered by the targeted browser transcript in [`2026-10-03-v2-timezone/`](2026-10-03-v2-timezone/), run against source commit `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a` with web submodule `483cb2cecc4a368fdf6fc3406fa682207b514aea`.
 Latest raw outputs: [full Go verification](2026-10-01-go.txt), [real HTTP and database role scenarios](2026-10-01-http.txt), and [contract checks](2026-10-01-contracts.txt).
 Review corrections and expired verdicts are recorded in [the review history](review-history.md). The platform-admin owner fix regression evidence is captured under [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/).
 
@@ -52,4 +53,4 @@ Future Key, video, command, job and report role checks remain assigned to their 
 - Dependencies: Go 1.26.8; PostgreSQL/Timescale image `timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76`; Node v24.21.0; npm 11.19.0; Playwright 1.63.0.
 - Test data: owner/admin/member/viewer/support roles, future and missing support expiry, inactive tenant/membership, cross-tenant alarm, farm reassignment, and failed authorization paths.
 - Browser artifacts: tenant organization/member page screenshots emitted under `.omo/evidence/` by `web/e2e/admin-pages.spec.ts`; build and seven Playwright scenarios passed.
-- Review state: fixed on source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12` after the platform-admin legacy-owner bug; raw regression evidence is in `2026-10-01-platform-owner-fix/`. Earlier approvals are stale/rejected for this exact snapshot, and fresh independent double review is pending. Do not mark the R37 software gate passed yet. Future R37.b resources and external inputs remain deferred by the acceptance matrix.
+- Review state: D15 is fixed and has targeted three-timezone browser evidence, but the R37 software gate remains pending fresh independent double review on the final source snapshot. Earlier approvals are stale/rejected after the platform-admin owner fix and subsequent source changes. Do not mark the R37 software gate passed yet. Future R37.b resources and external inputs remain deferred by the acceptance matrix.

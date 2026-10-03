@@ -23,7 +23,7 @@
 | R28 | 软件通过，外部阻塞 | durable outbox/worker、WeChat HTTP adapter、重试/lease/归属重验及失败状态 | 真微信凭据、授权和设备回执缺失，外部实发为 `external_blocked` |
 | R29–R33 | 软件通过，适用外部阻塞 | health/readiness、metrics、10秒有界排空、固定监听/TLS反代模板、整库custom备份恢复、容量烟测与CI | 真实TLS主机、100GiB恢复、发布中断和24小时500设备/90天容量演练为 `external_blocked` |
 | R34–R35 | 软件验收通过 | M6a 产品模型、版本发布/分配、通用遥测、兼容投影、fixture 回填 | 外部不适用；证据见 docs/evidence/acceptance/R34/ 与 R35/ |
-| R36–R37 | 已修复，待新快照双审 | 租户上下文、成员/RBAC、Casbin角色-资源-动作策略、资源归属过滤、权限版本撤销、组织与成员后台页；真实TimescaleDB与HTTP角色矩阵及平台管理员owner回归修复证据已记录；旧审批因平台管理员legacy-owner缺陷作废，待提交 `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12` 的新双审 | R36.b/R37.b 的 Key、播放、命令、任务、报表等后续资源按对应阶段验收；硬件、公网MQTT和生产迁移仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [R37](evidence/acceptance/R37/) |
+| R36–R37 | 已修复，待新快照双审 | 租户上下文、成员/RBAC、Casbin角色-资源-动作策略、资源归属过滤、权限版本撤销、组织与成员后台页；D15（支持到期时间显示/保存的时区一致性）已在 source `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a`、web `483cb2cecc4a368fdf6fc3406fa682207b514aea` 修复，并由三时区 Playwright 证据覆盖；旧审批因平台管理员legacy-owner缺陷及后续源变更作废，仍待同一最终快照的新双审 | R36.b/R37.b 的 Key、播放、命令、任务、报表等后续资源按对应阶段验收；D15 修复不构成 R36/R37 通过；硬件、公网MQTT和生产迁移仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [R37](evidence/acceptance/R37/) |
 | R38–R42 | 未实现 | 文档设计 | License、离线包、开放平台待实施 |
 | R43–R45 | 未实现 | 文档设计 | 视频/地图/大屏待实施；真实验收所需外部输入未就绪 |
 | R46–R54 | 未实现 | MQTT命令结构预留/调试CLI | 命令生命周期、HTTP/Modbus/网关/转发/调度/联动/Web调试/报表待实施 |
@@ -56,5 +56,6 @@ M0完整命令、版本、日志及双审结论见 [M0证据](evidence/2026-09-1
 | D09 | R14/R04 | M0首启/密码存储已修；M2登录迁移及token撤销待修 |
 | D10 | R28 | 通知持久化、失败识别、接收人和软件重试/lease已验证；真机仍阻塞 |
 | D11 | R30–R32 | TLS反代边界、custom整库备份恢复、迁移失败/回退文档和软件演练已完成；真实部署演练仍阻塞 |
+| D15 | R37 | 支持到期时间在 Asia/Shanghai、UTC、America/New_York 环境下显示、编辑、保存和重载保持同一瞬间；已由 web `483cb2cecc4a368fdf6fc3406fa682207b514aea` 修复并有三场景 Playwright 证据，R36/R37 阶段门仍待新快照双审 |
 
 此表是审查已发现问题的起点，不声称已完成逐行代码审计；实施时新的问题继续编号，不用更改需求来掩盖缺陷。

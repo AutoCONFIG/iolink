@@ -1,6 +1,6 @@
 # R36 M6b tenant isolation evidence
 
-Date: 2026-10-01 (latest verification; earlier transcripts retained)
+Date: 2026-10-03 (latest verification; earlier transcripts retained)
 
 Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN used verbatim below. No production data or external service credentials were used.
 
@@ -48,4 +48,4 @@ External hardware, public MQTT exposure and production migration are not claimed
 - Dependencies: Go 1.26.8; PostgreSQL/Timescale image `timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76`; Node v24.21.0; npm 11.19.0; Playwright 1.63.0.
 - Test data: isolated migrations create default tenant; M6b fixture uses tenants 601/602, users 601/603/604/605, farms 601/602, farm assignment 603→601, revoked user 605, and cross-tenant alarm/device rows.
 - Browser artifacts: `.omo/evidence/todo10-m6a-products-created.png`, `.omo/evidence/todo10-m6a-products-model-draft.png`, `.omo/evidence/todo10-m6a-products-published-assigned.png` and the tenant-page screenshots emitted by `web/e2e/admin-pages.spec.ts`.
-- Review state: fixed on source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12` after the platform-admin legacy-owner bug. Earlier approvals are stale/rejected for this exact snapshot; fresh independent double review is pending. Do not mark the R36 software gate passed yet. Future R36.b resources and external inputs remain deferred by the acceptance matrix.
+- Review state: D15 support-expiry timezone fix is recorded in the shared R37 evidence; the R36 software gate remains pending fresh independent double review on the final source snapshot. Earlier approvals are stale/rejected after the platform-admin owner fix and subsequent source changes. Do not mark the R36 software gate passed yet. Future R36.b resources and external inputs remain deferred by the acceptance matrix.
