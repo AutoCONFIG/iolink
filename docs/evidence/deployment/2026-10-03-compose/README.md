@@ -16,11 +16,17 @@ Environment: Linux x86_64, Docker29.8.2, Compose5.5.1, dedicated
 Web gitlink is unchanged c54237e9d1a424bc9cb0b3f700014e2e966cf2cc.
 Secrets generated in memory and redacted before preserving artifacts.
 
-The database reference now follows the current `timescale/timescaledb:latest-pg16`
-multi-architecture index digest
+The initial database reference was pinned. Per the user's subsequent instruction,
+the server and CI now use `timescale/timescaledb:latest-pg16` directly, with
+server `pull_policy: always`. The observed multi-architecture index digest is
 `sha256:6f139d56042989bd35f50ba5986e492cd32e35cc6778c50be2659add298dc09f`.
 The pulled image reports PostgreSQL 16.15; Compose config validation passed
-with generated secrets and the image pull completed successfully.
+with generated secrets and the image pull completed successfully. Both the
+server and merged development models resolve database latest-pg16/always.
+An isolated disposable container successfully started and created the Timescale
+extension: PostgreSQL16.15, TimescaleDB2.30.2. The container was removed after
+verification; no existing database volumes were used. This validates startup
+and configuration, not an existing-volume upgrade or restore rehearsal.
 
 | Verification | Observed result |
 |---|---|
