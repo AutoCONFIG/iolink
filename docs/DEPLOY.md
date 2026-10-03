@@ -56,7 +56,7 @@ docker compose run --rm --pull never --no-deps iolinkd migrate up
 docker compose up -d --pull never --wait iolinkd
 ```
 
-数据库保存在项目的 `pgdata` 命名卷中，`docker compose down` 保留数据；`down -v` 会删除数据。默认仅监听 `127.0.0.1:8080/1883`，数据库不公开端口。测试机需从其他主机直接访问时，配置 `IOLINK_HTTP_BIND=0.0.0.0` / `IOLINK_MQTT_BIND=0.0.0.0` 并配置防火墙；公网部署按下节反代 TLS。Docker stdout/stderr 日志每服务限制10MB×3。内部日志转储另行开发，当前不把它记为已交付。
+数据库保存在项目的 `pgdata` 命名卷中，`docker compose down` 保留数据；`down -v` 会删除数据。内部 JSON 诊断日志保存在同目录的 `logs/iolinkd.jsonl`，容器内限制为20MB×5个备份，可通过 `IOLINK_LOG_LEVEL=debug|info|warn|error` 调整级别；日志目录和 Docker stdout/stderr 都有大小上限。默认仅监听 `127.0.0.1:8080/1883`，数据库不公开端口。测试机需从其他主机直接访问时，配置 `IOLINK_HTTP_BIND=0.0.0.0` / `IOLINK_MQTT_BIND=0.0.0.0` 并配置防火墙；公网部署按下节反代 TLS。
 
 `latest` 适合测试机追踪最新发布；正式发布和可复现验收应把 `IOLINKD_IMAGE` 固定为 tag 或 digest。该 Compose 不代表 TLS、容量、离线安装或 M6b 完整阶段验收已通过。
 

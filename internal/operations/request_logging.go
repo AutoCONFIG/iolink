@@ -11,6 +11,9 @@ import (
 )
 
 func RequestLogging(log *slog.Logger) gin.HandlerFunc {
+	if log == nil {
+		log = slog.Default()
+	}
 	return func(c *gin.Context) {
 		started := time.Now()
 		id := rand.Text()

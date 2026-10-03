@@ -22,6 +22,8 @@ services:
     pull_policy: always
     restart: unless-stopped
     stop_grace_period: 15s
+    volumes:
+      - ./logs:/var/log/iolink
     depends_on:
       db: {condition: service_healthy}
     ports:
@@ -38,6 +40,10 @@ services:
       IOLINK_WX_SECRET: ${IOLINK_WX_SECRET:-}
       IOLINK_WX_TEMPLATE_ID: ${IOLINK_WX_TEMPLATE_ID:-}
       GIN_MODE: release
+      IOLINK_LOG_DIR: /var/log/iolink
+      IOLINK_LOG_LEVEL: ${IOLINK_LOG_LEVEL:-info}
+      IOLINK_LOG_MAX_MB: ${IOLINK_LOG_MAX_MB:-20}
+      IOLINK_LOG_BACKUPS: ${IOLINK_LOG_BACKUPS:-5}
     healthcheck:
       test: ["CMD", "wget", "--spider", "--timeout=2", "http://127.0.0.1:8080/readyz"]
       interval: 10s
