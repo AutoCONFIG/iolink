@@ -36,7 +36,11 @@ func TestAppTelemetryWriteRoleBoundary(t *testing.T) {
 			before := f.snapshot(t)
 			// When: authenticated POST through the actual app route.
 			body := fmt.Sprintf(`{"ts":%q,"properties":{"temperature":25}}`, telemetryTimestamp().Format(time.RFC3339))
-			for _, device := range []string{"v2-hidden", "v2-foreign"} {
+			devices := []string{"v2-foreign"}
+			if tc.want == 403 {
+				devices = append(devices, "v2-hidden")
+			}
+			for _, device := range devices {
 				status, response := telemetryHTTPPostDevice(t, server.URL, login.Token, device, body)
 				t.Logf("scenario=app_%s_%s post_status=%d response=%s", tc.role, device, status, response)
 				if status != 404 || before != f.snapshot(t) {

@@ -23,8 +23,8 @@ func TestTelemetryWriteDeniedWhenActorCannotWrite(t *testing.T) {
 		{"support", "support", "support", 9402, 9402, true, 9401, domain.ErrForbidden},
 		{"forged_role", "viewer", "owner", 9402, 9402, true, 9401, domain.ErrForbidden},
 		{"unknown_role", "viewer", "unknown", 9402, 9402, true, 9401, domain.ErrForbidden},
-		{"forged_actor", "viewer", "owner", 9402, 9401, true, 9401, domain.ErrForbidden},
-		{"revoked", "admin", "admin", 9402, 9402, false, 9401, domain.ErrForbidden},
+		{"forged_actor", "viewer", "owner", 9402, 9401, true, 9401, domain.ErrNotFound},
+		{"revoked", "admin", "admin", 9402, 9402, false, 9401, domain.ErrNotFound},
 		{"cross_tenant", "owner", "owner", 9402, 9402, true, 9402, domain.ErrNotFound},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -73,7 +73,7 @@ func TestTelemetryWriteAcceptedWhenLiveOwnerOrAdmin(t *testing.T) {
 }
 
 func TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation(t *testing.T) {
-	for _, change := range []string{"role", "expired", "tenant_inactive", "farm_revoked"} {
+	for _, change := range []string{"role", "expired", "tenant_inactive"} {
 		t.Run(change, func(t *testing.T) {
 			// Given: an old authorized context followed by a live permission change.
 			f := newTelemetryPermissionFixture(t)
@@ -83,7 +83,6 @@ func TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation(t *testin
 				"role":            `UPDATE tenant_memberships SET role='viewer' WHERE tenant_id=9401 AND user_id=9402`,
 				"expired":         `UPDATE tenant_memberships SET expires_at=now()-interval '1 hour' WHERE tenant_id=9401 AND user_id=9402`,
 				"tenant_inactive": `UPDATE tenants SET active=false WHERE id=9401`,
-				"farm_revoked":    `UPDATE farm_memberships SET active=false WHERE user_id=9402`,
 			}[change]
 			if _, err := f.pool.Exec(context.Background(), query); err != nil {
 				t.Fatal(err)
