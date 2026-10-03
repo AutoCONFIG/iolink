@@ -44,3 +44,8 @@ These two approvals referred to the pre-fix final worktree. They are stale/rejec
 - `/root/m6b_review_764_retry1`: REQUEST_CHANGES. Evidence in `.omo/evidence/m6b-review-764-retry1-viewer-repro.log` shows owner and viewer `POST /api/v2/devices/review-device/telemetry` both returned HTTP 202; viewer increased telemetry rows from 1 to 2 and changed shadow temperature from the owner control value 20 to 25.
 - `/root/m6b_review_764_a` and `/root/m6b_review_764_b`: inconclusive because API returned 429; neither is an approval.
 - Current state: D13 is open. R36/R37 software status is pending (`not_run` in the requirement manifest); previous approvals and prior passing checks remain historical evidence for their own source snapshots only. M6b gate is pending until D13 is fixed, fresh relevant verification completes, and two independent reviewers approve the same exact post-fix snapshot.
+
+## 2026-10-03 D15 support-expiry timezone fix
+
+- Source candidate commit: `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a`; web submodule candidate: `483cb2cecc4a368fdf6fc3406fa682207b514aea`.
+- D15 targeted Playwright evidence covers Asia/Shanghai, UTC, and America/New_York in `2026-10-03-v2-timezone/`. This fixes D15 only; D13 remains open and R36/R37/M6b remain pending.
