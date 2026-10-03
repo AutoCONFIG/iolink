@@ -846,6 +846,10 @@ func (s *Service) ListAllAlarms(ctx context.Context, limit int) ([]domain.Alarm,
 }
 
 func (s *Service) ConfirmAlarm(ctx context.Context, id int64) error {
+	if domain.TenantRole(ctx) != "" {
+		actorID, _ := domain.TenantUserID(ctx)
+		return s.ConfirmAlarmByActor(ctx, id, actorID)
+	}
 	q := `UPDATE alarms a SET confirmed_at=now() FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE a.id=$1 AND a.pond_id=p.id AND a.confirmed_at IS NULL`
 	args := []any{id}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
@@ -873,11 +877,16 @@ func (s *Service) ConfirmAlarm(ctx context.Context, id int64) error {
 }
 
 func (s *Service) ConfirmAlarmByActor(ctx context.Context, id, actorID int64) error {
+	_, scoped := domain.TenantID(ctx)
+	contextActor, actorOK := domain.TenantUserID(ctx)
+	if !scoped || !actorOK || actorID <= 0 || contextActor != actorID {
+		return domain.ErrForbidden
+	}
 	return (&alarmRepo{s.pool}).ConfirmByUser(ctx, id, actorID)
 }
 
 func (s *Service) BatchConfirm(ctx context.Context, ids []int64) (int64, error) {
-	if role := domain.TenantRole(ctx); role != "" && role != "owner" && role != "admin" {
+	if role := domain.TenantRole(ctx); role != "" {
 		actorID, _ := domain.TenantUserID(ctx)
 		return s.BatchConfirmByActor(ctx, ids, actorID)
 	}
