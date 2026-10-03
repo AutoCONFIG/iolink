@@ -32,6 +32,11 @@ including organization role change, support expiry and deactivation persistence.
 $ cd web && npm test
 9 unit tests PASS.
 
+2026-10-03 D15 support-expiry timezone regression (source `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a`; web `483cb2cecc4a368fdf6fc3406fa682207b514aea`):
+$ cd web && npm run e2e -- e2e/support-expiry.spec.ts --workers=1
+3 passed: Asia/Shanghai, UTC, and America/New_York display/edit/save/reload scenarios.
+Captured output: `2026-10-03-v2-timezone/support-final.log` and `hook-verification.log`.
+
 2026-09-30 policy correction after independent REJECT:
 Casbin role/resource/action policy is injected at the composition root. The
 core farm-member operation checks policy and live membership before listing.
