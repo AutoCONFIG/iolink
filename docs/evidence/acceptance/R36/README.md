@@ -1,12 +1,12 @@
 # R36 M6b tenant isolation evidence
 
-Date: 2026-10-03 (latest verification; earlier transcripts retained)
+Date: 2026-10-03 (candidate assembly; earlier transcripts retained)
 
-Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN used verbatim below. No production data or external service credentials were used.
+Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN supplied through the environment and redacted from evidence. No production data or external service credentials were used.
 
-## Executed checks and captured output
+## Historical checks and captured output
 
-Raw command transcript: [`commands.txt`](commands.txt).
+Raw historical command transcript: [`commands.txt`](commands.txt). Counts below belong to that earlier snapshot; final candidate verification and double review are pending. D17 app scope evidence is in [`../R37/2026-10-03-d17-app-scope/`](../R37/2026-10-03-d17-app-scope/).
 
 ```text
 $ IOLINK_TEST_PG_DSN="$IOLINK_TEST_PG_DSN" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1

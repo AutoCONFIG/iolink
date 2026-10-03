@@ -1,7 +1,7 @@
 {
   "gate": "M6b",
   "status": "pending",
-  "blocked_by": ["D13", "fresh QA", "two independent reviews on the exact post-fix snapshot"],
+  "blocked_by": ["fresh assembled-candidate QA", "two independent reviews on the exact post-fix snapshot"],
   "requirements": ["R36", "R37"],
   "evidence": {
     "R36": "docs/evidence/acceptance/R36/",
@@ -14,5 +14,7 @@
     "m6b_review_764_a": "inconclusive: API429",
     "m6b_review_764_b": "inconclusive: API429"
   },
-  "note": "R36/R37 software_status is pending (not_run) until D13 is fixed, fresh relevant verification completes, and two independent reviewers approve the same exact snapshot. Earlier approvals and passing test outputs remain historical only."
+  "fixed_defects": ["D12", "D13", "D15", "D16", "D17"],
+  "web_commit": "e84092326d9979e066c611e2be8eb6b9736e09f3",
+  "note": "R36/R37 software_status is pending (not_run) until fresh assembled-candidate verification completes and two independent reviewers approve the same exact snapshot. Earlier approvals and passing test outputs remain historical only."
 }

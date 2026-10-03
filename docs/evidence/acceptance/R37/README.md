@@ -1,14 +1,15 @@
 # R37 M6b RBAC and revocation evidence
 
-Date: 2026-10-03 (latest verification; earlier transcripts retained)
+Date: 2026-10-03 (candidate assembly; earlier transcripts retained)
 
-Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN used verbatim below.
+Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN supplied through the environment and redacted from evidence.
 
-## Executed checks and captured output
+## Historical checks and captured output
 
-Raw command transcript: [`commands.txt`](commands.txt).
+Raw historical command transcript: [`commands.txt`](commands.txt). Counts below belong to earlier snapshots and do not certify the assembled release candidate.
 The D15 support-expiry timezone fix is covered by the targeted browser transcript in [`2026-10-03-v2-timezone/`](2026-10-03-v2-timezone/), run against source commit `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a` with web submodule `483cb2cecc4a368fdf6fc3406fa682207b514aea`.
-Latest raw outputs: [full Go verification](2026-10-01-go.txt), [real HTTP and database role scenarios](2026-10-01-http.txt), and [contract checks](2026-10-01-contracts.txt).
+Earlier raw outputs: [full Go verification](2026-10-01-go.txt), [real HTTP and database role scenarios](2026-10-01-http.txt), and [contract checks](2026-10-01-contracts.txt).
+The D16 precision fix is recorded in [`../../rebuild/M6b-D16/`](../../rebuild/M6b-D16/); D17 real HTTP/database scope regression is recorded in [`2026-10-03-d17-app-scope/`](2026-10-03-d17-app-scope/). Final combined verification and two independent approvals remain pending.
 Review corrections and expired verdicts are recorded in [the review history](review-history.md). The platform-admin owner fix regression evidence is captured under [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/). Later re-review of snapshot `764c5eb01dcbee0d015bf7153ded74f3881ba07f` reproduced an unauthorized viewer telemetry mutation; see `.omo/evidence/m6b-review-764-retry1-viewer-repro.log`.
 
 ```text

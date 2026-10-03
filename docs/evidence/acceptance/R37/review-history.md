@@ -54,4 +54,5 @@ These two approvals referred to the pre-fix final worktree. They are stale/rejec
 
 - Candidate `ce23acdeb9d450b48649f0279e1f6c3b02afc3f2` was rejected by two independent reviewers: unchanged support expiry lost seconds (D16), and a tenant administrator without farm membership could not access same-tenant app resources (D17). Neither earlier approval can be reused.
 - D16 fix: web `e84092326d9979e066c611e2be8eb6b9736e09f3`, assembled in parent `8197c590dfaa1eb1bdd3b7c7606f5b95c05896da`; evidence in [`../../rebuild/M6b-D16/`](../../rebuild/M6b-D16/).
-- D17 integration and fresh review of the combined candidate are pending. No current software-gate pass is claimed.
+- D17 fix: `62acecee62160d48efcd48f0e161a927ad583ef6`, integrated as `a96b234`; evidence in [`2026-10-03-d17-app-scope/`](2026-10-03-d17-app-scope/).
+- Fresh verification and review of the combined candidate are pending. No current software-gate pass is claimed.

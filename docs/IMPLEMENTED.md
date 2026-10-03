@@ -23,7 +23,7 @@
 | R28 | 软件通过，外部阻塞 | durable outbox/worker、WeChat HTTP adapter、重试/lease/归属重验及失败状态 | 真微信凭据、授权和设备回执缺失，外部实发为 `external_blocked` |
 | R29–R33 | 软件通过，适用外部阻塞 | health/readiness、metrics、10秒有界排空、固定监听/TLS反代模板、整库custom备份恢复、容量烟测与CI | 真实TLS主机、100GiB恢复、发布中断和24小时500设备/90天容量演练为 `external_blocked` |
 | R34–R35 | 软件验收通过 | M6a 产品模型、版本发布/分配、通用遥测、兼容投影、fixture 回填 | 外部不适用；证据见 docs/evidence/acceptance/R34/ 与 R35/ |
-| R36–R37 | 修复候选，待最终验证与双审 | 租户上下文、成员/RBAC、Casbin策略、资源隔离、权限撤销及组织后台；D12/D13/D15/D16 已修复，D17 正在整合。D13 限制 viewer/member/support 遥测写入；D16 保留授权到期秒与小数秒。旧审批因后续源变更作废 | 最终候选须完成完整验证及两位独立审阅者批准；R36.b/R37.b 后续资源按对应阶段验收；外部输入仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [R37](evidence/acceptance/R37/) |
+| R36–R37 | 修复候选，待最终验证与双审 | 租户上下文、成员/RBAC、Casbin策略、资源隔离、权限撤销及组织后台；D12/D13/D15/D16/D17 已整合。D13 限制 viewer/member/support 遥测写入；D16 保留授权到期秒与小数秒；D17 允许租户 owner/admin 访问本租户全部农场资源并重验实时权限。旧审批因后续源变更作废 | 最终候选须完成完整验证及两位独立审阅者批准；R36.b/R37.b 后续资源按对应阶段验收；外部输入仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [R37](evidence/acceptance/R37/) |
 | R38–R42 | 未实现 | 文档设计 | License、离线包、开放平台待实施 |
 | R43–R45 | 未实现 | 文档设计 | 视频/地图/大屏待实施；真实验收所需外部输入未就绪 |
 | R46–R54 | 未实现 | MQTT命令结构预留/调试CLI | 命令生命周期、HTTP/Modbus/网关/转发/调度/联动/Web调试/报表待实施 |
@@ -59,5 +59,6 @@ M0完整命令、版本、日志及双审结论见 [M0证据](evidence/2026-09-1
 | D13 | R36/R37 | 已修复：viewer/member/support 遥测写入返回 403，owner/admin 保持授权写入；拒绝请求无部分状态。原始复现与修复证据见 [D13](evidence/acceptance/R37/2026-10-01-v2-permission-fix/)；阶段门待最终快照双审 |
 | D15 | R37 | 支持到期时间在 Asia/Shanghai、UTC、America/New_York 环境下显示、编辑、保存和重载保持同一瞬间；已由 web `483cb2cecc4a368fdf6fc3406fa682207b514aea` 修复并有三场景 Playwright 证据，R36/R37 阶段门仍待新快照双审 |
 | D16 | R37 | 已修复：未编辑授权保存保留原始秒与小数秒；web `e84092326d9979e066c611e2be8eb6b9736e09f3`；证据见 [D16](evidence/rebuild/M6b-D16/)；阶段门待最终快照双审 |
+| D17 | R36/R37 | 已修复：本租户 owner/admin 无农场分配仍可访问全部业务资源，其他角色保持农场范围；实时授权和跨租户拒绝无部分写入；源提交 `62acecee62160d48efcd48f0e161a927ad583ef6`；证据见 [D17](evidence/acceptance/R37/2026-10-03-d17-app-scope/)；阶段门待最终快照双审 |
 
 此表是审查已发现问题的起点，不声称已完成逐行代码审计；实施时新的问题继续编号，不用更改需求来掩盖缺陷。
