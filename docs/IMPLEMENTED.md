@@ -1,5 +1,9 @@
 # 当前实现状态与证据
 
+附加部署里程碑：统一服务器 `deploy/docker-compose.yaml` 与源码构建覆盖
+`deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，待同快照双审和发布。
+证据见 [Compose](evidence/deployment/2026-10-03-compose/)。此项不改变 M6b 及 TLS/容量阶段状态；内部日志转储另行开发。
+
 基线代码：b71095bbb6b228caed74adf47c48ca4c6b07c92b，检查日期2026-09-19。文档双审通过后已实施M0及M1软件部分；旧文档的“全部完成/全绿”不构成本轮验收。需求细项见 ACCEPTANCE.md。
 
 重建 Todo 4 的实现与验证候选已完成，待双审门禁收据写入后登记完成；新增应用层 normalized event 边界与真实 ingestion 回归。命令、环境、负面路径和证据见 [Todo 4证据](evidence/rebuild/mqtt-ingestion.txt)。该证据只覆盖软件/provider 链路，硬件和外部 provider 仍按 `external_blocked` 处理。

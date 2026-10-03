@@ -18,7 +18,9 @@ M0–M8 全部纳入，按阶段完成和验收。核心业务以单二进制交
 
 ## 仓库
 
-`cmd/iolinkd` 组装服务；`internal/access` 接入；`internal/core` 数据与报警；`internal/appapi`、`internal/adminapi` 双API；`internal/domain` 共享模型；`internal/platform` 配置；`web/admin/dist` 当前为占位页；`deploy` 为待整改部署脚本。
+`cmd/iolinkd` 组装服务；`internal/access` 接入；`internal/core` 数据与报警；`internal/appapi`、`internal/adminapi` 双API；`internal/domain` 共享模型；`internal/platform` 配置；`web` 为管理前端子模块。
+
+测试服务器使用 [deploy/docker-compose.yaml](deploy/docker-compose.yaml) 统一管理应用与数据库，默认在启动时拉取 `ghcr.io/autoconfig/iolink:latest`。本地源码构建增加 [deploy/docker-compose.dev.yaml](deploy/docker-compose.dev.yaml) 覆盖文件；配置示例为 [deploy/.env.example](deploy/.env.example)。首次迁移、管理员初始化及更新命令见 [部署说明](docs/DEPLOY.md)。
 
 ## 当前可做的检查
 

@@ -1,0 +1,17 @@
+{
+  "image": "iolinkd:local-dev",
+  "pull_policy": "build",
+  "build": {
+    "context": "/tmp/iolink-server-compose",
+    "dockerfile": "Dockerfile"
+  },
+  "ports": [
+    {
+      "mode": "ingress",
+      "host_ip": "127.0.0.1",
+      "target": 5432,
+      "published": "55449",
+      "protocol": "tcp"
+    }
+  ]
+}

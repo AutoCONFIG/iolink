@@ -1,7 +1,7 @@
 GO ?= go
 PYTHON ?= python3
 DOCS_PYTHON ?= .venv/contracts/bin/python
-DEV_COMPOSE = docker compose -p iolink-dev -f deploy/docker-compose.yml
+DEV_COMPOSE = docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml
 
 .PHONY: bootstrap build test verify verify-contracts docs-tools integration capacity web-verify dev migrate admin-init stop clean embed-front
 
@@ -51,7 +51,7 @@ capacity:
 # Export IOLINK_PG_DSN and a random IOLINK_SECRET_KEY before serving.
 # The first start requires: make migrate; make admin-init ADMIN_USERNAME=... < protected-password-file.
 dev: embed-front
-	$(DEV_COMPOSE) up -d --wait
+	$(DEV_COMPOSE) up -d --wait db
 	$(GO) run ./cmd/iolinkd migrate up
 	$(GO) run ./cmd/iolinkd serve
 
