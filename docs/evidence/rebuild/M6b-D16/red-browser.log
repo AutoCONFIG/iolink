@@ -1,0 +1,54 @@
+
+> iolink-admin-ui@0.1.0 e2e
+> playwright test --config /tmp/iolink-d16-playwright.config.mjs support-expiry --grep UTC.*未编辑 --output ../.omo/evidence/m6b-d16/red-browser-results
+
+[WebServer] (node:197155) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:197187) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/support-expiry.spec.ts:6:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 秒数 (1.9s)
+
+
+  1) e2e/support-expiry.spec.ts:6:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 秒数 ─────────────────────────────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+    @@ -1,9 +1,9 @@
+      Array [
+        Object {
+          "active": true,
+    -     "expiresAt": "2099-10-02T05:00:37Z",
+    +     "expiresAt": "2099-10-02T05:00:00Z",
+          "name": "秒数测试成员",
+          "role": "support",
+          "tenantId": 1,
+          "userId": 2,
+        },
+
+      23 |         const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('iolink.demo.tenant-members') ?? 'null'))
+      24 |         await testInfo.attach(`unchanged-save-${save}`, { body: JSON.stringify(persisted, null, 2), contentType: 'application/json' })
+    > 25 |         expect(persisted).toEqual([
+         |                           ^
+      26 |           { tenantId: 1, userId: 2, name: '秒数测试成员', role: 'support', active: true, expiresAt: '2099-10-02T05:00:37Z' },
+      27 |         ])
+      28 |         await page.reload()
+        at /tmp/iolink-m6b-d16-fix/web/e2e/support-expiry.spec.ts:25:27
+
+    Error Context: ../.omo/evidence/m6b-d16/red-browser-results/support-expiry-支持到期：UTC-未编辑到期时间的重复保存保留-UTC-秒数/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../.omo/evidence/m6b-d16/red-browser-results/support-expiry-支持到期：UTC-未编辑到期时间的重复保存保留-UTC-秒数/trace.zip
+    Usage:
+
+        npx playwright show-trace ../.omo/evidence/m6b-d16/red-browser-results/support-expiry-支持到期：UTC-未编辑到期时间的重复保存保留-UTC-秒数/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/support-expiry.spec.ts:6:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 秒数 ──────────────────────────────
