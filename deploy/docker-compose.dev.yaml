@@ -1,0 +1,10 @@
+services:
+  db:
+    ports:
+      - "127.0.0.1:${IOLINK_DEV_PG_PORT:-5432}:5432"
+  iolinkd:
+    image: iolinkd:local-dev
+    pull_policy: build
+    build:
+      context: ..
+      dockerfile: Dockerfile

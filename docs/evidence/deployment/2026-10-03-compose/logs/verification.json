@@ -1,0 +1,250 @@
+{
+  "source": "74232902ff2d34a7dc83374b9804aa5c65ff1e3b",
+  "date": "2026-10-03",
+  "docker": "29.8.2",
+  "compose": "5.5.1",
+  "receipts": [
+    {
+      "name": "config-server",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "config",
+        "--quiet"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.048
+    },
+    {
+      "name": "config-development",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "-f",
+        "deploy/docker-compose.dev.yml",
+        "config",
+        "--quiet"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.046
+    },
+    {
+      "name": "model-development",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "-f",
+        "deploy/docker-compose.dev.yml",
+        "config",
+        "--format",
+        "json"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.059
+    },
+    {
+      "name": "source-build",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "-f",
+        "deploy/docker-compose.dev.yml",
+        "build",
+        "iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 57.793
+    },
+    {
+      "name": "database-up",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "-f",
+        "deploy/docker-compose.dev.yml",
+        "up",
+        "-d",
+        "--wait",
+        "db"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 5.849
+    },
+    {
+      "name": "migrations",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--no-deps",
+        "iolinkd",
+        "migrate",
+        "up"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 1.03
+    },
+    {
+      "name": "admin-init",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--no-deps",
+        "-T",
+        "iolinkd",
+        "admin",
+        "init",
+        "operator"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.559
+    },
+    {
+      "name": "application-up",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "up",
+        "-d",
+        "--pull",
+        "never",
+        "--wait",
+        "iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 17.037
+    },
+    {
+      "name": "restart",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "restart",
+        "iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.402
+    },
+    {
+      "name": "restart-ready",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "up",
+        "-d",
+        "--pull",
+        "never",
+        "--wait",
+        "iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 10.091
+    },
+    {
+      "name": "migration-repeat",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--no-deps",
+        "iolinkd",
+        "migrate",
+        "up"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.388
+    },
+    {
+      "name": "admin-repeat-rejected",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--no-deps",
+        "-T",
+        "iolinkd",
+        "admin",
+        "init",
+        "other"
+      ],
+      "code": 1,
+      "expected": 1,
+      "seconds": 0.453
+    },
+    {
+      "name": "containers",
+      "args": [
+        "compose",
+        "-p",
+        "iolink-compose-verify",
+        "-f",
+        "deploy/docker-compose.yml",
+        "ps"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.058
+    }
+  ],
+  "http": "healthz/readyz/SPA200; login200; restart login200; no credentials recorded"
+}

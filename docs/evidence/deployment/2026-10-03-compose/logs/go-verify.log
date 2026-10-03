@@ -1,0 +1,24 @@
+go build ./...
+go vet ./...
+go test -race -shuffle=on ./... -count=1
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	1.075s
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-once	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-sim	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/tp-spike-pub	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.049s
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	6.216s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.092s
+ok  	git.hyhy.fun/rsplab/iolink/internal/authorization	1.043s
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	17.571s
+ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.017s
+?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/ingestion	1.948s
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	9.524s
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	6.573s
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.018s
+ok  	git.hyhy.fun/rsplab/iolink/internal/persistence	1.952s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	1.812s
+?   	git.hyhy.fun/rsplab/iolink/internal/testdb	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/internal/web	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.018s
+?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]

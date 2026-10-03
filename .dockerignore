@@ -8,3 +8,11 @@ web/.playwright
 web/test-results
 web/playwright-report
 tmp
+.omo
+docs/evidence
+deploy/.env
+deploy/logs
+logs
+**/.env
+**/.env.*
+web/dist

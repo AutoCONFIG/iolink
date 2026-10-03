@@ -10,7 +10,7 @@
 
 ## M0 已实现的安装入口
 
-先构建 `go build -o /tmp/iolinkd ./cmd/iolinkd`。在隔离开发环境可用 `docker compose -p iolink-dev -f deploy/docker-compose.yml up -d --wait` 起数据库；开发Compose仅本机监听，固定开发口令不用于生产。提供 `IOLINK_PG_DSN` 和至少32字节随机 `IOLINK_SECRET_KEY` 后运行：
+先构建 `go build -o /tmp/iolinkd ./cmd/iolinkd`。本地数据库使用下节的开发 Compose 覆盖文件发布 loopback 端口；配置 `deploy/.env` 后可用 `docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml up -d --wait db`。提供指向本地数据库的 `IOLINK_PG_DSN` 和至少32字节随机 `IOLINK_SECRET_KEY` 后运行：
 
 ```bash
 /tmp/iolinkd migrate status
@@ -23,17 +23,56 @@
 
 `migrate adopt-legacy` 仅用于隔离的非生产旧schema fixture/恢复演练：它只接管与仓库遗留DDL指纹、Timescale时序表和13个月保留策略匹配的八表库；出现未知表或漂移即拒绝，不能绕过检查硬写版本。fixture 需先快照/备份，演练应核对数据保留与失败恢复。该入口不构成已部署客户数据升级支持。旧公开默认密码被强制门禁阻止，需运行 `admin reset-password admin < /run/secrets/iolink-admin-password` 后才能启动。新版本/checksum不兼容也拒绝启动。当前M0仅递增token_version，既有HTTP token的撤销校验还在M2待实现；本地重置需先停服务并轮换根密钥，再启动以使既有令牌失效。
 
-生产Compose须在 `deploy/.env` 受限文件配置强随机PG口令、根密钥，支持 `IOLINK_REPORT_INTERVAL=60|300`（默认60）和 `IOLINK_OFFLINE_GRACE=1..10`（默认3）。PG口令使用URL安全字符，例如随机hex，避免嵌入DSN产生URL歧义；任意口令须正确URL编码连接串。迁移和管理员命令在起常驻应用之前运行：
+## 测试服务器 Compose
+
+复制 `deploy/docker-compose.yaml` 和 `deploy/.env.example` 到服务器同一目录即可，无需克隆源码。文件内统一管理 iolinkd 与 PostgreSQL 16/TimescaleDB；MQTT 内嵌于 iolinkd，当前没有 Redis 依赖。下面命令都在该目录运行。
 
 ```bash
-docker build -t iolinkd:latest .
-docker compose -p iolink-prod -f deploy/docker-compose.prod.yml up -d --wait db
-docker compose -p iolink-prod -f deploy/docker-compose.prod.yml run --rm --no-deps iolinkd migrate up
-docker compose -p iolink-prod -f deploy/docker-compose.prod.yml run --rm --no-deps -T iolinkd admin init operator < /run/secrets/iolink-admin-password
-docker compose -p iolink-prod -f deploy/docker-compose.prod.yml up -d iolinkd
+cp .env.example .env
+chmod 600 .env
+openssl rand -hex 32
+openssl rand -hex 32
 ```
 
-上述容器流程提供已实现命令的使用方式；M0实际验收使用本机二进制+隔离Timescale容器，不冒称已完成生产容器/TLS验收。正式发布须使用固定发布标签/digest取代本地构建的latest标签。
+把两次生成的值分别填入 `.env` 的 `IOLINK_PG_PASSWORD` 和 `IOLINK_SECRET_KEY`。PG 口令必须使用 URL 安全字符（上述 hex 符合要求），因为 Compose 将其直接嵌入 PostgreSQL URL。准备受限权限的管理员口令文件 `/run/secrets/iolink-admin-password`，内容12–256字节、不含空白。支持 `IOLINK_REPORT_INTERVAL=60|300`（默认60）和 `IOLINK_OFFLINE_GRACE=1..10`（默认3）；微信功能需要同时配置 `IOLINK_WX_APPID`、`IOLINK_WX_SECRET`、`IOLINK_WX_TEMPLATE_ID`。
+
+首次启动：
+
+```bash
+docker compose pull
+docker compose up -d --wait db
+docker compose run --rm --pull never --no-deps iolinkd migrate up
+docker compose run --rm --pull never --no-deps -T iolinkd admin init operator < /run/secrets/iolink-admin-password
+docker compose up -d --pull never --wait iolinkd
+curl -f http://127.0.0.1:8080/readyz
+```
+
+`IOLINKD_IMAGE` 默认 `ghcr.io/autoconfig/iolink:latest`，`pull_policy: always` 在执行 `up` 时检查拉取镜像，不会在后台定时升级。需要更新时先备份数据库，显式停应用并迁移，再启动：
+
+```bash
+docker compose pull
+docker compose stop iolinkd
+docker compose run --rm --pull never --no-deps iolinkd migrate up
+docker compose up -d --pull never --wait iolinkd
+```
+
+数据库保存在项目的 `pgdata` 命名卷中，`docker compose down` 保留数据；`down -v` 会删除数据。默认仅监听 `127.0.0.1:8080/1883`，数据库不公开端口。测试机需从其他主机直接访问时，配置 `IOLINK_HTTP_BIND=0.0.0.0` / `IOLINK_MQTT_BIND=0.0.0.0` 并配置防火墙；公网部署按下节反代 TLS。Docker stdout/stderr 日志每服务限制10MB×3。内部日志转储另行开发，当前不把它记为已交付。
+
+`latest` 适合测试机追踪最新发布；正式发布和可复现验收应把 `IOLINKD_IMAGE` 固定为 tag 或 digest。该 Compose 不代表 TLS、容量、离线安装或 M6b 完整阶段验收已通过。
+
+## 从本地源码构建
+
+在仓库根目录先执行 `git submodule update --init web`，复制 `deploy/.env.example` 为 `deploy/.env` 并填写随机配置。开发文件覆盖镜像拉取规则，使用当前源码构建 Go 与管理前端，Docker cache 复用依赖和编译缓存，无需手工生成 `web/dist`。
+
+```bash
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml build iolinkd
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml up -d --wait db
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml run --rm --pull never --no-deps iolinkd migrate up
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml run --rm --pull never --no-deps -T iolinkd admin init operator < /run/secrets/iolink-admin-password
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml up -d --build --wait iolinkd
+```
+
+源码修改后再次执行最后一条命令即可重新构建。开发 DB 额外发布 `127.0.0.1:${IOLINK_DEV_PG_PORT:-5432}` 供宿主 Go 调试；该覆盖文件不要用于公网部署。`make dev` 只启动开发 DB，再用宿主 `go run` 迁移和服务，需要单独导出本地 `IOLINK_PG_DSN`、根密钥并已初始化管理员；它不会自动读取 `deploy/.env` 给 Go 进程。
 
 ## M1 迁移fixture注意
 
