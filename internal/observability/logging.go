@@ -1,7 +1,6 @@
 package observability
 
 import (
-	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
@@ -9,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"sync"
 	"sync/atomic"
 
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -46,12 +46,14 @@ func FromEnv(getenv func(string) string) (Config, error) {
 }
 
 type Sink struct {
+	mu     sync.Mutex
 	file   io.WriteCloser
 	stderr io.Writer
 	failed atomic.Bool
+	closed bool
 }
 
-func New(c Config, stderr io.Writer) (*slog.Logger, *Sink, error) {
+func Console(c Config, stderr io.Writer) (*slog.Logger, error) {
 	var level slog.Level
 	switch c.Level {
 	case "debug":
@@ -63,7 +65,14 @@ func New(c Config, stderr io.Writer) (*slog.Logger, *Sink, error) {
 	case "error":
 		level = slog.LevelError
 	default:
-		return nil, nil, errors.New("IOLINK_LOG_LEVEL must be debug, info, warn or error")
+		return nil, errors.New("IOLINK_LOG_LEVEL must be debug, info, warn or error")
+	}
+	return slog.New(slog.NewJSONHandler(stderr, &slog.HandlerOptions{Level: level, ReplaceAttr: safeAttr})), nil
+}
+
+func New(c Config, stderr io.Writer) (*slog.Logger, *Sink, error) {
+	if _, err := Console(c, stderr); err != nil {
+		return nil, nil, err
 	}
 	if c.Dir == "" || c.MaxMB < 1 || c.MaxMB > 1024 || c.Backups < 1 || c.Backups > 20 {
 		return nil, nil, errors.New("invalid diagnostic log configuration")
@@ -85,10 +94,16 @@ func New(c Config, stderr io.Writer) (*slog.Logger, *Sink, error) {
 	}
 	file := &lumberjack.Logger{Filename: path, MaxSize: c.MaxMB, MaxBackups: c.Backups}
 	sink := &Sink{file: file, stderr: stderr}
-	return slog.New(slog.NewJSONHandler(sink, &slog.HandlerOptions{Level: level, ReplaceAttr: safeAttr})), sink, nil
+	log, err := Console(c, sink)
+	return log, sink, err
 }
 
 func (s *Sink) Write(p []byte) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return 0, os.ErrClosed
+	}
 	n, err := s.file.Write(p)
 	if err != nil || n != len(p) {
 		if !s.failed.Swap(true) {
@@ -105,23 +120,9 @@ func (s *Sink) Write(p []byte) (int, error) {
 	return n, stderrErr
 }
 func (s *Sink) Healthy() bool { return !s.failed.Load() }
-func (s *Sink) Close() error  { return s.file.Close() }
-
-func safeAttr(_ []string, a slog.Attr) slog.Attr {
-	if a.Key == "err" || a.Key == "error" {
-		if err, ok := a.Value.Any().(error); ok {
-			return slog.String(a.Key, fmt.Sprintf("%T", err))
-		}
-		return slog.String(a.Key, "redacted")
-	}
-	if a.Key == "device" {
-		sum := sha256.Sum256([]byte(a.Value.String()))
-		return slog.String("device_hash", fmt.Sprintf("%x", sum[:12]))
-	}
-	switch a.Key {
-	case slog.TimeKey, slog.LevelKey, slog.MessageKey, "request_id", "route", "method", "status", "duration_ms", "tenant_id", "actor_id", "stage", "outcome", "count", "fields", "kind", "field", "http", "mqtt", "addr":
-		return a
-	default:
-		return slog.String(a.Key, "redacted")
-	}
+func (s *Sink) Close() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.closed = true
+	return s.file.Close()
 }

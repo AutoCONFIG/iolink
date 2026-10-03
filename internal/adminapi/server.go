@@ -87,6 +87,7 @@ type adminTenantStore interface {
 // Deps wires the store plus optional repos for pond enrichment
 // (both implemented by core).
 type Deps struct {
+	Logger    *slog.Logger
 	Store     AdminStore           // required
 	Telemetry domain.TelemetryRepo // optional; enables pond latest readings
 	Catalog   ProductCatalog
@@ -119,7 +120,7 @@ func New(cfg Config, deps Deps) *Server {
 // Routes builds the gin engine with all /admin/v1 routes.
 func (s *Server) Routes() http.Handler {
 	r := gin.New()
-	r.Use(operations.RequestLogging(slog.Default()))
+	r.Use(operations.RequestLogging(s.deps.Logger))
 
 	v1 := r.Group("/admin/v1")
 	v1.POST("/login", s.login)

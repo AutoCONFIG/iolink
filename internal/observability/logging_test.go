@@ -18,6 +18,7 @@ func TestStructuredFileLoggingLevelsAndRedaction(t *testing.T) {
 	}
 	logger.Debug("hidden", "secret", "jwt-value")
 	logger.Info("visible", "device", "pond-device-7", "password", "pw-value", "err", errors.New("database password=pw-value"))
+	logger.Warn("error processing packet", "pk", map[string]string{"Payload": "payload-secret", "Password": "mqtt-secret"}, "client", "client-secret")
 	if err := sink.Close(); err != nil {
 		t.Fatal(err)
 	}
@@ -26,7 +27,7 @@ func TestStructuredFileLoggingLevelsAndRedaction(t *testing.T) {
 		t.Fatal(err)
 	}
 	text := string(raw)
-	for _, forbidden := range []string{"hidden", "jwt-value", "pw-value", "pond-device-7"} {
+	for _, forbidden := range []string{"hidden", "jwt-value", "pw-value", "pond-device-7", "payload-secret", "mqtt-secret", "client-secret"} {
 		if strings.Contains(text, forbidden) {
 			t.Fatalf("sensitive or debug value leaked: %q", forbidden)
 		}

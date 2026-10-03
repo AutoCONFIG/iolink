@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -38,12 +37,12 @@ import (
 
 func main() {
 	if err := run(os.Args[1:], os.Stdin, os.Stdout); err != nil {
-		slog.Error("iolinkd stopped", "error", err)
+		fmt.Fprintln(os.Stderr, "iolinkd stopped; check configuration and diagnostics")
 		os.Exit(1)
 	}
 }
 
-func run(args []string, stdin io.Reader, stdout io.Writer) error {
+func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Fprintln(stdout, "iolinkd [serve | migrate up | migrate status | migrate adopt-legacy | admin init USER | admin reset-password USER]\nAdmin commands read a new password from redirected stdin, never argv. Back up before adopt-legacy or upgrades.")
 		return nil
@@ -61,16 +60,27 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
-	log, logSink, err := observability.New(logConfig, os.Stderr)
+	log, err := observability.Console(logConfig, os.Stderr)
 	if err != nil {
 		return err
 	}
+	var logSink *observability.Sink
+	if serving {
+		log, logSink, err = observability.New(logConfig, os.Stderr)
+		if err != nil {
+			return err
+		}
+	}
 	defer func() {
-		if err := logSink.Close(); err != nil {
-			fmt.Fprintln(os.Stderr, "diagnostic log close failed")
+		if runErr != nil {
+			log.Error("iolinkd operation failed", "stage", "process", "err", runErr)
+		}
+		if logSink != nil {
+			if err := logSink.Close(); err != nil {
+				fmt.Fprintln(os.Stderr, "diagnostic log close failed")
+			}
 		}
 	}()
-	slog.SetDefault(log)
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	pool, err := platform.DB(ctx, cfg)
@@ -168,7 +178,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 	admin := adminapi.New(adminapi.Config{
 		SecretKey: cfg.SecretKey,
 		JWT:       12 * time.Hour,
-	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy})
+	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy, Logger: log})
 
 	// --- appapi: /api/v1 for the mini program, backed by core repos ---
 	api := appapi.New(appapi.Config{
