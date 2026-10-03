@@ -3,7 +3,7 @@
 This receipt records the assembled M6b candidate before independent review. It is
 not a gate approval by itself.
 
-- Source candidate: `336f184dc4a4dd68c4441440a1fd184571b80523`
+- Source candidate: `9321988b03d1dbbe48207896237e114c87ca8a35`
 - Web submodule: `e84092326d9979e066c611e2be8eb6b9736e09f3`
 - Date: 2026-10-03 Asia/Shanghai
 - Database: dedicated Docker container `iolink-todo9-pg`, PostgreSQL 16.15,
@@ -31,5 +31,11 @@ lower-role scope, platform-admin exclusion, stale-token rejection, cross-tenant
 no-partial-write behavior.
 
 The M6b gate remains `pending` until two independent reviewers explicitly
-approve this exact source snapshot. The batch confirmation regression was
-added after the first review and is covered by the focused Go run above.
+approve the frozen receipt snapshot. Review of `cc1ef42` rejected manager
+singular and batch alarm confirmation after committed authorization revocation.
+The candidate routes both public entry points through live actor checks. New
+deterministic HTTP and core regressions cover role downgrade, membership
+revocation, tenant disable and platform authority changes, asserting 404 and
+unchanged database state. The full verification above was rerun after this fix.
+
+Sanitized command outputs and verification metadata are preserved in `logs/`.

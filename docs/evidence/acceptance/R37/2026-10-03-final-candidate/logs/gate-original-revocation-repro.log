@@ -1,0 +1,26 @@
+-test.shuffle 1791009454860867995
+=== RUN   TestGateOriginalManagerBatchRevocation
+=== RUN   TestGateOriginalManagerBatchRevocation/role
+    gate_revocation_probe_test.go:11: environment real_timescaledb=2.30.0
+    gate_revocation_probe_test.go:33: exact_source=cc1ef420 change=role confirmed_count=1 error=<nil> persisted_confirmed=true
+    gate_revocation_probe_test.go:35: revoked manager must not confirm: count=1 error=<nil> persisted=true
+=== RUN   TestGateOriginalManagerBatchRevocation/membership
+    gate_revocation_probe_test.go:11: environment real_timescaledb=2.30.0
+    gate_revocation_probe_test.go:33: exact_source=cc1ef420 change=membership confirmed_count=1 error=<nil> persisted_confirmed=true
+    gate_revocation_probe_test.go:35: revoked manager must not confirm: count=1 error=<nil> persisted=true
+=== RUN   TestGateOriginalManagerBatchRevocation/tenant
+    gate_revocation_probe_test.go:11: environment real_timescaledb=2.30.0
+    gate_revocation_probe_test.go:33: exact_source=cc1ef420 change=tenant confirmed_count=1 error=<nil> persisted_confirmed=true
+    gate_revocation_probe_test.go:35: revoked manager must not confirm: count=1 error=<nil> persisted=true
+=== RUN   TestGateOriginalManagerBatchRevocation/platform_authority
+    gate_revocation_probe_test.go:11: environment real_timescaledb=2.30.0
+    gate_revocation_probe_test.go:33: exact_source=cc1ef420 change=platform_authority confirmed_count=1 error=<nil> persisted_confirmed=true
+    gate_revocation_probe_test.go:35: revoked manager must not confirm: count=1 error=<nil> persisted=true
+--- FAIL: TestGateOriginalManagerBatchRevocation (1.86s)
+    --- FAIL: TestGateOriginalManagerBatchRevocation/role (0.45s)
+    --- FAIL: TestGateOriginalManagerBatchRevocation/membership (0.59s)
+    --- FAIL: TestGateOriginalManagerBatchRevocation/tenant (0.41s)
+    --- FAIL: TestGateOriginalManagerBatchRevocation/platform_authority (0.42s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.894s
+FAIL

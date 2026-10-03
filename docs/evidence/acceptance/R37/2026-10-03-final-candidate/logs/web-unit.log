@@ -1,0 +1,16 @@
+$ npm test
+
+> iolink-admin-ui@0.1.0 test
+> vitest run tests
+
+
+ RUN  v5.0.1 /tmp/iolink-m6b-release-final/web
+
+
+ Test Files  2 passed (2)
+      Tests  21 passed (21)
+   Start at  14:39:45
+   Duration  136ms (transform 74%, import 14%, tests 7%, worker 4%)
+
+
+EXIT 0
