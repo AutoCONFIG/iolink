@@ -36,6 +36,11 @@ Final candidate commit: `3c2a504383b599e1985d7b7678daf49ac9608986`.
 | Real TimescaleDB integration after correction | `IOLINK_TEST_PG_DSN=<isolated DSN> go test ./internal/migrate ./internal/core ./internal/notifications ./internal/persistence ./internal/wechat -count=1 -v` | PASS | All five packages passed against TimescaleDB 2.30.2/PostgreSQL 16.15 |
 | Contract verification after correction | `make verify-contracts` | PASS | 56 target operations and 276 fixtures passed |
 
+Implementation follow-up commit: `abccf0a1392ff31786ce1137588a731df4572eff`.
+It maps device registration License, quota, and verification-capability failures to the
+stable HTTP contract (`license_required`, `device_quota_exceeded`, and
+`license_unavailable`). The follow-up focused test and the full verification suite passed.
+
 ## External and deployment limits
 
 The checks use local images and a dedicated test-only database. They do not claim a clean
