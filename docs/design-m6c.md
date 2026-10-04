@@ -2,7 +2,7 @@
 
 ## 状态和边界
 
-`license_state` 持久化当前导入的原始 payload、签名和摘要；解析后的字段仅为缓存，授权决策每次使用已验签原文。`license_clock` 只保留最大已见 UTC 时间和 `clock_error` 状态。运行时公钥来自 `IOLINK_LICENSE_PUBLIC_KEY_FILE`（PEM），对应 `IOLINK_LICENSE_KEY_ID`。两项必须一起配置，缺失时仍能启动基础监测与管理恢复，但导入/新增/恢复/可选动作拒绝；配置非 RSA 或不足 2048 位的密钥则启动失败。签发私钥不进入仓库、镜像、运行包或数据库。
+`license_state` 持久化当前导入的原始 payload、签名和摘要，授权决策每次使用已验签原文。`license_clock` 只保留最大已见 UTC 时间和 `clock_error` 状态。运行时公钥来自 `IOLINK_LICENSE_PUBLIC_KEY_FILE`（PEM），对应 `IOLINK_LICENSE_KEY_ID`。两项必须一起配置，缺失时仍能启动基础监测与管理恢复，但导入/新增/恢复/可选动作拒绝；配置非 RSA 或不足 2048 位的密钥则启动失败。签发私钥不进入仓库、镜像、运行包或数据库。
 
 状态为 `missing`、`invalid`、`instance_mismatch`、`not_before`、`expired`、`clock_error`、`valid` 或 `permanent`。`expired` 与 `clock_error` 保留既有基础采集、查询和报警；设备新增/恢复以及 video、openapi、automation、reports 功能拒绝。无效导入事务回滚，不替换上一份有效授权。
 
@@ -18,7 +18,11 @@ DDL 提案为 `docs/m6c-schema.sql`，设计通过后新增运行迁移 011。`d
 
 ## HTTP 契约
 
-管理端 `GET /admin/v1/license` 返回状态、实例 ID、摘要、额度和 feature 列表；`POST /admin/v1/license` 只接受 `{payload_b64,signature_b64}`，成功 204，字段/签名/实例/未生效/过期无效 400，clock_error 为 409，缺少验证能力为 503，当前有效证书不因失败上传改变。两操作均只允许实时有效平台管理员，普通租户主体 403；平台 token 版本在事务内重验。支持证书重导入，摘要相同仍为 204、无重复业务副作用。最大上传 64KiB，严格拒绝额外字段、重复 JSON 键、尾随对象、无效 UTF-8、空 features/null、缺省必填字段；RSA-PSS salt 长度为 SHA-256 的 32 字节。契约详见 `docs/api/license-openapi.yaml`。
+管理端 `GET /admin/v1/license` 返回状态、实例 ID、摘要、额度和 feature 列表；`POST /admin/v1/license` 只接受 `{payload_b64,signature_b64}`，成功 204，字段/签名/实例/未生效/过期无效 400，clock_error 为 409，缺少验证能力为 503，当前有效证书不因失败上传改变。两操作均只允许实时有效平台管理员，普通租户主体 403；平台 token 版本在事务内重验。支持证书重导入，摘要相同仍为 204、无重复业务副作用。最大上传 64KiB，严格拒绝额外字段、重复 JSON 键、尾随对象、无效 UTF-8、features=null、缺省必填字段；features=[] 合法，表示只授权基础监测。RSA-PSS salt 长度为 SHA-256 的 32 字节。契约详见 `docs/api/license-openapi.yaml`。
+
+离线签发工具为独立源码入口 `cmd/license-sign`，不得复制到 runtime Dockerfile 或客户离线包。调用 `license-sign --private-key /protected/issuer.pem < payload.json > license.json`，私钥只从本地 0600 PEM 文件读取（RSA PKCS#1 或 PKCS#8，至少 2048 位），payload 从 stdin 最多 48KiB。工具严格解析 `SignedPayload` 完整字段，时间使用 UTC RFC3339（秒或纳秒、Z 后缀），issued_at<=not_before、expires_at=null 或 expires_at>not_before；max_devices 为十进制 int64 整数 0..9223372036854775807，不接受小数/指数形式；ID 为 1..128 UTF-8 字节且无前后空格。允许 features=[]，不接受重复/未知值/null。以经验证的输入原始字节签名，输出仅标准 Base64 的两个 envelope 字段和换行到 stdout；错误写 stderr，仅安全类别，不输出密钥或 payload。算法 RSA-PSS-SHA256、salt 32，验签无需重新序列化；私钥、公钥生成步骤在签发方文档，临时测试密钥不进版本库。
+
+签名向量在实现测试中使用临时 RSA key：有效有期限 payload、expires_at=null/features=[] 永久 payload；逐字段删除、未知字段、features=null/重复/未知、负数/小数/超 int64、时间倒序/非 UTC、有效 JSON 但变更一个字节、不同 key/盐长度都必须拒绝。原始 payload 含任意有效 UTF-8（包括多字节 ID）验签一致；payload/envelope 重复键/尾随内容仍拒绝。
 
 设备恢复新增 `POST /admin/v1/devices/{device_no}/restore`：按当前租户管理员授权，成功 204，跨租户 404，无权限 403，非法或状态不允许 409，License/配额拒绝 403（稳定码 `license_required` / `device_quota_exceeded`），服务能力缺失 503。恢复成功使设备 offline、last_seen_at 清空、session_version 增加，旧 session/旧 shadow 失效；重复恢复不占第二份额度。停用重复幂等。后续所有可选 HTTP/MQTT/worker 执行入口调用同一 feature gate；M6c 只用 fake future executor 验证每个 feature，真实 future 入口仍为 R39.b 待各阶段实现。
 
@@ -34,7 +38,7 @@ DDL 提案为 `docs/m6c-schema.sql`，设计通过后新增运行迁移 011。`d
 
 安装脚本先严格校验文件清单、拒绝缺少/损坏/路径越界，再 docker load，版本和依赖检查；自动生成本地随机数据库密码/JWT key（只写 0600 .env），提示输入自设管理员和 owner 密码且不回显，完成迁移/初始化/License 导入/健康与模拟上报。没有签发方 License 时停在授权步骤，记录外部阻塞。卸载仅停容器，默认保留数据；删数据需要显式参数。
 
-软件验收使用本任务专属隔离 TimescaleDB，完整断网安装采用独立 Docker network + `pull_policy: never` 验证不访问 registry；干净实机 30 分钟、实际签发/续期仍需外部交付证据，不把本地隔离 Docker 验证写成已满足外部实机。ARM64 未验收。
+软件验收使用本任务专属隔离 TimescaleDB，完整断网安装采用 `docker network create --internal` 的禁出网网络 + `pull_policy: never`。驱动脚本只执行本地工具、通过 docker exec 访问服务，不设置 HTTP/WX 外部凭据；检查 network internal 标志、失败的外部连接探针、镜像 manifest 与 docker load/Compose 启动记录。该方案证明容器出网受限和镜像无需 registry，不等于断网 Docker daemon/干净实机；干净实机 30 分钟、实际签发/续期仍需外部交付证据，不把本地隔离 Docker 验证写成已满足外部实机。ARM64 未验收。
 
 ## 权限矩阵
 
