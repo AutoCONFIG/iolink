@@ -825,6 +825,38 @@ func (s *Server) deleteDevice(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func (s *Server) restoreDevice(c *gin.Context) {
+	if err := s.deps.Store.RestoreDevice(c.Request.Context(), c.Param("device_no")); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
+		if errors.Is(err, domain.ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
+			return
+		}
+		if errors.Is(err, domain.ErrConflict) {
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
+			return
+		}
+		if errors.Is(err, license.ErrRequired) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "license_required"})
+			return
+		}
+		if errors.Is(err, license.ErrQuotaExceeded) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "device_quota_exceeded"})
+			return
+		}
+		if errors.Is(err, license.ErrUnavailable) {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "restore failed"})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
 // ---- alarm rules ----
 
 type ruleReq struct {

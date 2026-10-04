@@ -141,6 +141,9 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 			if err := decoder.Decode(&input); err != nil {
 				return errors.New("invalid setup JSON")
 			}
+			if err := decoder.Decode(&struct{}{}); err != io.EOF {
+				return errors.New("invalid setup JSON")
+			}
 			return platform.SetupInit(cmdCtx, pool, input)
 		}
 		if args[0] == "license" && args[1] == "import" {
@@ -202,6 +205,9 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	}
 	svc, err := core.NewWithPolicy(ctx, pool, log, policy, cfg.ReportInterval)
 	if err != nil {
+		return err
+	}
+	if err := svc.ObserveLicenseClock(ctx); err != nil && !errors.Is(err, license.ErrClockError) {
 		return err
 	}
 	if cfg.LicensePublicKeyFile != "" {

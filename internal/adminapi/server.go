@@ -50,6 +50,7 @@ type AdminStore interface {
 	GetDevice(ctx context.Context, deviceNo string) (domain.Device, error)
 	MoveDevice(ctx context.Context, deviceNo string, pondID int64) error
 	DeleteDevice(ctx context.Context, deviceNo string) error
+	RestoreDevice(ctx context.Context, deviceNo string) error
 
 	ListRules(ctx context.Context) ([]domain.AlarmRule, error)
 	CreateRule(ctx context.Context, rule domain.AlarmRule) (domain.AlarmRule, error)
@@ -162,6 +163,7 @@ func (s *Server) Routes() http.Handler {
 		tenantAuth.POST("/devices", s.registerDevice)
 		tenantAuth.GET("/devices/:device_no", s.getDevice)
 		tenantAuth.DELETE("/devices/:device_no", s.deleteDevice)
+		tenantAuth.POST("/devices/:device_no/restore", s.restoreDevice)
 		tenantAuth.PUT("/devices/:device_no/pond", s.moveDevice)
 
 		tenantAuth.GET("/alarm-rules", s.listRules)

@@ -92,6 +92,12 @@ func (f *fakeStore) DeleteDevice(_ context.Context, no string) error {
 	delete(f.devices, no)
 	return nil
 }
+func (f *fakeStore) RestoreDevice(_ context.Context, no string) error {
+	if _, ok := f.devices[no]; !ok {
+		return domain.ErrNotFound
+	}
+	return nil
+}
 
 func (f *fakeStore) ListRules(_ context.Context) ([]domain.AlarmRule, error) {
 	out := make([]domain.AlarmRule, 0, len(f.rules))

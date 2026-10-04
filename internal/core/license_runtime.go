@@ -103,9 +103,6 @@ func (s *Service) checkDeviceAdmission(ctx context.Context, tx pgx.Tx) error {
 	if s.license.PublicKey == nil || s.license.KeyID == "" {
 		return license.ErrUnavailable
 	}
-	if err := observeLicenseClock(ctx, tx); err != nil {
-		return err
-	}
 	var deployment string
 	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&deployment); err != nil {
 		return fmt.Errorf("license deployment: %w", err)
@@ -140,6 +137,12 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 	if s.license == nil || s.license.PublicKey == nil || s.license.KeyID == "" {
 		return license.ErrUnavailable
 	}
+	if err := s.observeLicenseClock(ctx); err != nil {
+		if errors.Is(err, license.ErrClockError) {
+			_ = s.recordLicenseRejection(ctx, envelope, actorID, "license_clock_error")
+		}
+		return err
+	}
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("license import transaction: %w", err)
@@ -149,12 +152,6 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 		_ = tx.Rollback(ctx)
 		_ = s.recordLicenseRejection(ctx, envelope, actorID, reason)
 		return cause
-	}
-	if err := observeLicenseClock(ctx, tx); err != nil {
-		if errors.Is(err, license.ErrClockError) {
-			return reject("license_clock_error", err)
-		}
-		return err
 	}
 	var deployment string
 	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE FOR UPDATE`).Scan(&deployment); err != nil {
@@ -197,6 +194,25 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 	}
 	return nil
 }
+
+func (s *Service) observeLicenseClock(ctx context.Context) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("license clock transaction: %w", err)
+	}
+	defer tx.Rollback(ctx)
+	if err := observeLicenseClock(ctx, tx); err != nil {
+		return err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("license clock commit: %w", err)
+	}
+	return nil
+}
+
+// ObserveLicenseClock records the process clock high-water mark in its own
+// short transaction so a later business rollback cannot erase it.
+func (s *Service) ObserveLicenseClock(ctx context.Context) error { return s.observeLicenseClock(ctx) }
 
 func (s *Service) RecordLicenseRejection(ctx context.Context, raw []byte, actorID int64, reason string) error {
 	tx, err := s.pool.Begin(ctx)

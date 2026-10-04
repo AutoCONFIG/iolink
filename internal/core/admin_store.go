@@ -607,6 +607,9 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 // RegisterDevice generates a unique device_no and a one-time secret
 // (only sha256 is persisted).
 func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (domain.Device, string, error) {
+	if err := s.observeLicenseClock(ctx); err != nil {
+		return domain.Device{}, "", err
+	}
 	tx, err := s.beginTenantWrite(ctx, "devices")
 	if err != nil {
 		return domain.Device{}, "", err
@@ -676,6 +679,44 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 		return domain.Device{}, "", err
 	}
 	return d, secHex, nil
+}
+
+func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) error {
+	if err := s.observeLicenseClock(ctx); err != nil {
+		return err
+	}
+	tx, err := s.beginTenantWrite(ctx, "devices")
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	q := `SELECT d.id,d.disabled_at FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
+	args := []any{deviceNo}
+	if tenantID, scoped := domain.TenantID(ctx); scoped {
+		q += ` AND f.tenant_id=$2`
+		args = append(args, tenantID)
+	}
+	var id int64
+	var disabledAt *time.Time
+	if err := tx.QueryRow(ctx, q+` FOR UPDATE`, args...).Scan(&id, &disabledAt); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.ErrNotFound
+		}
+		return err
+	}
+	if disabledAt == nil {
+		return nil
+	}
+	if err := s.checkDeviceAdmission(ctx, tx); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(ctx, `UPDATE devices SET disabled_at=NULL,status='offline',last_seen_at=NULL,session_version=session_version+1 WHERE id=$1`, id); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM device_shadows WHERE device_no=$1`, deviceNo); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 func normalizeDBError(err error) error {
