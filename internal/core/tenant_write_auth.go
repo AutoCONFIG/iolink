@@ -12,7 +12,7 @@ func (s *Service) authorizeTenantWrite(ctx context.Context, tx pgx.Tx, resource,
 }
 
 func (s *Service) beginTenantWrite(ctx context.Context, resource string) (pgx.Tx, error) {
-	tx, err := s.pool.Begin(ctx)
+	tx, err := s.beginWriteTransaction(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -20,6 +20,14 @@ func (s *Service) beginTenantWrite(ctx context.Context, resource string) (pgx.Tx
 		if rollbackErr := tx.Rollback(ctx); rollbackErr != nil {
 			return nil, rollbackErr
 		}
+		return nil, err
+	}
+	return tx, nil
+}
+
+func (s *Service) beginWriteTransaction(ctx context.Context) (pgx.Tx, error) {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
 		return nil, err
 	}
 	return tx, nil

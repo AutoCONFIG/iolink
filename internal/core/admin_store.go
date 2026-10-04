@@ -610,11 +610,17 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 	if err := s.observeLicenseClock(ctx); err != nil {
 		return domain.Device{}, "", err
 	}
-	tx, err := s.beginTenantWrite(ctx, "devices")
+	tx, err := s.beginWriteTransaction(ctx)
 	if err != nil {
 		return domain.Device{}, "", err
 	}
 	defer s.finishLicenseTransaction(ctx, tx, &resultErr)
+	if err := lockLicenseState(ctx, tx); err != nil {
+		return domain.Device{}, "", err
+	}
+	if err := s.authorizeTenantWrite(ctx, tx, "devices", "write"); err != nil {
+		return domain.Device{}, "", err
+	}
 	if err := s.checkDeviceAdmission(ctx, tx); err != nil {
 		return domain.Device{}, "", err
 	}
@@ -685,12 +691,15 @@ func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) (resultErr
 	if err := s.observeLicenseClock(ctx); err != nil {
 		return err
 	}
-	tx, err := s.beginTenantWrite(ctx, "devices")
+	tx, err := s.beginWriteTransaction(ctx)
 	if err != nil {
 		return err
 	}
 	defer s.finishLicenseTransaction(ctx, tx, &resultErr)
 	if err := lockLicenseState(ctx, tx); err != nil {
+		return err
+	}
+	if err := s.authorizeTenantWrite(ctx, tx, "devices", "write"); err != nil {
 		return err
 	}
 	q := `SELECT d.id,d.disabled_at,d.status FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`

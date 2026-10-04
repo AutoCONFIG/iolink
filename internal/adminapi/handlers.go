@@ -859,7 +859,7 @@ func (s *Server) restoreDevice(c *gin.Context) {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "restore failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 		return
 	}
 	c.Status(http.StatusNoContent)
