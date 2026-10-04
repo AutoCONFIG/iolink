@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 )
 
 type tenantStatusRequest struct {
@@ -673,7 +674,7 @@ type registerDeviceReq struct {
 func (s *Server) registerDevice(c *gin.Context) {
 	var req registerDeviceReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	dev, secret, err := s.deps.Store.RegisterDevice(c.Request.Context(), req.PondID, req.Name, req.Model, req.ReportInterval)
@@ -690,7 +691,23 @@ func (s *Server) registerDevice(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		if errors.Is(err, license.ErrRequired) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "license_required"})
+			return
+		}
+		if errors.Is(err, license.ErrQuotaExceeded) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "device_quota_exceeded"})
+			return
+		}
+		if errors.Is(err, license.ErrClockError) {
+			c.JSON(http.StatusConflict, gin.H{"error": "license_clock_error"})
+			return
+		}
+		if errors.Is(err, license.ErrUnavailable) {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -807,6 +824,42 @@ func (s *Server) deleteDevice(c *gin.Context) {
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
+func (s *Server) restoreDevice(c *gin.Context) {
+	if err := s.deps.Store.RestoreDevice(c.Request.Context(), c.Param("device_no")); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
+		if errors.Is(err, domain.ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
+			return
+		}
+		if errors.Is(err, domain.ErrConflict) {
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
+			return
+		}
+		if errors.Is(err, license.ErrRequired) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "license_required"})
+			return
+		}
+		if errors.Is(err, license.ErrQuotaExceeded) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "device_quota_exceeded"})
+			return
+		}
+		if errors.Is(err, license.ErrClockError) {
+			c.JSON(http.StatusConflict, gin.H{"error": "license_clock_error"})
+			return
+		}
+		if errors.Is(err, license.ErrUnavailable) {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 		return
 	}
 	c.Status(http.StatusNoContent)

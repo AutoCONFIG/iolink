@@ -74,6 +74,38 @@ docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-comp
 
 源码修改后再次执行最后一条命令即可重新构建。开发 DB 额外发布 `127.0.0.1:${IOLINK_DEV_PG_PORT:-5432}` 供宿主 Go 调试；该覆盖文件不要用于公网部署。`make dev` 只启动开发 DB，再用宿主 `go run` 迁移和服务，需要单独导出本地 `IOLINK_PG_DSN`、根密钥并已初始化管理员；它不会自动读取 `deploy/.env` 给 Go 进程。
 
+## M6c 离线包
+
+离线包由操作者明确提供已经存在于本机的应用和 TimescaleDB 镜像构建，脚本会检查 `linux/amd64`、保存镜像 manifest 和 digest、复制迁移/Compose/前端/依赖清单，并生成 SPDX SBOM、许可证清单和 SHA-256 清单。SBOM 覆盖 Go 模块和前端锁文件的运行、构建依赖，许可证清单收集本地依赖根目录的 LICENSE/COPYING/NOTICE 正文；缺少正文的包明确标记，licenseConcluded 不作法律认定。镜像内操作系统和数据库软件以镜像 manifest 定位，不宣称已逐包扫描。应用镜像是前后端一体的 `iolinkd`，其中也带有 `/app/mqtt-sim` 供隔离验收使用；`web-mini` 不进入常驻镜像。
+
+```bash
+docker build -t local/iolinkd:build .
+IOLINKD_IMAGE=local/iolinkd:build \
+IOLINK_DB_IMAGE=timescale/timescaledb:latest-pg16 \
+  sh scripts/build-offline-bundle.sh dist/iolink-offline
+```
+
+把整个 `dist/iolink-offline` 目录复制到目标机。安装前准备仅本地可读的 setup JSON，例如：
+
+```json
+{"platform_username":"platform","platform_password":"Platform-pass1!","tenant_username":"tenant","tenant_password":"Tenant-pass2@","tenant_name":"Default tenant"}
+```
+
+然后执行：
+
+```bash
+cd dist/iolink-offline
+chmod 600 setup-input.json
+mkdir -p secrets
+cp /protected/issuer/public-key.pem secrets/license-public.pem
+chmod 600 secrets/license-public.pem
+IOLINK_LICENSE_KEY_ID=production-2026-01 IOLINK_SETUP_INPUT=$PWD/setup-input.json ./install.sh
+```
+
+脚本会先校验所有 SHA-256，再 `docker load`、启动数据库、运行 `migrate up`、检查 `setup status`。尚未初始化时执行同一事务内的 `setup init`；已初始化时沿用账户和卷，补入 License 后继续启动应用并检查 `/healthz` 与 `/readyz`。签发方提供 License 时，把 envelope 保存到受限文件并设置 `IOLINK_LICENSE_INPUT` 和 `IOLINK_LICENSE_KEY_ID`；缺少 License 时安装退出 3，不会启动未完成首启的服务。把公钥放在离线包根目录的 `secrets/license-public.pem`，随后使用相同目录重跑安装；无需重复设置已初始化的账户。`./uninstall.sh` 默认只停止并移除容器，保留数据库卷；删除数据必须显式执行 Compose 的 `down -v`。
+
+离线 Compose 使用 `pull_policy: never` 和内部网络；`deploy/reverse-proxy.optional.yaml` 与 `deploy/streaming.optional.yaml` 目前明确标记为 `optional_unimplemented`，不能当作已交付的视频或反代服务。
+
 ## M1 迁移fixture注意
 
 003迁移新增pond快照、逐字段时间、采样ID窗口和报警唯一约束。旧遥测没有塘快照，只能按仍存在的设备当前塘回填；设备已删除的孤立旧样本保留NULL，不伪造归属，未来授权查询必须拒绝不可归属记录。旧影子各字段时间只能以原影子ts回填，不能恢复旧版本未保留的逐字段历史。

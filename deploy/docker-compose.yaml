@@ -25,6 +25,7 @@ services:
     stop_grace_period: 15s
     volumes:
       - ./logs:/var/log/iolink
+      - ./secrets:/run/iolink/secrets:ro
     depends_on:
       db: {condition: service_healthy}
     ports:
@@ -35,6 +36,8 @@ services:
       IOLINK_MQTT_ADDR: :1883
       IOLINK_PG_DSN: postgres://iolink:${IOLINK_PG_PASSWORD}@db:5432/iolink?sslmode=disable
       IOLINK_SECRET_KEY: ${IOLINK_SECRET_KEY:?set IOLINK_SECRET_KEY in .env}
+      IOLINK_LICENSE_PUBLIC_KEY_FILE: ${IOLINK_LICENSE_PUBLIC_KEY_FILE:-}
+      IOLINK_LICENSE_KEY_ID: ${IOLINK_LICENSE_KEY_ID:-}
       IOLINK_REPORT_INTERVAL: ${IOLINK_REPORT_INTERVAL:-60}
       IOLINK_OFFLINE_GRACE: ${IOLINK_OFFLINE_GRACE:-3}
       IOLINK_WX_APPID: ${IOLINK_WX_APPID:-}
@@ -53,6 +56,10 @@ services:
     logging:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
+
+networks:
+  default:
+    name: iolink-net
 
 volumes:
   pgdata:

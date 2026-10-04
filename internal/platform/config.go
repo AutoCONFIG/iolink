@@ -19,7 +19,7 @@ func LoadConfig(getenv func(string) string, serving bool) (Config, error) {
 		}
 		return def
 	}
-	c := Config{HTTPAddr: get("IOLINK_HTTP_ADDR", ":8080"), MQTTAddr: get("IOLINK_MQTT_ADDR", ":1883"), PgDSN: getenv("IOLINK_PG_DSN"), PgMaxConns: 20, QueryTimeout: 5 * time.Second, SecretKey: getenv("IOLINK_SECRET_KEY"), WXAppID: getenv("IOLINK_WX_APPID"), WXSecret: getenv("IOLINK_WX_SECRET"), WXTemplateID: getenv("IOLINK_WX_TEMPLATE_ID")}
+	c := Config{HTTPAddr: get("IOLINK_HTTP_ADDR", ":8080"), MQTTAddr: get("IOLINK_MQTT_ADDR", ":1883"), PgDSN: getenv("IOLINK_PG_DSN"), PgMaxConns: 20, QueryTimeout: 5 * time.Second, SecretKey: getenv("IOLINK_SECRET_KEY"), LicensePublicKeyFile: getenv("IOLINK_LICENSE_PUBLIC_KEY_FILE"), LicenseKeyID: getenv("IOLINK_LICENSE_KEY_ID"), WXAppID: getenv("IOLINK_WX_APPID"), WXSecret: getenv("IOLINK_WX_SECRET"), WXTemplateID: getenv("IOLINK_WX_TEMPLATE_ID")}
 	// Requiring a URL keeps connection error redaction and deployment behavior unambiguous.
 	u, err := url.Parse(c.PgDSN)
 	if err != nil || u == nil || (u.Scheme != "postgres" && u.Scheme != "postgresql") || u.Host == "" || u.Path == "" || u.Path == "/" {
@@ -44,6 +44,9 @@ func LoadConfig(getenv func(string) string, serving bool) (Config, error) {
 	c.OfflineGrace = grace
 	if serving && (len(c.SecretKey) < 32 || strings.TrimSpace(c.SecretKey) != c.SecretKey || c.SecretKey == strings.Repeat(string(c.SecretKey[0]), len(c.SecretKey))) {
 		return c, errors.New("IOLINK_SECRET_KEY must be a non-default random string of at least 32 bytes")
+	}
+	if (c.LicensePublicKeyFile == "") != (c.LicenseKeyID == "") {
+		return c, errors.New("IOLINK_LICENSE_PUBLIC_KEY_FILE and IOLINK_LICENSE_KEY_ID must be configured together")
 	}
 	if (c.WXAppID == "") != (c.WXSecret == "") {
 		return c, errors.New("IOLINK_WX_APPID and IOLINK_WX_SECRET must be configured together")

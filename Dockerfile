@@ -13,11 +13,13 @@ COPY . .
 COPY --from=frontend /web/dist ./web/dist
 RUN sh scripts/embed-frontend.sh
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/iolinkd ./cmd/iolinkd
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/mqtt-sim ./cmd/mqtt-sim
 
 FROM alpine:3.20
 RUN apk add --no-cache ca-certificates tzdata wget
 WORKDIR /app
 COPY --from=build /out/iolinkd /app/iolinkd
+COPY --from=build /out/mqtt-sim /app/mqtt-sim
 ENV IOLINK_HTTP_ADDR=:8080 IOLINK_MQTT_ADDR=:1883
 EXPOSE 8080 1883
 ENTRYPOINT ["/app/iolinkd"]

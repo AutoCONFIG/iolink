@@ -606,12 +606,24 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 
 // RegisterDevice generates a unique device_no and a one-time secret
 // (only sha256 is persisted).
-func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (domain.Device, string, error) {
-	tx, err := s.beginTenantWrite(ctx, "devices")
+func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (device domain.Device, secretValue string, resultErr error) {
+	if err := s.observeLicenseClock(ctx); err != nil {
+		return domain.Device{}, "", err
+	}
+	tx, err := s.beginWriteTransaction(ctx)
 	if err != nil {
 		return domain.Device{}, "", err
 	}
-	defer tx.Rollback(ctx)
+	defer s.finishLicenseTransaction(ctx, tx, &resultErr)
+	if err := lockLicenseState(ctx, tx); err != nil {
+		return domain.Device{}, "", err
+	}
+	if err := s.authorizeTenantWrite(ctx, tx, "devices", "write"); err != nil {
+		return domain.Device{}, "", err
+	}
+	if err := s.checkDeviceAdmission(ctx, tx); err != nil {
+		return domain.Device{}, "", err
+	}
 	if reportInterval != 0 && reportInterval != 60 && reportInterval != 300 {
 		return domain.Device{}, "", domain.ErrInvalidRange
 	}
@@ -673,6 +685,54 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 		return domain.Device{}, "", err
 	}
 	return d, secHex, nil
+}
+
+func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) (resultErr error) {
+	if err := s.observeLicenseClock(ctx); err != nil {
+		return err
+	}
+	tx, err := s.beginWriteTransaction(ctx)
+	if err != nil {
+		return err
+	}
+	defer s.finishLicenseTransaction(ctx, tx, &resultErr)
+	if err := lockLicenseState(ctx, tx); err != nil {
+		return err
+	}
+	if err := s.authorizeTenantWrite(ctx, tx, "devices", "write"); err != nil {
+		return err
+	}
+	q := `SELECT d.id,d.disabled_at,d.status FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
+	args := []any{deviceNo}
+	if tenantID, scoped := domain.TenantID(ctx); scoped {
+		q += ` AND f.tenant_id=$2`
+		args = append(args, tenantID)
+	}
+	var id int64
+	var disabledAt *time.Time
+	var status string
+	if err := tx.QueryRow(ctx, q+` FOR UPDATE OF d`, args...).Scan(&id, &disabledAt, &status); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.ErrNotFound
+		}
+		return err
+	}
+	if disabledAt == nil {
+		return nil
+	}
+	if status != string(domain.DeviceOffline) {
+		return domain.ErrConflict
+	}
+	if err := s.checkDeviceAdmission(ctx, tx); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(ctx, `UPDATE devices SET disabled_at=NULL,status='offline',last_seen_at=NULL,session_version=session_version+1 WHERE id=$1`, id); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM device_shadows WHERE device_no=$1`, deviceNo); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 func normalizeDBError(err error) error {

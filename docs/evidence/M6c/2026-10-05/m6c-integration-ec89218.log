@@ -1,0 +1,7 @@
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	4.803s
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	9.689s
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	72.448s
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	6.690s
+ok  	git.hyhy.fun/rsplab/iolink/internal/persistence	1.878s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	1.661s
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.020s

@@ -1,0 +1,4 @@
+running_image=sha256:60f87d30159cca4a601a0dce7b4e20af170a0f4c44a20c91f2ad03507bc10b2a source=333fc427a4cd9c49715193176993c1e1827dedc6
+Internal=true
+external probe refused; simulator present; issuer absent
+telemetry_rows=5

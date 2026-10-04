@@ -1,0 +1,132 @@
+openapi: 3.0.3
+info:
+  title: IoLink License API
+  version: 1.0.0
+  description: |
+    M6c 管理授权契约。运行时只接受签名授权文件，不接收或保存签发私钥。
+    POST 导入失败时必须保留当前有效授权；所有摘要只使用 SHA-256 十六进制值。
+servers:
+  - url: http://localhost:8080/admin/v1
+security:
+  - BearerAuth: []
+paths:
+  /license:
+    get:
+      summary: 查询当前授权状态
+      responses:
+        '200':
+          description: 当前状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicenseStatus'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    post:
+      summary: 导入签名授权文件
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicenseEnvelope'
+      responses:
+        '204': { description: 导入成功 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '500': { $ref: '#/components/responses/InternalError' }
+  /devices/{device_no}/restore:
+    post:
+      summary: 恢复停用设备（租户管理员，事务配额校验）
+      parameters:
+        - { name: device_no, in: path, required: true, schema: { type: string, minLength: 1, maxLength: 64 } }
+      responses:
+        '204': { description: 成功，重复恢复幂等 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+components:
+  securitySchemes:
+    BearerAuth: { type: http, scheme: bearer }
+  schemas:
+    LicenseEnvelope:
+      type: object
+      required: [payload_b64, signature_b64]
+      additionalProperties: false
+      properties:
+        payload_b64: { type: string, format: byte, minLength: 1, maxLength: 62000 }
+        signature_b64: { type: string, format: byte, minLength: 1, maxLength: 1500 }
+    SignedPayload:
+      type: object
+      description: 原始 UTF-8 JSON 字节按 RSA-PSS-SHA256 签名，salt 32 字节；不得重序列化后验签。issued_at 不晚于 not_before，expires_at 非空时严格晚于 not_before。
+      required: [license_id, deployment_id, issued_at, not_before, expires_at, max_devices, features, key_id]
+      additionalProperties: false
+      properties:
+        license_id: { type: string, minLength: 1, maxLength: 128 }
+        deployment_id: { type: string, minLength: 1, maxLength: 128 }
+        issued_at: { type: string, format: date-time }
+        not_before: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time, nullable: true }
+        max_devices: { type: integer, format: int64, minimum: 0 }
+        features:
+          type: array
+          uniqueItems: true
+          items: { type: string, enum: [video, openapi, automation, reports] }
+        key_id: { type: string, minLength: 1, maxLength: 128 }
+    Error:
+      type: object
+      required: [error]
+      additionalProperties: false
+      properties:
+        error:
+          type: string
+          enum: [invalid_request, license_invalid, license_signature_invalid, license_instance_mismatch, license_not_before, license_expired, license_clock_error, unauthorized, forbidden, license_required, device_quota_exceeded, not_found, conflict, license_unavailable, internal_error]
+    LicenseStatus:
+      type: object
+      required: [state, deployment_id, license_id, key_id, issued_at, not_before, expires_at, max_devices, features, used_devices, overage, payload_sha256]
+      additionalProperties: false
+      properties:
+        state: { type: string, enum: [missing, valid, permanent, not_before, expired, invalid, instance_mismatch, clock_error, overage] }
+        license_id: { type: string, nullable: true }
+        deployment_id: { type: string, nullable: true }
+        key_id: { type: string, nullable: true }
+        issued_at: { type: string, format: date-time, nullable: true }
+        not_before: { type: string, format: date-time, nullable: true }
+        expires_at: { type: string, format: date-time, nullable: true }
+        max_devices: { type: integer, minimum: 0 }
+        features:
+          type: array
+          items: { type: string, enum: [video, openapi, automation, reports] }
+        used_devices: { type: integer, minimum: 0 }
+        overage: { type: integer, minimum: 0 }
+        payload_sha256: { type: string, pattern: '^[0-9a-f]{64}$', nullable: true }
+  responses:
+    InternalError:
+      description: internal_error
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    BadRequest:
+      description: invalid_request / license_invalid / license_signature_invalid / license_instance_mismatch / license_not_before / license_expired
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Unauthorized:
+      description: unauthorized
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Conflict:
+      description: license_clock_error（导入）/ conflict（设备恢复冲突）
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Forbidden:
+      description: forbidden（权限）/ license_required（设备准入）/ device_quota_exceeded（额度）
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    NotFound:
+      description: not_found（设备不存在或不属于当前租户）
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Unavailable:
+      description: license_unavailable（验证能力缺失）/ internal_error（数据库不可用）
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }

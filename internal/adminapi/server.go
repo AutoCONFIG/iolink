@@ -15,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"git.hyhy.fun/rsplab/iolink/internal/operations"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 )
@@ -49,6 +50,7 @@ type AdminStore interface {
 	GetDevice(ctx context.Context, deviceNo string) (domain.Device, error)
 	MoveDevice(ctx context.Context, deviceNo string, pondID int64) error
 	DeleteDevice(ctx context.Context, deviceNo string) error
+	RestoreDevice(ctx context.Context, deviceNo string) error
 
 	ListRules(ctx context.Context) ([]domain.AlarmRule, error)
 	CreateRule(ctx context.Context, rule domain.AlarmRule) (domain.AlarmRule, error)
@@ -71,6 +73,13 @@ type TenantAdminStore interface {
 	SetTenantActive(context.Context, int64, bool, int64) error
 	ListTenantMembers(context.Context, int64) ([]domain.TenantMembership, error)
 	SetTenantMember(context.Context, int64, int64, string, bool, *time.Time, int64) error
+}
+
+type LicenseStore interface {
+	LicenseStatus(context.Context) (license.Status, error)
+	ImportLicenseRaw(context.Context, []byte, license.Envelope, int64) error
+	RecordLicenseRejection(context.Context, []byte, int64, string) error
+	RecordLicenseRejectionDigest(context.Context, string, int64, string) error
 }
 
 type FarmMembershipStore interface {
@@ -127,6 +136,8 @@ func (s *Server) Routes() http.Handler {
 
 	auth := v1.Group("", s.authRequired)
 	{
+		auth.GET("/license", s.getLicense)
+		auth.POST("/license", s.importLicense)
 		auth.GET("/tenants", s.listTenants)
 		auth.PUT("/tenants/:id/status", s.setTenantStatus)
 		auth.GET("/tenants/:id/members", s.listTenantMembers)
@@ -153,6 +164,7 @@ func (s *Server) Routes() http.Handler {
 		tenantAuth.POST("/devices", s.registerDevice)
 		tenantAuth.GET("/devices/:device_no", s.getDevice)
 		tenantAuth.DELETE("/devices/:device_no", s.deleteDevice)
+		tenantAuth.POST("/devices/:device_no/restore", s.restoreDevice)
 		tenantAuth.PUT("/devices/:device_no/pond", s.moveDevice)
 
 		tenantAuth.GET("/alarm-rules", s.listRules)

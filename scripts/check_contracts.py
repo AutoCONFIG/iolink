@@ -52,6 +52,8 @@ def fixture(schema):
         return True
     if s.get('format') == 'date-time':
         return '2026-09-19T00:00:00Z'
+    if s.get('format') == 'byte':
+        return 'eA=='
     if s.get('pattern') == '^[0-9a-f]{64}$':
         return 'a' * 64
     return 'x' * max(s.get('minLength', 0), 1)
@@ -69,6 +71,9 @@ def main():
                 if method not in {'get', 'post', 'put', 'delete', 'patch'}:
                     continue
                 count += 1
+                for status, response in operation['responses'].items():
+                    if path.name == 'license-openapi.yaml' and int(status) >= 400:
+                        assert 'schema' in response.get('content', {}).get('application/json', {}), (route, method, status, 'missing error schema')
                 parameters = operation.get('parameters', [])
                 assert set(re.findall(r'{([^}]+)}', route)) == {p['name'] for p in parameters if p['in'] == 'path'}
                 containers = [operation['requestBody']] if 'requestBody' in operation else []
@@ -85,9 +90,23 @@ def main():
             assert not checker.is_valid(dict(base, min_value=None, max_value=None))
             assert checker.is_valid(dict(base, min_value=4))
             assert checker.is_valid(dict(base, max_value=9))
+        if 'SignedPayload' in full['components']['schemas']:
+            signed = full['components']['schemas']['SignedPayload']
+            payload = fixture(signed)
+            checker = OAS30Validator(signed)
+            checker.validate(payload)
+            for field in signed['required']:
+                missing = {key: value for key, value in payload.items() if key != field}
+                assert not checker.is_valid(missing), (path, field, 'missing required signed field accepted')
+                samples += 1
+            assert not checker.is_valid(dict(payload, features=['video', 'video']))
+            assert not checker.is_valid(dict(payload, features=['future']))
+            assert not checker.is_valid(dict(payload, max_devices=-1))
+            assert not checker.is_valid(dict(payload, unexpected=True))
+            samples += 5
         counts.append(count)
         print(f'{path.relative_to(ROOT)}: standard schema and {count} operation fixtures PASS')
-    assert sorted(counts) == [15, 38], counts
+    assert sorted(counts) == [3, 15, 39], counts
     print(f'{sum(counts)} target operations, {samples} synthetic request/response fixtures PASS; live handler verification is R02.c')
 
 if __name__ == '__main__':

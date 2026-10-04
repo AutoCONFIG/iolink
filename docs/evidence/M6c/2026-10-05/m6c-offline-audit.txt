@@ -1,0 +1,3 @@
+license.imported|1
+setup.initialized|1
+setup.tenant_created|1

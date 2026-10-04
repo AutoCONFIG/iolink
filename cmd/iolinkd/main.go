@@ -23,6 +23,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/appapi"
 	"git.hyhy.fun/rsplab/iolink/internal/authorization"
 	"git.hyhy.fun/rsplab/iolink/internal/core"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
 	"git.hyhy.fun/rsplab/iolink/internal/notifications"
 	"git.hyhy.fun/rsplab/iolink/internal/observability"
@@ -56,11 +57,11 @@ func printFailure(stderr io.Writer, err error) {
 
 func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
-		fmt.Fprintln(stdout, "iolinkd [serve | migrate up | migrate status | migrate adopt-legacy | admin init USER | admin reset-password USER]\nAdmin commands read a new password from redirected stdin, never argv. Back up before adopt-legacy or upgrades.")
+		fmt.Fprintln(stdout, "iolinkd [serve | migrate up | migrate status | migrate adopt-legacy | admin init USER | admin reset-password USER | setup status | setup init | license import | license reconcile-clock]\nSetup and admin commands read protected JSON/password input from stdin, never argv. Back up before adopt-legacy or upgrades.")
 		return nil
 	}
 	serving := len(args) == 0 || (len(args) == 1 && args[0] == "serve")
-	valid := serving || (len(args) == 2 && args[0] == "migrate" && (args[1] == "up" || args[1] == "status" || args[1] == "adopt-legacy")) || (len(args) == 3 && args[0] == "admin" && (args[1] == "init" || args[1] == "reset-password"))
+	valid := serving || (len(args) == 2 && args[0] == "migrate" && (args[1] == "up" || args[1] == "status" || args[1] == "adopt-legacy")) || (len(args) == 3 && args[0] == "admin" && (args[1] == "init" || args[1] == "reset-password")) || (len(args) == 2 && args[0] == "setup" && (args[1] == "status" || args[1] == "init")) || (len(args) == 2 && args[0] == "license" && (args[1] == "import" || args[1] == "reconcile-clock"))
 	if !valid {
 		return &startupError{errors.New("unknown command; use iolinkd --help")}
 	}
@@ -120,6 +121,77 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 		if err := migrate.CheckLatest(cmdCtx, pool); err != nil {
 			return err
 		}
+		if args[0] == "setup" && args[1] == "status" {
+			status, err := platform.SetupStatusJSON(cmdCtx, pool)
+			if err != nil {
+				return err
+			}
+			_, err = stdout.Write(append(status, '\n'))
+			return err
+		}
+		if args[0] == "setup" && args[1] == "init" {
+			if f, ok := stdin.(*os.File); ok {
+				if st, e := f.Stat(); e == nil && st.Mode()&os.ModeCharDevice != 0 {
+					return errors.New("redirect setup JSON from a protected file on stdin")
+				}
+			}
+			var input platform.SetupInput
+			decoder := json.NewDecoder(io.LimitReader(stdin, 4097))
+			decoder.DisallowUnknownFields()
+			if err := decoder.Decode(&input); err != nil {
+				return errors.Join(errors.New("invalid setup JSON"), platform.RecordSetupInputRejection(cmdCtx, pool))
+			}
+			if err := decoder.Decode(&struct{}{}); err != io.EOF {
+				return errors.Join(errors.New("invalid setup JSON"), platform.RecordSetupInputRejection(cmdCtx, pool))
+			}
+			return platform.SetupInit(cmdCtx, pool, input)
+		}
+		if args[0] == "license" && args[1] == "import" {
+			if cfg.LicensePublicKeyFile == "" || cfg.LicenseKeyID == "" {
+				return errors.New("license verification configuration unavailable")
+			}
+			rawKey, err := os.ReadFile(cfg.LicensePublicKeyFile)
+			if err != nil {
+				return errors.New("license public key unavailable")
+			}
+			publicKey, err := license.ParsePublicKey(string(rawKey))
+			if err != nil {
+				return errors.New("license public key invalid")
+			}
+			input, err := license.ReadRawInput(stdin)
+			if err != nil {
+				return errors.New("license input unavailable")
+			}
+			svc := core.NewLicenseService(pool, log)
+			var actorID int64
+			if err := pool.QueryRow(cmdCtx, `SELECT id FROM users WHERE authority='ADMIN' ORDER BY id LIMIT 1`).Scan(&actorID); err != nil {
+				return errors.New("platform administrator unavailable")
+			}
+			if input.Oversized {
+				if auditErr := svc.RecordLicenseRejectionDigest(cmdCtx, input.SHA256, actorID, "license_invalid"); auditErr != nil {
+					return fmt.Errorf("license rejection audit: %w", auditErr)
+				}
+				return errors.New("license input exceeds 64 KiB")
+			}
+			raw := input.Bytes
+			envelope, err := license.ParseEnvelope(raw)
+			if err != nil {
+				if auditErr := svc.RecordLicenseRejection(cmdCtx, raw, actorID, "license_invalid"); auditErr != nil {
+					return fmt.Errorf("license rejection audit: %w", auditErr)
+				}
+				return errors.New("license input invalid")
+			}
+			svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: publicKey, KeyID: cfg.LicenseKeyID})
+			return svc.ImportLicenseRaw(cmdCtx, raw, envelope, actorID)
+		}
+		if args[0] == "license" && args[1] == "reconcile-clock" {
+			svc := core.NewLicenseService(pool, log)
+			var actorID int64
+			if err := pool.QueryRow(cmdCtx, `SELECT id FROM users WHERE authority='ADMIN' ORDER BY id LIMIT 1`).Scan(&actorID); err != nil {
+				return errors.New("platform administrator unavailable")
+			}
+			return svc.ReconcileLicenseClock(cmdCtx, actorID)
+		}
 		if f, ok := stdin.(*os.File); ok {
 			if st, e := f.Stat(); e == nil && st.Mode()&os.ModeCharDevice != 0 {
 				return errors.New("redirect password from a protected file on stdin; interactive echo is disabled")
@@ -149,6 +221,20 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	svc, err := core.NewWithPolicy(ctx, pool, log, policy, cfg.ReportInterval)
 	if err != nil {
 		return err
+	}
+	if err := svc.ObserveLicenseClock(ctx); err != nil && !errors.Is(err, license.ErrClockError) {
+		return err
+	}
+	if cfg.LicensePublicKeyFile != "" {
+		rawKey, readErr := os.ReadFile(cfg.LicensePublicKeyFile)
+		if readErr != nil {
+			return &startupError{errors.New("license public key unavailable")}
+		}
+		publicKey, keyErr := license.ParsePublicKey(string(rawKey))
+		if keyErr != nil {
+			return &startupError{errors.New("license public key invalid")}
+		}
+		svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: publicKey, KeyID: cfg.LicenseKeyID})
 	}
 
 	notificationSender := wechat.NewSender(wechat.Config{
