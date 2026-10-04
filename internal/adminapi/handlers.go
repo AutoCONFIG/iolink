@@ -76,6 +76,10 @@ func (s *Server) setTenantStatus(c *gin.Context) {
 		return
 	}
 	if err = store.SetTenantActive(c.Request.Context(), id, *req.Active, aid(c)); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "tenant not found"})
 			return
@@ -1017,6 +1021,10 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 		}
 	}
 	if err := confirm(); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "alarm not found"})
 			return
