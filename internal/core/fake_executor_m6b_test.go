@@ -5,10 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
-
 	"git.hyhy.fun/rsplab/iolink/internal/authorization"
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/persistence"
 )
 
 type fakeTenantJob struct {
@@ -42,27 +41,12 @@ func TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation(t *testing.T) {
 	ctx := telemetryActor("admin", 9402)
 	f.role(t, "admin", true)
 	check := func(jobCtx context.Context) error {
-		tenantID, tenantOK := domain.TenantID(jobCtx)
-		actorID, actorOK := domain.TenantUserID(jobCtx)
-		if !tenantOK || !actorOK || domain.TenantRole(jobCtx) == "" {
-			return domain.ErrForbidden
-		}
-		var role string
-		err := f.pool.QueryRow(context.Background(), `SELECT tm.role FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id AND t.active JOIN users u ON u.id=tm.user_id AND u.authority='USER' WHERE tm.tenant_id=$1 AND tm.user_id=$2 AND tm.active AND (tm.expires_at IS NULL OR tm.expires_at>now())`, tenantID, actorID).Scan(&role)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return domain.ErrForbidden
-		}
+		tx, err := f.pool.Begin(jobCtx)
 		if err != nil {
 			return err
 		}
-		if role != domain.TenantRole(jobCtx) {
-			return domain.ErrForbidden
-		}
-		allowed, err := policy.Allow(role, "farms", "write")
-		if err != nil || !allowed {
-			return domain.ErrForbidden
-		}
-		return nil
+		defer tx.Rollback(jobCtx)
+		return persistence.AuthorizeTenantWrite(jobCtx, tx, policy, "farms", "write")
 	}
 
 	t.Run("preserves tenant actor context", func(t *testing.T) {
@@ -97,6 +81,27 @@ func TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation(t *testing.T) {
 		}
 		if runs != 0 {
 			t.Fatalf("revoked job executed %d times", runs)
+		}
+	})
+
+	t.Run("rejects committed permission version revocation before side effect", func(t *testing.T) {
+		f.role(t, "admin", true)
+		var version int64
+		if err := f.pool.QueryRow(ctx, `SELECT permission_version FROM tenant_memberships WHERE tenant_id=9401 AND user_id=9402`).Scan(&version); err != nil {
+			t.Fatal(err)
+		}
+		jobCtx := domain.WithTenantPermissionVersion(ctx, version)
+		executor := fakeTenantExecutor{}
+		runs := 0
+		executor.Enqueue(jobCtx, func(context.Context) error {
+			runs++
+			return nil
+		})
+		if _, err := f.pool.Exec(ctx, `UPDATE tenant_memberships SET permission_version=permission_version+1 WHERE tenant_id=9401 AND user_id=9402`); err != nil {
+			t.Fatal(err)
+		}
+		if err := executor.RunNext(check); !errors.Is(err, domain.ErrForbidden) || runs != 0 {
+			t.Fatalf("revoked executor result=%v runs=%d", err, runs)
 		}
 	})
 }

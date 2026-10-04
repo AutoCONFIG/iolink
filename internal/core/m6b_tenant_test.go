@@ -287,7 +287,7 @@ func TestM6bScopedReadsAndExistsQueries(t *testing.T) {
 	if err := p.QueryRow(ctx, `SELECT id FROM alarms WHERE device_no='visible-device'`).Scan(&alarmID); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.ConfirmAlarm(scoped, alarmID); err != nil {
+	if err := svc.ConfirmAlarm(support, alarmID); err != nil {
 		t.Fatalf("confirm already-confirmed alarm: %v", err)
 	}
 }
