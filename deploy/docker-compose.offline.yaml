@@ -35,7 +35,7 @@ services:
       IOLINK_LOG_DIR: /var/log/iolink
     volumes:
       - ./logs:/var/log/iolink
-      - ./secrets:/run/iolink/secrets:ro
+      - ../secrets:/run/iolink/secrets:ro
     healthcheck:
       test: ["CMD", "wget", "--spider", "--timeout=2", "http://127.0.0.1:8080/readyz"]
       interval: 10s

@@ -25,13 +25,17 @@ if test ! -f .env; then
 fi
 docker compose --env-file .env -f deploy/docker-compose.yaml up -d --wait db
 docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd migrate up
-if test -z "${IOLINK_SETUP_INPUT:-}" || test ! -f "$IOLINK_SETUP_INPUT"; then
-  echo 'set IOLINK_SETUP_INPUT to a protected setup JSON file; installation stops before serving' >&2
-  exit 2
+setup_status=$(docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd setup status)
+if ! printf '%s' "$setup_status" | grep -q '"platform_ready":true'; then
+  if test -z "${IOLINK_SETUP_INPUT:-}" || test ! -f "$IOLINK_SETUP_INPUT"; then
+    echo 'set IOLINK_SETUP_INPUT to a protected setup JSON file; installation stops before serving' >&2
+    exit 2
+  fi
+  docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps -T iolinkd setup init <"$IOLINK_SETUP_INPUT"
+  setup_status=$(docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd setup status)
 fi
-umask 077
-docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps -T iolinkd setup init <"$IOLINK_SETUP_INPUT"
-docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd setup status
+printf '%s\n' "$setup_status"
+printf '%s' "$setup_status" | grep -q '"tenant_ready":true' || { echo 'tenant setup incomplete; recover locally before serving' >&2; exit 2; }
 if test -z "${IOLINK_LICENSE_INPUT:-}" || test ! -f "$IOLINK_LICENSE_INPUT"; then
   echo 'set IOLINK_LICENSE_INPUT to a protected License envelope; installation stops before serving' >&2
   exit 3

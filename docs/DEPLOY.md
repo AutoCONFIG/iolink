@@ -76,7 +76,7 @@ docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-comp
 
 ## M6c 离线包
 
-离线包由操作者明确提供已经存在于本机的应用和 TimescaleDB 镜像构建，脚本会检查 `linux/amd64`、保存镜像 manifest 和 digest、复制迁移/Compose/前端/依赖清单，并生成 SPDX SBOM、许可证清单和 SHA-256 清单。应用镜像是前后端一体的 `iolinkd`，其中也带有 `/app/mqtt-sim` 供隔离验收使用；`web-mini` 不进入常驻镜像。
+离线包由操作者明确提供已经存在于本机的应用和 TimescaleDB 镜像构建，脚本会检查 `linux/amd64`、保存镜像 manifest 和 digest、复制迁移/Compose/前端/依赖清单，并生成 SPDX SBOM、许可证清单和 SHA-256 清单。SBOM 覆盖 Go 模块和前端锁文件的运行、构建依赖，许可证清单收集本地依赖根目录的 LICENSE/COPYING/NOTICE 正文；缺少正文的包明确标记，licenseConcluded 不作法律认定。镜像内操作系统和数据库软件以镜像 manifest 定位，不宣称已逐包扫描。应用镜像是前后端一体的 `iolinkd`，其中也带有 `/app/mqtt-sim` 供隔离验收使用；`web-mini` 不进入常驻镜像。
 
 ```bash
 docker build -t local/iolinkd:build .
@@ -94,6 +94,7 @@ IOLINK_DB_IMAGE=timescale/timescaledb:latest-pg16 \
 然后执行：
 
 ```bash
+cd dist/iolink-offline
 chmod 600 setup-input.json
 mkdir -p secrets
 cp /protected/issuer/public-key.pem secrets/license-public.pem
@@ -101,7 +102,7 @@ chmod 600 secrets/license-public.pem
 IOLINK_LICENSE_KEY_ID=production-2026-01 IOLINK_SETUP_INPUT=$PWD/setup-input.json ./install.sh
 ```
 
-脚本会先校验所有 SHA-256，再 `docker load`、启动数据库、运行 `migrate up`、执行同一事务内的 `setup init`、显示 `setup status`，导入 License 后才启动应用并检查 `/healthz` 与 `/readyz`。签发方提供 License 时，把 envelope 保存到受限文件并同时设置 `IOLINK_LICENSE_INPUT`；缺少 License 时安装在授权步骤停止，不会启动未完成首启的服务。`./uninstall.sh` 默认只停止并移除容器，保留数据库卷；删除数据必须显式执行 Compose 的 `down -v`。
+脚本会先校验所有 SHA-256，再 `docker load`、启动数据库、运行 `migrate up`、检查 `setup status`。尚未初始化时执行同一事务内的 `setup init`；已初始化时沿用账户和卷，补入 License 后继续启动应用并检查 `/healthz` 与 `/readyz`。签发方提供 License 时，把 envelope 保存到受限文件并设置 `IOLINK_LICENSE_INPUT` 和 `IOLINK_LICENSE_KEY_ID`；缺少 License 时安装退出 3，不会启动未完成首启的服务。把公钥放在离线包根目录的 `secrets/license-public.pem`，随后使用相同目录重跑安装；无需重复设置已初始化的账户。`./uninstall.sh` 默认只停止并移除容器，保留数据库卷；删除数据必须显式执行 Compose 的 `down -v`。
 
 离线 Compose 使用 `pull_policy: never` 和内部网络；`deploy/reverse-proxy.optional.yaml` 与 `deploy/streaming.optional.yaml` 目前明确标记为 `optional_unimplemented`，不能当作已交付的视频或反代服务。
 

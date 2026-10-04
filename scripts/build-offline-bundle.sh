@@ -28,24 +28,8 @@ cp deploy/.env.example "$out/deploy/"
 cp deploy/reverse-proxy.optional.yaml deploy/streaming.optional.yaml "$out/deploy/"
 cp -a internal/migrate/sql "$out/migrations/"
 go list -m all >"$out/metadata/go-dependencies.txt"
-go list -m -json all | python3 -c '
-import json, sys
-packages = []
-decoder = json.JSONDecoder()
-raw = sys.stdin.read()
-pos = 0
-while pos < len(raw):
-    while pos < len(raw) and raw[pos].isspace():
-        pos += 1
-    if pos >= len(raw):
-        break
-    item, end = decoder.raw_decode(raw, pos)
-    packages.append({"name": item.get("Path", ""), "version": item.get("Version", "") or "NOASSERTION", "licenseConcluded": "NOASSERTION"})
-    pos = end
-json.dump({"spdxVersion":"SPDX-2.3","dataLicense":"CC0-1.0","SPDXID":"SPDXRef-DOCUMENT","name":"iolink-offline-go-dependencies","documentNamespace":"https://iolink.invalid/sbom/" + "'"$source_revision"'" ,"packages":packages}, sys.stdout, indent=2)
-print()
-' >"$out/metadata/sbom.spdx.json"
-printf '%s\n' 'License expressions are NOASSERTION; review upstream notices before redistribution.' >"$out/metadata/licenses.txt"
+go list -m -json all | go run ./cmd/offline-sbom --out "$out/metadata" --revision "$source_revision"
+cp web/package-lock.json "$out/metadata/web-package-lock.json"
 if test -d web/dist; then
   cp -a web/dist "$out/frontend/admin-dist"
 else
