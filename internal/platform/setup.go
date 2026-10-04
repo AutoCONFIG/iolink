@@ -85,8 +85,7 @@ func SetupStatusJSON(ctx context.Context, pool *pgxpool.Pool) ([]byte, error) {
 
 func SetupInit(ctx context.Context, pool *pgxpool.Pool, input SetupInput) (setupErr error) {
 	if err := input.validate(); err != nil {
-		_ = recordSetupFailure(ctx, pool, "validation")
-		return err
+		return errors.Join(err, recordSetupFailure(ctx, pool, "validation"))
 	}
 	tx, err := pool.Begin(ctx)
 	if err != nil {
@@ -95,7 +94,7 @@ func SetupInit(ctx context.Context, pool *pgxpool.Pool, input SetupInput) (setup
 	defer func() {
 		_ = tx.Rollback(ctx)
 		if setupErr != nil {
-			_ = recordSetupFailure(ctx, pool, "initialization")
+			setupErr = errors.Join(setupErr, recordSetupFailure(ctx, pool, "initialization"))
 		}
 	}()
 	if _, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock(1232047152)`); err != nil {
@@ -147,4 +146,8 @@ func recordSetupFailure(ctx context.Context, pool *pgxpool.Pool, reason string) 
 		return err
 	}
 	return tx.Commit(ctx)
+}
+
+func RecordSetupInputRejection(ctx context.Context, pool *pgxpool.Pool) error {
+	return recordSetupFailure(ctx, pool, "invalid_input")
 }

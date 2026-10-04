@@ -139,10 +139,10 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 			decoder := json.NewDecoder(io.LimitReader(stdin, 4097))
 			decoder.DisallowUnknownFields()
 			if err := decoder.Decode(&input); err != nil {
-				return errors.New("invalid setup JSON")
+				return errors.Join(errors.New("invalid setup JSON"), platform.RecordSetupInputRejection(cmdCtx, pool))
 			}
 			if err := decoder.Decode(&struct{}{}); err != io.EOF {
-				return errors.New("invalid setup JSON")
+				return errors.Join(errors.New("invalid setup JSON"), platform.RecordSetupInputRejection(cmdCtx, pool))
 			}
 			return platform.SetupInit(cmdCtx, pool, input)
 		}
@@ -158,30 +158,34 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 			if err != nil {
 				return errors.New("license public key invalid")
 			}
-			raw, err := io.ReadAll(io.LimitReader(stdin, license.MaxEnvelopeBytes+1))
-			if err != nil || len(raw) > license.MaxEnvelopeBytes {
-				return errors.New("license input exceeds 64 KiB")
-			}
-			envelope, err := license.ParseEnvelope(raw)
+			input, err := license.ReadRawInput(stdin)
 			if err != nil {
-				return errors.New("license input invalid")
+				return errors.New("license input unavailable")
 			}
-			svc, err := core.New(cmdCtx, pool, log)
-			if err != nil {
-				return err
-			}
-			svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: publicKey, KeyID: cfg.LicenseKeyID})
+			svc := core.NewLicenseService(pool, log)
 			var actorID int64
 			if err := pool.QueryRow(cmdCtx, `SELECT id FROM users WHERE authority='ADMIN' ORDER BY id LIMIT 1`).Scan(&actorID); err != nil {
 				return errors.New("platform administrator unavailable")
 			}
-			return svc.ImportLicense(cmdCtx, envelope, actorID)
+			if input.Oversized {
+				if auditErr := svc.RecordLicenseRejectionDigest(cmdCtx, input.SHA256, actorID, "license_invalid"); auditErr != nil {
+					return fmt.Errorf("license rejection audit: %w", auditErr)
+				}
+				return errors.New("license input exceeds 64 KiB")
+			}
+			raw := input.Bytes
+			envelope, err := license.ParseEnvelope(raw)
+			if err != nil {
+				if auditErr := svc.RecordLicenseRejection(cmdCtx, raw, actorID, "license_invalid"); auditErr != nil {
+					return fmt.Errorf("license rejection audit: %w", auditErr)
+				}
+				return errors.New("license input invalid")
+			}
+			svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: publicKey, KeyID: cfg.LicenseKeyID})
+			return svc.ImportLicenseRaw(cmdCtx, raw, envelope, actorID)
 		}
 		if args[0] == "license" && args[1] == "reconcile-clock" {
-			svc, err := core.New(cmdCtx, pool, log)
-			if err != nil {
-				return err
-			}
+			svc := core.NewLicenseService(pool, log)
 			var actorID int64
 			if err := pool.QueryRow(cmdCtx, `SELECT id FROM users WHERE authority='ADMIN' ORDER BY id LIMIT 1`).Scan(&actorID); err != nil {
 				return errors.New("platform administrator unavailable")

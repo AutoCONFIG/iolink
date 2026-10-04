@@ -23,6 +23,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '503': { $ref: '#/components/responses/Unavailable' }
+        '500': { $ref: '#/components/responses/InternalError' }
     post:
       summary: 导入签名授权文件
       requestBody:
@@ -38,6 +39,7 @@ paths:
         '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
         '503': { $ref: '#/components/responses/Unavailable' }
+        '500': { $ref: '#/components/responses/InternalError' }
   /devices/{device_no}/restore:
     post:
       summary: 恢复停用设备（租户管理员，事务配额校验）
@@ -107,6 +109,9 @@ components:
         overage: { type: integer, minimum: 0 }
         payload_sha256: { type: string, pattern: '^[0-9a-f]{64}$', nullable: true }
   responses:
+    InternalError:
+      description: internal_error
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
     BadRequest:
       description: invalid_request / license_invalid / license_signature_invalid / license_instance_mismatch / license_not_before / license_expired
       content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }

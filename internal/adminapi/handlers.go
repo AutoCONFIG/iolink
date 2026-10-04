@@ -674,7 +674,7 @@ type registerDeviceReq struct {
 func (s *Server) registerDevice(c *gin.Context) {
 	var req registerDeviceReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	dev, secret, err := s.deps.Store.RegisterDevice(c.Request.Context(), req.PondID, req.Name, req.Model, req.ReportInterval)
@@ -707,7 +707,7 @@ func (s *Server) registerDevice(c *gin.Context) {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

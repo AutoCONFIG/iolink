@@ -26,7 +26,7 @@ func TestSignerAcceptsMaximumPayloadAndProducesVerifiableEnvelope(t *testing.T) 
 		t.Fatal(err)
 	}
 	base := `{"license_id":"l","deployment_id":"d","issued_at":"2026-01-01T00:00:00Z","not_before":"2026-01-01T00:00:00Z","expires_at":null,"max_devices":1,"features":[],"key_id":"k"}`
-	payload := base + strings.Repeat(" ", license.MaxPayloadBytes-len(base))
+	payload := base + strings.Repeat(" ", 45*1024-len(base))
 	cmd := exec.Command("go", "run", ".", "--private-key", keyPath)
 	cmd.Stdin = strings.NewReader(payload)
 	out, err := cmd.Output()
@@ -57,7 +57,7 @@ func TestSignerRejectsPayloadOverMaximumAndInsecureKeyPermissions(t *testing.T) 
 		t.Fatal(err)
 	}
 	cmd := exec.Command("go", "run", ".", "--private-key", keyPath)
-	cmd.Stdin = strings.NewReader(base + strings.Repeat(" ", license.MaxPayloadBytes-len(base)+1))
+	cmd.Stdin = strings.NewReader(base + strings.Repeat(" ", 45*1024-len(base)+1))
 	if err := cmd.Run(); err == nil {
 		t.Fatalf("oversized input unexpectedly accepted")
 	}

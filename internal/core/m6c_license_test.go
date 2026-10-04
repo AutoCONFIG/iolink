@@ -25,7 +25,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/testdb"
 )
 
-func installTestLicense(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDevices int64) {
+func installTestLicense(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDevices int64) *rsa.PrivateKey {
 	t.Helper()
 	ctx := context.Background()
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -46,11 +46,11 @@ func installTestLicense(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDev
 	if err != nil {
 		t.Fatal(err)
 	}
-	features, _ := json.Marshal(payload.Features)
-	if _, err := p.Exec(ctx, `UPDATE license_state SET license_id=$1,deployment_id=$2,key_id=$3,issued_at=$4,not_before=$5,max_devices=$6,features=$7,payload=$8,signature=$9,payload_sha256=$10,state='permanent' WHERE singleton=TRUE`, payload.LicenseID, payload.DeploymentID, payload.KeyID, payload.IssuedAt, payload.NotBefore, payload.MaxDevices, features, raw, signature, fmt.Sprintf("%x", digest)); err != nil {
+	if _, err := p.Exec(ctx, `UPDATE license_state SET payload=$1,signature=$2,payload_sha256=$3,imported_at=now() WHERE singleton=TRUE`, raw, signature, fmt.Sprintf("%x", digest)); err != nil {
 		t.Fatal(err)
 	}
 	svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: &key.PublicKey, KeyID: "test-key"})
+	return key
 }
 
 func TestRegisterDevice_enforcesLicenseQuotaInOneTransaction(t *testing.T) {
@@ -80,8 +80,7 @@ func TestRegisterDevice_enforcesLicenseQuotaInOneTransaction(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	features, _ := json.Marshal(payload.Features)
-	if _, err := p.Exec(ctx, `UPDATE license_state SET license_id=$1,deployment_id=$2,key_id=$3,issued_at=$4,not_before=$5,max_devices=$6,features=$7,payload=$8,signature=$9,payload_sha256=$10,state='permanent' WHERE singleton=TRUE`, payload.LicenseID, payload.DeploymentID, payload.KeyID, payload.IssuedAt, payload.NotBefore, payload.MaxDevices, features, raw, signature, fmt.Sprintf("%x", digest)); err != nil {
+	if _, err := p.Exec(ctx, `UPDATE license_state SET payload=$1,signature=$2,payload_sha256=$3,imported_at=now() WHERE singleton=TRUE`, raw, signature, fmt.Sprintf("%x", digest)); err != nil {
 		t.Fatal(err)
 	}
 	policy, err := authorization.New()
@@ -93,16 +92,29 @@ func TestRegisterDevice_enforcesLicenseQuotaInOneTransaction(t *testing.T) {
 		t.Fatal(err)
 	}
 	svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: &key.PublicKey, KeyID: "test-key"})
-	if err := svc.ImportLicense(ctx, license.Envelope{PayloadB64: "e30=", SignatureB64: "eA=="}, 7001); !errors.Is(err, license.ErrInvalidSignature) {
+	invalidEnvelopeRaw := []byte(`{"payload_b64":"e30=","signature_b64":"eA=="}`)
+	invalidEnvelope, err := license.ParseEnvelope(invalidEnvelopeRaw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := svc.ImportLicenseRaw(ctx, invalidEnvelopeRaw, invalidEnvelope, 7001); !errors.Is(err, license.ErrInvalidSignature) {
 		t.Fatalf("invalid import error=%v", err)
 	}
-	var licenseID string
-	if err := p.QueryRow(ctx, `SELECT license_id FROM license_state WHERE singleton=TRUE`).Scan(&licenseID); err != nil || licenseID != payload.LicenseID {
-		t.Fatalf("invalid import replaced license: id=%q err=%v", licenseID, err)
+	current, err := svc.LicenseStatus(ctx)
+	if err != nil || current.LicenseID == nil || *current.LicenseID != payload.LicenseID {
+		t.Fatalf("invalid import replaced license: status=%+v err=%v", current, err)
 	}
 	var rejected int
 	if err := p.QueryRow(ctx, `SELECT count(*) FROM audit_events WHERE action='license.import_rejected' AND actor_id=7001`).Scan(&rejected); err != nil || rejected != 1 {
 		t.Fatalf("rejection audit count=%d err=%v", rejected, err)
+	}
+	var rejectionSHA string
+	if err := p.QueryRow(ctx, `SELECT resource_id FROM audit_events WHERE action='license.import_rejected' AND actor_id=7001`).Scan(&rejectionSHA); err != nil {
+		t.Fatal(err)
+	}
+	rawDigest := sha256.Sum256(invalidEnvelopeRaw)
+	if rejectionSHA != fmt.Sprintf("%x", rawDigest) {
+		t.Fatalf("rejection sha=%q want raw envelope sha=%x", rejectionSHA, rawDigest)
 	}
 	var wg sync.WaitGroup
 	results := make(chan error, 4)

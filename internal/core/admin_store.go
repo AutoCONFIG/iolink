@@ -606,7 +606,7 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 
 // RegisterDevice generates a unique device_no and a one-time secret
 // (only sha256 is persisted).
-func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (domain.Device, string, error) {
+func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (device domain.Device, secretValue string, resultErr error) {
 	if err := s.observeLicenseClock(ctx); err != nil {
 		return domain.Device{}, "", err
 	}
@@ -614,7 +614,7 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 	if err != nil {
 		return domain.Device{}, "", err
 	}
-	defer tx.Rollback(ctx)
+	defer s.finishLicenseTransaction(ctx, tx, &resultErr)
 	if err := s.checkDeviceAdmission(ctx, tx); err != nil {
 		return domain.Device{}, "", err
 	}
@@ -681,7 +681,7 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 	return d, secHex, nil
 }
 
-func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) error {
+func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) (resultErr error) {
 	if err := s.observeLicenseClock(ctx); err != nil {
 		return err
 	}
@@ -689,7 +689,10 @@ func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(ctx)
+	defer s.finishLicenseTransaction(ctx, tx, &resultErr)
+	if err := lockLicenseState(ctx, tx); err != nil {
+		return err
+	}
 	q := `SELECT d.id,d.disabled_at,d.status FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
 	args := []any{deviceNo}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
@@ -699,7 +702,7 @@ func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) error {
 	var id int64
 	var disabledAt *time.Time
 	var status string
-	if err := tx.QueryRow(ctx, q+` FOR UPDATE`, args...).Scan(&id, &disabledAt, &status); err != nil {
+	if err := tx.QueryRow(ctx, q+` FOR UPDATE OF d`, args...).Scan(&id, &disabledAt, &status); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.ErrNotFound
 		}

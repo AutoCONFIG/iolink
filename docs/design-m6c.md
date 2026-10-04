@@ -30,7 +30,7 @@ DDL 提案为 `docs/m6c-schema.sql`，设计通过后新增运行迁移 011。`d
 
 ## 首启和离线包
 
-首启为本地分步 CLI 向导，避免暴露未认证的远程安装入口：①连接测试、显式 migrate up；② `setup status` 显示 deployment_id；③ `setup init PLATFORM_USER TENANT_USER` 从受保护 stdin JSON 接收两个自设强密码及默认租户名，在同事务创建平台管理员、独立 USER 租户 owner、默认租户 membership 及审计（系统租户仍保留用于系统审计）；④ `license import` 从 stdin 导入签发方对该 ID 的 License；⑤ `setup status` 显示每步状态。重复初始化拒绝，失败不留下部分账户或 membership；连接、迁移、初始化、密码校验失败都写安全类别审计并不写密钥/密码，事务回滚后只保留失败审计。密码 12..256 UTF-8 字节，至少含字母及非字母且不全相同，不公开默认口令；旧 `admin init/reset-password` 本地恢复入口保留。平台管理员默认无业务读取权限，租户 owner 只在默认租户管理业务。
+首启为本地分步 CLI 向导，避免暴露未认证的远程安装入口：①连接测试、显式 migrate up；② `setup status` 显示 deployment_id；③ `setup init` 从受保护 stdin JSON 接收两个账号、自设强密码及默认租户名，在同事务创建平台管理员、独立 USER 租户 owner、默认租户 membership 及审计（系统租户仍保留用于系统审计）；④ `license import` 从 stdin 导入签发方对该 ID 的 License；⑤ `setup status` 显示每步状态。重复初始化拒绝，失败不留下部分账户或 membership；初始化、输入解析和密码校验失败在事务回滚后写安全类别失败审计，审计写入失败须返回操作失败。数据库不可连接或迁移尚未建立审计 schema 时，连接/迁移失败仅能写脱敏 stderr 诊断，不宣称存在数据库审计；本地 CLI 不写常驻轮转文件。密码 12..256 UTF-8 字节，至少含字母及非字母且不全相同，不公开默认口令；旧 `admin init/reset-password` 本地恢复入口保留。平台管理员默认无业务读取权限，租户 owner 只在默认租户管理业务。
 
 后台“系统授权”页：平台主体显示实例 ID、状态、签发/生效/到期时间、使用/上限/超额、features、摘要和文件导入；使用平台权限真实 403 呈现无权状态。上传不显示原始证书，成功重拉状态；覆盖加载、missing/empty、错误/重试、登录过期、签名拒绝保留旧显示与额度拒绝。设备页增加停用/恢复动作与额度错误提示，菜单隐藏不代替服务端 gate。
 

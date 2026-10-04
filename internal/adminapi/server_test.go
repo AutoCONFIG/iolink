@@ -3,6 +3,7 @@ package adminapi
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -160,7 +161,7 @@ func (f *fakeStore) Stats(_ context.Context) (domain.Stats, error) { return f.st
 func (f *fakeStore) LicenseStatus(context.Context) (license.Status, error) {
 	return f.licenseStatus, f.licenseErr
 }
-func (f *fakeStore) ImportLicense(_ context.Context, envelope license.Envelope, _ int64) error {
+func (f *fakeStore) ImportLicenseRaw(_ context.Context, _ []byte, envelope license.Envelope, _ int64) error {
 	if f.importErr != nil {
 		return f.importErr
 	}
@@ -169,6 +170,9 @@ func (f *fakeStore) ImportLicense(_ context.Context, envelope license.Envelope, 
 }
 func (f *fakeStore) RecordLicenseRejection(_ context.Context, raw []byte, _ int64, _ string) error {
 	f.rejections = append(f.rejections, append([]byte(nil), raw...))
+	return nil
+}
+func (f *fakeStore) RecordLicenseRejectionDigest(context.Context, string, int64, string) error {
 	return nil
 }
 
@@ -553,6 +557,8 @@ func TestRegisterDeviceMapsLicenseErrors(t *testing.T) {
 	}{
 		{name: "required", err: license.ErrRequired, code: http.StatusForbidden, body: `{"error":"license_required"}`},
 		{name: "quota", err: license.ErrQuotaExceeded, code: http.StatusForbidden, body: `{"error":"device_quota_exceeded"}`},
+		{name: "clock", err: license.ErrClockError, code: http.StatusConflict, body: `{"error":"license_clock_error"}`},
+		{name: "internal", err: errors.New("database password=hidden"), code: http.StatusInternalServerError, body: `{"error":"internal_error"}`},
 		{name: "unavailable", err: license.ErrUnavailable, code: http.StatusServiceUnavailable, body: `{"error":"license_unavailable"}`},
 	} {
 		t.Run(tt.name, func(t *testing.T) {

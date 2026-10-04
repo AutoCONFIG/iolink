@@ -7,20 +7,13 @@ INSERT INTO deployment_config(singleton, deployment_id) VALUES (TRUE, gen_random
 ON CONFLICT (singleton) DO NOTHING;
 CREATE TABLE IF NOT EXISTS license_state (
     singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),
-    license_id TEXT,
-    deployment_id TEXT,
-    key_id TEXT,
-    issued_at TIMESTAMPTZ,
-    not_before TIMESTAMPTZ,
-    expires_at TIMESTAMPTZ,
-    max_devices BIGINT NOT NULL DEFAULT 0 CHECK (max_devices >= 0),
-    features JSONB NOT NULL DEFAULT '[]'::jsonb,
     payload BYTEA,
     signature BYTEA,
-    payload_sha256 TEXT,
-    state TEXT NOT NULL DEFAULT 'missing' CHECK (state IN ('missing','valid','permanent','not_before','expired','invalid','instance_mismatch','clock_error','overage')),
+    payload_sha256 TEXT CHECK (payload_sha256 ~ '^[0-9a-f]{64}$'),
     imported_at TIMESTAMPTZ,
-    imported_by BIGINT REFERENCES users(id)
+    imported_by BIGINT REFERENCES users(id),
+    CHECK ((payload IS NULL AND signature IS NULL AND payload_sha256 IS NULL AND imported_at IS NULL)
+        OR (payload IS NOT NULL AND signature IS NOT NULL AND payload_sha256 IS NOT NULL AND imported_at IS NOT NULL))
 );
 INSERT INTO license_state(singleton) VALUES (TRUE) ON CONFLICT (singleton) DO NOTHING;
 CREATE TABLE IF NOT EXISTS license_clock (
