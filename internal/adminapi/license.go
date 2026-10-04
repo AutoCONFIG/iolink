@@ -45,16 +45,6 @@ func (s *Server) importLicense(c *gin.Context) {
 	if !ok {
 		return
 	}
-	raw, err := io.ReadAll(io.LimitReader(c.Request.Body, license.MaxEnvelopeBytes+1))
-	if err != nil || len(raw) > license.MaxEnvelopeBytes {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
-		return
-	}
-	envelope, err := license.ParseEnvelope(raw)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
-		return
-	}
 	actor, ok := c.Get("aid")
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -63,6 +53,20 @@ func (s *Server) importLicense(c *gin.Context) {
 	actorID, ok := actor.(int64)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+	raw, err := io.ReadAll(io.LimitReader(c.Request.Body, license.MaxEnvelopeBytes+1))
+	if err != nil || len(raw) > license.MaxEnvelopeBytes {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	envelope, err := license.ParseEnvelope(raw)
+	if err != nil {
+		if auditErr := store.RecordLicenseRejection(c.Request.Context(), raw, actorID, "license_invalid"); auditErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+			return
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := store.ImportLicense(c.Request.Context(), envelope, actorID); err != nil {

@@ -33,6 +33,7 @@ func setup(t *testing.T) (*core.Service, *pgxpool.Pool) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	installTestLicense(t, p, s, 100)
 	return s, p
 }
 func execute(t *testing.T, p *pgxpool.Pool, q string, args ...any) {

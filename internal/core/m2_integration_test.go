@@ -34,6 +34,7 @@ func TestM2OwnershipLifecycleAndTokenRevocation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	installTestLicense(t, p, s, 100)
 	if _, err = p.Exec(ctx, `INSERT INTO users(id,open_id,nickname,authority) VALUES (10,'wx-a','A','USER'),(11,'wx-b','B','USER')`); err != nil {
 		t.Fatal(err)
 	}
@@ -247,6 +248,7 @@ func TestCreateFarmAssignsDefaultTenantMembership(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	installTestLicense(t, p, s, 100)
 	if _, err := p.Exec(ctx, `INSERT INTO users(id,open_id,nickname,authority) VALUES (20,'wx-new','New','USER')`); err != nil {
 		t.Fatal(err)
 	}
@@ -283,6 +285,7 @@ func TestHistoryAndAlarmFiltersUseSnapshotOwnership(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	installTestLicense(t, p, s, 100)
 	if _, err := p.Exec(ctx, `INSERT INTO users(id,open_id,nickname,authority) VALUES (30,'wx-a','A','USER'),(31,'wx-b','B','USER')`); err != nil {
 		t.Fatal(err)
 	}

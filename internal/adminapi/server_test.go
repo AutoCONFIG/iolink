@@ -30,6 +30,7 @@ type fakeStore struct {
 	licenseErr       error
 	importErr        error
 	imports          []license.Envelope
+	rejections       [][]byte
 }
 
 func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.User, error) {
@@ -150,6 +151,10 @@ func (f *fakeStore) ImportLicense(_ context.Context, envelope license.Envelope, 
 		return f.importErr
 	}
 	f.imports = append(f.imports, envelope)
+	return nil
+}
+func (f *fakeStore) RecordLicenseRejection(_ context.Context, raw []byte, _ int64, _ string) error {
+	f.rejections = append(f.rejections, append([]byte(nil), raw...))
 	return nil
 }
 
@@ -345,6 +350,9 @@ func TestLicenseImportMapsClockErrorAndRejectsDuplicateJSON(t *testing.T) {
 		if resp.StatusCode != want {
 			t.Fatalf("body=%s status=%d want=%d", body, resp.StatusCode, want)
 		}
+	}
+	if len(store.rejections) != 1 || string(store.rejections[0]) != `{"payload_b64":"YQ==","signature_b64":"Yg==","payload_b64":"Yw=="}` {
+		t.Fatalf("malformed import rejection audit=%q", store.rejections)
 	}
 }
 

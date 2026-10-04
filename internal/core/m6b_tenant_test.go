@@ -39,6 +39,7 @@ func TestM6bTenantMembershipVersionAndRevocation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	installTestLicense(t, p, svc, 100)
 	if _, err := p.Exec(ctx, `INSERT INTO users(id,open_id) VALUES (605,'m6b-revoked'); INSERT INTO tenant_memberships(tenant_id,user_id,role,active) SELECT id,605,'member',false FROM tenants WHERE name='__iolink_system__'`); err != nil {
 		t.Fatal(err)
 	}

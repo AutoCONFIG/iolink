@@ -98,7 +98,7 @@ func (s *Service) LicenseStatus(ctx context.Context) (license.Status, error) {
 
 func (s *Service) checkDeviceAdmission(ctx context.Context, tx pgx.Tx) error {
 	if s.license == nil {
-		return nil
+		return license.ErrUnavailable
 	}
 	if s.license.PublicKey == nil || s.license.KeyID == "" {
 		return license.ErrUnavailable
@@ -198,17 +198,13 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 	return nil
 }
 
-func (s *Service) recordLicenseRejection(ctx context.Context, envelope license.Envelope, actorID int64, reason string) error {
+func (s *Service) RecordLicenseRejection(ctx context.Context, raw []byte, actorID int64, reason string) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback(ctx)
-	payload := []byte(envelope.PayloadB64)
-	if decoded, decodeErr := base64.StdEncoding.DecodeString(envelope.PayloadB64); decodeErr == nil {
-		payload = decoded
-	}
-	digest := sha256.Sum256(payload)
+	digest := sha256.Sum256(raw)
 	digestHex := fmt.Sprintf("%x", digest)
 	metadata, err := json.Marshal(map[string]string{"sha256": digestHex, "reason": reason})
 	if err != nil {
@@ -218,6 +214,14 @@ func (s *Service) recordLicenseRejection(ctx context.Context, envelope license.E
 		return err
 	}
 	return tx.Commit(ctx)
+}
+
+func (s *Service) recordLicenseRejection(ctx context.Context, envelope license.Envelope, actorID int64, reason string) error {
+	payload := []byte(envelope.PayloadB64)
+	if decoded, decodeErr := base64.StdEncoding.DecodeString(envelope.PayloadB64); decodeErr == nil {
+		payload = decoded
+	}
+	return s.RecordLicenseRejection(ctx, payload, actorID, reason)
 }
 
 func observeLicenseClock(ctx context.Context, tx pgx.Tx) error {

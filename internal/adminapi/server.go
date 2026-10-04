@@ -77,6 +77,7 @@ type TenantAdminStore interface {
 type LicenseStore interface {
 	LicenseStatus(context.Context) (license.Status, error)
 	ImportLicense(context.Context, license.Envelope, int64) error
+	RecordLicenseRejection(context.Context, []byte, int64, string) error
 }
 
 type FarmMembershipStore interface {
