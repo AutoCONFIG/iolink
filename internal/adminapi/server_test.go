@@ -560,7 +560,6 @@ func TestRegisterDeviceMapsLicenseErrors(t *testing.T) {
 		{name: "clock", err: license.ErrClockError, code: http.StatusConflict, body: `{"error":"license_clock_error"}`},
 		{name: "internal", err: errors.New("database password=hidden"), code: http.StatusInternalServerError, body: `{"error":"internal_error"}`},
 		{name: "unavailable", err: license.ErrUnavailable, code: http.StatusServiceUnavailable, body: `{"error":"license_unavailable"}`},
-		{name: "internal", err: errors.New("database password=hidden"), code: http.StatusInternalServerError, body: `{"error":"internal_error"}`},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			store := &fakeStore{admin: &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "ADMIN"}, devices: map[string]domain.Device{}, rules: map[int64]domain.AlarmRule{}, registerErr: tt.err}
@@ -609,6 +608,7 @@ func TestRestoreDeviceMapsLicenseErrors(t *testing.T) {
 		{name: "clock", err: license.ErrClockError, code: http.StatusConflict, body: `{"error":"license_clock_error"}`},
 		{name: "conflict", err: domain.ErrConflict, code: http.StatusConflict, body: `{"error":"conflict"}`},
 		{name: "unavailable", err: license.ErrUnavailable, code: http.StatusServiceUnavailable, body: `{"error":"license_unavailable"}`},
+		{name: "internal", err: errors.New("database password=hidden"), code: http.StatusInternalServerError, body: `{"error":"internal_error"}`},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			store := &fakeStore{admin: &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "ADMIN"}, devices: map[string]domain.Device{"dev-restore": {DeviceNo: "dev-restore"}}, rules: map[int64]domain.AlarmRule{}, restoreErr: tt.err}
