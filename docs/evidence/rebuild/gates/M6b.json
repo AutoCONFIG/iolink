@@ -1,9 +1,14 @@
 {
   "gate": "M6b",
-  "status": "pending",
-  "blocked_by": ["two independent reviews on the exact post-fix snapshot"],
+  "status": "complete",
+  "blocked_by": [],
   "verified_source": "ef6510ffa5e43fd9796352ae324e09dfc3820c68",
   "verification": "docs/evidence/acceptance/R37/2026-10-04-version-revocation/verification.json",
+  "candidate": "03354381b5954087d82d0d3f807cad9993b94b8d",
+  "reviews": [
+    "docs/evidence/acceptance/R37/2026-10-04-version-revocation/code-review-approve.md",
+    "docs/evidence/acceptance/R37/2026-10-04-version-revocation/gate-review-approve.md"
+  ],
   "requirements": ["R36", "R37"],
   "evidence": {
     "R36": "docs/evidence/acceptance/R36/",
@@ -18,5 +23,5 @@
   },
   "fixed_defects": ["D12", "D13", "D15", "D16", "D17"],
   "web_commit": "e84092326d9979e066c611e2be8eb6b9736e09f3",
-  "note": "R36.a/R37.a software verification passed on verified_source; stage status remains pending until two independent reviewers approve the same exact candidate. Earlier approvals are historical only; future R36.b/R37.b resources are not certified."
+  "note": "R36.a/R37.a software verification and two independent reviews passed on the same candidate; future R36.b/R37.b resources are not certified."
 }

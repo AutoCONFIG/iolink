@@ -1,6 +1,6 @@
 # M6b permission-version correction and final verification
 
-Requirements: R36.a/R37.a only. Verified executable source: `ef6510ffa5e43fd9796352ae324e09dfc3820c68`; web gitlink: `e84092326d9979e066c611e2be8eb6b9736e09f3`. A subsequent evidence-only candidate commit contains this receipt; its independent review must name that exact candidate. M6b remains pending until two fresh independent approvals.
+Requirements: R36.a/R37.a only. Verified executable source: `ef6510ffa5e43fd9796352ae324e09dfc3820c68`; web gitlink: `e84092326d9979e066c611e2be8eb6b9736e09f3`. Final candidate: `03354381b5954087d82d0d3f807cad9993b94b8d`. Two independent reviewers approved that exact candidate: [code review](code-review-approve.md) and [gate review](gate-review-approve.md). M6b R36.a/R37.a software scope is complete; future R36.b/R37.b resources remain deferred.
 
 ## Environment and reproduction
 
@@ -28,5 +28,10 @@ Executed runner: `node docs/evidence/acceptance/R37/2026-10-04-m6b-revocation/ve
 | frontend typecheck / production build | [typecheck PASS](logs/web-typecheck.log), [build PASS](logs/web-build.log) |
 | browser E2E | 16 scenarios, including role management and support-expiry timezone/precision: [PASS](logs/web-e2e.log) |
 | `git diff --check` | [PASS](logs/diff-check.log) |
+
+## Independent approvals
+
+- Code-quality review: **APPROVE**, high confidence, 249 PASS markers, zero skips/failures: [report](code-review-approve.md), [focused output](logs/code-review-focused.log).
+- Gate review: **APPROVE**, high confidence, real Timescale race/shuffle, 29 top-level tests / 249 PASS markers, zero skips/failures: [report](gate-review-approve.md), [focused output](logs/gate-focused.log).
 
 Browser scenarios exercise the demo UI adapter; actual backend routes and persistence are verified separately by the real HTTP/Timescale tests. The timezone/precision browser artifacts remain at the unchanged web snapshot under [D16](../../../rebuild/M6b-D16/README.md). Hardware, real WeChat, public TLS and capacity acceptance remain `external_blocked`; R36.b/R37.b future resources follow their own stages.
