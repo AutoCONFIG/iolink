@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 )
 
 type tenantStatusRequest struct {
@@ -688,6 +689,18 @@ func (s *Server) registerDevice(c *gin.Context) {
 		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
+			return
+		}
+		if errors.Is(err, license.ErrRequired) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "license_required"})
+			return
+		}
+		if errors.Is(err, license.ErrQuotaExceeded) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "device_quota_exceeded"})
+			return
+		}
+		if errors.Is(err, license.ErrUnavailable) {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

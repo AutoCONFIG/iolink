@@ -31,6 +31,7 @@ type fakeStore struct {
 	importErr        error
 	imports          []license.Envelope
 	rejections       [][]byte
+	registerErr      error
 }
 
 func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.User, error) {
@@ -63,6 +64,9 @@ func (f *fakeStore) UpdatePond(_ context.Context, _ int64, _ string, _ float64) 
 func (f *fakeStore) DeletePond(_ context.Context, _ int64) error                      { return nil }
 
 func (f *fakeStore) RegisterDevice(_ context.Context, pondID int64, _ string, model string, _ int) (domain.Device, string, error) {
+	if f.registerErr != nil {
+		return domain.Device{}, "", f.registerErr
+	}
 	no := "dev-abc12345"
 	secret := strings.Repeat("ab", 32) // 64 hex chars, like the real generator
 	f.devices[no] = domain.Device{ID: 1, PondID: pondID, DeviceNo: no, Model: model, Status: domain.DeviceOffline}
@@ -522,6 +526,49 @@ func TestRegisterDeviceSecretOnce(t *testing.T) {
 	}
 	if len(out.Secret) != 64 {
 		t.Fatalf("secret too weak: %q", out.Secret)
+	}
+}
+
+func TestRegisterDeviceMapsLicenseErrors(t *testing.T) {
+	hash := platform.HashPassword("admin123")
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tt := range []struct {
+		name string
+		err  error
+		code int
+		body string
+	}{
+		{name: "required", err: license.ErrRequired, code: http.StatusForbidden, body: `{"error":"license_required"}`},
+		{name: "quota", err: license.ErrQuotaExceeded, code: http.StatusForbidden, body: `{"error":"device_quota_exceeded"}`},
+		{name: "unavailable", err: license.ErrUnavailable, code: http.StatusServiceUnavailable, body: `{"error":"license_unavailable"}`},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &fakeStore{admin: &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "ADMIN"}, devices: map[string]domain.Device{}, rules: map[int64]domain.AlarmRule{}, registerErr: tt.err}
+			ts := httptest.NewServer(New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: store, Policy: policy}).Routes())
+			defer ts.Close()
+			token := adminLogin(t, ts)
+			req, err := http.NewRequest(http.MethodPost, ts.URL+"/admin/v1/devices", strings.NewReader(`{"pond_id":1,"model":"ESP32"}`))
+			if err != nil {
+				t.Fatal(err)
+			}
+			req.Header.Set("Authorization", "Bearer "+token)
+			req.Header.Set("Content-Type", "application/json")
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer resp.Body.Close()
+			var got map[string]string
+			if err := json.NewDecoder(resp.Body).Decode(&got); err != nil {
+				t.Fatal(err)
+			}
+			if resp.StatusCode != tt.code || got["error"] != strings.TrimSuffix(strings.TrimPrefix(tt.body, `{"error":"`), `"}`) {
+				t.Fatalf("status=%d body=%v want status=%d body=%s", resp.StatusCode, got, tt.code, tt.body)
+			}
+		})
 	}
 }
 
