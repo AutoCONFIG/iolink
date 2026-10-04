@@ -15,6 +15,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"git.hyhy.fun/rsplab/iolink/internal/operations"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 )
@@ -73,6 +74,11 @@ type TenantAdminStore interface {
 	SetTenantMember(context.Context, int64, int64, string, bool, *time.Time, int64) error
 }
 
+type LicenseStore interface {
+	LicenseStatus(context.Context) (license.Status, error)
+	ImportLicense(context.Context, license.Envelope, int64) error
+}
+
 type FarmMembershipStore interface {
 	ListFarmMembers(context.Context, int64) ([]domain.FarmMembership, error)
 	SetFarmMember(context.Context, int64, int64, string, bool, *time.Time, int64) error
@@ -127,6 +133,8 @@ func (s *Server) Routes() http.Handler {
 
 	auth := v1.Group("", s.authRequired)
 	{
+		auth.GET("/license", s.getLicense)
+		auth.POST("/license", s.importLicense)
 		auth.GET("/tenants", s.listTenants)
 		auth.PUT("/tenants/:id/status", s.setTenantStatus)
 		auth.GET("/tenants/:id/members", s.listTenantMembers)

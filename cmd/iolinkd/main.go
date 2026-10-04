@@ -23,6 +23,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/appapi"
 	"git.hyhy.fun/rsplab/iolink/internal/authorization"
 	"git.hyhy.fun/rsplab/iolink/internal/core"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
 	"git.hyhy.fun/rsplab/iolink/internal/notifications"
 	"git.hyhy.fun/rsplab/iolink/internal/observability"
@@ -149,6 +150,17 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	svc, err := core.NewWithPolicy(ctx, pool, log, policy, cfg.ReportInterval)
 	if err != nil {
 		return err
+	}
+	if cfg.LicensePublicKeyFile != "" {
+		rawKey, readErr := os.ReadFile(cfg.LicensePublicKeyFile)
+		if readErr != nil {
+			return &startupError{errors.New("license public key unavailable")}
+		}
+		publicKey, keyErr := license.ParsePublicKey(string(rawKey))
+		if keyErr != nil {
+			return &startupError{errors.New("license public key invalid")}
+		}
+		svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: publicKey, KeyID: cfg.LicenseKeyID})
 	}
 
 	notificationSender := wechat.NewSender(wechat.Config{

@@ -612,6 +612,9 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 		return domain.Device{}, "", err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.checkDeviceAdmission(ctx, tx); err != nil {
+		return domain.Device{}, "", err
+	}
 	if reportInterval != 0 && reportInterval != 60 && reportInterval != 300 {
 		return domain.Device{}, "", domain.ErrInvalidRange
 	}

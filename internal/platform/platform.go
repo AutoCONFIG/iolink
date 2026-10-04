@@ -18,9 +18,11 @@ type Config struct {
 	PgMaxConns   int32
 	QueryTimeout time.Duration
 
-	SecretKey      string // JWT signing key (production: env only)
-	ReportInterval time.Duration
-	OfflineGrace   int
+	SecretKey            string // JWT signing key (production: env only)
+	LicensePublicKeyFile string
+	LicenseKeyID         string
+	ReportInterval       time.Duration
+	OfflineGrace         int
 
 	WXAppID      string // WeChat mini program; empty = notifier off
 	WXSecret     string
