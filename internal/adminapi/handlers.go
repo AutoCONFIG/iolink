@@ -160,6 +160,10 @@ func (s *Server) setTenantMember(c *gin.Context) {
 		active = *req.Active
 	}
 	if err = store.SetTenantMember(c.Request.Context(), tenantID, userID, req.Role, active, req.ExpiresAt, aid(c)); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "tenant or user not found"})
 			return
@@ -253,6 +257,10 @@ func (s *Server) setFarmMember(c *gin.Context) {
 		active = *req.Active
 	}
 	if err := store.SetFarmMember(c.Request.Context(), farmID, userID, req.Role, active, req.ExpiresAt, aid(c)); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "farm or user not found"})
 			return
