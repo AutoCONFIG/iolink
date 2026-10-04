@@ -91,6 +91,9 @@ func (s *Service) CreateFarm(ctx context.Context, ownerID *int64, name, location
 		return domain.Farm{}, err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "farms", "write"); err != nil {
+		return domain.Farm{}, err
+	}
 	var tenantID int64
 	if scopedTenant, scoped := domain.TenantID(ctx); scoped {
 		tenantID = scopedTenant
@@ -280,6 +283,9 @@ func (s *Service) SetFarmMember(ctx context.Context, farmID, userID int64, role 
 	if !tenantMember {
 		return domain.ErrNotFound
 	}
+	if err := s.authorizeTenantWrite(ctx, tx, "farm_members", "write"); err != nil {
+		return err
+	}
 	if _, err := tx.Exec(ctx, `INSERT INTO farm_memberships(tenant_id,farm_id,user_id,role,active,expires_at) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(farm_id,user_id) DO UPDATE SET tenant_id=excluded.tenant_id,role=excluded.role,active=excluded.active,expires_at=excluded.expires_at`, tenantID, farmID, userID, role, active, expiresAt); err != nil {
 		return err
 	}
@@ -328,6 +334,9 @@ func (s *Service) SetFarmOwnerByActor(ctx context.Context, id int64, ownerID *in
 		if !ok {
 			return domain.ErrNotFound
 		}
+		if err := s.authorizeTenantWrite(ctx, tx, "farms", "write"); err != nil {
+			return err
+		}
 		var activeMembership, anyMembership bool
 		if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tenant_memberships WHERE tenant_id=$1 AND user_id=$2 AND active AND (expires_at IS NULL OR expires_at>now())), EXISTS(SELECT 1 FROM tenant_memberships WHERE tenant_id=$1 AND user_id=$2)`, tenantID, *ownerID).Scan(&activeMembership, &anyMembership); err != nil {
 			return err
@@ -340,6 +349,8 @@ func (s *Service) SetFarmOwnerByActor(ctx context.Context, id int64, ownerID *in
 				return err
 			}
 		}
+	} else if err := s.authorizeTenantWrite(ctx, tx, "farms", "write"); err != nil {
+		return err
 	}
 	updateQ := `UPDATE farms SET owner_id=$2 WHERE id=$1`
 	updateArgs := []any{id, ownerID}
@@ -383,17 +394,28 @@ func nullableID(id *int64) string {
 }
 
 func (s *Service) UpdateFarm(ctx context.Context, id int64, name, location string) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "farms", "write"); err != nil {
+		return err
+	}
 	q := `UPDATE farms SET name=$2, location=$3 WHERE id=$1`
 	args := []any{id, name, location}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
 		q += ` AND tenant_id=$4`
 		args = append(args, tenantID)
 	}
-	ct, err := s.pool.Exec(ctx, q, args...)
+	ct, err := tx.Exec(ctx, q, args...)
 	if err == nil && ct.RowsAffected() == 0 {
 		return domain.ErrNotFound
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 func (s *Service) FindAdminByID(ctx context.Context, id int64) (*domain.User, error) {
@@ -423,6 +445,11 @@ func (s *Service) ChangeAdminPassword(ctx context.Context, id int64, oldPassword
 }
 
 func (s *Service) DeleteFarm(ctx context.Context, id int64) error {
+	tx, err := s.beginTenantWrite(ctx, "farms")
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
 	var n int
 	q := `SELECT count(*) FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.farm_id=$1`
 	args := []any{id}
@@ -430,7 +457,7 @@ func (s *Service) DeleteFarm(ctx context.Context, id int64) error {
 		q += ` AND f.tenant_id=$2`
 		args = append(args, tenantID)
 	}
-	if err := s.pool.QueryRow(ctx, q, args...).Scan(&n); err != nil {
+	if err := tx.QueryRow(ctx, q, args...).Scan(&n); err != nil {
 		return err
 	}
 	if n > 0 {
@@ -441,11 +468,14 @@ func (s *Service) DeleteFarm(ctx context.Context, id int64) error {
 		q += ` AND tenant_id=$2`
 		args = append(args[:1], tenantID)
 	}
-	ct, err := s.pool.Exec(ctx, q, args...)
+	ct, err := tx.Exec(ctx, q, args...)
 	if err == nil && ct.RowsAffected() == 0 {
 		return domain.ErrNotFound
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // ---- ponds ----
@@ -484,6 +514,11 @@ func (s *Service) FarmExists(ctx context.Context, id int64) (bool, error) {
 }
 
 func (s *Service) CreatePond(ctx context.Context, farmID int64, name string, areaMu float64) (domain.Pond, error) {
+	tx, err := s.beginTenantWrite(ctx, "ponds")
+	if err != nil {
+		return domain.Pond{}, err
+	}
+	defer tx.Rollback(ctx)
 	var ok bool
 	q := `SELECT EXISTS(SELECT 1 FROM farms WHERE id=$1)`
 	args := []any{farmID}
@@ -491,35 +526,54 @@ func (s *Service) CreatePond(ctx context.Context, farmID int64, name string, are
 		q = `SELECT EXISTS(SELECT 1 FROM farms WHERE id=$1 AND tenant_id=$2)`
 		args = append(args, tenantID)
 	}
-	if err := s.pool.QueryRow(ctx, q, args...).Scan(&ok); err != nil {
+	if err := tx.QueryRow(ctx, q, args...).Scan(&ok); err != nil {
 		return domain.Pond{}, err
 	}
 	if !ok {
 		return domain.Pond{}, domain.ErrNotFound
 	}
 	var p domain.Pond
-	err := s.pool.QueryRow(ctx,
+	err = tx.QueryRow(ctx,
 		`INSERT INTO ponds (farm_id, name, area_mu) VALUES ($1,$2,$3)
 		 RETURNING id, farm_id, name, coalesce(area_mu,0), created_at`,
 		farmID, name, areaMu).Scan(&p.ID, &p.FarmID, &p.Name, &p.AreaMu, &p.CreatedAt)
-	return p, normalizeDBError(err)
+	if err := normalizeDBError(err); err != nil {
+		return p, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return p, err
+	}
+	return p, nil
 }
 
 func (s *Service) UpdatePond(ctx context.Context, id int64, name string, areaMu float64) error {
+	tx, err := s.beginTenantWrite(ctx, "ponds")
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
 	q := `UPDATE ponds p SET name=$2, area_mu=$3 FROM farms f WHERE p.farm_id=f.id AND p.id=$1`
 	args := []any{id, name, areaMu}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
 		q += ` AND f.tenant_id=$4`
 		args = append(args, tenantID)
 	}
-	ct, err := s.pool.Exec(ctx, q, args...)
+	ct, err := tx.Exec(ctx, q, args...)
 	if err == nil && ct.RowsAffected() == 0 {
 		return domain.ErrNotFound
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 func (s *Service) DeletePond(ctx context.Context, id int64) error {
+	tx, err := s.beginTenantWrite(ctx, "ponds")
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
 	var n int
 	q := `SELECT count(*) FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND (EXISTS(SELECT 1 FROM devices WHERE pond_id=$1) OR EXISTS(SELECT 1 FROM sensor_data WHERE pond_id=$1) OR EXISTS(SELECT 1 FROM alarms WHERE pond_id=$1) OR EXISTS(SELECT 1 FROM alarm_rules WHERE pond_id=$1))`
 	args := []any{id}
@@ -527,7 +581,7 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 		q += ` AND f.tenant_id=$2`
 		args = append(args, tenantID)
 	}
-	if err := s.pool.QueryRow(ctx, q, args...).Scan(&n); err != nil {
+	if err := tx.QueryRow(ctx, q, args...).Scan(&n); err != nil {
 		return err
 	}
 	if n > 0 {
@@ -538,11 +592,14 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 		q += ` AND f.tenant_id=$2`
 		args = append(args[:1], tenantID)
 	}
-	ct, err := s.pool.Exec(ctx, q, args...)
+	ct, err := tx.Exec(ctx, q, args...)
 	if err == nil && ct.RowsAffected() == 0 {
 		return domain.ErrNotFound
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // ---- devices ----
@@ -550,6 +607,11 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 // RegisterDevice generates a unique device_no and a one-time secret
 // (only sha256 is persisted).
 func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (domain.Device, string, error) {
+	tx, err := s.beginTenantWrite(ctx, "devices")
+	if err != nil {
+		return domain.Device{}, "", err
+	}
+	defer tx.Rollback(ctx)
 	if reportInterval != 0 && reportInterval != 60 && reportInterval != 300 {
 		return domain.Device{}, "", domain.ErrInvalidRange
 	}
@@ -563,7 +625,7 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 		q = `SELECT EXISTS(SELECT 1 FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND f.tenant_id=$2)`
 		args = append(args, tenantID)
 	}
-	if err := s.pool.QueryRow(ctx, q, args...).Scan(&ok); err != nil {
+	if err := tx.QueryRow(ctx, q, args...).Scan(&ok); err != nil {
 		return domain.Device{}, "", err
 	}
 	if !ok {
@@ -585,7 +647,7 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 		}
 		no = "dev-" + hex.EncodeToString(cand)
 		var exists int
-		if err := s.pool.QueryRow(ctx, `SELECT count(*) FROM devices WHERE device_no=$1`, no).Scan(&exists); err != nil {
+		if err := tx.QueryRow(ctx, `SELECT count(*) FROM devices WHERE device_no=$1`, no).Scan(&exists); err != nil {
 			return domain.Device{}, "", err
 		}
 		if exists == 0 {
@@ -598,13 +660,16 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 	}
 
 	var d domain.Device
-	err := s.pool.QueryRow(ctx,
+	err = tx.QueryRow(ctx,
 		`INSERT INTO devices (pond_id, device_no, secret_hash, name, model, report_interval)
 			 VALUES ($1,$2,$3,$4,$5,$6)
 			 RETURNING id, pond_id, device_no, coalesce(name,''), coalesce(model,''), status, last_seen_at, created_at, disabled_at, coalesce(report_interval,$6)`,
 		pondID, no, hash, name, model, reportInterval).
 		Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
 	if err != nil {
+		return domain.Device{}, "", err
+	}
+	if err := tx.Commit(ctx); err != nil {
 		return domain.Device{}, "", err
 	}
 	return d, secHex, nil
@@ -677,6 +742,9 @@ func (s *Service) MoveDevice(ctx context.Context, deviceNo string, pondID int64)
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "devices", "write"); err != nil {
+		return err
+	}
 	var id int64
 	var disabled *time.Time
 	q := `SELECT d.id,d.disabled_at FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
@@ -718,17 +786,25 @@ func (s *Service) MoveDevice(ctx context.Context, deviceNo string, pondID int64)
 }
 
 func (s *Service) DeleteDevice(ctx context.Context, deviceNo string) error {
+	tx, err := s.beginTenantWrite(ctx, "devices")
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
 	q := `UPDATE devices d SET disabled_at=coalesce(d.disabled_at,now()),status='offline',session_version=session_version+1 FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE d.pond_id=p.id AND d.device_no=$1`
 	args := []any{deviceNo}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
 		q += ` AND f.tenant_id=$2`
 		args = append(args, tenantID)
 	}
-	ct, err := s.pool.Exec(ctx, q, args...)
+	ct, err := tx.Exec(ctx, q, args...)
 	if err == nil && ct.RowsAffected() == 0 {
 		return domain.ErrNotFound
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // ---- alarm rules ----
@@ -762,6 +838,11 @@ func (s *Service) ListRules(ctx context.Context) ([]domain.AlarmRule, error) {
 }
 
 func (s *Service) CreateRule(ctx context.Context, rule domain.AlarmRule) (domain.AlarmRule, error) {
+	tx, err := s.beginTenantWrite(ctx, "alarm_rules")
+	if err != nil {
+		return domain.AlarmRule{}, err
+	}
+	defer tx.Rollback(ctx)
 	if err := validateRule(rule); err != nil {
 		return domain.AlarmRule{}, err
 	}
@@ -771,20 +852,31 @@ func (s *Service) CreateRule(ctx context.Context, rule domain.AlarmRule) (domain
 		q = `INSERT INTO alarm_rules (pond_id, metric, min_value, max_value, level)
 			SELECT $1,$2,$3,$4,$5 WHERE EXISTS (SELECT 1 FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND f.tenant_id=$6)
 			RETURNING ` + ruleCols
-		r, err := scanRule(s.pool.QueryRow(ctx, q, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level), tenantID))
+		r, err := scanRule(tx.QueryRow(ctx, q, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level), tenantID))
 		if err != nil {
 			return domain.AlarmRule{}, normalizeDBError(err)
 		}
+		if err := tx.Commit(ctx); err != nil {
+			return domain.AlarmRule{}, err
+		}
 		return r, nil
 	}
-	r, err := scanRule(s.pool.QueryRow(ctx, q, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level)))
+	r, err := scanRule(tx.QueryRow(ctx, q, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level)))
 	if err != nil {
 		return domain.AlarmRule{}, normalizeDBError(err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return domain.AlarmRule{}, err
 	}
 	return r, nil
 }
 
 func (s *Service) UpdateRule(ctx context.Context, rule domain.AlarmRule) error {
+	tx, err := s.beginTenantWrite(ctx, "alarm_rules")
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
 	if err := validateRule(rule); err != nil {
 		return err
 	}
@@ -794,25 +886,36 @@ func (s *Service) UpdateRule(ctx context.Context, rule domain.AlarmRule) error {
 		q = `UPDATE alarm_rules r SET pond_id=$2, metric=$3, min_value=$4, max_value=$5, level=$6, enabled=$7 FROM ponds oldp JOIN farms f ON f.id=oldp.farm_id WHERE r.id=$1 AND oldp.id=r.pond_id AND f.tenant_id=$8 AND EXISTS (SELECT 1 FROM ponds newp JOIN farms newf ON newf.id=newp.farm_id WHERE newp.id=$2 AND newf.tenant_id=$8)`
 		args = append(args, tenantID)
 	}
-	ct, err := s.pool.Exec(ctx, q, args...)
+	ct, err := tx.Exec(ctx, q, args...)
 	if err == nil && ct.RowsAffected() == 0 {
 		return domain.ErrNotFound
 	}
-	return normalizeDBError(err)
+	if err := normalizeDBError(err); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 func (s *Service) DeleteRule(ctx context.Context, id int64) error {
+	tx, err := s.beginTenantWrite(ctx, "alarm_rules")
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
 	q := `DELETE FROM alarm_rules r USING ponds p JOIN farms f ON f.id=p.farm_id WHERE r.id=$1 AND r.pond_id=p.id`
 	args := []any{id}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
 		q += ` AND f.tenant_id=$2`
 		args = append(args, tenantID)
 	}
-	ct, err := s.pool.Exec(ctx, q, args...)
+	ct, err := tx.Exec(ctx, q, args...)
 	if err == nil && ct.RowsAffected() == 0 {
 		return domain.ErrNotFound
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // ---- alarms (admin view) ----
@@ -846,6 +949,10 @@ func (s *Service) ListAllAlarms(ctx context.Context, limit int) ([]domain.Alarm,
 }
 
 func (s *Service) ConfirmAlarm(ctx context.Context, id int64) error {
+	if domain.HasTenantScope(ctx) {
+		actorID, _ := domain.TenantUserID(ctx)
+		return s.ConfirmAlarmByActor(ctx, id, actorID)
+	}
 	q := `UPDATE alarms a SET confirmed_at=now() FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE a.id=$1 AND a.pond_id=p.id AND a.confirmed_at IS NULL`
 	args := []any{id}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
@@ -873,11 +980,16 @@ func (s *Service) ConfirmAlarm(ctx context.Context, id int64) error {
 }
 
 func (s *Service) ConfirmAlarmByActor(ctx context.Context, id, actorID int64) error {
+	_, scoped := domain.TenantID(ctx)
+	contextActor, actorOK := domain.TenantUserID(ctx)
+	if !scoped || !actorOK || actorID <= 0 || contextActor != actorID || domain.TenantRole(ctx) == "" {
+		return domain.ErrForbidden
+	}
 	return (&alarmRepo{s.pool}).ConfirmByUser(ctx, id, actorID)
 }
 
 func (s *Service) BatchConfirm(ctx context.Context, ids []int64) (int64, error) {
-	if role := domain.TenantRole(ctx); role != "" && role != "owner" && role != "admin" {
+	if domain.HasTenantScope(ctx) {
 		actorID, _ := domain.TenantUserID(ctx)
 		return s.BatchConfirmByActor(ctx, ids, actorID)
 	}
@@ -927,8 +1039,8 @@ func (s *Service) batchConfirm(ctx context.Context, ids []int64, actorID int64) 
 		countArgs = append(countArgs, tenantID)
 	}
 	if actorID > 0 {
-		countQ += ` AND EXISTS (SELECT 1 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.tenant_id=f.tenant_id AND tm.user_id=$3 AND tm.role=$4 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())) AND EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.tenant_id=f.tenant_id AND fm.farm_id=f.id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
-		countArgs = append(countArgs, actorID, domain.TenantRole(ctx))
+		countQ += ` AND ` + appFarmConfirmScope(ctx, "f", 3)
+		countArgs = append(countArgs, actorID)
 	}
 	rows, err := tx.Query(ctx, countQ+` ORDER BY a.id FOR UPDATE OF a`, countArgs...)
 	if err != nil {
@@ -960,8 +1072,8 @@ func (s *Service) batchConfirm(ctx context.Context, ids []int64, actorID int64) 
 		updateArgs = append(updateArgs, tenantID)
 	}
 	if actorID > 0 {
-		updateQ += ` AND EXISTS (SELECT 1 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.tenant_id=f.tenant_id AND tm.user_id=$3 AND tm.role=$4 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())) AND EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.tenant_id=f.tenant_id AND fm.farm_id=f.id AND fm.user_id=$3 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()))`
-		updateArgs = append(updateArgs, actorID, domain.TenantRole(ctx))
+		updateQ += ` AND ` + appFarmConfirmScope(ctx, "f", 3)
+		updateArgs = append(updateArgs, actorID)
 	}
 	ct, err := tx.Exec(ctx, updateQ, updateArgs...)
 	if err != nil {

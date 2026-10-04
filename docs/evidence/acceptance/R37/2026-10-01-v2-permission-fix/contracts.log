@@ -1,0 +1,4 @@
+.venv/contracts/bin/python scripts/check_contracts.py
+docs/api/admin-openapi.yaml: standard schema and 38 operation fixtures PASS
+docs/api/openapi.yaml: standard schema and 15 operation fixtures PASS
+53 target operations, 245 synthetic request/response fixtures PASS; live handler verification is R02.c

@@ -75,8 +75,10 @@ func (s *Service) HandleEvent(e event.Event) (err error) {
 
 // --- Repository accessors for appapi wiring ---
 
-func (s *Service) Ponds() domain.PondRepo           { return &pondRepo{s.pool} }
-func (s *Service) Devices() domain.DeviceRepo       { return &deviceRepo{s.pool} }
-func (s *Service) Telemetry() domain.TelemetryRepo  { return &telemetryRepo{s.pool, s.defaultInterval} }
+func (s *Service) Ponds() domain.PondRepo     { return &pondRepo{s.pool} }
+func (s *Service) Devices() domain.DeviceRepo { return &deviceRepo{s.pool} }
+func (s *Service) Telemetry() domain.TelemetryRepo {
+	return &telemetryRepo{pool: s.pool, defaultInterval: s.defaultInterval, policy: s.policy}
+}
 func (s *Service) Alarms() domain.AlarmRepo         { return &alarmRepo{s.pool} }
 func (s *Service) AlarmRules() domain.AlarmRuleRepo { return &alarmRuleRepo{s.pool} }

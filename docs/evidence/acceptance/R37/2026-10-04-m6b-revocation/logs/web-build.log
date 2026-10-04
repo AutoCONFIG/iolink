@@ -1,0 +1,35 @@
+$ npm run build
+
+> iolink-admin-ui@0.1.0 build
+> vue-tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 1713 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                             0.47 kB │ gzip:   0.33 kB
+dist/assets/ProductsView-DY-L-zJk.css                                       0.36 kB │ gzip:   0.23 kB
+dist/assets/TenantsView-CthDnldy.css                                        0.43 kB │ gzip:   0.25 kB
+dist/assets/index-D6CmpLJq.css                                            369.56 kB │ gzip:  50.66 kB
+dist/assets/metrics-mFZmf0P5.js                                             0.47 kB │ gzip:   0.33 kB
+dist/assets/MetricGrid.vue_vue_type_script_setup_true_lang-Bu7MlwTp.js      1.01 kB │ gzip:   0.61 kB
+dist/assets/LoginView-D88astC-.js                                           2.59 kB │ gzip:   1.53 kB
+dist/assets/SystemView-Jogay1Je.js                                          2.70 kB │ gzip:   1.51 kB
+dist/assets/AdminLayout-CNqTfMON.js                                         2.81 kB │ gzip:   1.49 kB
+dist/assets/DashboardView-DYJl38mC.js                                       4.23 kB │ gzip:   2.01 kB
+dist/assets/TenantsView-BH5uzHMK.js                                         4.69 kB │ gzip:   2.21 kB
+dist/assets/AlarmsView-CEH7rdcG.js                                          4.69 kB │ gzip:   2.15 kB
+dist/assets/RulesView-B8dAprwf.js                                           4.94 kB │ gzip:   2.02 kB
+dist/assets/DevicesView-DlcSKo1q.js                                         4.96 kB │ gzip:   2.30 kB
+dist/assets/PondsView-LBtgyFAh.js                                           5.51 kB │ gzip:   2.25 kB
+dist/assets/ProductsView-yXciTuZY.js                                        6.49 kB │ gzip:   2.52 kB
+dist/assets/index-CWBTrFFp.js                                           1,100.70 kB │ gzip: 364.62 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.38s
+
+EXIT 0

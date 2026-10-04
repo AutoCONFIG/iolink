@@ -1,0 +1,58 @@
+
+> iolink-admin-ui@0.1.0 e2e
+> playwright test --config /tmp/iolink-d16-playwright.config.mjs support-expiry --grep UTC.*未编辑.*123Z --output ../.omo/evidence/m6b-d16/red-fraction-browser-results
+
+[WebServer] (node:206465) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:206496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 e2e/support-expiry.spec.ts:8:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z (1.4s)
+
+
+  1) e2e/support-expiry.spec.ts:8:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z ────
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+    @@ -1,9 +1,9 @@
+      Array [
+        Object {
+          "active": true,
+    -     "expiresAt": "2099-10-02T05:00:37.123Z",
+    +     "expiresAt": "2099-10-02T05:00:37Z",
+          "name": "秒数测试成员",
+          "role": "support",
+          "tenantId": 1,
+          "userId": 2,
+        },
+
+      27 |         await writeFile(artifact, JSON.stringify(persisted, null, 2))
+      28 |         await testInfo.attach(`unchanged-save-${save}`, { path: artifact, contentType: 'application/json' })
+    > 29 |         expect(persisted).toEqual([
+         |                           ^
+      30 |           { tenantId: 1, userId: 2, name: '秒数测试成员', role: 'support', active: true, expiresAt },
+      31 |         ])
+      32 |         await page.reload()
+        at /tmp/iolink-m6b-d16-fix/web/e2e/support-expiry.spec.ts:29:27
+
+    attachment #1: unchanged-save-1 (application/json) ─────────────────────────────────────────────
+    ../.omo/evidence/m6b-d16/red-fraction-browser-results/support-expiry-支持到期：UTC-未编-2b614-精度：2099-10-02T05-00-37-123Z/attachments/unchanged-save-1-f84e21612e5fe0e9315a47696286d162abf0bb33.json
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../.omo/evidence/m6b-d16/red-fraction-browser-results/support-expiry-支持到期：UTC-未编-2b614-精度：2099-10-02T05-00-37-123Z/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../.omo/evidence/m6b-d16/red-fraction-browser-results/support-expiry-支持到期：UTC-未编-2b614-精度：2099-10-02T05-00-37-123Z/trace.zip
+    Usage:
+
+        npx playwright show-trace ../.omo/evidence/m6b-d16/red-fraction-browser-results/support-expiry-支持到期：UTC-未编-2b614-精度：2099-10-02T05-00-37-123Z/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/support-expiry.spec.ts:8:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z ─────

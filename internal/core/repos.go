@@ -27,7 +27,7 @@ func (r *pondRepo) ListByUser(ctx context.Context, userID int64) ([]domain.Pond,
 	q := `SELECT p.id, p.farm_id, p.name, coalesce(p.area_mu,0), p.created_at
 		FROM ponds p
 		JOIN farms f ON f.id = p.farm_id
-		WHERE (f.owner_id=$1 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$1 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id))`
+		WHERE ` + appFarmScope(ctx, "f", 1)
 	args := []any{userID}
 	if tenantID, ok := domain.TenantID(ctx); ok {
 		q += ` AND f.tenant_id = $2`
@@ -60,7 +60,7 @@ func (r *pondRepo) Get(ctx context.Context, id int64) (domain.Pond, error) {
 
 func (r *pondRepo) GetByUser(ctx context.Context, id, userID int64) (domain.Pond, error) {
 	var p domain.Pond
-	q := `SELECT p.id,p.farm_id,p.name,coalesce(p.area_mu,0),p.created_at FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id))`
+	q := `SELECT p.id,p.farm_id,p.name,coalesce(p.area_mu,0),p.created_at FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND ` + appFarmScope(ctx, "f", 2)
 	args := []any{id, userID}
 	if tenantID, ok := domain.TenantID(ctx); ok {
 		q += ` AND f.tenant_id=$3`
@@ -102,7 +102,7 @@ func (r *deviceRepo) GetByDeviceNo(ctx context.Context, no string) (domain.Devic
 
 func (r *deviceRepo) GetByDeviceNoForUser(ctx context.Context, no string, userID int64) (domain.Device, error) {
 	var d domain.Device
-	q := `SELECT d.id,d.pond_id,d.device_no,coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,60) FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1 AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id)) AND d.disabled_at IS NULL`
+	q := `SELECT d.id,d.pond_id,d.device_no,coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,60) FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1 AND ` + appFarmScope(ctx, "f", 2) + ` AND d.disabled_at IS NULL`
 	args := []any{no, userID}
 	if tenantID, ok := domain.TenantID(ctx); ok {
 		q += ` AND f.tenant_id=$3`
@@ -121,6 +121,7 @@ func (r *deviceRepo) UpdateStatus(ctx context.Context, no string, s domain.Devic
 type telemetryRepo struct {
 	pool            *pgxpool.Pool
 	defaultInterval time.Duration
+	policy          domain.PermissionPolicy
 }
 
 var telemetryMetricRE = regexp.MustCompile(`^[a-z][a-z0-9_]{0,63}$`)
@@ -129,7 +130,7 @@ func (r *telemetryRepo) ModelLatestForUser(ctx context.Context, deviceNo string,
 	result := domain.DeviceModelLatest{DeviceNo: deviceNo, Properties: map[string]json.RawMessage{}}
 	var schema []byte
 	var shadow []byte
-	q := `SELECT d.product_id,d.model_version,m.schema,s.ts,s.last FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id JOIN product_models m ON m.product_id=d.product_id AND m.version=d.model_version AND m.published_at IS NOT NULL LEFT JOIN device_shadows s ON s.device_no=d.device_no AND s.pond_id=d.pond_id AND s.product_id=d.product_id AND s.model_version=d.model_version WHERE d.device_no=$1 AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id)) AND d.disabled_at IS NULL`
+	q := `SELECT d.product_id,d.model_version,m.schema,s.ts,s.last FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id JOIN product_models m ON m.product_id=d.product_id AND m.version=d.model_version AND m.published_at IS NOT NULL LEFT JOIN device_shadows s ON s.device_no=d.device_no AND s.pond_id=d.pond_id AND s.product_id=d.product_id AND s.model_version=d.model_version WHERE d.device_no=$1 AND ` + appFarmScope(ctx, "f", 2) + ` AND d.disabled_at IS NULL`
 	args := []any{deviceNo, userID}
 	if tenantID, ok := domain.TenantID(ctx); ok {
 		q += ` AND f.tenant_id=$3`
@@ -194,7 +195,7 @@ func (r *telemetryRepo) SubmitTelemetry(ctx context.Context, deviceNo string, us
 		pr.id=(SELECT wp.id FROM products wp JOIN tenants wt ON wt.id=wp.tenant_id WHERE wt.name='__iolink_system__' AND wp.name='water-quality' LIMIT 1)
 		FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id JOIN tenants t ON t.id=f.tenant_id AND t.active
 		JOIN product_models m ON m.product_id=d.product_id AND m.version=d.model_version JOIN products pr ON pr.id=d.product_id
-		WHERE d.device_no=$1 AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id)) AND d.disabled_at IS NULL AND m.published_at IS NOT NULL`
+		WHERE d.device_no=$1 AND ` + appFarmScope(ctx, "f", 2) + ` AND d.disabled_at IS NULL AND m.published_at IS NOT NULL`
 	args := []any{deviceNo, userID}
 	if scopedTenant, ok := domain.TenantID(ctx); ok {
 		q += ` AND f.tenant_id=$3`
@@ -206,6 +207,9 @@ func (r *telemetryRepo) SubmitTelemetry(ctx context.Context, deviceNo string, us
 		return result, domain.ErrNotFound
 	}
 	if err != nil {
+		return result, err
+	}
+	if err := r.authorizeTelemetryWrite(ctx, tx, tenantID, userID); err != nil {
 		return result, err
 	}
 	var decoded struct {
@@ -282,10 +286,10 @@ func (r *telemetryRepo) HistoryV2ForUser(ctx context.Context, deviceNo string, u
 		return nil, "", domain.ErrInvalidProductModel
 	}
 	var visible int
-	visibleQ := `SELECT 1 WHERE EXISTS (SELECT 1 FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1 AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id)) AND d.disabled_at IS NULL) OR EXISTS (SELECT 1 FROM telemetry t JOIN ponds hp ON hp.id=t.pond_id JOIN farms hf ON hf.id=hp.farm_id WHERE t.device_no=$1 AND (hf.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=hf.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=hf.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=hf.tenant_id)) AND t.product_id IS NOT NULL)`
+	visibleQ := `SELECT 1 WHERE EXISTS (SELECT 1 FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1 AND ` + appFarmScope(ctx, "f", 2) + ` AND d.disabled_at IS NULL) OR EXISTS (SELECT 1 FROM telemetry t JOIN ponds hp ON hp.id=t.pond_id JOIN farms hf ON hf.id=hp.farm_id WHERE t.device_no=$1 AND ` + appFarmScope(ctx, "hf", 2) + ` AND t.product_id IS NOT NULL)`
 	visibleArgs := []any{deviceNo, userID}
 	if tenantID, ok := domain.TenantID(ctx); ok {
-		visibleQ = `SELECT 1 WHERE EXISTS (SELECT 1 FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1 AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id)) AND f.tenant_id=$3 AND d.disabled_at IS NULL) OR EXISTS (SELECT 1 FROM telemetry t JOIN ponds hp ON hp.id=t.pond_id JOIN farms hf ON hf.id=hp.farm_id WHERE t.device_no=$1 AND (hf.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=hf.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=hf.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=hf.tenant_id)) AND hf.tenant_id=$3 AND t.product_id IS NOT NULL)`
+		visibleQ = `SELECT 1 WHERE EXISTS (SELECT 1 FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1 AND ` + appFarmScope(ctx, "f", 2) + ` AND f.tenant_id=$3 AND d.disabled_at IS NULL) OR EXISTS (SELECT 1 FROM telemetry t JOIN ponds hp ON hp.id=t.pond_id JOIN farms hf ON hf.id=hp.farm_id WHERE t.device_no=$1 AND ` + appFarmScope(ctx, "hf", 2) + ` AND hf.tenant_id=$3 AND t.product_id IS NOT NULL)`
 		visibleArgs = append(visibleArgs, tenantID)
 	}
 	err := r.pool.QueryRow(ctx, visibleQ, visibleArgs...).Scan(&visible)
@@ -348,7 +352,7 @@ func (r *telemetryRepo) HistoryV2ForUser(ctx context.Context, deviceNo string, u
 			break
 		}
 	}
-	historyQ := `SELECT t.ts,t.product_id,t.model_version,t.properties->$4 FROM telemetry t JOIN ponds hp ON hp.id=t.pond_id JOIN farms hf ON hf.id=hp.farm_id WHERE t.device_no=$1 AND (hf.owner_id=$5 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=hf.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=hf.id AND fm.user_id=$5 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=hf.tenant_id)) AND t.ts >= $2 AND t.ts < $3 AND t.properties ? $4 AND EXISTS (SELECT 1 FROM product_models pm, jsonb_array_elements(pm.schema->'fields') field WHERE pm.product_id=t.product_id AND pm.version=t.model_version AND field->>'identifier'=$4 AND coalesce((field->>'readable')::boolean,false)`
+	historyQ := `SELECT t.ts,t.product_id,t.model_version,t.properties->$4 FROM telemetry t JOIN ponds hp ON hp.id=t.pond_id JOIN farms hf ON hf.id=hp.farm_id WHERE t.device_no=$1 AND ` + appFarmScope(ctx, "hf", 5) + ` AND t.ts >= $2 AND t.ts < $3 AND t.properties ? $4 AND EXISTS (SELECT 1 FROM product_models pm, jsonb_array_elements(pm.schema->'fields') field WHERE pm.product_id=t.product_id AND pm.version=t.model_version AND field->>'identifier'=$4 AND coalesce((field->>'readable')::boolean,false)`
 	historyArgs := []any{deviceNo, from, to, metric, userID}
 	if scoped {
 		historyQ += ` AND hf.tenant_id=$6`
@@ -512,7 +516,7 @@ func (r *telemetryRepo) HistoryForUser(ctx context.Context, no string, userID in
 		FROM sensor_data sd
 		JOIN ponds p ON p.id=sd.pond_id
 		JOIN farms f ON f.id=p.farm_id
-		WHERE sd.device_no=$1 AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id)) AND sd.ts >= $3 AND sd.ts < $4 AND sd.` + col + ` IS NOT NULL
+		WHERE sd.device_no=$1 AND ` + appFarmScope(ctx, "f", 2) + ` AND sd.ts >= $3 AND sd.ts < $4 AND sd.` + col + ` IS NOT NULL
 		`
 	args := []any{no, userID, from, to, bucket}
 	if tenantID, ok := domain.TenantID(ctx); ok {
@@ -548,7 +552,7 @@ func (r *alarmRepo) ListByUser(ctx context.Context, userID int64, limit int) ([]
 		FROM alarms a
 		JOIN ponds p ON p.id = a.pond_id
 		JOIN farms f ON f.id = p.farm_id
-		WHERE (f.owner_id=$1 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$1 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id))`
+		WHERE ` + appFarmScope(ctx, "f", 1)
 	args := []any{userID}
 	idx := 2
 	if tenantID, ok := domain.TenantID(ctx); ok {
@@ -583,7 +587,7 @@ func (r *alarmRepo) ListByUserFiltered(ctx context.Context, userID int64, level 
 	q := `SELECT a.id, a.device_no, a.pond_id, a.metric, a.current_value, a.threshold,
 		a.level, coalesce(a.message,''), a.confirmed_at, a.created_at
 		FROM alarms a JOIN ponds p ON p.id=a.pond_id JOIN farms f ON f.id=p.farm_id
-		WHERE (f.owner_id=$1 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$1 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id))`
+		WHERE ` + appFarmScope(ctx, "f", 1)
 	args := []any{userID}
 	idx := 2
 	if tenantID, ok := domain.TenantID(ctx); ok {
@@ -624,7 +628,7 @@ func (r *alarmRepo) Confirm(ctx context.Context, id int64) error {
 }
 
 func (r *alarmRepo) ConfirmByUser(ctx context.Context, id, userID int64) error {
-	q := `UPDATE alarms a SET confirmed_at=now() FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE a.id=$1 AND a.pond_id=p.id AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id)) AND a.confirmed_at IS NULL`
+	q := `UPDATE alarms a SET confirmed_at=now() FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE a.id=$1 AND a.pond_id=p.id AND ` + appFarmConfirmScope(ctx, "f", 2) + ` AND a.confirmed_at IS NULL`
 	args := []any{id, userID}
 	if tenantID, ok := domain.TenantID(ctx); ok {
 		q += ` AND f.tenant_id=$3`
@@ -640,7 +644,7 @@ func (r *alarmRepo) ConfirmByUser(ctx context.Context, id, userID int64) error {
 			SELECT 1 FROM alarms a
 			JOIN ponds p ON p.id=a.pond_id
 			JOIN farms f ON f.id=p.farm_id
-			WHERE a.id=$1 AND (f.owner_id=$2 AND EXISTS (SELECT 1 FROM users owner WHERE owner.id=f.owner_id AND owner.authority='USER') OR EXISTS (SELECT 1 FROM farm_memberships fm JOIN users membership_user ON membership_user.id=fm.user_id AND (membership_user.authority='USER' OR (membership_user.authority='ADMIN' AND fm.role='support' AND fm.expires_at IS NOT NULL)) WHERE fm.farm_id=f.id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>now()) AND fm.tenant_id=f.tenant_id)) AND a.confirmed_at IS NOT NULL
+			WHERE a.id=$1 AND ` + appFarmConfirmScope(ctx, "f", 2) + ` AND a.confirmed_at IS NOT NULL
 		`
 		existsArgs := []any{id, userID}
 		if tenantID, ok := domain.TenantID(ctx); ok {

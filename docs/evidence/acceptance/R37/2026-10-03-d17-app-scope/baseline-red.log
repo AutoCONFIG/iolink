@@ -1,0 +1,28 @@
+-test.shuffle 1790997901728781360
+=== RUN   TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment
+=== RUN   TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment/owner
+    app_resource_scope_test.go:16: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:25: scenario=manager_owner_no_farm_assignment latest={DeviceNo:v2-hidden ProductID:0 ModelVersion:0 Fields:[] Timestamp:<nil> Properties:map[]} error=not found
+    app_resource_scope_test.go:27: latest={DeviceNo:v2-hidden ProductID:0 ModelVersion:0 Fields:[] Timestamp:<nil> Properties:map[]} error=not found
+=== RUN   TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment/admin
+    app_resource_scope_test.go:16: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:25: scenario=manager_admin_no_farm_assignment latest={DeviceNo:v2-hidden ProductID:0 ModelVersion:0 Fields:[] Timestamp:<nil> Properties:map[]} error=not found
+    app_resource_scope_test.go:27: latest={DeviceNo:v2-hidden ProductID:0 ModelVersion:0 Fields:[] Timestamp:<nil> Properties:map[]} error=not found
+--- FAIL: TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment (0.76s)
+    --- FAIL: TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment/owner (0.38s)
+    --- FAIL: TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment/admin (0.38s)
+=== RUN   TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment
+=== RUN   TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment/owner
+    app_resource_scope_test.go:37: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:47: scenario=manager_owner_no_farm_assignment_write result={DeviceNo:v2-hidden ModelVersion:0 Accepted:[] Rejected:[]} error=not found before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+    app_resource_scope_test.go:49: result={DeviceNo:v2-hidden ModelVersion:0 Accepted:[] Rejected:[]} error=not found changed=false
+=== RUN   TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment/admin
+    app_resource_scope_test.go:37: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:47: scenario=manager_admin_no_farm_assignment_write result={DeviceNo:v2-hidden ModelVersion:0 Accepted:[] Rejected:[]} error=not found before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+    app_resource_scope_test.go:49: result={DeviceNo:v2-hidden ModelVersion:0 Accepted:[] Rejected:[]} error=not found changed=false
+--- FAIL: TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment (0.72s)
+    --- FAIL: TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment/owner (0.37s)
+    --- FAIL: TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment/admin (0.35s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.510s
+FAIL

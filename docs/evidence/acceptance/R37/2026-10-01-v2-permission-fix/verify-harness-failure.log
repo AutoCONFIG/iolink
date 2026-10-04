@@ -1,0 +1,6 @@
+go build ./...
+go vet ./...
+# git.hyhy.fun/rsplab/iolink/docs/evidence/acceptance/R37/2026-10-01-v2-permission-fix_test
+# [git.hyhy.fun/rsplab/iolink/docs/evidence/acceptance/R37/2026-10-01-v2-permission-fix_test]
+vet: docs/evidence/acceptance/R37/2026-10-01-v2-permission-fix/manual_qa_test.go:22:9: undefined: newTelemetryPermissionFixture
+make: *** [Makefile:24: verify] Error 1

@@ -1,0 +1,134 @@
+=== RUN   TestManualAppTelemetryCurl
+=== RUN   TestManualAppTelemetryCurl/owner
+    telemetry_manual_qa_test.go:22: environment real_timescaledb=2.30.0
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/auth/tenants      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listTenants-fm (4 handlers)
+[GIN-debug] POST   /api/v1/auth/tenant       --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).switchTenant-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN-debug] POST   /api/v2/devices/:device_no/telemetry --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).submitTelemetryV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/model/latest --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).modelLatestV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/history --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).telemetryHistoryV2-fm (4 handlers)
+[GIN] 2026/10/01 - 10:23:44 | 200 |    3.951528ms |       127.0.0.1 | POST     "/api/v1/auth/login"
+[GIN] 2026/10/01 - 10:23:44 | 200 |     2.26002ms |       127.0.0.1 | POST     "/api/v1/auth/tenant"
+[GIN] 2026/10/01 - 10:23:44 | 202 |    7.888147ms |       127.0.0.1 | POST     "/api/v2/devices/v2-permission/telemetry"
+    telemetry_manual_qa_test.go:66: curl role=owner login=200 switch=200 telemetry_status=202 response={"device_no":"v2-permission","model_version":1,"accepted":["temperature"],"rejected":[]} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-01T00:00:00+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-01T02:23:44.019817+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-01T02:23:44.019817+00:00", "last_error": null, "updated_at": "2026-10-01T02:23:44.019817+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestManualAppTelemetryCurl/admin
+    telemetry_manual_qa_test.go:22: environment real_timescaledb=2.30.0
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/auth/tenants      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listTenants-fm (4 handlers)
+[GIN-debug] POST   /api/v1/auth/tenant       --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).switchTenant-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN-debug] POST   /api/v2/devices/:device_no/telemetry --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).submitTelemetryV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/model/latest --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).modelLatestV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/history --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).telemetryHistoryV2-fm (4 handlers)
+[GIN] 2026/10/01 - 10:23:44 | 200 |      3.7088ms |       127.0.0.1 | POST     "/api/v1/auth/login"
+[GIN] 2026/10/01 - 10:23:44 | 200 |    2.248308ms |       127.0.0.1 | POST     "/api/v1/auth/tenant"
+[GIN] 2026/10/01 - 10:23:44 | 202 |    7.611205ms |       127.0.0.1 | POST     "/api/v2/devices/v2-permission/telemetry"
+    telemetry_manual_qa_test.go:66: curl role=admin login=200 switch=200 telemetry_status=202 response={"device_no":"v2-permission","model_version":1,"accepted":["temperature"],"rejected":[]} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-01T00:00:00+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-01T02:23:44.391532+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-01T02:23:44.391532+00:00", "last_error": null, "updated_at": "2026-10-01T02:23:44.391532+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestManualAppTelemetryCurl/viewer
+    telemetry_manual_qa_test.go:22: environment real_timescaledb=2.30.0
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/auth/tenants      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listTenants-fm (4 handlers)
+[GIN-debug] POST   /api/v1/auth/tenant       --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).switchTenant-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN-debug] POST   /api/v2/devices/:device_no/telemetry --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).submitTelemetryV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/model/latest --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).modelLatestV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/history --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).telemetryHistoryV2-fm (4 handlers)
+[GIN] 2026/10/01 - 10:23:44 | 200 |    4.126407ms |       127.0.0.1 | POST     "/api/v1/auth/login"
+[GIN] 2026/10/01 - 10:23:44 | 200 |    3.644549ms |       127.0.0.1 | POST     "/api/v1/auth/tenant"
+[GIN] 2026/10/01 - 10:23:44 | 403 |    3.408564ms |       127.0.0.1 | POST     "/api/v2/devices/v2-permission/telemetry"
+    telemetry_manual_qa_test.go:66: curl role=viewer login=200 switch=200 telemetry_status=403 response={"error":"forbidden"} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestManualAppTelemetryCurl/member
+    telemetry_manual_qa_test.go:22: environment real_timescaledb=2.30.0
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/auth/tenants      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listTenants-fm (4 handlers)
+[GIN-debug] POST   /api/v1/auth/tenant       --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).switchTenant-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN-debug] POST   /api/v2/devices/:device_no/telemetry --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).submitTelemetryV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/model/latest --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).modelLatestV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/history --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).telemetryHistoryV2-fm (4 handlers)
+[GIN] 2026/10/01 - 10:23:45 | 200 |    3.733687ms |       127.0.0.1 | POST     "/api/v1/auth/login"
+[GIN] 2026/10/01 - 10:23:45 | 200 |    2.195107ms |       127.0.0.1 | POST     "/api/v1/auth/tenant"
+[GIN] 2026/10/01 - 10:23:45 | 403 |    3.545402ms |       127.0.0.1 | POST     "/api/v2/devices/v2-permission/telemetry"
+    telemetry_manual_qa_test.go:66: curl role=member login=200 switch=200 telemetry_status=403 response={"error":"forbidden"} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestManualAppTelemetryCurl/support
+    telemetry_manual_qa_test.go:22: environment real_timescaledb=2.30.0
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (3 handlers)
+[GIN-debug] GET    /api/v1/auth/tenants      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listTenants-fm (4 handlers)
+[GIN-debug] POST   /api/v1/auth/tenant       --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).switchTenant-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (4 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (4 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (4 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN-debug] POST   /api/v2/devices/:device_no/telemetry --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).submitTelemetryV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/model/latest --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).modelLatestV2-fm (4 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/history --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).telemetryHistoryV2-fm (4 handlers)
+[GIN] 2026/10/01 - 10:23:45 | 200 |    3.386303ms |       127.0.0.1 | POST     "/api/v1/auth/login"
+[GIN] 2026/10/01 - 10:23:45 | 200 |    2.324461ms |       127.0.0.1 | POST     "/api/v1/auth/tenant"
+[GIN] 2026/10/01 - 10:23:45 | 403 |    3.795454ms |       127.0.0.1 | POST     "/api/v2/devices/v2-permission/telemetry"
+    telemetry_manual_qa_test.go:66: curl role=support login=200 switch=200 telemetry_status=403 response={"error":"forbidden"} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+--- PASS: TestManualAppTelemetryCurl (1.85s)
+    --- PASS: TestManualAppTelemetryCurl/owner (0.38s)
+    --- PASS: TestManualAppTelemetryCurl/admin (0.37s)
+    --- PASS: TestManualAppTelemetryCurl/viewer (0.36s)
+    --- PASS: TestManualAppTelemetryCurl/member (0.36s)
+    --- PASS: TestManualAppTelemetryCurl/support (0.37s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	1.859s

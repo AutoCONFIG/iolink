@@ -42,8 +42,8 @@ provider_operations:
   - {id: R33, provider: postgres-timescale, operation: capacity_test, required_level: L3, status: passed, command: "make capacity", evidence_path: docs/evidence/rebuild/m5-operations.txt}
   - {id: R34, provider: postgres-timescale, operation: product_models, required_level: L4, status: passed, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R34/README.md}
   - {id: R35, provider: postgres-timescale, operation: compatibility_projection, required_level: L4, status: passed, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R35/README.md}
-  - {id: R36, provider: postgres-timescale, operation: tenant_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R36/README.md}
-  - {id: R37, provider: postgres-timescale, operation: rbac_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R37/README.md}
+  - {id: R36, provider: postgres-timescale, operation: tenant_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R36/README.md}
+  - {id: R37, provider: postgres-timescale, operation: rbac_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R37/README.md}
   - {id: R38, provider: tls-reverse-proxy, operation: license_verification, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R39, provider: tls-reverse-proxy, operation: feature_quota_guards, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R40, provider: tls-reverse-proxy, operation: offline_install, required_level: L4, status: external_blocked, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
@@ -383,18 +383,18 @@ requirements:
     owner: 10
     provider: software
     required_level: software
-    software_status: passed
+    software_status: not_run
     external_status: not_applicable
-    verification: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1; verify resource-boundary authorization integration cases"
+    verification: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1; verify resource-boundary authorization integration cases"
     evidence: docs/evidence/acceptance/R36/
   - id: R37
     wave: M6b
     owner: 10
     provider: software
     required_level: software
-    software_status: passed
+    software_status: not_run
     external_status: not_applicable
-    verification: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1; verify role and revocation integration cases"
+    verification: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1; verify role and revocation integration cases"
     evidence: docs/evidence/acceptance/R37/
   - id: R38
     wave: M6c

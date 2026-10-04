@@ -1,0 +1,9 @@
+2026/10/03 12:43:17 INFO added hook hook=iolink-access-hook
+2026/10/03 12:43:17 INFO iolinkd started http=127.0.0.1:32849 mqtt=127.0.0.1:38083
+2026/10/03 12:43:17 INFO attached listener id=iolink-mqtt protocol=tcp address=127.0.0.1:38083
+2026/10/03 12:43:17 INFO mochi mqtt starting version=2.7.9
+2026/10/03 12:43:17 INFO mochi mqtt server started
+2026/10/03 12:47:08 INFO shutting down
+2026/10/03 12:47:08 INFO gracefully stopping server
+2026/10/03 12:47:08 INFO stopping hook hook=iolink-access-hook
+2026/10/03 12:47:08 INFO mochi mqtt server stopped

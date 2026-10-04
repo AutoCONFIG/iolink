@@ -39,7 +39,7 @@ func TestM2OwnershipLifecycleAndTokenRevocation(t *testing.T) {
 	}
 	if _, err = p.Exec(ctx, `WITH tenant AS (INSERT INTO tenants(name) VALUES ('m2-tenant') RETURNING id)
 		INSERT INTO tenant_memberships(tenant_id,user_id,role)
-		SELECT tenant.id,10,'owner' FROM tenant`); err != nil {
+		SELECT tenant.id,10,'member' FROM tenant`); err != nil {
 		t.Fatal(err)
 	}
 	a := int64(10)
@@ -89,6 +89,13 @@ func TestM2OwnershipLifecycleAndTokenRevocation(t *testing.T) {
 		return out.Token
 	}
 	aToken, bToken := login("a"), login("b")
+	var ownerTenantID int64
+	if err := p.QueryRow(ctx, `SELECT tenant_id FROM farms WHERE id=$1`, f.ID).Scan(&ownerTenantID); err != nil {
+		t.Fatal(err)
+	}
+	var ownerSelection struct{ Token string }
+	m6bHTTPRequest(t, appServer.URL, aToken, http.MethodPost, "/api/v1/auth/tenant", fmt.Sprintf(`{"tenant_id":%d}`, ownerTenantID), http.StatusOK, &ownerSelection)
+	aToken = ownerSelection.Token
 	get := func(token, path string) *http.Response {
 		req, _ := http.NewRequest("GET", appServer.URL+path, nil)
 		req.Header.Set("Authorization", "Bearer "+token)

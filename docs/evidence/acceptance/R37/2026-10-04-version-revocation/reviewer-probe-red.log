@@ -1,0 +1,44 @@
+source=c56cb22b00712d1cd8b2624af60e7f06636fbf24
+command=go test -overlay /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.omo/evidence/m6b-final14-probes/overlay.json -race -shuffle=on -count=1 -v ./internal/core -run TestFinal14
+environment=isolated iolink-todo9-pg Timescale on localhost:55439; DSN redacted
+-test.shuffle 1791106685948616931
+=== RUN   TestFinal14AlarmsRejectPermissionVersionAfterAuthentication
+=== RUN   TestFinal14AlarmsRejectPermissionVersionAfterAuthentication/singular
+    alarm_revocation_http_test.go:107: environment real_timescaledb=2.30.0
+2026/10/04 17:38:06 INFO http request request_id=JVSOBJ4TKHIPDHQ2JZ72HI5LXS route=/admin/v1/login method=POST status=200 duration_ms=166 tenant_id=0 actor_id=0
+2026/10/04 17:38:06 INFO http request request_id=3F6PU6GPVLQRN7XIFCL7LAQZVA route=/admin/v1/alarms/:id/confirm method=POST status=204 duration_ms=5 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:127: http method=POST path=/admin/v1/alarms/2/confirm status=204 response=
+    alarm_revocation_http_test.go:129: source=c56cb22 operation=singular permission_version_revoked_after_authentication=true status=204 changed=true response=
+    alarm_revocation_http_test.go:130: stale authenticated context confirmed alarm: status=204 changed=true
+=== RUN   TestFinal14AlarmsRejectPermissionVersionAfterAuthentication/batch
+    alarm_revocation_http_test.go:107: environment real_timescaledb=2.30.0
+2026/10/04 17:38:07 INFO http request request_id=K64WFR7A4UQ2DPNZWYLM3KR7LO route=/admin/v1/login method=POST status=200 duration_ms=143 tenant_id=0 actor_id=0
+2026/10/04 17:38:07 INFO http request request_id=YVFB5J4QZG7RSP2ELREQHDTAQB route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=6 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:127: http method=POST path=/admin/v1/alarms/batch-confirm status=200 response={"confirmed":1}
+    alarm_revocation_http_test.go:129: source=c56cb22 operation=batch permission_version_revoked_after_authentication=true status=200 changed=true response={"confirmed":1}
+    alarm_revocation_http_test.go:130: stale authenticated context confirmed alarm: status=200 changed=true
+--- FAIL: TestFinal14AlarmsRejectPermissionVersionAfterAuthentication (1.35s)
+    --- FAIL: TestFinal14AlarmsRejectPermissionVersionAfterAuthentication/singular (0.70s)
+    --- FAIL: TestFinal14AlarmsRejectPermissionVersionAfterAuthentication/batch (0.65s)
+=== RUN   TestFinal14AlarmMutationsRejectPartialTenantContext
+=== RUN   TestFinal14AlarmMutationsRejectPartialTenantContext/singular
+    alarm_revocation_http_test.go:137: environment real_timescaledb=2.30.0
+    alarm_revocation_http_test.go:146: source=c56cb22 operation=singular partial_tenant_context=true err=<nil> changed=true
+    alarm_revocation_http_test.go:147: partial tenant context authorized alarm: err=<nil> changed=true
+=== RUN   TestFinal14AlarmMutationsRejectPartialTenantContext/batch
+    alarm_revocation_http_test.go:137: environment real_timescaledb=2.30.0
+    alarm_revocation_http_test.go:146: source=c56cb22 operation=batch partial_tenant_context=true err=<nil> changed=true
+    alarm_revocation_http_test.go:147: partial tenant context authorized alarm: err=<nil> changed=true
+--- FAIL: TestFinal14AlarmMutationsRejectPartialTenantContext (0.72s)
+    --- FAIL: TestFinal14AlarmMutationsRejectPartialTenantContext/singular (0.37s)
+    --- FAIL: TestFinal14AlarmMutationsRejectPartialTenantContext/batch (0.35s)
+=== RUN   TestFinal14TelemetryRejectsPermissionVersionAfterAuthentication
+    telemetry_permission_http_test.go:142: environment real_timescaledb=2.30.0
+    telemetry_permission_http_test.go:158: source=c56cb22 operation=telemetry permission_version_revoked_after_authentication=true status=202 changed=true response={"device_no":"v2-permission","model_version":1,"accepted":["temperature"],"rejected":[]}
+    telemetry_permission_http_test.go:159: stale authenticated context committed telemetry: status=202 changed=true
+--- FAIL: TestFinal14TelemetryRejectsPermissionVersionAfterAuthentication (0.37s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	2.497s
+FAIL
+
+EXIT 1

@@ -1,0 +1,6 @@
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	18.114s
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	3.693s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.029s [no tests to run]
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	1.675s
+
+exit=0

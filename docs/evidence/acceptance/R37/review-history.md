@@ -38,8 +38,21 @@ These two approvals referred to the pre-fix final worktree. They are stale/rejec
 - The previous approvals are stale/rejected due to the platform-admin legacy-owner bug. Raw red/green regression commands and outputs are recorded in [`2026-10-01-platform-owner-fix/`](2026-10-01-platform-owner-fix/).
 - Status: fixed, pending fresh independent double review on this exact snapshot; no R36/R37 final software gate pass is claimed.
 
+## 2026-10-01 re-review of snapshot 764c5eb
+
+- Snapshot reviewed: `764c5eb01dcbee0d015bf7153ded74f3881ba07f`.
+- `/root/m6b_review_764_retry1`: REQUEST_CHANGES. Evidence in `.omo/evidence/m6b-review-764-retry1-viewer-repro.log` shows owner and viewer `POST /api/v2/devices/review-device/telemetry` both returned HTTP 202; viewer increased telemetry rows from 1 to 2 and changed shadow temperature from the owner control value 20 to 25.
+- `/root/m6b_review_764_a` and `/root/m6b_review_764_b`: inconclusive because API returned 429; neither is an approval.
+- Current state: D13 is open. R36/R37 software status is pending (`not_run` in the requirement manifest); previous approvals and prior passing checks remain historical evidence for their own source snapshots only. M6b gate is pending until D13 is fixed, fresh relevant verification completes, and two independent reviewers approve the same exact post-fix snapshot.
+
 ## 2026-10-03 D15 support-expiry timezone fix
 
 - Source candidate commit: `62c0ecab0e5aa32fc0ad7227a7d8d4ff45ca1b9a`; web submodule candidate: `483cb2cecc4a368fdf6fc3406fa682207b514aea`.
-- D15 was fixed in the web support-expiry editor. The targeted Playwright command exercised Asia/Shanghai, UTC, and America/New_York and passed all three scenarios; raw output is in [`2026-10-03-v2-timezone/`](2026-10-03-v2-timezone/).
-- This evidence records the fix only. Earlier R36/R37 approvals remain stale after source changes; fresh independent double review of the exact final snapshot is still required. No R36/R37 or M6b gate pass is claimed.
+- D15 targeted Playwright evidence covers Asia/Shanghai, UTC, and America/New_York in `2026-10-03-v2-timezone/`. D13 was already fixed in `96de9abc5cafdb7bf574e431f21686ecb7ca625f`; stale earlier wording incorrectly called it open. R36/R37/M6b remained pending final assembled-snapshot review.
+
+## 2026-10-03 candidate ce23 review and corrections
+
+- Candidate `ce23acdeb9d450b48649f0279e1f6c3b02afc3f2` was rejected by two independent reviewers: unchanged support expiry lost seconds (D16), and a tenant administrator without farm membership could not access same-tenant app resources (D17). Neither earlier approval can be reused.
+- D16 fix: web `e84092326d9979e066c611e2be8eb6b9736e09f3`, assembled in parent `8197c590dfaa1eb1bdd3b7c7606f5b95c05896da`; evidence in [`../../rebuild/M6b-D16/`](../../rebuild/M6b-D16/).
+- D17 fix: `62acecee62160d48efcd48f0e161a927ad583ef6`, integrated as `a96b234`; evidence in [`2026-10-03-d17-app-scope/`](2026-10-03-d17-app-scope/).
+- Fresh verification and review of the combined candidate are pending. No current software-gate pass is claimed.

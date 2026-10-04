@@ -1,0 +1,4 @@
+$ .venv/contracts/bin/python scripts/check_architecture_manifests.py --all
+architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+
+EXIT 0

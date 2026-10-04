@@ -1,0 +1,6 @@
+$ iolinkd migrate up <protected stdin if admin>
+
+EXIT 0
+$ iolinkd admin init qa-platform <protected stdin if admin>
+
+EXIT 0

@@ -1,15 +1,15 @@
 # R36 M6b tenant isolation evidence
 
-Date: 2026-10-03 (latest verification; earlier transcripts retained)
+Date: 2026-10-03 (candidate assembly; earlier transcripts retained)
 
-Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN used verbatim below. No production data or external service credentials were used.
+Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN supplied through the environment and redacted from evidence. No production data or external service credentials were used.
 
-## Executed checks and captured output
+## Historical checks and captured output
 
-Raw command transcript: [`commands.txt`](commands.txt).
+Raw historical command transcript: [`commands.txt`](commands.txt). Counts below belong to that earlier snapshot; final candidate verification and double review are pending. D17 app scope evidence is in [`../R37/2026-10-03-d17-app-scope/`](../R37/2026-10-03-d17-app-scope/).
 
 ```text
-$ IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1
+$ IOLINK_TEST_PG_DSN="$IOLINK_TEST_PG_DSN" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1
 PASS (all six packages; Docker PostgreSQL/Timescale)
 
 $ make verify
@@ -44,8 +44,8 @@ External hardware, public MQTT exposure and production migration are not claimed
 
 ## Run metadata
 
-- Requirement/version: R36.a, M6b tenant isolation, exact release source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`.
+- Requirement/version: R36.a, M6b tenant isolation, historical regression verification was run on source commit `1c9f1eaf95053f9409cfd784f5481cdddb7f1c12`; web submodule `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`. Later review found D13 on snapshot `764c5eb01dcbee0d015bf7153ded74f3881ba07f`; the earlier outputs remain historical evidence only.
 - Dependencies: Go 1.26.8; PostgreSQL/Timescale image `timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76`; Node v24.21.0; npm 11.19.0; Playwright 1.63.0.
 - Test data: isolated migrations create default tenant; M6b fixture uses tenants 601/602, users 601/603/604/605, farms 601/602, farm assignment 603→601, revoked user 605, and cross-tenant alarm/device rows.
 - Browser artifacts: `.omo/evidence/todo10-m6a-products-created.png`, `.omo/evidence/todo10-m6a-products-model-draft.png`, `.omo/evidence/todo10-m6a-products-published-assigned.png` and the tenant-page screenshots emitted by `web/e2e/admin-pages.spec.ts`.
-- Review state: D15 support-expiry timezone fix is recorded in the shared R37 evidence; the R36 software gate remains pending fresh independent double review on the final source snapshot. Earlier approvals are stale/rejected after the platform-admin owner fix and subsequent source changes. Do not mark the R36 software gate passed yet. Future R36.b resources and external inputs remain deferred by the acceptance matrix.
+- Review state: pending final assembled-candidate verification and fresh independent double review. D13 telemetry authorization and D15/D16 support-expiry fixes are recorded in shared R37 evidence. Earlier approvals are stale after source changes. Future R36.b resources and external inputs remain deferred by the acceptance matrix.

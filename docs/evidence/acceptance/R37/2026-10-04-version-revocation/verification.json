@@ -1,0 +1,162 @@
+{
+  "source": "ef6510ffa5e43fd9796352ae324e09dfc3820c68",
+  "web": "e84092326d9979e066c611e2be8eb6b9736e09f3",
+  "date": "2026-10-04",
+  "container": "iolink-todo9-pg",
+  "dsn": "<redacted isolated DSN>",
+  "postgres": "PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit\n2.30.0",
+  "results": [
+    {
+      "name": "web-unit",
+      "code": 0,
+      "seconds": 0.489,
+      "command": [
+        "npm",
+        "test"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final/web",
+      "artifact": "logs/web-unit.log"
+    },
+    {
+      "name": "web-typecheck",
+      "code": 0,
+      "seconds": 2.142,
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final/web",
+      "artifact": "logs/web-typecheck.log"
+    },
+    {
+      "name": "web-build",
+      "code": 0,
+      "seconds": 5.349,
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final/web",
+      "artifact": "logs/web-build.log"
+    },
+    {
+      "name": "docs-tools",
+      "code": 0,
+      "seconds": 1.096,
+      "command": [
+        "make",
+        "docs-tools"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final",
+      "artifact": "logs/docs-tools.log"
+    },
+    {
+      "name": "architecture",
+      "code": 0,
+      "seconds": 0.092,
+      "command": [
+        ".venv/contracts/bin/python",
+        "scripts/check_architecture_manifests.py",
+        "--all"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final",
+      "artifact": "logs/architecture.log"
+    },
+    {
+      "name": "contracts",
+      "code": 0,
+      "seconds": 0.404,
+      "command": [
+        "make",
+        "verify-contracts"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final",
+      "artifact": "logs/contracts.log"
+    },
+    {
+      "name": "web-e2e",
+      "code": 0,
+      "seconds": 39.148,
+      "command": [
+        "npm",
+        "run",
+        "e2e",
+        "--",
+        "--config",
+        "/tmp/m6b-final-playwright.config.mjs"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final/web",
+      "artifact": "logs/web-e2e.log"
+    },
+    {
+      "name": "go-verify",
+      "code": 0,
+      "seconds": 70.996,
+      "command": [
+        "make",
+        "verify"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final",
+      "artifact": "logs/go-verify.log"
+    },
+    {
+      "name": "m6b-focused",
+      "code": 0,
+      "seconds": 41.478,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-shuffle=on",
+        "-count=1",
+        "-v",
+        "./internal/core",
+        "./internal/migrate",
+        "./internal/appapi",
+        "./internal/adminapi",
+        "-run",
+        "Test(M6b|AppResource|AppTelemetry|AppAlarm|TelemetrySubmission|TelemetryHTTP|LegacyTenant|Platform|ProductionMux)"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final",
+      "artifact": "logs/m6b-focused.log"
+    },
+    {
+      "name": "m6b-revocation",
+      "code": 0,
+      "seconds": 7.178,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-shuffle=on",
+        "-count=1",
+        "-v",
+        "./internal/core",
+        "-run",
+        "Test(Reviewer|M6bFakeExecutor)"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final",
+      "artifact": "logs/m6b-revocation.log"
+    },
+    {
+      "name": "diff-check",
+      "code": 0,
+      "seconds": 0.007,
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "/tmp/iolink-m6b-release-final",
+      "artifact": "logs/diff-check.log"
+    }
+  ],
+  "runner": "node docs/evidence/acceptance/R37/2026-10-04-m6b-revocation/verify.mjs",
+  "environment": {
+    "GOFLAGS": "-buildvcs=false",
+    "IOLINK_TEST_PG_DSN": "redacted isolated local DSN",
+    "port": 55439
+  }
+}

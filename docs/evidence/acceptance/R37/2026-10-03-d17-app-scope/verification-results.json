@@ -1,0 +1,30 @@
+{
+  "source_commit": "62acecee62160d48efcd48f0e161a927ad583ef6",
+  "worktree": "/tmp/iolink-m6b-d17-fix",
+  "environment": {
+    "go": "go1.26.8 linux/amd64",
+    "postgresql": "16.15",
+    "timescaledb": "2.30.0",
+    "database_isolation": "unique testdb database per test",
+    "dsn": "dedicated test DSN redacted"
+  },
+  "commands": [
+    {
+      "invocation": "GOFLAGS=-buildvcs=false go vet ./...",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "invocation": "git diff --check",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "invocation": "IOLINK_TEST_PG_DSN=<dedicated redacted DSN> GOFLAGS=-buildvcs=false go test -race -shuffle=on -count=1 -v ./...",
+      "exit_code": 0,
+      "artifact": "go-race-shuffle.log"
+    }
+  ]
+}

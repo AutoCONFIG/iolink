@@ -1,0 +1,10 @@
+[
+  {
+    "tenantId": 1,
+    "userId": 2,
+    "name": "时区测试成员",
+    "role": "support",
+    "active": true,
+    "expiresAt": "2099-10-03T05:00:47Z"
+  }
+]

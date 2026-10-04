@@ -1,0 +1,55 @@
+source=c56cb22; test additions uncommitted
+command=go test -race -shuffle=on -count=1 -v ./internal/core -run TestM6b(AlarmHTTPRejectsRevocationAfterAuthentication/.*permission_version|AlarmMutationsRejectPartialTenantContext|TelemetryRejectsVersionRevocationAfterAuthentication)
+environment=isolated iolink-todo9-pg; DSN redacted
+-test.shuffle 1791106882361611702
+=== RUN   TestM6bTelemetryRejectsVersionRevocationAfterAuthentication
+    telemetry_version_revocation_http_test.go:34: environment real_timescaledb=2.30.0
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /api/v1/auth/tenants      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listTenants-fm (3 handlers)
+[GIN-debug] POST   /api/v1/auth/tenant       --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).switchTenant-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (3 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (3 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (3 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] POST   /api/v2/devices/:device_no/telemetry --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).submitTelemetryV2-fm (3 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/model/latest --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).modelLatestV2-fm (3 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/history --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).telemetryHistoryV2-fm (3 handlers)
+    telemetry_version_revocation_http_test.go:50: revoked_after_authentication=true status=202 unchanged=false response={"device_no":"v2-permission","model_version":1,"accepted":["temperature"],"rejected":[]}
+    telemetry_version_revocation_http_test.go:52: stale authenticated context committed telemetry: status=202 changed=true
+--- FAIL: TestM6bTelemetryRejectsVersionRevocationAfterAuthentication (0.39s)
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/singular_open
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:35: operation=singular already_confirmed=false err=<nil> unchanged=false
+    alarm_partial_context_test.go:37: partial context authorized alarm: err=<nil> changed=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/singular_confirmed
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:35: operation=singular already_confirmed=true err=<nil> unchanged=true
+    alarm_partial_context_test.go:37: partial context authorized alarm: err=<nil> changed=false
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/batch_open
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:35: operation=batch already_confirmed=false err=<nil> unchanged=false
+    alarm_partial_context_test.go:37: partial context authorized alarm: err=<nil> changed=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/batch_confirmed
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:35: operation=batch already_confirmed=true err=<nil> unchanged=true
+    alarm_partial_context_test.go:37: partial context authorized alarm: err=<nil> changed=false
+--- FAIL: TestM6bAlarmMutationsRejectPartialTenantContext (1.54s)
+    --- FAIL: TestM6bAlarmMutationsRejectPartialTenantContext/singular_open (0.38s)
+    --- FAIL: TestM6bAlarmMutationsRejectPartialTenantContext/singular_confirmed (0.39s)
+    --- FAIL: TestM6bAlarmMutationsRejectPartialTenantContext/batch_open (0.38s)
+    --- FAIL: TestM6bAlarmMutationsRejectPartialTenantContext/batch_confirmed (0.40s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.970s
+FAIL
+
+EXIT 1

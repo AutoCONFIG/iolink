@@ -1,11 +1,27 @@
 {
   "gate": "M6b",
-  "requirements": [
-    "R36",
-    "R37"
+  "status": "complete",
+  "blocked_by": [],
+  "verified_source": "ef6510ffa5e43fd9796352ae324e09dfc3820c68",
+  "verification": "docs/evidence/acceptance/R37/2026-10-04-version-revocation/verification.json",
+  "candidate": "03354381b5954087d82d0d3f807cad9993b94b8d",
+  "reviews": [
+    "docs/evidence/acceptance/R37/2026-10-04-version-revocation/code-review-approve.md",
+    "docs/evidence/acceptance/R37/2026-10-04-version-revocation/gate-review-approve.md"
   ],
+  "requirements": ["R36", "R37"],
   "evidence": {
     "R36": "docs/evidence/acceptance/R36/",
-    "R37": "docs/evidence/acceptance/R37/"
-  }
+    "R37": "docs/evidence/acceptance/R37/",
+    "D13_reproduction": ".omo/evidence/m6b-review-764-retry1-viewer-repro.log"
+  },
+  "historical_snapshot": "764c5eb01dcbee0d015bf7153ded74f3881ba07f",
+  "historical_review": {
+    "m6b_review_764_retry1": "REQUEST_CHANGES",
+    "m6b_review_764_a": "inconclusive: API429",
+    "m6b_review_764_b": "inconclusive: API429"
+  },
+  "fixed_defects": ["D12", "D13", "D15", "D16", "D17"],
+  "web_commit": "e84092326d9979e066c611e2be8eb6b9736e09f3",
+  "note": "R36.a/R37.a software verification and two independent reviews passed on the same candidate; future R36.b/R37.b resources are not certified."
 }

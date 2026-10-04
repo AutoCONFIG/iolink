@@ -1,0 +1,1026 @@
+source=03354381b5954087d82d0d3f807cad9993b94b8d
+command=go test -race -shuffle=on -count=1 -v ./internal/core ./internal/migrate ./internal/adminapi ./internal/appapi -run Test(M6b|Reviewer|AppResource|AppTelemetry|AppAlarm|TelemetrySubmission|TelemetryHTTP|LegacyTenant|Platform|ProductionMux)
+DSN=redacted real dedicated TimescaleDB
+-test.shuffle 1791107915397762242
+=== RUN   TestAppTelemetryWriteDeniedWhenTokenRevoked
+    telemetry_permission_http_test.go:77: environment real_timescaledb=2.30.0
+    telemetry_permission_http_test.go:93: scenario=app_revoked post_status=401 response={"error":"tenant membership revoked"} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+--- PASS: TestAppTelemetryWriteDeniedWhenTokenRevoked (0.82s)
+=== RUN   TestReviewerMemberGrantRejectsCommittedActorRevocation
+=== RUN   TestReviewerMemberGrantRejectsCommittedActorRevocation/role
+    tenant_write_revocation_http_test.go:41: environment real_timescaledb=2.30.0
+2026/10/04 17:58:37 INFO http request request_id=MRVV4O2IWIVHJTFVIDZYLKWELP route=/admin/v1/login method=POST status=200 duration_ms=167 tenant_id=0 actor_id=0
+2026/10/04 17:58:37 WARN http request request_id=AUDXSJN7WWQ26QASQEYB7JFJCU route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+    tenant_write_revocation_http_test.go:68: http method=PUT path=/admin/v1/tenants/9401/members/9401 status=403 response={"error":"forbidden"}
+    tenant_write_revocation_http_test.go:73: source=9120469 member_change=role injected=true status=403 before="owner" after="owner" response={"error":"forbidden"}
+=== RUN   TestReviewerMemberGrantRejectsCommittedActorRevocation/membership
+    tenant_write_revocation_http_test.go:41: environment real_timescaledb=2.30.0
+2026/10/04 17:58:37 INFO http request request_id=JMLWCEHGAFOTXUAZM6WHBTFHP2 route=/admin/v1/login method=POST status=200 duration_ms=157 tenant_id=0 actor_id=0
+2026/10/04 17:58:37 WARN http request request_id=APKHWXBVC2X5PA7JJGXFLWPQZL route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    tenant_write_revocation_http_test.go:68: http method=PUT path=/admin/v1/tenants/9401/members/9401 status=403 response={"error":"forbidden"}
+    tenant_write_revocation_http_test.go:73: source=9120469 member_change=membership injected=true status=403 before="owner" after="owner" response={"error":"forbidden"}
+=== RUN   TestReviewerMemberGrantRejectsCommittedActorRevocation/tenant
+    tenant_write_revocation_http_test.go:41: environment real_timescaledb=2.30.0
+2026/10/04 17:58:39 INFO http request request_id=TQUKHN73WXMLMEOL5JGN2SEYR2 route=/admin/v1/login method=POST status=200 duration_ms=142 tenant_id=0 actor_id=0
+2026/10/04 17:58:39 WARN http request request_id=AX44QOPLOBC45YIMAWHRQ2C4ZQ route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    tenant_write_revocation_http_test.go:68: http method=PUT path=/admin/v1/tenants/9401/members/9401 status=403 response={"error":"forbidden"}
+    tenant_write_revocation_http_test.go:73: source=9120469 member_change=tenant injected=true status=403 before="owner" after="owner" response={"error":"forbidden"}
+=== RUN   TestReviewerMemberGrantRejectsCommittedActorRevocation/platform_authority
+    tenant_write_revocation_http_test.go:41: environment real_timescaledb=2.30.0
+2026/10/04 17:58:39 INFO http request request_id=D2LBBXZTVLMZIKLI6H2QUFAV5A route=/admin/v1/login method=POST status=200 duration_ms=142 tenant_id=0 actor_id=0
+2026/10/04 17:58:39 WARN http request request_id=4DIL4YTPKL64LUYI6IVQPLUU43 route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    tenant_write_revocation_http_test.go:68: http method=PUT path=/admin/v1/tenants/9401/members/9401 status=403 response={"error":"forbidden"}
+    tenant_write_revocation_http_test.go:73: source=9120469 member_change=platform_authority injected=true status=403 before="owner" after="owner" response={"error":"forbidden"}
+--- PASS: TestReviewerMemberGrantRejectsCommittedActorRevocation (3.60s)
+    --- PASS: TestReviewerMemberGrantRejectsCommittedActorRevocation/role (0.93s)
+    --- PASS: TestReviewerMemberGrantRejectsCommittedActorRevocation/membership (1.10s)
+    --- PASS: TestReviewerMemberGrantRejectsCommittedActorRevocation/tenant (0.89s)
+    --- PASS: TestReviewerMemberGrantRejectsCommittedActorRevocation/platform_authority (0.68s)
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/actor
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:107: scenario=manager_actor error=not found
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/role
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:107: scenario=manager_role error=not found
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/membership
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:107: scenario=manager_membership error=not found
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/platform_authority
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:107: scenario=manager_platform_authority error=not found
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/missing_actor
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:107: scenario=manager_missing_actor error=not found
+--- PASS: TestAppResourceScopeWhenManagerContextIsForged (2.65s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/actor (0.54s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/role (0.45s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/membership (0.53s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/platform_authority (0.75s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/missing_actor (0.37s)
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/role
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:43 INFO http request request_id=NZY6NHHYQBWIZJ7JDJARXYBZLB route=/admin/v1/login method=POST status=200 duration_ms=151 tenant_id=0 actor_id=0
+2026/10/04 17:58:43 WARN http request request_id=THFHJGOQH5WVHAUY4DHSNRN6C2 route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/membership
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:43 INFO http request request_id=54JQ5NVIYZQ4YEEJ2I2CYKSV6P route=/admin/v1/login method=POST status=200 duration_ms=140 tenant_id=0 actor_id=0
+2026/10/04 17:58:43 WARN http request request_id=KF4L7QDGTN47GNRRQXYBHETNUX route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/tenant
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:44 INFO http request request_id=LCRHEHLHADOB6XEU7EAD7JK7QZ route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/04 17:58:44 WARN http request request_id=G2N6UHZ5J672OJFKXUDKVZ457K route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/platform_authority
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:45 INFO http request request_id=LHEFTPKEGQUXBRGMA7R6FQIE6X route=/admin/v1/login method=POST status=200 duration_ms=140 tenant_id=0 actor_id=0
+2026/10/04 17:58:45 WARN http request request_id=TRIVBUE6UQGM2A7XJGINRG6KO4 route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/permission_version
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:46 INFO http request request_id=PAK5P5RCE3WVCKUDJABXPFSG2J route=/admin/v1/login method=POST status=200 duration_ms=139 tenant_id=0 actor_id=0
+2026/10/04 17:58:46 WARN http request request_id=TKTQWPCIYKBMZCT2GSYEZ5OWTP route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/role
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:47 INFO http request request_id=6D63GSGLC6GIFT3OAZEQ64TP7L route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/04 17:58:47 WARN http request request_id=U2BD4QJUO22SSN527EAWIDWZW2 route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/membership
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:47 INFO http request request_id=EUCNXJ5I6X6UBUJFQ5LUV2PRKE route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/04 17:58:47 WARN http request request_id=2XP4GWJXSEL7UIOCNVSYB5ATMI route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/tenant
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:48 INFO http request request_id=P3DNLGQYT2JM76R52PQ3JCR7VL route=/admin/v1/login method=POST status=200 duration_ms=132 tenant_id=0 actor_id=0
+2026/10/04 17:58:48 WARN http request request_id=SPUG7EZR2TAZFX3F7BIIROFVEB route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=2 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/platform_authority
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:48 INFO http request request_id=XBUDHAUQYC4VJFTHQU4INE6TU5 route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/04 17:58:48 WARN http request request_id=EFNR357SZG2DHQGHMXWWJZZK5Y route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/permission_version
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:49 INFO http request request_id=BBERHCQVO5RRNIB4C27CNWFQDJ route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/04 17:58:49 WARN http request request_id=G5SXELKJ53Q55JKPUBH6OZ7J6O route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/role
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:50 INFO http request request_id=QN2E2S2B7EN7N6SZNPFTESGRFJ route=/admin/v1/login method=POST status=200 duration_ms=132 tenant_id=0 actor_id=0
+2026/10/04 17:58:50 WARN http request request_id=2J547ELXOTM7DXX7CKYEY4IEYF route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models/2/publish status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/membership
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:50 INFO http request request_id=AHILOWRUXEC3XA6RORE2GPHW32 route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/04 17:58:50 WARN http request request_id=TKQ633PXBOAFKZZA4I43XOKUIZ route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models/2/publish status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/tenant
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:51 INFO http request request_id=JTHHP66XIV6A3KU2NGLDLALRCY route=/admin/v1/login method=POST status=200 duration_ms=135 tenant_id=0 actor_id=0
+2026/10/04 17:58:51 WARN http request request_id=ZJXGCP7RF5PEDRHZKXMQYWFPZ6 route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=2 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models/2/publish status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/platform_authority
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:51 INFO http request request_id=TCUTJCQI55DQDCFZPGSMJTZHPF route=/admin/v1/login method=POST status=200 duration_ms=138 tenant_id=0 actor_id=0
+2026/10/04 17:58:51 WARN http request request_id=JCNBC55PRBNPPSP5FX55IWMUBZ route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models/2/publish status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/permission_version
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:52 INFO http request request_id=HTAZ4KWM7U24AW2OGHQ3EOZUOH route=/admin/v1/login method=POST status=200 duration_ms=141 tenant_id=0 actor_id=0
+2026/10/04 17:58:52 WARN http request request_id=5WN7HWAFWR3OWJNRZBLKDSAPHM route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=POST path=/admin/v1/products/2/models/2/publish status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/role
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:53 INFO http request request_id=4WIHRGTUPE7WI5RRBLRVM632CO route=/admin/v1/login method=POST status=200 duration_ms=134 tenant_id=0 actor_id=0
+2026/10/04 17:58:53 WARN http request request_id=MTEVTF3FSUKI536RURO43ZK3GE route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=PUT path=/admin/v1/devices/v2-permission/product status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/membership
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:53 INFO http request request_id=NQ5TN7Q3IEUVDL5MEPCJUJIAUO route=/admin/v1/login method=POST status=200 duration_ms=132 tenant_id=0 actor_id=0
+2026/10/04 17:58:53 WARN http request request_id=AP2WEZN3THIYM6A6GECNXEEB36 route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=PUT path=/admin/v1/devices/v2-permission/product status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/tenant
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:54 INFO http request request_id=AZYEXDRJPCECP4FSPL6MJKUPKC route=/admin/v1/login method=POST status=200 duration_ms=131 tenant_id=0 actor_id=0
+2026/10/04 17:58:54 WARN http request request_id=OBSKJHCVSPLKZQQSVEG62SIAPD route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=PUT path=/admin/v1/devices/v2-permission/product status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/platform_authority
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:55 INFO http request request_id=PASQRZDWQY3JJARNWVUN4FP67M route=/admin/v1/login method=POST status=200 duration_ms=133 tenant_id=0 actor_id=0
+2026/10/04 17:58:55 WARN http request request_id=4U5IDZKRD5IEXT7MZLM6XVAWA2 route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=PUT path=/admin/v1/devices/v2-permission/product status=403 response={"error":"forbidden"}
+=== RUN   TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/permission_version
+    product_revocation_http_test.go:39: environment real_timescaledb=2.30.0
+2026/10/04 17:58:55 INFO http request request_id=46E2YY55V2S56WHVLG5XG3GLHF route=/admin/v1/login method=POST status=200 duration_ms=132 tenant_id=0 actor_id=0
+2026/10/04 17:58:55 WARN http request request_id=3XJQJ2FC4AK3OJIGBRTBEHOP23 route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    product_revocation_http_test.go:91: http method=PUT path=/admin/v1/devices/v2-permission/product status=403 response={"error":"forbidden"}
+--- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware (13.17s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/role (0.70s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/membership (0.68s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/tenant (0.95s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/platform_authority (0.74s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_product/permission_version (0.95s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/role (0.66s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/membership (0.60s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/tenant (0.60s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/platform_authority (0.61s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/create_model/permission_version (0.60s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/role (0.61s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/membership (0.61s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/tenant (0.61s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/platform_authority (0.62s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/publish_model/permission_version (0.62s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/role (0.62s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/membership (0.60s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/tenant (0.60s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/platform_authority (0.60s)
+    --- PASS: TestM6bProductWritesRejectRevocationAfterMiddleware/assign_device/permission_version (0.60s)
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner
+    app_resource_scope_http_test.go:72: environment real_timescaledb=2.30.0
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/ponds
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/ponds status=200 response=[{"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:55.925324939Z","turbidity":null},"ts":"2026-10-04T17:57:55.925324+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"},{"device_count":1,"latest":{"device_no":"v2-hidden","dissolved_oxygen":null,"ph":null,"pond_id":9403,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:55.934768603Z","turbidity":null},"ts":"2026-10-04T17:57:55.934768+08:00","turbidity":null},"pond_id":9403,"pond_name":"hidden","status":"warning"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/devices status=200 response=[{"created_at":"2026-10-04T17:58:55.917162+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"},{"created_at":"2026-10-04T17:58:55.917162+08:00","device_no":"v2-hidden","disabled_at":null,"id":3,"last_seen_at":null,"model":"","name":"","pond_id":9403,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/alarms
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/alarms status=200 response=[{"confirmed_at":null,"created_at":"2026-10-04T17:57:55.934768+08:00","current_value":25,"device_no":"v2-hidden","id":2,"level":"warning","message":"temperature 高于阈值 20","metric":"temperature","pond_id":9403,"threshold":20},{"confirmed_at":null,"created_at":"2026-10-04T17:57:55.925324+08:00","current_value":25,"device_no":"v2-permission","id":1,"level":"warning","message":"temperature 高于阈值 20","metric":"temperature","pond_id":9401,"threshold":20}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner/stats
+    app_resource_scope_http_test.go:98: http method=GET path=/api/v1/stats/summary status=200 response={"alarm_devices":2,"offline_devices":2,"online_devices":0,"ponds":[{"pond_id":9401,"pond_name":"v2-pond","status":"warning"},{"pond_id":9403,"pond_name":"hidden","status":"warning"}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/ponds/9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9401 status=200 response={"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:55.925324939Z","turbidity":null},"ts":"2026-10-04T17:57:55.925324+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices?pond_id=9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9401 status=200 response=[{"created_at":"2026-10-04T17:58:55.917162+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices/v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-permission status=200 response={"created_at":"2026-10-04T17:58:55.917162+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:55.925324939Z","turbidity":null},"ts":"2026-10-04T17:57:55.925324+08:00","turbidity":null},"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/latest?device_no=v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-permission status=200 response={"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:55.925324939Z","turbidity":null},"ts":"2026-10-04T17:57:55.925324+08:00","turbidity":null}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d status=200 response={"metric":"temperature","points":[{"ts":"2026-10-04T14:22:55.974377+08:00","value":25}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-permission/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/model/latest status=200 response={"device_no":"v2-permission","product_id":1,"model_version":1,"fields":[{"identifier":"temperature","type":"number","unit":"℃","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"dissolved_oxygen","type":"number","unit":"mg/L","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"ph","type":"number","unit":"","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"turbidity","type":"number","unit":"NTU","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"salinity","type":"number","unit":"ppt","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true}],"ts":"2026-10-04T17:57:55.925324+08:00","properties":{"temperature":25}}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-permission/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/history?metric=temperature status=200 response={"device_no":"v2-permission","metric":"temperature","points":[{"ts":"2026-10-04T17:57:55.925324+08:00","value":25,"model_version":1,"unit":"℃"}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/ponds/9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9403 status=200 response={"device_count":1,"latest":{"device_no":"v2-hidden","dissolved_oxygen":null,"ph":null,"pond_id":9403,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:55.934768603Z","turbidity":null},"ts":"2026-10-04T17:57:55.934768+08:00","turbidity":null},"pond_id":9403,"pond_name":"hidden","status":"warning"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices?pond_id=9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9403 status=200 response=[{"created_at":"2026-10-04T17:58:55.917162+08:00","device_no":"v2-hidden","disabled_at":null,"id":3,"last_seen_at":null,"model":"","name":"","pond_id":9403,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices/v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-hidden status=200 response={"created_at":"2026-10-04T17:58:55.917162+08:00","device_no":"v2-hidden","disabled_at":null,"id":3,"last_seen_at":null,"latest":{"device_no":"v2-hidden","dissolved_oxygen":null,"ph":null,"pond_id":9403,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:55.934768603Z","turbidity":null},"ts":"2026-10-04T17:57:55.934768+08:00","turbidity":null},"model":"","name":"","pond_id":9403,"report_interval":60,"status":"offline"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/latest?device_no=v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-hidden status=200 response={"device_no":"v2-hidden","dissolved_oxygen":null,"ph":null,"pond_id":9403,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:55.934768603Z","turbidity":null},"ts":"2026-10-04T17:57:55.934768+08:00","turbidity":null}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d status=200 response={"metric":"temperature","points":[{"ts":"2026-10-04T14:22:55.995475+08:00","value":25}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-hidden/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/model/latest status=200 response={"device_no":"v2-hidden","product_id":1,"model_version":1,"fields":[{"identifier":"temperature","type":"number","unit":"℃","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"dissolved_oxygen","type":"number","unit":"mg/L","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"ph","type":"number","unit":"","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"turbidity","type":"number","unit":"NTU","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"salinity","type":"number","unit":"ppt","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true}],"ts":"2026-10-04T17:57:55.934768+08:00","properties":{"temperature":25}}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-hidden/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/history?metric=temperature status=200 response={"device_no":"v2-hidden","metric":"temperature","points":[{"ts":"2026-10-04T17:57:55.934768+08:00","value":25,"model_version":1,"unit":"℃"}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/ponds/9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices?pond_id=9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices/v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-foreign status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/latest?device_no=v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-foreign status=404 response={"error":"no data"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-foreign/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/model/latest status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-foreign/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/history?metric=temperature status=404 response={"error":"not_found"}
+=== NAME  TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner
+    app_resource_scope_http_test.go:149: http method=POST path=/api/v1/alarms/2/confirm status=204 response=
+    app_resource_scope_http_test.go:158: scenario=owner_hidden_alarm_confirm before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:55.925324+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:55.934768+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:55.925366+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:55.925366+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:55.925366+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:55.934812+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:55.934812+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:55.934812+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:55.934768+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:55.934768603Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:55.925324+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:55.925324939Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:55.925324+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:55.934768+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:55.925324+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:55.934768+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:55.925324+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:55.934768+00:00", "product_id": 1, "confirmed_at": "2026-10-04T09:58:56.015601+00:00", "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:55.925366+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:55.925366+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:55.925366+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:55.934812+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:55.934812+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:55.934812+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:55.934768+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:55.934768603Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:55.925324+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:55.925324939Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:55.925324+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:55.934768+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:55.925324+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:55.934768+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin
+    app_resource_scope_http_test.go:72: environment real_timescaledb=2.30.0
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/ponds
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/ponds status=200 response=[{"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.336580681Z","turbidity":null},"ts":"2026-10-04T17:57:56.33658+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"},{"device_count":1,"latest":{"device_no":"v2-hidden","dissolved_oxygen":null,"ph":null,"pond_id":9403,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.344503097Z","turbidity":null},"ts":"2026-10-04T17:57:56.344503+08:00","turbidity":null},"pond_id":9403,"pond_name":"hidden","status":"warning"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/devices status=200 response=[{"created_at":"2026-10-04T17:58:56.32834+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"},{"created_at":"2026-10-04T17:58:56.32834+08:00","device_no":"v2-hidden","disabled_at":null,"id":3,"last_seen_at":null,"model":"","name":"","pond_id":9403,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/alarms
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/alarms status=200 response=[{"confirmed_at":null,"created_at":"2026-10-04T17:57:56.344503+08:00","current_value":25,"device_no":"v2-hidden","id":2,"level":"warning","message":"temperature 高于阈值 20","metric":"temperature","pond_id":9403,"threshold":20},{"confirmed_at":null,"created_at":"2026-10-04T17:57:56.33658+08:00","current_value":25,"device_no":"v2-permission","id":1,"level":"warning","message":"temperature 高于阈值 20","metric":"temperature","pond_id":9401,"threshold":20}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin/stats
+    app_resource_scope_http_test.go:98: http method=GET path=/api/v1/stats/summary status=200 response={"alarm_devices":2,"offline_devices":2,"online_devices":0,"ponds":[{"pond_id":9401,"pond_name":"v2-pond","status":"warning"},{"pond_id":9403,"pond_name":"hidden","status":"warning"}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/ponds/9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9401 status=200 response={"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.336580681Z","turbidity":null},"ts":"2026-10-04T17:57:56.33658+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices?pond_id=9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9401 status=200 response=[{"created_at":"2026-10-04T17:58:56.32834+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices/v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-permission status=200 response={"created_at":"2026-10-04T17:58:56.32834+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.336580681Z","turbidity":null},"ts":"2026-10-04T17:57:56.33658+08:00","turbidity":null},"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/latest?device_no=v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-permission status=200 response={"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.336580681Z","turbidity":null},"ts":"2026-10-04T17:57:56.33658+08:00","turbidity":null}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d status=200 response={"metric":"temperature","points":[{"ts":"2026-10-04T14:22:56.383543+08:00","value":25}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-permission/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/model/latest status=200 response={"device_no":"v2-permission","product_id":1,"model_version":1,"fields":[{"identifier":"temperature","type":"number","unit":"℃","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"dissolved_oxygen","type":"number","unit":"mg/L","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"ph","type":"number","unit":"","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"turbidity","type":"number","unit":"NTU","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"salinity","type":"number","unit":"ppt","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true}],"ts":"2026-10-04T17:57:56.33658+08:00","properties":{"temperature":25}}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-permission/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/history?metric=temperature status=200 response={"device_no":"v2-permission","metric":"temperature","points":[{"ts":"2026-10-04T17:57:56.33658+08:00","value":25,"model_version":1,"unit":"℃"}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/ponds/9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9403 status=200 response={"device_count":1,"latest":{"device_no":"v2-hidden","dissolved_oxygen":null,"ph":null,"pond_id":9403,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.344503097Z","turbidity":null},"ts":"2026-10-04T17:57:56.344503+08:00","turbidity":null},"pond_id":9403,"pond_name":"hidden","status":"warning"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices?pond_id=9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9403 status=200 response=[{"created_at":"2026-10-04T17:58:56.32834+08:00","device_no":"v2-hidden","disabled_at":null,"id":3,"last_seen_at":null,"model":"","name":"","pond_id":9403,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices/v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-hidden status=200 response={"created_at":"2026-10-04T17:58:56.32834+08:00","device_no":"v2-hidden","disabled_at":null,"id":3,"last_seen_at":null,"latest":{"device_no":"v2-hidden","dissolved_oxygen":null,"ph":null,"pond_id":9403,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.344503097Z","turbidity":null},"ts":"2026-10-04T17:57:56.344503+08:00","turbidity":null},"model":"","name":"","pond_id":9403,"report_interval":60,"status":"offline"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/latest?device_no=v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-hidden status=200 response={"device_no":"v2-hidden","dissolved_oxygen":null,"ph":null,"pond_id":9403,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.344503097Z","turbidity":null},"ts":"2026-10-04T17:57:56.344503+08:00","turbidity":null}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d status=200 response={"metric":"temperature","points":[{"ts":"2026-10-04T14:22:56.404174+08:00","value":25}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-hidden/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/model/latest status=200 response={"device_no":"v2-hidden","product_id":1,"model_version":1,"fields":[{"identifier":"temperature","type":"number","unit":"℃","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"dissolved_oxygen","type":"number","unit":"mg/L","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"ph","type":"number","unit":"","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"turbidity","type":"number","unit":"NTU","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"salinity","type":"number","unit":"ppt","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true}],"ts":"2026-10-04T17:57:56.344503+08:00","properties":{"temperature":25}}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-hidden/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/history?metric=temperature status=200 response={"device_no":"v2-hidden","metric":"temperature","points":[{"ts":"2026-10-04T17:57:56.344503+08:00","value":25,"model_version":1,"unit":"℃"}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/ponds/9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices?pond_id=9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices/v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-foreign status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/latest?device_no=v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-foreign status=404 response={"error":"no data"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-foreign/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/model/latest status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-foreign/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/history?metric=temperature status=404 response={"error":"not_found"}
+=== NAME  TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin
+    app_resource_scope_http_test.go:149: http method=POST path=/api/v1/alarms/2/confirm status=204 response=
+    app_resource_scope_http_test.go:158: scenario=admin_hidden_alarm_confirm before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:56.33658+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:56.344503+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:56.336618+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:56.336618+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:56.336618+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:56.344537+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:56.344537+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:56.344537+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:56.344503+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:56.344503097Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:56.33658+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:56.336580681Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:56.33658+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:56.344503+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:56.33658+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:56.344503+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:56.33658+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:56.344503+00:00", "product_id": 1, "confirmed_at": "2026-10-04T09:58:56.424747+00:00", "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:56.336618+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:56.336618+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:56.336618+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:56.344537+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:56.344537+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:56.344537+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:56.344503+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:56.344503097Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:56.33658+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:56.336580681Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:56.33658+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:56.344503+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:56.33658+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:56.344503+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member
+    app_resource_scope_http_test.go:72: environment real_timescaledb=2.30.0
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/ponds
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/ponds status=200 response=[{"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.741985361Z","turbidity":null},"ts":"2026-10-04T17:57:56.741985+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/devices status=200 response=[{"created_at":"2026-10-04T17:58:56.733123+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/alarms
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/alarms status=200 response=[{"confirmed_at":null,"created_at":"2026-10-04T17:57:56.741985+08:00","current_value":25,"device_no":"v2-permission","id":1,"level":"warning","message":"temperature 高于阈值 20","metric":"temperature","pond_id":9401,"threshold":20}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member/stats
+    app_resource_scope_http_test.go:98: http method=GET path=/api/v1/stats/summary status=200 response={"alarm_devices":1,"offline_devices":1,"online_devices":0,"ponds":[{"pond_id":9401,"pond_name":"v2-pond","status":"warning"}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/ponds/9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9401 status=200 response={"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.741985361Z","turbidity":null},"ts":"2026-10-04T17:57:56.741985+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices?pond_id=9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9401 status=200 response=[{"created_at":"2026-10-04T17:58:56.733123+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices/v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-permission status=200 response={"created_at":"2026-10-04T17:58:56.733123+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.741985361Z","turbidity":null},"ts":"2026-10-04T17:57:56.741985+08:00","turbidity":null},"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/latest?device_no=v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-permission status=200 response={"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:56.741985361Z","turbidity":null},"ts":"2026-10-04T17:57:56.741985+08:00","turbidity":null}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d status=200 response={"metric":"temperature","points":[{"ts":"2026-10-04T14:22:56.787342+08:00","value":25}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-permission/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/model/latest status=200 response={"device_no":"v2-permission","product_id":1,"model_version":1,"fields":[{"identifier":"temperature","type":"number","unit":"℃","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"dissolved_oxygen","type":"number","unit":"mg/L","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"ph","type":"number","unit":"","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"turbidity","type":"number","unit":"NTU","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"salinity","type":"number","unit":"ppt","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true}],"ts":"2026-10-04T17:57:56.741985+08:00","properties":{"temperature":25}}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-permission/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/history?metric=temperature status=200 response={"device_no":"v2-permission","metric":"temperature","points":[{"ts":"2026-10-04T17:57:56.741985+08:00","value":25,"model_version":1,"unit":"℃"}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/ponds/9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9403 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices?pond_id=9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9403 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices/v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-hidden status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/latest?device_no=v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-hidden status=404 response={"error":"no data"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-hidden/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/model/latest status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-hidden/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/history?metric=temperature status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/ponds/9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices?pond_id=9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices/v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-foreign status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/latest?device_no=v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-foreign status=404 response={"error":"no data"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-foreign/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/model/latest status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-foreign/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/history?metric=temperature status=404 response={"error":"not_found"}
+=== NAME  TestAppResourceHTTPWhenRoleDeterminesFarmScope/member
+    app_resource_scope_http_test.go:149: http method=POST path=/api/v1/alarms/2/confirm status=404 response={"error":"alarm not found"}
+    app_resource_scope_http_test.go:158: scenario=member_hidden_alarm_confirm before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:56.741985+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:56.750504+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:56.742017+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:56.742017+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:56.742017+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:56.750537+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:56.750537+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:56.750537+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:56.750504+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:56.750504833Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:56.741985+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:56.741985361Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:56.741985+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:56.750504+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:56.741985+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:56.750504+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:56.741985+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:56.750504+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:56.742017+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:56.742017+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:56.742017+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:56.750537+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:56.750537+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:56.750537+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:56.750504+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:56.750504833Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:56.741985+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:56.741985361Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:56.741985+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:56.750504+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:56.741985+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:56.750504+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer
+    app_resource_scope_http_test.go:72: environment real_timescaledb=2.30.0
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/ponds
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/ponds status=200 response=[{"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:57.145228738Z","turbidity":null},"ts":"2026-10-04T17:57:57.145228+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/devices status=200 response=[{"created_at":"2026-10-04T17:58:57.13691+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/alarms
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/alarms status=200 response=[{"confirmed_at":null,"created_at":"2026-10-04T17:57:57.145228+08:00","current_value":25,"device_no":"v2-permission","id":1,"level":"warning","message":"temperature 高于阈值 20","metric":"temperature","pond_id":9401,"threshold":20}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer/stats
+    app_resource_scope_http_test.go:98: http method=GET path=/api/v1/stats/summary status=200 response={"alarm_devices":1,"offline_devices":1,"online_devices":0,"ponds":[{"pond_id":9401,"pond_name":"v2-pond","status":"warning"}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/ponds/9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9401 status=200 response={"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:57.145228738Z","turbidity":null},"ts":"2026-10-04T17:57:57.145228+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices?pond_id=9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9401 status=200 response=[{"created_at":"2026-10-04T17:58:57.13691+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices/v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-permission status=200 response={"created_at":"2026-10-04T17:58:57.13691+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:57.145228738Z","turbidity":null},"ts":"2026-10-04T17:57:57.145228+08:00","turbidity":null},"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/latest?device_no=v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-permission status=200 response={"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:57.145228738Z","turbidity":null},"ts":"2026-10-04T17:57:57.145228+08:00","turbidity":null}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d status=200 response={"metric":"temperature","points":[{"ts":"2026-10-04T14:22:57.189433+08:00","value":25}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-permission/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/model/latest status=200 response={"device_no":"v2-permission","product_id":1,"model_version":1,"fields":[{"identifier":"temperature","type":"number","unit":"℃","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"dissolved_oxygen","type":"number","unit":"mg/L","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"ph","type":"number","unit":"","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"turbidity","type":"number","unit":"NTU","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"salinity","type":"number","unit":"ppt","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true}],"ts":"2026-10-04T17:57:57.145228+08:00","properties":{"temperature":25}}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-permission/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/history?metric=temperature status=200 response={"device_no":"v2-permission","metric":"temperature","points":[{"ts":"2026-10-04T17:57:57.145228+08:00","value":25,"model_version":1,"unit":"℃"}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/ponds/9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9403 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices?pond_id=9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9403 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices/v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-hidden status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/latest?device_no=v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-hidden status=404 response={"error":"no data"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-hidden/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/model/latest status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-hidden/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/history?metric=temperature status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/ponds/9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices?pond_id=9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices/v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-foreign status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/latest?device_no=v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-foreign status=404 response={"error":"no data"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-foreign/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/model/latest status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-foreign/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/history?metric=temperature status=404 response={"error":"not_found"}
+=== NAME  TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer
+    app_resource_scope_http_test.go:149: http method=POST path=/api/v1/alarms/2/confirm status=403 response={"error":"forbidden"}
+    app_resource_scope_http_test.go:158: scenario=viewer_hidden_alarm_confirm before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:57.145228+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:57.153237+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:57.145259+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:57.145259+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:57.145259+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:57.15327+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:57.15327+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:57.15327+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:57.153237+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:57.153237196Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:57.145228+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:57.145228738Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:57.145228+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:57.153237+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:57.145228+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:57.153237+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:57.145228+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:57.153237+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:57.145259+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:57.145259+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:57.145259+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:57.15327+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:57.15327+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:57.15327+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:57.153237+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:57.153237196Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:57.145228+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:57.145228738Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:57.145228+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:57.153237+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:57.145228+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:57.153237+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support
+    app_resource_scope_http_test.go:72: environment real_timescaledb=2.30.0
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/ponds
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/ponds status=200 response=[{"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:57.543280596Z","turbidity":null},"ts":"2026-10-04T17:57:57.54328+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/devices status=200 response=[{"created_at":"2026-10-04T17:58:57.534881+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/alarms
+    app_resource_scope_http_test.go:89: http method=GET path=/api/v1/alarms status=200 response=[{"confirmed_at":null,"created_at":"2026-10-04T17:57:57.54328+08:00","current_value":25,"device_no":"v2-permission","id":1,"level":"warning","message":"temperature 高于阈值 20","metric":"temperature","pond_id":9401,"threshold":20}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support/stats
+    app_resource_scope_http_test.go:98: http method=GET path=/api/v1/stats/summary status=200 response={"alarm_devices":1,"offline_devices":1,"online_devices":0,"ponds":[{"pond_id":9401,"pond_name":"v2-pond","status":"warning"}]}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/ponds/9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9401 status=200 response={"device_count":1,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:57.543280596Z","turbidity":null},"ts":"2026-10-04T17:57:57.54328+08:00","turbidity":null},"pond_id":9401,"pond_name":"v2-pond","status":"warning"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices?pond_id=9401
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9401 status=200 response=[{"created_at":"2026-10-04T17:58:57.534881+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}]
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices/v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-permission status=200 response={"created_at":"2026-10-04T17:58:57.534881+08:00","device_no":"v2-permission","disabled_at":null,"id":1,"last_seen_at":null,"latest":{"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:57.543280596Z","turbidity":null},"ts":"2026-10-04T17:57:57.54328+08:00","turbidity":null},"model":"","name":"","pond_id":9401,"report_interval":60,"status":"offline"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/latest?device_no=v2-permission
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-permission status=200 response={"device_no":"v2-permission","dissolved_oxygen":null,"ph":null,"pond_id":9401,"report_interval":60,"salinity":null,"signal":null,"temperature":25,"timestamps":{"dissolved_oxygen":null,"ph":null,"salinity":null,"signal":null,"temperature":"2026-10-04T09:57:57.543280596Z","turbidity":null},"ts":"2026-10-04T17:57:57.54328+08:00","turbidity":null}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d status=200 response={"metric":"temperature","points":[{"ts":"2026-10-04T14:22:57.586845+08:00","value":25}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-permission/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/model/latest status=200 response={"device_no":"v2-permission","product_id":1,"model_version":1,"fields":[{"identifier":"temperature","type":"number","unit":"℃","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"dissolved_oxygen","type":"number","unit":"mg/L","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"ph","type":"number","unit":"","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"turbidity","type":"number","unit":"NTU","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true},{"identifier":"salinity","type":"number","unit":"ppt","minimum":null,"maximum":null,"enum_values":null,"readable":true,"writable":false,"nullable":true}],"ts":"2026-10-04T17:57:57.54328+08:00","properties":{"temperature":25}}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-permission/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-permission/history?metric=temperature status=200 response={"device_no":"v2-permission","metric":"temperature","points":[{"ts":"2026-10-04T17:57:57.54328+08:00","value":25,"model_version":1,"unit":"℃"}],"unit":"℃"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/ponds/9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9403 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices?pond_id=9403
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9403 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices/v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-hidden status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/latest?device_no=v2-hidden
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-hidden status=404 response={"error":"no data"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-hidden/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/model/latest status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-hidden/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-hidden/history?metric=temperature status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/ponds/9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/ponds/9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices?pond_id=9402
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices?pond_id=9402 status=404 response={"error":"pond not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices/v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/devices/v2-foreign status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/latest?device_no=v2-foreign
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/latest?device_no=v2-foreign status=404 response={"error":"no data"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d status=404 response={"error":"device not found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-foreign/model/latest
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/model/latest status=404 response={"error":"not_found"}
+=== RUN   TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-foreign/history?metric=temperature
+    app_resource_scope_http_test.go:127: http method=GET path=/api/v2/devices/v2-foreign/history?metric=temperature status=404 response={"error":"not_found"}
+=== NAME  TestAppResourceHTTPWhenRoleDeterminesFarmScope/support
+    app_resource_scope_http_test.go:149: http method=POST path=/api/v1/alarms/2/confirm status=404 response={"error":"alarm not found"}
+    app_resource_scope_http_test.go:158: scenario=support_hidden_alarm_confirm before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:57.54328+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:57.55142+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:57.54332+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:57.54332+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:57.54332+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:57.551454+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:57.551454+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:57.551454+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:57.55142+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:57.551420552Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:57.54328+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:57.543280596Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:57.54328+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:57.55142+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:57.54328+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:57.55142+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:57.54328+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:57.55142+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:57.54332+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:57.54332+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:57.54332+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:57.551454+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:57.551454+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:57.551454+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:57.55142+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:57.551420552Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:57.54328+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:57.543280596Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:57.54328+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:57.55142+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:57.54328+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:57.55142+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+--- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope (2.01s)
+    --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner (0.41s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/ponds (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/alarms (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner/stats (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/ponds/9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices?pond_id=9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices/v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/latest?device_no=v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-permission/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-permission/history?metric=temperature (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/ponds/9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices?pond_id=9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices/v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/latest?device_no=v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-hidden/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-hidden/history?metric=temperature (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/ponds/9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices?pond_id=9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/devices/v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/latest?device_no=v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-foreign/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/owner//api/v2/devices/v2-foreign/history?metric=temperature (0.00s)
+    --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin (0.41s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/ponds (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/alarms (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin/stats (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/ponds/9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices?pond_id=9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices/v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/latest?device_no=v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-permission/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-permission/history?metric=temperature (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/ponds/9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices?pond_id=9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices/v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/latest?device_no=v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-hidden/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-hidden/history?metric=temperature (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/ponds/9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices?pond_id=9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/devices/v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/latest?device_no=v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-foreign/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/admin//api/v2/devices/v2-foreign/history?metric=temperature (0.00s)
+    --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member (0.40s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/ponds (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/alarms (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member/stats (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/ponds/9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices?pond_id=9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices/v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/latest?device_no=v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-permission/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-permission/history?metric=temperature (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/ponds/9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices?pond_id=9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices/v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/latest?device_no=v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-hidden/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-hidden/history?metric=temperature (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/ponds/9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices?pond_id=9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/devices/v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/latest?device_no=v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-foreign/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/member//api/v2/devices/v2-foreign/history?metric=temperature (0.00s)
+    --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer (0.40s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/ponds (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/alarms (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer/stats (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/ponds/9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices?pond_id=9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices/v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/latest?device_no=v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-permission/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-permission/history?metric=temperature (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/ponds/9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices?pond_id=9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices/v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/latest?device_no=v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-hidden/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-hidden/history?metric=temperature (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/ponds/9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices?pond_id=9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/devices/v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/latest?device_no=v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-foreign/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/viewer//api/v2/devices/v2-foreign/history?metric=temperature (0.00s)
+    --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support (0.40s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/ponds (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/alarms (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support/stats (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/ponds/9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices?pond_id=9401 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices/v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/latest?device_no=v2-permission (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/history?device_no=v2-permission&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-permission/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-permission/history?metric=temperature (0.01s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/ponds/9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices?pond_id=9403 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices/v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/latest?device_no=v2-hidden (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/history?device_no=v2-hidden&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-hidden/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-hidden/history?metric=temperature (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/ponds/9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices?pond_id=9402 (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/devices/v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/latest?device_no=v2-foreign (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v1/water/history?device_no=v2-foreign&metric=temperature&range=30d (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-foreign/model/latest (0.00s)
+        --- PASS: TestAppResourceHTTPWhenRoleDeterminesFarmScope/support//api/v2/devices/v2-foreign/history?metric=temperature (0.00s)
+=== RUN   TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment
+=== RUN   TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment/owner
+    app_resource_scope_test.go:16: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:25: scenario=manager_owner_no_farm_assignment latest={DeviceNo:v2-hidden ProductID:1 ModelVersion:1 Fields:[{Identifier:temperature Type:number Unit:℃ Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true} {Identifier:dissolved_oxygen Type:number Unit:mg/L Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true} {Identifier:ph Type:number Unit: Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true} {Identifier:turbidity Type:number Unit:NTU Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true} {Identifier:salinity Type:number Unit:ppt Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true}] Timestamp:<nil> Properties:map[]} error=<nil>
+=== RUN   TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment/admin
+    app_resource_scope_test.go:16: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:25: scenario=manager_admin_no_farm_assignment latest={DeviceNo:v2-hidden ProductID:1 ModelVersion:1 Fields:[{Identifier:temperature Type:number Unit:℃ Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true} {Identifier:dissolved_oxygen Type:number Unit:mg/L Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true} {Identifier:ph Type:number Unit: Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true} {Identifier:turbidity Type:number Unit:NTU Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true} {Identifier:salinity Type:number Unit:ppt Min:<nil> Max:<nil> Enum:[] Readable:true Writable:false Nullable:true}] Timestamp:<nil> Properties:map[]} error=<nil>
+--- PASS: TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment (0.65s)
+    --- PASS: TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment/owner (0.33s)
+    --- PASS: TestAppResourceScopeWhenTenantManagerHasNoFarmAssignment/admin (0.32s)
+=== RUN   TestAppAlarmConfirmDeniedWhenLiveRoleCannotConfirm
+=== RUN   TestAppAlarmConfirmDeniedWhenLiveRoleCannotConfirm/viewer
+    app_resource_scope_test.go:119: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:134: scenario=confirm_viewer error=not found before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:58.598546+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:58.606724+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:58.598576+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:58.598576+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:58.598576+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:58.606755+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:58.606755+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:58.606755+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:58.606724+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:58.606724755Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:58.598546+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:58.598546997Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:58.598546+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:58.606724+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:58.598546+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:58.606724+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:58.598546+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:58.606724+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:58.598576+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:58.598576+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:58.598576+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:58.606755+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:58.606755+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:58.606755+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:58.606724+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:58.606724755Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:58.598546+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:58.598546997Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:58.598546+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:58.606724+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:58.598546+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:58.606724+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppAlarmConfirmDeniedWhenLiveRoleCannotConfirm/revoked_admin
+    app_resource_scope_test.go:119: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:134: scenario=confirm_revoked_admin error=not found before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:58.9276+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:58.937316+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:58.927647+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:58.927647+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:58.927647+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:58.937348+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:58.937348+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:58.937348+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:58.937316+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:58.937316242Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:58.9276+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:58.927600174Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:58.9276+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:58.937316+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:58.9276+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:58.937316+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:57:58.9276+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:57:58.937316+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:58:58.927647+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:58:58.927647+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:58.927647+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:58:58.937348+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:58:58.937348+00:00", "last_error": null, "updated_at": "2026-10-04T09:58:58.937348+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:57:58.937316+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:58.937316242Z"}, "model_version": 1}, {"ts": "2026-10-04T09:57:58.9276+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:57:58.927600174Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:57:58.9276+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:57:58.937316+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:57:58.9276+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:57:58.937316+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+--- PASS: TestAppAlarmConfirmDeniedWhenLiveRoleCannotConfirm (0.68s)
+    --- PASS: TestAppAlarmConfirmDeniedWhenLiveRoleCannotConfirm/viewer (0.34s)
+    --- PASS: TestAppAlarmConfirmDeniedWhenLiveRoleCannotConfirm/revoked_admin (0.34s)
+=== RUN   TestAppResourceScopeWhenTenantManagerRoleRevoked
+    app_resource_scope_test.go:62: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:74: scenario=manager_role_revoked error=not found before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+--- PASS: TestAppResourceScopeWhenTenantManagerRoleRevoked (0.34s)
+=== RUN   TestReviewerFarmUpdateRejectsCommittedRevocation
+=== RUN   TestReviewerFarmUpdateRejectsCommittedRevocation/role
+    tenant_write_revocation_http_test.go:99: environment real_timescaledb=2.30.0
+2026/10/04 17:58:59 INFO http request request_id=KW6XP2KE4LFPBYHWVAJFEJWTHV route=/admin/v1/login method=POST status=200 duration_ms=130 tenant_id=0 actor_id=0
+2026/10/04 17:58:59 WARN http request request_id=7SKLVT7NZYOEYODKAO5BNKZ7G7 route=/admin/v1/farms/:id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    tenant_write_revocation_http_test.go:127: http method=PUT path=/admin/v1/farms/9401 status=403 response={"error":"forbidden"}
+    tenant_write_revocation_http_test.go:133: source=9120469 change=role injected=true status=403 before="v2-farm" after="v2-farm" response={"error":"forbidden"}
+=== RUN   TestReviewerFarmUpdateRejectsCommittedRevocation/membership
+    tenant_write_revocation_http_test.go:99: environment real_timescaledb=2.30.0
+2026/10/04 17:59:00 INFO http request request_id=IW6H5SBDUOQAYDNA2V26JNGVNW route=/admin/v1/login method=POST status=200 duration_ms=133 tenant_id=0 actor_id=0
+2026/10/04 17:59:00 WARN http request request_id=POTKEGGEQ7STCYBL2TOZX6TME5 route=/admin/v1/farms/:id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    tenant_write_revocation_http_test.go:127: http method=PUT path=/admin/v1/farms/9401 status=403 response={"error":"forbidden"}
+    tenant_write_revocation_http_test.go:133: source=9120469 change=membership injected=true status=403 before="v2-farm" after="v2-farm" response={"error":"forbidden"}
+=== RUN   TestReviewerFarmUpdateRejectsCommittedRevocation/tenant
+    tenant_write_revocation_http_test.go:99: environment real_timescaledb=2.30.0
+2026/10/04 17:59:01 INFO http request request_id=ZCVFYTCZPIPHP7L7TQSEG2RXND route=/admin/v1/login method=POST status=200 duration_ms=139 tenant_id=0 actor_id=0
+2026/10/04 17:59:01 WARN http request request_id=ZVQVQUCGSG63HTRRQSHS67OXFP route=/admin/v1/farms/:id method=PUT status=403 duration_ms=2 tenant_id=9401 actor_id=9402
+    tenant_write_revocation_http_test.go:127: http method=PUT path=/admin/v1/farms/9401 status=403 response={"error":"forbidden"}
+    tenant_write_revocation_http_test.go:133: source=9120469 change=tenant injected=true status=403 before="v2-farm" after="v2-farm" response={"error":"forbidden"}
+=== RUN   TestReviewerFarmUpdateRejectsCommittedRevocation/platform_authority
+    tenant_write_revocation_http_test.go:99: environment real_timescaledb=2.30.0
+2026/10/04 17:59:01 INFO http request request_id=H4JF6R7HVGW5Q7E6OBJYGKDHC3 route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/04 17:59:01 WARN http request request_id=RIXWEJDUQLXDYLRUQJVLG6EXHZ route=/admin/v1/farms/:id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+    tenant_write_revocation_http_test.go:127: http method=PUT path=/admin/v1/farms/9401 status=403 response={"error":"forbidden"}
+    tenant_write_revocation_http_test.go:133: source=9120469 change=platform_authority injected=true status=403 before="v2-farm" after="v2-farm" response={"error":"forbidden"}
+--- PASS: TestReviewerFarmUpdateRejectsCommittedRevocation (2.36s)
+    --- PASS: TestReviewerFarmUpdateRejectsCommittedRevocation/role (0.59s)
+    --- PASS: TestReviewerFarmUpdateRejectsCommittedRevocation/membership (0.59s)
+    --- PASS: TestReviewerFarmUpdateRejectsCommittedRevocation/tenant (0.59s)
+    --- PASS: TestReviewerFarmUpdateRejectsCommittedRevocation/platform_authority (0.59s)
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/member
+2026/10/04 17:59:02 INFO http request request_id=JSRWK5QPEATRZAXBLRZY6CQ6NW route=/admin/v1/login method=POST status=200 duration_ms=132 tenant_id=0 actor_id=0
+2026/10/04 17:59:02 INFO http request request_id=MLOIZ4OZ2X2D76ZBKDI3LWSWYI route=/admin/v1/farms method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=D3JIZXVV5FOWLSVNMFFW7O6XQQ route=/admin/v1/ponds method=GET status=200 duration_ms=6 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=W5RBRSSKH72E6L65YQRYB64GZD route=/admin/v1/devices method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=SPCUPV6ZLQTNE2ABWCFWMRWGS3 route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=ODY6ZV7J7YGXXABJW4TF6XMIJD route=/admin/v1/stats method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=MQTUWGGMUEELAOBE75FAQZUSYU route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=723FKKSD2EIKO4WZ2VQMWWMINI route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=5ETK776TEVDD6UKT7NJMBWMDNM route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=CJLHRZ74JHDW4AYAFVE7RVMIFU route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=Y7S76EJMOMSCEVOWX72PSRXOS4 route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=3 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=BAGXC6TSUYHOZLPI7EEELBB5FQ route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=3 tenant_id=801 actor_id=802
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/viewer
+2026/10/04 17:59:02 INFO http request request_id=P4SNDDCRHXQDMMTDWLJZZXOD2Y route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/04 17:59:02 INFO http request request_id=H2Y3TA35CYX6UKDI3HOG5KQKDP route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=FFZRNWQLFWJ6KXVAAVY4R3VZOL route=/admin/v1/ponds method=GET status=200 duration_ms=7 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=DV6WXRYAZAAUQUDTUJXDDYHHHC route=/admin/v1/devices method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=VTB4UDG4LLFOC6762PCWFCACGP route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=62QYJE3II63P7HTGZ626BMVX6X route=/admin/v1/stats method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=36L7P4JHFR3K65GKR6G4R7J4FQ route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=VRJPBVED5U24ASJ2J6MHMLSZEA route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=CUOPHPRFU4QQQ6TXHKBMIGSYVD route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=LZAUR25V4SQ2NT3T4XEZCPCSRT route=/admin/v1/alarms/batch-confirm method=POST status=403 duration_ms=0 tenant_id=801 actor_id=802
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/support
+2026/10/04 17:59:02 INFO http request request_id=ERBRRRA3ATDEAI26PLMQVNE4UY route=/admin/v1/login method=POST status=200 duration_ms=129 tenant_id=0 actor_id=0
+2026/10/04 17:59:02 INFO http request request_id=4PNEERW6HDGVNKWLZO6VH7AD3B route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=TODFTUO4VUDM7TYDMPV6UOHZYZ route=/admin/v1/ponds method=GET status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=HPGQSYXRJHCDFEO4Q4HZUGK5HN route=/admin/v1/devices method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=WTKQSCPF3ETRAAVHUCBSL5PIU7 route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=37EVDY7PWJWCBYAJQGVFARQPEW route=/admin/v1/stats method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=BQ3W4YYZGL4OZ7M3TM3UNSK4SN route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=CHLFRGIHCAQS5Z7D7QG2QICXU3 route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=NXTPXT7UJQDKQFKIT43DGNHIFC route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 WARN http request request_id=QUAP57RQQCC5GAOL4DQJ73OQWE route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=3CALPUMBONQUC66HFVV2LAMMWH route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=3 tenant_id=801 actor_id=802
+2026/10/04 17:59:02 INFO http request request_id=VW2G5C3UUXEMSZ47CV3INRY6KH route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=3 tenant_id=801 actor_id=802
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/tenant_manager_without_farm_assignment_owner
+2026/10/04 17:59:02 INFO http request request_id=U73EDQJUUIH4HB6FQUZ3GYZCHJ route=/admin/v1/login method=POST status=200 duration_ms=127 tenant_id=0 actor_id=0
+2026/10/04 17:59:02 INFO http request request_id=NHVTGBNTSWTN6K567EQDDV3OKX route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=4 tenant_id=801 actor_id=802
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/tenant_manager_without_farm_assignment_admin
+2026/10/04 17:59:02 INFO http request request_id=UQLDKM33JT2B5E6RB4ZBDNS53S route=/admin/v1/login method=POST status=200 duration_ms=133 tenant_id=0 actor_id=0
+2026/10/04 17:59:02 INFO http request request_id=I3P7KITPI4GAPECNRLZSZAKO6N route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=4 tenant_id=801 actor_id=802
+--- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation (1.23s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/member (0.19s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/viewer (0.16s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/support (0.16s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/tenant_manager_without_farm_assignment_owner (0.13s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/tenant_manager_without_farm_assignment_admin (0.14s)
+=== RUN   TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment
+=== RUN   TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment/owner
+    app_resource_scope_test.go:37: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:47: scenario=manager_owner_no_farm_assignment_write result={DeviceNo:v2-hidden ModelVersion:1 Accepted:[temperature] Rejected:[]} error=<nil> before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment/admin
+    app_resource_scope_test.go:37: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:47: scenario=manager_admin_no_farm_assignment_write result={DeviceNo:v2-hidden ModelVersion:1 Accepted:[temperature] Rejected:[]} error=<nil> before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+--- PASS: TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment (0.66s)
+    --- PASS: TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment/owner (0.32s)
+    --- PASS: TestAppTelemetryWriteWhenTenantManagerHasNoFarmAssignment/admin (0.33s)
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner
+2026/10/04 17:59:03 WARN http request request_id=M6KCRVFQIHEO5Z3BMZABJCI2RL route=/admin/v1/farms method=GET status=401 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/04 17:59:04 INFO http request request_id=EEH6KXEEKF6GVM54B4JLJ3NSD5 route=/admin/v1/login method=POST status=200 duration_ms=135 tenant_id=0 actor_id=0
+2026/10/04 17:59:04 WARN http request request_id=2TPB5ORCIIPO6SNMKKAP45JNZ3 route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+    platform_membership_test.go:76: ADMIN stored role=owner old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/admin
+2026/10/04 17:59:04 WARN http request request_id=D34ZCICJ6NN6OFXQWL4DY76KDK route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/04 17:59:04 INFO http request request_id=PRYLMM4P2532XH3NBAOORYIHMW route=/admin/v1/login method=POST status=200 duration_ms=130 tenant_id=0 actor_id=0
+2026/10/04 17:59:04 WARN http request request_id=PBTPE4THZZNX7N6EPUT5ODX634 route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+    platform_membership_test.go:76: ADMIN stored role=admin old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/member
+2026/10/04 17:59:04 WARN http request request_id=IIL6TYP7T6NUITTDHSG4WYO6RZ route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/04 17:59:04 INFO http request request_id=E4BCJPRLTPRCRMI7DUCYNCPTU6 route=/admin/v1/login method=POST status=200 duration_ms=126 tenant_id=0 actor_id=0
+2026/10/04 17:59:04 WARN http request request_id=RN75GDXTQQUAZ4NJAABAKAA5QZ route=/admin/v1/farms method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+    platform_membership_test.go:76: ADMIN stored role=member old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/viewer
+2026/10/04 17:59:04 WARN http request request_id=RFGJ6I42XGYY5447IAL5OFPQXE route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/04 17:59:04 INFO http request request_id=ZTOZHCXOZVSXFWYBGXD7YYHICK route=/admin/v1/login method=POST status=200 duration_ms=129 tenant_id=0 actor_id=0
+2026/10/04 17:59:04 WARN http request request_id=SOHZOSKCJ65KM2ZJAEDMRIS7LE route=/admin/v1/farms method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+    platform_membership_test.go:76: ADMIN stored role=viewer old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_false
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_true
+--- PASS: TestM6bStoredPlatformMembershipFailsClosed (0.99s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner (0.14s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/admin (0.14s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/member (0.13s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/viewer (0.13s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_false (0.00s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_true (0.00s)
+=== RUN   TestM6bEnsurePlatformUserDoesNotCreateOrdinaryMembership
+--- PASS: TestM6bEnsurePlatformUserDoesNotCreateOrdinaryMembership (0.31s)
+=== RUN   TestM6bTelemetryRejectsVersionRevocationAfterAuthentication
+    telemetry_version_revocation_http_test.go:34: environment real_timescaledb=2.30.0
+    telemetry_version_revocation_http_test.go:50: revoked_after_authentication=true status=403 unchanged=true response={"error":"forbidden"}
+--- PASS: TestM6bTelemetryRejectsVersionRevocationAfterAuthentication (0.33s)
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_role
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:05 INFO http request request_id=MBKXH2IHJ3KCVZG4W3MOSNUDBG route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/04 17:59:05 WARN http request request_id=6AYY5ADHEZ4ZM7GW7GLLWKQKBE route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=3 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=batch revocation=role injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_membership
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:06 INFO http request request_id=PB2IGSY5LNMUE24XSZ2YEGLMHP route=/admin/v1/login method=POST status=200 duration_ms=129 tenant_id=0 actor_id=0
+2026/10/04 17:59:06 WARN http request request_id=N6DDLCBLHAWIW2YOYLR2INDGTM route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=batch revocation=membership injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_tenant
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:06 INFO http request request_id=62WZCEHYBAOVDR7OVPUSBAHLXK route=/admin/v1/login method=POST status=200 duration_ms=130 tenant_id=0 actor_id=0
+2026/10/04 17:59:06 WARN http request request_id=C2K43UUTVDVJMF5ZQI2FZXPQN4 route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=3 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=batch revocation=tenant injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_platform_authority
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:07 INFO http request request_id=BGEQUWAMAL4N6RYGWDS6DNTPVE route=/admin/v1/login method=POST status=200 duration_ms=131 tenant_id=0 actor_id=0
+2026/10/04 17:59:07 WARN http request request_id=47NKR7HUM3YST4OC2FSDUQ7JRQ route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=batch revocation=platform_authority injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_permission_version
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:08 INFO http request request_id=ZEEVJAC5SLSYMOR32O7VLF2W6W route=/admin/v1/login method=POST status=200 duration_ms=129 tenant_id=0 actor_id=0
+2026/10/04 17:59:08 WARN http request request_id=3LBZQYYX5JQ2HAX2OET7SRJFRR route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=batch revocation=permission_version injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_role
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:08 INFO http request request_id=SMJGP2A4CZSLIRAQM637X5LQWS route=/admin/v1/login method=POST status=200 duration_ms=133 tenant_id=0 actor_id=0
+2026/10/04 17:59:08 WARN http request request_id=BLKG3WLXHWAAJSUM6M6D23ZVLO route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=singular revocation=role injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_membership
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:09 INFO http request request_id=EXKHWS7QCJEESVIU7RPIYAMGXB route=/admin/v1/login method=POST status=200 duration_ms=135 tenant_id=0 actor_id=0
+2026/10/04 17:59:09 WARN http request request_id=SFY4CAOKCGOQKRWJDD7YL6VXPL route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=singular revocation=membership injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_tenant
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:10 INFO http request request_id=XDF2ERDY3SLUYVDB2KTZYSDX26 route=/admin/v1/login method=POST status=200 duration_ms=128 tenant_id=0 actor_id=0
+2026/10/04 17:59:10 WARN http request request_id=AJKA7KB4TFFMUR77DK4QSSDBAW route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=singular revocation=tenant injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_platform_authority
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:10 INFO http request request_id=GQVPRFIALS2CYXXZRQPIMBXC6J route=/admin/v1/login method=POST status=200 duration_ms=134 tenant_id=0 actor_id=0
+2026/10/04 17:59:10 WARN http request request_id=NTCLEO4NVFVT5I2AZXYXACGEC7 route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=singular revocation=platform_authority injected=true status=404 response={"error":"alarm not found"} unchanged=true
+=== RUN   TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_permission_version
+    alarm_revocation_http_test.go:43: environment real_timescaledb=2.30.0
+2026/10/04 17:59:11 INFO http request request_id=NMU2QPXM6AF3OHPYVWA4OA7FDQ route=/admin/v1/login method=POST status=200 duration_ms=138 tenant_id=0 actor_id=0
+2026/10/04 17:59:11 WARN http request request_id=PX5J3OPZHUGVL72NCX4R35CIL2 route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+    alarm_revocation_http_test.go:95: operation=singular revocation=permission_version injected=true status=404 response={"error":"alarm not found"} unchanged=true
+--- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication (6.14s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_role (0.60s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_membership (0.60s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_tenant (0.61s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_platform_authority (0.61s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/batch_permission_version (0.70s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_role (0.61s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_membership (0.60s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_tenant (0.60s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_platform_authority (0.60s)
+    --- PASS: TestM6bAlarmHTTPRejectsRevocationAfterAuthentication/singular_permission_version (0.61s)
+=== RUN   TestM6bScopedReadsAndExistsQueries
+--- PASS: TestM6bScopedReadsAndExistsQueries (0.33s)
+=== RUN   TestAppResourceHTTPWhenManagerTokenLosesAuthority
+=== RUN   TestAppResourceHTTPWhenManagerTokenLosesAuthority/role
+    app_resource_scope_http_test.go:170: environment real_timescaledb=2.30.0
+    app_resource_scope_http_test.go:187: http method=GET path=/api/v2/devices/v2-hidden/model/latest status=401 response={"error":"tenant membership revoked"}
+    app_resource_scope_http_test.go:190: scenario=role_revocation status=401 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+    app_resource_scope_http_test.go:187: http method=POST path=/api/v2/devices/v2-hidden/telemetry status=401 response={"error":"tenant membership revoked"}
+    app_resource_scope_http_test.go:190: scenario=role_revocation status=401 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestAppResourceHTTPWhenManagerTokenLosesAuthority/membership
+    app_resource_scope_http_test.go:170: environment real_timescaledb=2.30.0
+    app_resource_scope_http_test.go:187: http method=GET path=/api/v2/devices/v2-hidden/model/latest status=401 response={"error":"tenant membership revoked"}
+    app_resource_scope_http_test.go:190: scenario=membership_revocation status=401 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+    app_resource_scope_http_test.go:187: http method=POST path=/api/v2/devices/v2-hidden/telemetry status=401 response={"error":"tenant membership revoked"}
+    app_resource_scope_http_test.go:190: scenario=membership_revocation status=401 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestAppResourceHTTPWhenManagerTokenLosesAuthority/platform_authority
+    app_resource_scope_http_test.go:170: environment real_timescaledb=2.30.0
+    app_resource_scope_http_test.go:187: http method=GET path=/api/v2/devices/v2-hidden/model/latest status=401 response={"error":"token revoked"}
+    app_resource_scope_http_test.go:190: scenario=platform_authority_revocation status=401 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+    app_resource_scope_http_test.go:187: http method=POST path=/api/v2/devices/v2-hidden/telemetry status=401 response={"error":"token revoked"}
+    app_resource_scope_http_test.go:190: scenario=platform_authority_revocation status=401 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+--- PASS: TestAppResourceHTTPWhenManagerTokenLosesAuthority (1.00s)
+    --- PASS: TestAppResourceHTTPWhenManagerTokenLosesAuthority/role (0.34s)
+    --- PASS: TestAppResourceHTTPWhenManagerTokenLosesAuthority/membership (0.33s)
+    --- PASS: TestAppResourceHTTPWhenManagerTokenLosesAuthority/platform_authority (0.33s)
+=== RUN   TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked
+=== RUN   TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/owner
+    app_resource_scope_write_http_test.go:13: environment real_timescaledb=2.30.0
+    app_resource_scope_write_http_test.go:21: http method=POST path=/api/v2/devices/v2-hidden/telemetry status=202 response={"device_no":"v2-hidden","model_version":1,"accepted":["temperature"],"rejected":[]}
+    app_resource_scope_write_http_test.go:29: scenario=owner_revoked_farm_assignment status=202 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/admin
+    app_resource_scope_write_http_test.go:13: environment real_timescaledb=2.30.0
+    app_resource_scope_write_http_test.go:21: http method=POST path=/api/v2/devices/v2-hidden/telemetry status=202 response={"device_no":"v2-hidden","model_version":1,"accepted":["temperature"],"rejected":[]}
+    app_resource_scope_write_http_test.go:29: scenario=admin_revoked_farm_assignment status=202 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/member
+    app_resource_scope_write_http_test.go:13: environment real_timescaledb=2.30.0
+    app_resource_scope_write_http_test.go:21: http method=POST path=/api/v2/devices/v2-hidden/telemetry status=404 response={"error":"not_found"}
+    app_resource_scope_write_http_test.go:29: scenario=member_revoked_farm_assignment status=404 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/viewer
+    app_resource_scope_write_http_test.go:13: environment real_timescaledb=2.30.0
+    app_resource_scope_write_http_test.go:21: http method=POST path=/api/v2/devices/v2-hidden/telemetry status=404 response={"error":"not_found"}
+    app_resource_scope_write_http_test.go:29: scenario=viewer_revoked_farm_assignment status=404 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/support
+    app_resource_scope_write_http_test.go:13: environment real_timescaledb=2.30.0
+    app_resource_scope_write_http_test.go:21: http method=POST path=/api/v2/devices/v2-hidden/telemetry status=404 response={"error":"not_found"}
+    app_resource_scope_write_http_test.go:29: scenario=support_revoked_farm_assignment status=404 before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+--- PASS: TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked (1.67s)
+    --- PASS: TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/owner (0.34s)
+    --- PASS: TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/admin (0.34s)
+    --- PASS: TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/member (0.33s)
+    --- PASS: TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/viewer (0.33s)
+    --- PASS: TestAppTelemetryHTTPWhenManagerFarmAssignmentIsRevoked/support (0.33s)
+=== RUN   TestAppAlarmBatchConfirmAllowsTenantManagerWithoutFarmAssignment
+=== RUN   TestAppAlarmBatchConfirmAllowsTenantManagerWithoutFarmAssignment/owner
+    app_resource_scope_test.go:146: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:174: scenario=batch_confirm_manager_owner confirmed=2 error=<nil> before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:58:14.636495+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:58:14.644925+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:14.636534+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:14.636534+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:14.636534+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:59:14.644953+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:59:14.644953+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:14.644953+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:58:14.644925+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:58:14.644925864Z"}, "model_version": 1}, {"ts": "2026-10-04T09:58:14.636495+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:58:14.636495891Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:58:14.636495+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:58:14.644925+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:58:14.636495+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:58:14.644925+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:58:14.636495+00:00", "product_id": 1, "confirmed_at": "2026-10-04T09:59:14.653204+00:00", "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:58:14.644925+00:00", "product_id": 1, "confirmed_at": "2026-10-04T09:59:14.653204+00:00", "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:14.636534+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:14.636534+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:14.636534+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:59:14.644953+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:59:14.644953+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:14.644953+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:58:14.644925+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:58:14.644925864Z"}, "model_version": 1}, {"ts": "2026-10-04T09:58:14.636495+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:58:14.636495891Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:58:14.636495+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:58:14.644925+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:58:14.636495+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:58:14.644925+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppAlarmBatchConfirmAllowsTenantManagerWithoutFarmAssignment/admin
+    app_resource_scope_test.go:146: environment real_timescaledb=2.30.0
+    app_resource_scope_test.go:174: scenario=batch_confirm_manager_admin confirmed=2 error=<nil> before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:58:14.971878+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:58:14.980275+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:14.971914+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:14.971914+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:14.971914+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:59:14.980304+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:59:14.980304+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:14.980304+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:58:14.980275+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:58:14.98027504Z"}, "model_version": 1}, {"ts": "2026-10-04T09:58:14.971878+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:58:14.97187814Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:58:14.971878+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:58:14.980275+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:58:14.971878+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:58:14.980275+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-04T09:58:14.971878+00:00", "product_id": 1, "confirmed_at": "2026-10-04T09:59:14.988417+00:00", "current_value": 25}, {"id": 2, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9403, "device_no": "v2-hidden", "threshold": 20, "created_at": "2026-10-04T09:58:14.980275+00:00", "product_id": 1, "confirmed_at": "2026-10-04T09:59:14.988417+00:00", "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:14.971914+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:14.971914+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:14.971914+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}, {"id": 2, "status": "pending", "next_at": "2026-10-04T09:59:14.980304+00:00", "alarm_id": 2, "attempts": 0, "created_at": "2026-10-04T09:59:14.980304+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:14.980304+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-04T09:58:14.980275+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:58:14.98027504Z"}, "model_version": 1}, {"ts": "2026-10-04T09:58:14.971878+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-04T09:58:14.97187814Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-04T09:58:14.971878+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}, {"ts": "2026-10-04T09:58:14.980275+00:00", "pond_id": 9403, "device_no": "v2-hidden", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-04T09:58:14.971878+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}, {"ph": null, "ts": "2026-10-04T09:58:14.980275+00:00", "signal": null, "battery": null, "pond_id": 9403, "salinity": null, "device_no": "v2-hidden", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+--- PASS: TestAppAlarmBatchConfirmAllowsTenantManagerWithoutFarmAssignment (0.67s)
+    --- PASS: TestAppAlarmBatchConfirmAllowsTenantManagerWithoutFarmAssignment/owner (0.34s)
+    --- PASS: TestAppAlarmBatchConfirmAllowsTenantManagerWithoutFarmAssignment/admin (0.34s)
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation/role_batch
+    alarm_batch_revocation_test.go:19: environment real_timescaledb=2.30.0
+    alarm_batch_revocation_test.go:45: revocation=role actor_entry=false confirmed=0 error=not found unchanged=true
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation/role_batch_by_actor
+    alarm_batch_revocation_test.go:19: environment real_timescaledb=2.30.0
+    alarm_batch_revocation_test.go:45: revocation=role actor_entry=true confirmed=0 error=not found unchanged=true
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation/membership_batch
+    alarm_batch_revocation_test.go:19: environment real_timescaledb=2.30.0
+    alarm_batch_revocation_test.go:45: revocation=membership actor_entry=false confirmed=0 error=not found unchanged=true
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation/membership_batch_by_actor
+    alarm_batch_revocation_test.go:19: environment real_timescaledb=2.30.0
+    alarm_batch_revocation_test.go:45: revocation=membership actor_entry=true confirmed=0 error=not found unchanged=true
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation/tenant_batch
+    alarm_batch_revocation_test.go:19: environment real_timescaledb=2.30.0
+    alarm_batch_revocation_test.go:45: revocation=tenant actor_entry=false confirmed=0 error=not found unchanged=true
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation/tenant_batch_by_actor
+    alarm_batch_revocation_test.go:19: environment real_timescaledb=2.30.0
+    alarm_batch_revocation_test.go:45: revocation=tenant actor_entry=true confirmed=0 error=not found unchanged=true
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation/platform_authority_batch
+    alarm_batch_revocation_test.go:19: environment real_timescaledb=2.30.0
+    alarm_batch_revocation_test.go:45: revocation=platform_authority actor_entry=false confirmed=0 error=not found unchanged=true
+=== RUN   TestM6bManagerBatchRejectsLiveRevocation/platform_authority_batch_by_actor
+    alarm_batch_revocation_test.go:19: environment real_timescaledb=2.30.0
+    alarm_batch_revocation_test.go:45: revocation=platform_authority actor_entry=true confirmed=0 error=not found unchanged=true
+--- PASS: TestM6bManagerBatchRejectsLiveRevocation (2.70s)
+    --- PASS: TestM6bManagerBatchRejectsLiveRevocation/role_batch (0.35s)
+    --- PASS: TestM6bManagerBatchRejectsLiveRevocation/role_batch_by_actor (0.33s)
+    --- PASS: TestM6bManagerBatchRejectsLiveRevocation/membership_batch (0.33s)
+    --- PASS: TestM6bManagerBatchRejectsLiveRevocation/membership_batch_by_actor (0.34s)
+    --- PASS: TestM6bManagerBatchRejectsLiveRevocation/tenant_batch (0.33s)
+    --- PASS: TestM6bManagerBatchRejectsLiveRevocation/tenant_batch_by_actor (0.34s)
+    --- PASS: TestM6bManagerBatchRejectsLiveRevocation/platform_authority_batch (0.34s)
+    --- PASS: TestM6bManagerBatchRejectsLiveRevocation/platform_authority_batch_by_actor (0.34s)
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/singular_open
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/singular_confirmed
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/batch_open
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/batch_confirmed
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+--- PASS: TestM6bAlarmMutationsRejectPartialTenantContext (1.33s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/singular_open (0.33s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/singular_confirmed (0.33s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/batch_open (0.33s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/batch_confirmed (0.35s)
+=== RUN   TestAppTelemetryWriteRoleBoundary
+=== RUN   TestAppTelemetryWriteRoleBoundary/owner
+    telemetry_permission_http_test.go:26: environment real_timescaledb=2.30.0
+    telemetry_permission_http_test.go:45: scenario=app_owner_v2-foreign post_status=404 response={"error":"not_found"}
+    telemetry_permission_http_test.go:53: scenario=app_owner login_status=200 post_status=202 response={"device_no":"v2-permission","model_version":1,"accepted":["temperature"],"rejected":[]} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-01T00:00:00+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:19.361181+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:19.361181+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:19.361181+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+    telemetry_permission_http_test.go:66: scenario=app_owner_live_downgrade post_status=401 response={"error":"tenant membership revoked"} before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-01T00:00:00+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:19.361181+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:19.361181+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:19.361181+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-01T00:00:00+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:19.361181+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:19.361181+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:19.361181+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppTelemetryWriteRoleBoundary/admin
+    telemetry_permission_http_test.go:26: environment real_timescaledb=2.30.0
+    telemetry_permission_http_test.go:45: scenario=app_admin_v2-foreign post_status=404 response={"error":"not_found"}
+    telemetry_permission_http_test.go:53: scenario=app_admin login_status=200 post_status=202 response={"device_no":"v2-permission","model_version":1,"accepted":["temperature"],"rejected":[]} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-01T00:00:00+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:19.711497+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:19.711497+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:19.711497+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+    telemetry_permission_http_test.go:66: scenario=app_admin_live_downgrade post_status=401 response={"error":"tenant membership revoked"} before={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-01T00:00:00+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:19.711497+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:19.711497+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:19.711497+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]} after={"alarms": [{"id": 1, "level": "warning", "metric": "temperature", "message": "temperature 高于阈值 20", "pond_id": 9401, "device_no": "v2-permission", "threshold": 20, "created_at": "2026-10-01T00:00:00+00:00", "product_id": 1, "confirmed_at": null, "current_value": 25}], "outbox": [{"id": 1, "status": "pending", "next_at": "2026-10-04T09:59:19.711497+00:00", "alarm_id": 1, "attempts": 0, "created_at": "2026-10-04T09:59:19.711497+00:00", "last_error": null, "updated_at": "2026-10-04T09:59:19.711497+00:00", "lease_owner": null, "leased_until": null, "recipient_open_id": null}], "shadows": [{"ts": "2026-10-01T00:00:00+00:00", "last": {"temperature": 25}, "signal": null, "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "timestamps": {"temperature": "2026-10-01T00:00:00Z"}, "model_version": 1}], "telemetry": [{"ts": "2026-10-01T00:00:00+00:00", "pond_id": 9401, "device_no": "v2-permission", "tenant_id": 9401, "product_id": 1, "properties": {"temperature": 25}, "model_version": 1}], "sensor_data": [{"ph": null, "ts": "2026-10-01T00:00:00+00:00", "signal": null, "battery": null, "pond_id": 9401, "salinity": null, "device_no": "v2-permission", "tenant_id": 9401, "turbidity": null, "temperature": 25, "dissolved_oxygen": null}]}
+=== RUN   TestAppTelemetryWriteRoleBoundary/viewer
+    telemetry_permission_http_test.go:26: environment real_timescaledb=2.30.0
+    telemetry_permission_http_test.go:45: scenario=app_viewer_v2-foreign post_status=404 response={"error":"not_found"}
+    telemetry_permission_http_test.go:45: scenario=app_viewer_v2-hidden post_status=404 response={"error":"not_found"}
+    telemetry_permission_http_test.go:53: scenario=app_viewer login_status=200 post_status=403 response={"error":"forbidden"} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestAppTelemetryWriteRoleBoundary/member
+    telemetry_permission_http_test.go:26: environment real_timescaledb=2.30.0
+    telemetry_permission_http_test.go:45: scenario=app_member_v2-foreign post_status=404 response={"error":"not_found"}
+    telemetry_permission_http_test.go:45: scenario=app_member_v2-hidden post_status=404 response={"error":"not_found"}
+    telemetry_permission_http_test.go:53: scenario=app_member login_status=200 post_status=403 response={"error":"forbidden"} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestAppTelemetryWriteRoleBoundary/support
+    telemetry_permission_http_test.go:26: environment real_timescaledb=2.30.0
+    telemetry_permission_http_test.go:45: scenario=app_support_v2-foreign post_status=404 response={"error":"not_found"}
+    telemetry_permission_http_test.go:45: scenario=app_support_v2-hidden post_status=404 response={"error":"not_found"}
+    telemetry_permission_http_test.go:53: scenario=app_support login_status=200 post_status=403 response={"error":"forbidden"} before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+--- PASS: TestAppTelemetryWriteRoleBoundary (1.71s)
+    --- PASS: TestAppTelemetryWriteRoleBoundary/owner (0.34s)
+    --- PASS: TestAppTelemetryWriteRoleBoundary/admin (0.35s)
+    --- PASS: TestAppTelemetryWriteRoleBoundary/viewer (0.34s)
+    --- PASS: TestAppTelemetryWriteRoleBoundary/member (0.34s)
+    --- PASS: TestAppTelemetryWriteRoleBoundary/support (0.34s)
+=== RUN   TestM6bTenantMembershipVersionAndRevocation
+    m6b_tenant_test.go:187: inactive tenant telemetry error=no rows in result set
+--- PASS: TestM6bTenantMembershipVersionAndRevocation (0.37s)
+=== RUN   TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation
+    fake_executor_m6b_test.go:36: environment real_timescaledb=2.30.0
+=== RUN   TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/preserves_tenant_actor_context
+=== RUN   TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/rejects_committed_role_revocation_before_side_effect
+=== RUN   TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/rejects_committed_permission_version_revocation_before_side_effect
+--- PASS: TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation (0.33s)
+    --- PASS: TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/preserves_tenant_actor_context (0.00s)
+    --- PASS: TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/rejects_committed_role_revocation_before_side_effect (0.00s)
+    --- PASS: TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/rejects_committed_permission_version_revocation_before_side_effect (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	47.157s
+-test.shuffle 1791107915393929046
+=== RUN   TestLegacyTenantReconciliationAndRollback
+--- PASS: TestLegacyTenantReconciliationAndRollback (0.84s)
+=== RUN   TestM6bMembershipMigrationRollbackAndLegacyBackfill
+--- PASS: TestM6bMembershipMigrationRollbackAndLegacyBackfill (0.90s)
+=== RUN   TestM6bLegacyPlatformOwnerBusinessBoundary
+2026/10/04 17:58:37 INFO http request request_id=5666FTTE3ECX3ETHJZU4EQQ45W route=/admin/v1/login method=POST status=200 duration_ms=168 tenant_id=0 actor_id=0
+    platform_owner_test.go:57: POST /admin/v1/login status=200 expected=200
+2026/10/04 17:58:37 WARN http request request_id=UNQHTPQQYGE7XEVV73EOCTXGDV route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+    platform_owner_test.go:58: GET /admin/v1/farms status=403 expected=403
+    platform_owner_test.go:66: migration platform memberships=0 reconciliation=1 legacy farm/owner preserved=1
+2026/10/04 17:58:38 INFO http request request_id=Z6ZREVFUO5PVHJDDFQG3ITP7MX route=/admin/v1/login method=POST status=200 duration_ms=140 tenant_id=0 actor_id=0
+    platform_owner_test.go:67: POST /admin/v1/login status=200 expected=200
+2026/10/04 17:58:38 INFO http request request_id=6BZO7YGPFYDDV74VHUFENOPZVA route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=1 actor_id=9202
+    platform_owner_test.go:69: GET /admin/v1/farms status=200 expected=200
+2026/10/04 17:58:38 INFO http request request_id=X3ZQQS3W2G2DH7VQD72TCGAJ67 route=/admin/v1/login method=POST status=200 duration_ms=134 tenant_id=0 actor_id=0
+    platform_owner_test.go:92: POST /admin/v1/login status=200 expected=200
+2026/10/04 17:58:38 INFO http request request_id=H6ANZ7PQLBFBOVTJ5FXFUAGSGY route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=1 actor_id=9201
+    platform_owner_test.go:93: GET /admin/v1/farms status=200 expected=200
+2026/10/04 17:58:38 WARN http request request_id=CIQORPXBSD5WJVNFCWDZ4YHMF3 route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    platform_owner_test.go:100: GET /admin/v1/farms status=401 expected=401
+2026/10/04 17:58:38 INFO http request request_id=WSYQESHA34UI6KCOT5GOXAT5YT route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+    platform_owner_test.go:101: POST /admin/v1/login status=200 expected=200
+2026/10/04 17:58:38 WARN http request request_id=LZ66LX4PMPHCXJRVBOSA5ZAUJR route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+    platform_owner_test.go:102: GET /admin/v1/farms status=403 expected=403
+2026/10/04 17:58:38 INFO http request request_id=DMDMLWXEKEVFSH73C7242ISDWH route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+    platform_owner_test.go:106: POST /admin/v1/login status=200 expected=200
+2026/10/04 17:58:38 WARN http request request_id=DLJNFHI5GC75QL7326SJP5YZUJ route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    platform_owner_test.go:110: GET /admin/v1/farms status=401 expected=401
+--- PASS: TestM6bLegacyPlatformOwnerBusinessBoundary (1.97s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	4.772s
+-test.shuffle 1791107915391357778
+=== RUN   TestPlatformAdminCannotGrantTenantMembership
+2026/10/04 17:58:35 INFO http request request_id=LOXMS7MKBHGDUUGUTRTCWP2EUV route=/admin/v1/login method=POST status=200 duration_ms=155 tenant_id=0 actor_id=0
+2026/10/04 17:58:35 WARN http request request_id=IOSDRTFOVVYXPEMWKETX56IOP3 route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=0 tenant_id=7 actor_id=9
+--- PASS: TestPlatformAdminCannotGrantTenantMembership (0.31s)
+=== RUN   TestPlatformAdminCanLoginAfterTenantMembershipExpires
+2026/10/04 17:58:35 INFO http request request_id=K3ZI7L4GQP3CMJS6AQMJNGUKHF route=/admin/v1/login method=POST status=200 duration_ms=148 tenant_id=0 actor_id=0
+2026/10/04 17:58:35 INFO http request request_id=YYMCGBTXZWCVP3C5WKEBEBV7QG route=/admin/v1/tenants/:id/status method=PUT status=204 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestPlatformAdminCanLoginAfterTenantMembershipExpires (0.28s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	1.650s
+-test.shuffle 1791107915387871345
+testing: warning: no tests to run
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.026s [no tests to run]
+
+EXIT 0

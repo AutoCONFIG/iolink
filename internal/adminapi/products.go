@@ -65,6 +65,10 @@ func (s *Server) createProduct(c *gin.Context) {
 	}
 	item, err := catalog.CreateProduct(c.Request.Context(), tenant, req.Name)
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrConflict) {
 			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 			return
@@ -109,6 +113,10 @@ func (s *Server) listProductModels(c *gin.Context) {
 	}
 	items, err := catalog.ListProductModels(c.Request.Context(), tenant, productID)
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
@@ -136,6 +144,10 @@ func (s *Server) createProductModel(c *gin.Context) {
 	}
 	models, err := catalog.ListProductModels(c.Request.Context(), tenant, productID)
 	if err != nil && !errors.Is(err, domain.ErrNotFound) {
+		if errors.Is(err, domain.ErrForbidden) || errors.Is(err, domain.ErrInactiveTenant) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "model query failed"})
 		return
 	}
@@ -145,6 +157,10 @@ func (s *Server) createProductModel(c *gin.Context) {
 	}
 	item, err := catalog.CreateProductModel(c.Request.Context(), tenant, productID, version, req.Fields)
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
@@ -173,6 +189,10 @@ func (s *Server) publishProductModel(c *gin.Context) {
 		return
 	}
 	if err := catalog.PublishProductModel(c.Request.Context(), tenant, productID, version); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
@@ -216,6 +236,10 @@ func (s *Server) assignDeviceProduct(c *gin.Context) {
 		return
 	}
 	if err := catalog.AssignDeviceProductByActor(c.Request.Context(), tenant, c.Param("device_no"), req.ProductID, req.ModelVersion, aid(c)); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return

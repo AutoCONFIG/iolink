@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/persistence"
 )
 
 // tenantMembershipAuthority rejects legacy ordinary grants to global platform admins.
@@ -111,6 +112,9 @@ func (s *Service) SetTenantActive(ctx context.Context, tenantID int64, active bo
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err := persistence.AuthorizePlatformWrite(ctx, tx, actorID); err != nil {
+		return err
+	}
 	ct, err := tx.Exec(ctx, `UPDATE tenants SET active=$2,permission_version=permission_version+1 WHERE id=$1`, tenantID, active)
 	if err != nil {
 		return err
@@ -152,6 +156,9 @@ func (s *Service) ListTenantMembers(ctx context.Context, tenantID int64) ([]doma
 }
 
 func (s *Service) SetTenantMember(ctx context.Context, tenantID, userID int64, role string, active bool, expiresAt *time.Time, actorID int64) error {
+	if err := persistence.AuthorizeTenantTarget(ctx, tenantID, actorID); err != nil {
+		return err
+	}
 	if role != "owner" && role != "admin" && role != "member" && role != "viewer" && role != "support" {
 		return domain.ErrInvalidProductModel
 	}
@@ -166,6 +173,9 @@ func (s *Service) SetTenantMember(ctx context.Context, tenantID, userID int64, r
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "tenant_members", "write"); err != nil {
+		return err
+	}
 	var exists bool
 	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tenants WHERE id=$1)`, tenantID).Scan(&exists); err != nil {
 		return err

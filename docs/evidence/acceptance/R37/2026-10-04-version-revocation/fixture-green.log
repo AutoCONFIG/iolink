@@ -1,0 +1,53 @@
+source=dff3427 plus test fixture corrections
+command=go test -race -shuffle=on -count=1 -v ./internal/core -run TestM6b(FakeExecutor|ScopedReadsAndExistsQueries|AlarmMutationsRejectPartialTenantContext)
+environment=isolated iolink-todo9-pg; DSN redacted
+-test.shuffle 1791107286329926819
+=== RUN   TestM6bScopedReadsAndExistsQueries
+--- PASS: TestM6bScopedReadsAndExistsQueries (0.37s)
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/singular_open
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/singular_confirmed
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/batch_open
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/batch_confirmed
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.0
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+--- PASS: TestM6bAlarmMutationsRejectPartialTenantContext (1.45s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/singular_open (0.37s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/singular_confirmed (0.36s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/batch_open (0.36s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/batch_confirmed (0.36s)
+=== RUN   TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation
+    fake_executor_m6b_test.go:36: environment real_timescaledb=2.30.0
+=== RUN   TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/preserves_tenant_actor_context
+=== RUN   TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/rejects_committed_role_revocation_before_side_effect
+=== RUN   TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/rejects_committed_permission_version_revocation_before_side_effect
+--- PASS: TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation (0.34s)
+    --- PASS: TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/preserves_tenant_actor_context (0.00s)
+    --- PASS: TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/rejects_committed_role_revocation_before_side_effect (0.00s)
+    --- PASS: TestM6bFakeExecutorPropagatesScopeAndRejectsRevocation/rejects_committed_permission_version_revocation_before_side_effect (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	3.198s
+
+EXIT 0
