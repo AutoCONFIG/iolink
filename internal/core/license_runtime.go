@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"crypto/rsa"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -24,29 +25,64 @@ func (s *Service) LicenseStatus(ctx context.Context) (license.Status, error) {
 	if err != nil {
 		return license.Status{}, fmt.Errorf("license status transaction: %w", err)
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 	var deployment string
 	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&deployment); err != nil {
 		return license.Status{}, fmt.Errorf("license deployment: %w", err)
 	}
+	var maxSeen *time.Time
+	var clockError bool
+	if err := tx.QueryRow(ctx, `SELECT max_seen_at,clock_error FROM license_clock WHERE singleton=TRUE`).Scan(&maxSeen, &clockError); err != nil {
+		return license.Status{}, fmt.Errorf("license clock: %w", err)
+	}
 	var payloadRaw, signature []byte
 	var sha string
-	var payload license.Payload
+	var licenseID, licenseDeploymentID, keyID *string
+	var issuedAt, notBefore, expiresAt *time.Time
+	var maxDevices int64
 	var features []byte
-	if err := tx.QueryRow(ctx, `SELECT license_id,deployment_id,key_id,issued_at,not_before,expires_at,max_devices,features,payload,signature,coalesce(payload_sha256,'') FROM license_state WHERE singleton=TRUE`).Scan(&payload.LicenseID, &payload.DeploymentID, &payload.KeyID, &payload.IssuedAt, &payload.NotBefore, &payload.ExpiresAt, &payload.MaxDevices, &features, &payloadRaw, &signature, &sha); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return license.Status{State: license.StateMissing, DeploymentID: &deployment, Features: []string{}}, nil
-		}
+	if err := tx.QueryRow(ctx, `SELECT license_id,deployment_id,key_id,issued_at,not_before,expires_at,max_devices,features,payload,signature,coalesce(payload_sha256,'') FROM license_state WHERE singleton=TRUE`).Scan(&licenseID, &licenseDeploymentID, &keyID, &issuedAt, &notBefore, &expiresAt, &maxDevices, &features, &payloadRaw, &signature, &sha); err != nil {
 		return license.Status{}, fmt.Errorf("license state: %w", err)
 	}
-	if err := json.Unmarshal(features, &payload.Features); err != nil {
+	if licenseID == nil && len(payloadRaw) == 0 && len(signature) == 0 {
+		state := license.StateMissing
+		if clockError {
+			state = license.StateClockError
+		}
+		return license.Status{State: state, DeploymentID: &deployment, Features: []string{}}, nil
+	}
+	var payloadFeatures []string
+	if err := json.Unmarshal(features, &payloadFeatures); err != nil {
 		return license.Status{}, fmt.Errorf("license features: %w", err)
 	}
-	status := license.Status{State: license.StateInvalid, DeploymentID: &deployment, LicenseID: &payload.LicenseID, KeyID: &payload.KeyID, IssuedAt: &payload.IssuedAt, NotBefore: &payload.NotBefore, ExpiresAt: payload.ExpiresAt, MaxDevices: payload.MaxDevices, Features: payload.Features}
+	payload := license.Payload{Features: payloadFeatures, MaxDevices: maxDevices}
+	if licenseID != nil {
+		payload.LicenseID = *licenseID
+	}
+	if licenseDeploymentID != nil {
+		payload.DeploymentID = *licenseDeploymentID
+	}
+	if keyID != nil {
+		payload.KeyID = *keyID
+	}
+	if issuedAt != nil {
+		payload.IssuedAt = *issuedAt
+	}
+	if notBefore != nil {
+		payload.NotBefore = *notBefore
+	}
+	payload.ExpiresAt = expiresAt
+	status := license.Status{State: license.StateInvalid, DeploymentID: &deployment, LicenseID: licenseID, KeyID: keyID, IssuedAt: issuedAt, NotBefore: notBefore, ExpiresAt: expiresAt, MaxDevices: maxDevices, Features: payloadFeatures, PayloadSHA256: &sha}
 	if s.license == nil || s.license.PublicKey == nil || len(payloadRaw) == 0 || len(signature) == 0 {
 		status.State = license.StateInvalid
 	} else if verified, verifyErr := license.Verify(license.Envelope{PayloadB64: base64.StdEncoding.EncodeToString(payloadRaw), SignatureB64: base64.StdEncoding.EncodeToString(signature)}, s.license.PublicKey); verifyErr == nil && verified.SHA256 == sha && verified.Payload.KeyID == s.license.KeyID {
-		status.State = license.Evaluate(verified.Payload, deployment, time.Now().UTC(), time.Time{}, false)
+		lastSeen := time.Time{}
+		if maxSeen != nil {
+			lastSeen = *maxSeen
+		}
+		status.State = license.Evaluate(verified.Payload, deployment, time.Now().UTC(), lastSeen, clockError)
+	} else if clockError {
+		status.State = license.StateClockError
 	}
 	if err := tx.QueryRow(ctx, `SELECT count(*) FROM devices WHERE disabled_at IS NULL`).Scan(&status.UsedDevices); err != nil {
 		return license.Status{}, fmt.Errorf("license devices: %w", err)
@@ -66,6 +102,9 @@ func (s *Service) checkDeviceAdmission(ctx context.Context, tx pgx.Tx) error {
 	}
 	if s.license.PublicKey == nil || s.license.KeyID == "" {
 		return license.ErrUnavailable
+	}
+	if err := observeLicenseClock(ctx, tx); err != nil {
+		return err
 	}
 	var deployment string
 	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&deployment); err != nil {
@@ -105,24 +144,43 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 	if err != nil {
 		return fmt.Errorf("license import transaction: %w", err)
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
+	reject := func(reason string, cause error) error {
+		_ = tx.Rollback(ctx)
+		_ = s.recordLicenseRejection(ctx, envelope, actorID, reason)
+		return cause
+	}
 	var deployment string
 	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE FOR UPDATE`).Scan(&deployment); err != nil {
 		return fmt.Errorf("license deployment: %w", err)
 	}
-	verified, err := license.Verify(envelope, s.license.PublicKey)
-	if err != nil {
+	if err := observeLicenseClock(ctx, tx); err != nil {
+		if errors.Is(err, license.ErrClockError) {
+			return reject("license_clock_error", err)
+		}
 		return err
 	}
+	verified, err := license.Verify(envelope, s.license.PublicKey)
+	if err != nil {
+		reason := "license_invalid"
+		if errors.Is(err, license.ErrInvalidSignature) {
+			reason = "license_signature_invalid"
+		}
+		return reject(reason, err)
+	}
 	if verified.Payload.KeyID != s.license.KeyID {
-		return license.ErrInvalidPayload
+		return reject("license_invalid", license.ErrInvalidPayload)
 	}
 	state := license.Evaluate(verified.Payload, deployment, time.Now().UTC(), time.Time{}, false)
 	if state == license.StateInstanceMismatch {
-		return license.ErrInstanceMismatch
+		return reject("license_instance_mismatch", license.ErrInstanceMismatch)
 	}
 	if state == license.StateNotBefore || state == license.StateExpired || state == license.StateClockError {
-		return license.ErrInvalidPayload
+		reason := "license_invalid"
+		if state == license.StateClockError {
+			reason = "license_clock_error"
+		}
+		return reject(reason, license.ErrInvalidPayload)
 	}
 	features, err := json.Marshal(verified.Payload.Features)
 	if err != nil {
@@ -136,6 +194,51 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 	}
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("license import commit: %w", err)
+	}
+	return nil
+}
+
+func (s *Service) recordLicenseRejection(ctx context.Context, envelope license.Envelope, actorID int64, reason string) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	payload := []byte(envelope.PayloadB64)
+	if decoded, decodeErr := base64.StdEncoding.DecodeString(envelope.PayloadB64); decodeErr == nil {
+		payload = decoded
+	}
+	digest := sha256.Sum256(payload)
+	digestHex := fmt.Sprintf("%x", digest)
+	metadata, err := json.Marshal(map[string]string{"sha256": digestHex, "reason": reason})
+	if err != nil {
+		return err
+	}
+	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id,metadata) VALUES((SELECT id FROM tenants WHERE name='__iolink_system__'),$1,'license.import_rejected','license',$2,$3::jsonb)`, actorID, digestHex, metadata); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
+}
+
+func observeLicenseClock(ctx context.Context, tx pgx.Tx) error {
+	var maxSeen *time.Time
+	var clockError bool
+	if err := tx.QueryRow(ctx, `SELECT max_seen_at,clock_error FROM license_clock WHERE singleton=TRUE FOR UPDATE`).Scan(&maxSeen, &clockError); err != nil {
+		return fmt.Errorf("license clock: %w", err)
+	}
+	now := time.Now().UTC()
+	if clockError || (maxSeen != nil && now.Before(maxSeen.Add(-5*time.Minute))) {
+		if !clockError {
+			if _, err := tx.Exec(ctx, `UPDATE license_clock SET clock_error=TRUE,updated_at=$1 WHERE singleton=TRUE`, now); err != nil {
+				return fmt.Errorf("license clock latch: %w", err)
+			}
+		}
+		return license.ErrClockError
+	}
+	if maxSeen == nil || now.After(*maxSeen) {
+		if _, err := tx.Exec(ctx, `UPDATE license_clock SET max_seen_at=$1,updated_at=$1 WHERE singleton=TRUE`, now); err != nil {
+			return fmt.Errorf("license clock observe: %w", err)
+		}
 	}
 	return nil
 }

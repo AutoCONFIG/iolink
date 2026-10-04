@@ -8,6 +8,9 @@
 固定源码 `e1b78e12d9dea3c1f60412fce1bcdaa0adb33b0e` 的真实隔离 DB/MQTT/HTTP/重启链路及完整检查通过，待双审。
 证据见 [日志转储](evidence/deployment/2026-10-03-logging/)。此项不改变 M6b 及 TLS/容量阶段状态。
 
+M6c License 与离线交付实现候选已完成本地、真实 Timescale、管理 HTTP、签发边界和离线包校验，
+等待最终快照双审后登记完成。证据见 [M6c License 交付](evidence/m6c-license-delivery.md)。
+
 基线代码：b71095bbb6b228caed74adf47c48ca4c6b07c92b，检查日期2026-09-19。文档双审通过后已实施M0及M1软件部分；旧文档的“全部完成/全绿”不构成本轮验收。需求细项见 ACCEPTANCE.md。
 
 重建 Todo 4 的实现与验证候选已完成，待双审门禁收据写入后登记完成；新增应用层 normalized event 边界与真实 ingestion 回归。命令、环境、负面路径和证据见 [Todo 4证据](evidence/rebuild/mqtt-ingestion.txt)。该证据只覆盖软件/provider 链路，硬件和外部 provider 仍按 `external_blocked` 处理。
@@ -32,7 +35,8 @@
 | R29–R33 | 软件通过，适用外部阻塞 | health/readiness、metrics、10秒有界排空、固定监听/TLS反代模板、整库custom备份恢复、容量烟测与CI | 真实TLS主机、100GiB恢复、发布中断和24小时500设备/90天容量演练为 `external_blocked` |
 | R34–R35 | 软件验收通过 | M6a 产品模型、版本发布/分配、通用遥测、兼容投影、fixture 回填 | 外部不适用；证据见 docs/evidence/acceptance/R34/ 与 R35/ |
 | R36–R37 | R36.a/R37.a 软件验收完成 | 租户上下文、成员/RBAC、Casbin策略、资源隔离、权限撤销及组织后台；事务写入校验实时权限，遥测/报警校验权限版本，不完整报警上下文拒绝；source `ef6510ffa5e43fd9796352ae324e09dfc3820c68` 的完整检查、真实 Timescale HTTP 正反向回归与生产授权器 fake executor 验证通过；D12/D13/D15/D16/D17 已整合；最终候选 `03354381b5954087d82d0d3f807cad9993b94b8d` 已获两位独立审阅者明确批准 | R36.b/R37.b 后续资源按对应阶段验收；外部输入仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [最终验证](evidence/acceptance/R37/2026-10-04-version-revocation/) |
-| R38–R42 | 未实现 | 文档设计 | License、离线包、开放平台待实施 |
+| R38–R40 | 实现候选，待双审 | `internal/license`、`cmd/license-sign`、License 管理 API、011 迁移、离线 Compose/打包脚本；真实 Timescale 配额、时钟、拒绝审计和离线包篡改检查通过 | 最终快照双审、外部签发方、干净客户主机30分钟安装、ARM64仍未验收；证据见 `evidence/m6c-license-delivery.md` |
+| R41–R42 | 未实现 | 文档设计 | 开放平台待实施 |
 | R43–R45 | 未实现 | 文档设计 | 视频/地图/大屏待实施；真实验收所需外部输入未就绪 |
 | R46–R54 | 未实现 | MQTT命令结构预留/调试CLI | 命令生命周期、HTTP/Modbus/网关/转发/调度/联动/Web调试/报表待实施 |
 | R55 | 未实现 | 无全量发布验收包 | 必须逐项通过后再判定 |

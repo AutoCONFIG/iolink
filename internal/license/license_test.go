@@ -5,9 +5,12 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 )
@@ -81,4 +84,60 @@ func TestVerify_rejectsTrailingPayloadAndNonUTC(t *testing.T) {
 	if _, err := Verify(signForTest(t, key, raw), &key.PublicKey); !errors.Is(err, ErrInvalidPayload) {
 		t.Fatalf("want UTC rejection, got %v", err)
 	}
+}
+
+func TestParsePayload_rejectsDuplicateMissingAndInvalidFeatureFields(t *testing.T) {
+	cases := []string{
+		`{"license_id":"l","license_id":"l2","deployment_id":"d","issued_at":"2026-01-01T00:00:00Z","not_before":"2026-01-01T00:00:00Z","expires_at":null,"max_devices":1,"features":[],"key_id":"k"}`,
+		`{"license_id":"l","deployment_id":"d","issued_at":"2026-01-01T00:00:00Z","not_before":"2026-01-01T00:00:00Z","expires_at":null,"max_devices":1,"key_id":"k"}`,
+		`{"license_id":"l","deployment_id":"d","issued_at":"2026-01-01T00:00:00Z","not_before":"2026-01-01T00:00:00Z","expires_at":null,"max_devices":1,"features":null,"key_id":"k"}`,
+	}
+	for _, raw := range cases {
+		if _, err := ParsePayload([]byte(raw)); !errors.Is(err, ErrInvalidPayload) {
+			t.Fatalf("ParsePayload(%s) error=%v", raw, err)
+		}
+	}
+}
+
+func TestParsePayload_acceptsMaximumRawSizeAndRejectsOneByteOver(t *testing.T) {
+	base := []byte(`{"license_id":"l","deployment_id":"d","issued_at":"2026-01-01T00:00:00Z","not_before":"2026-01-01T00:00:00Z","expires_at":null,"max_devices":1,"features":[],"key_id":"k"}`)
+	if _, err := ParsePayload(append(base, []byte(strings.Repeat(" ", MaxPayloadBytes-len(base)))...)); err != nil {
+		t.Fatalf("maximum payload rejected: %v", err)
+	}
+	if _, err := ParsePayload(append(base, []byte(strings.Repeat(" ", MaxPayloadBytes-len(base)+1))...)); !errors.Is(err, ErrInvalidPayload) {
+		t.Fatalf("oversized payload error=%v", err)
+	}
+}
+
+func TestParseEnvelope_rejectsUnknownDuplicateAndTrailingFields(t *testing.T) {
+	for _, raw := range []string{
+		`{"payload_b64":"YQ==","signature_b64":"Yg==","extra":true}`,
+		`{"payload_b64":"YQ==","payload_b64":"Yg==","signature_b64":"Yg=="}`,
+		`{"payload_b64":"YQ==","signature_b64":"Yg=="}{}`,
+	} {
+		if _, err := ParseEnvelope([]byte(raw)); !errors.Is(err, ErrInvalidEnvelope) {
+			t.Fatalf("ParseEnvelope(%s) error=%v", raw, err)
+		}
+	}
+}
+
+func TestParsePrivateKey_acceptsSupportedSizesAndRejectsOversized(t *testing.T) {
+	for _, bits := range []int{2048, 4096, 8192} {
+		key, err := rsa.GenerateKey(rand.Reader, bits)
+		if err != nil {
+			t.Fatal(err)
+		}
+		raw, err := pemEncodePKCS1(key)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := ParsePrivateKey(raw); err != nil {
+			t.Fatalf("%d-bit key rejected: %v", bits, err)
+		}
+	}
+}
+
+func pemEncodePKCS1(key *rsa.PrivateKey) ([]byte, error) {
+	raw := x509.MarshalPKCS1PrivateKey(key)
+	return pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: raw}), nil
 }

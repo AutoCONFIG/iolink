@@ -11,6 +11,7 @@ import (
 
 	"git.hyhy.fun/rsplab/iolink/internal/authorization"
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -25,6 +26,10 @@ type fakeStore struct {
 	rules            map[int64]domain.AlarmRule
 	ruleSeq          int64
 	stats            domain.Stats
+	licenseStatus    license.Status
+	licenseErr       error
+	importErr        error
+	imports          []license.Envelope
 }
 
 func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.User, error) {
@@ -137,6 +142,16 @@ func (f *fakeStore) BatchConfirmByActor(_ context.Context, _ []int64, _ int64) (
 	return 0, nil
 }
 func (f *fakeStore) Stats(_ context.Context) (domain.Stats, error) { return f.stats, nil }
+func (f *fakeStore) LicenseStatus(context.Context) (license.Status, error) {
+	return f.licenseStatus, f.licenseErr
+}
+func (f *fakeStore) ImportLicense(_ context.Context, envelope license.Envelope, _ int64) error {
+	if f.importErr != nil {
+		return f.importErr
+	}
+	f.imports = append(f.imports, envelope)
+	return nil
+}
 
 func (f *fakeStore) DefaultTenantForUser(context.Context, int64) (int64, error) {
 	if f.defaultTenantErr != nil {
@@ -237,6 +252,99 @@ func TestAdminLoginAndAuth(t *testing.T) {
 	_ = json.NewDecoder(resp.Body).Decode(&st)
 	if st.DevicesTotal != 3 || st.OpenAlarms != 4 {
 		t.Fatalf("bad stats: %+v", st)
+	}
+}
+
+func TestPlatformAdminCanReadAndImportLicense(t *testing.T) {
+	hash := platform.HashPassword("admin123")
+	store := &fakeStore{
+		admin:   &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "ADMIN"},
+		devices: map[string]domain.Device{}, rules: map[int64]domain.AlarmRule{},
+		licenseStatus: license.Status{State: license.StatePermanent, Features: []string{}},
+	}
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ts := httptest.NewServer(New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: store, Policy: policy}).Routes())
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	resp := authGet(t, ts, token, "/admin/v1/license")
+	if resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		t.Fatalf("license status=%d", resp.StatusCode)
+	}
+	resp.Body.Close()
+	req, err := http.NewRequest(http.MethodPost, ts.URL+"/admin/v1/license", strings.NewReader(`{"payload_b64":"YQ==","signature_b64":"Yg=="}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusNoContent || len(store.imports) != 1 {
+		t.Fatalf("license import status=%d imports=%d", resp.StatusCode, len(store.imports))
+	}
+}
+
+func TestTenantAdminCannotReadOrImportLicense(t *testing.T) {
+	ts := newTestServerWithRole(t, "USER", "admin")
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	resp := authGet(t, ts, token, "/admin/v1/license")
+	if resp.StatusCode != http.StatusForbidden {
+		resp.Body.Close()
+		t.Fatalf("license GET status=%d", resp.StatusCode)
+	}
+	resp.Body.Close()
+	req, err := http.NewRequest(http.MethodPost, ts.URL+"/admin/v1/license", strings.NewReader(`{"payload_b64":"YQ==","signature_b64":"Yg=="}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("license POST status=%d", resp.StatusCode)
+	}
+}
+
+func TestLicenseImportMapsClockErrorAndRejectsDuplicateJSON(t *testing.T) {
+	hash := platform.HashPassword("admin123")
+	store := &fakeStore{admin: &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "ADMIN"}, devices: map[string]domain.Device{}, rules: map[int64]domain.AlarmRule{}, importErr: license.ErrClockError}
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ts := httptest.NewServer(New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: store, Policy: policy}).Routes())
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	for body, want := range map[string]int{
+		`{"payload_b64":"YQ==","signature_b64":"Yg==","payload_b64":"Yw=="}`: http.StatusBadRequest,
+		`{"payload_b64":"YQ==","signature_b64":"Yg=="}`:                      http.StatusConflict,
+	} {
+		req, err := http.NewRequest(http.MethodPost, ts.URL+"/admin/v1/license", strings.NewReader(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.Header.Set("Authorization", "Bearer "+token)
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		resp.Body.Close()
+		if resp.StatusCode != want {
+			t.Fatalf("body=%s status=%d want=%d", body, resp.StatusCode, want)
+		}
 	}
 }
 

@@ -35,7 +35,7 @@ func TestRegisterDevice_enforcesLicenseQuotaInOneTransaction(t *testing.T) {
 		t.Fatal(err)
 	}
 	now := time.Now().UTC().Truncate(time.Second)
-	payload := license.Payload{LicenseID: "m6c-license", DeploymentID: "", IssuedAt: now, NotBefore: now.Add(-time.Minute), MaxDevices: 2, Features: []string{}, KeyID: "test-key"}
+	payload := license.Payload{LicenseID: "m6c-license", DeploymentID: "", IssuedAt: now.Add(-2 * time.Minute), NotBefore: now.Add(-time.Minute), MaxDevices: 2, Features: []string{}, KeyID: "test-key"}
 	if err := p.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&payload.DeploymentID); err != nil {
 		t.Fatal(err)
 	}
@@ -57,6 +57,17 @@ func TestRegisterDevice_enforcesLicenseQuotaInOneTransaction(t *testing.T) {
 		t.Fatal(err)
 	}
 	svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: &key.PublicKey, KeyID: "test-key"})
+	if err := svc.ImportLicense(ctx, license.Envelope{PayloadB64: "e30=", SignatureB64: "eA=="}, 7001); !errors.Is(err, license.ErrInvalidSignature) {
+		t.Fatalf("invalid import error=%v", err)
+	}
+	var licenseID string
+	if err := p.QueryRow(ctx, `SELECT license_id FROM license_state WHERE singleton=TRUE`).Scan(&licenseID); err != nil || licenseID != payload.LicenseID {
+		t.Fatalf("invalid import replaced license: id=%q err=%v", licenseID, err)
+	}
+	var rejected int
+	if err := p.QueryRow(ctx, `SELECT count(*) FROM audit_events WHERE action='license.import_rejected' AND actor_id=7001`).Scan(&rejected); err != nil || rejected != 1 {
+		t.Fatalf("rejection audit count=%d err=%v", rejected, err)
+	}
 	var wg sync.WaitGroup
 	results := make(chan error, 4)
 	for i := 0; i < 4; i++ {
@@ -83,5 +94,27 @@ func TestRegisterDevice_enforcesLicenseQuotaInOneTransaction(t *testing.T) {
 	var used int
 	if err := p.QueryRow(ctx, `SELECT count(*) FROM devices WHERE disabled_at IS NULL`).Scan(&used); err != nil || used != 2 {
 		t.Fatalf("used=%d err=%v", used, err)
+	}
+}
+
+func TestLicenseStatus_reportsPersistedClockError(t *testing.T) {
+	p := testdb.New(t)
+	ctx := context.Background()
+	if err := migrate.Up(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `UPDATE license_clock SET clock_error=TRUE WHERE singleton=TRUE`); err != nil {
+		t.Fatal(err)
+	}
+	svc, err := core.New(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	status, err := svc.LicenseStatus(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if status.State != license.StateClockError || len(status.Features) != 0 {
+		t.Fatalf("status=%+v", status)
 	}
 }

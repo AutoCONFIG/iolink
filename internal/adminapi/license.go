@@ -2,6 +2,7 @@ package adminapi
 
 import (
 	"errors"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -44,8 +45,13 @@ func (s *Server) importLicense(c *gin.Context) {
 	if !ok {
 		return
 	}
-	var envelope license.Envelope
-	if err := c.ShouldBindJSON(&envelope); err != nil {
+	raw, err := io.ReadAll(io.LimitReader(c.Request.Body, license.MaxEnvelopeBytes+1))
+	if err != nil || len(raw) > license.MaxEnvelopeBytes {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	envelope, err := license.ParseEnvelope(raw)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
