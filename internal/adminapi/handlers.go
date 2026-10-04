@@ -699,6 +699,10 @@ func (s *Server) registerDevice(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "device_quota_exceeded"})
 			return
 		}
+		if errors.Is(err, license.ErrClockError) {
+			c.JSON(http.StatusConflict, gin.H{"error": "license_clock_error"})
+			return
+		}
 		if errors.Is(err, license.ErrUnavailable) {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
 			return
@@ -845,6 +849,10 @@ func (s *Server) restoreDevice(c *gin.Context) {
 		}
 		if errors.Is(err, license.ErrQuotaExceeded) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "device_quota_exceeded"})
+			return
+		}
+		if errors.Is(err, license.ErrClockError) {
+			c.JSON(http.StatusConflict, gin.H{"error": "license_clock_error"})
 			return
 		}
 		if errors.Is(err, license.ErrUnavailable) {

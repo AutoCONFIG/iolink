@@ -690,7 +690,7 @@ func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) error {
 		return err
 	}
 	defer tx.Rollback(ctx)
-	q := `SELECT d.id,d.disabled_at FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
+	q := `SELECT d.id,d.disabled_at,d.status FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
 	args := []any{deviceNo}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
 		q += ` AND f.tenant_id=$2`
@@ -698,7 +698,8 @@ func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) error {
 	}
 	var id int64
 	var disabledAt *time.Time
-	if err := tx.QueryRow(ctx, q+` FOR UPDATE`, args...).Scan(&id, &disabledAt); err != nil {
+	var status string
+	if err := tx.QueryRow(ctx, q+` FOR UPDATE`, args...).Scan(&id, &disabledAt, &status); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.ErrNotFound
 		}
@@ -706,6 +707,9 @@ func (s *Service) RestoreDevice(ctx context.Context, deviceNo string) error {
 	}
 	if disabledAt == nil {
 		return nil
+	}
+	if status != string(domain.DeviceOffline) {
+		return domain.ErrConflict
 	}
 	if err := s.checkDeviceAdmission(ctx, tx); err != nil {
 		return err

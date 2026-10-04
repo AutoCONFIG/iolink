@@ -30,6 +30,10 @@ func (s *Server) getLicense(c *gin.Context) {
 	}
 	status, err := store.LicenseStatus(c.Request.Context())
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 		return
 	}
@@ -79,6 +83,10 @@ func (s *Server) importLicense(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "license_signature_invalid"})
 		case errors.Is(err, license.ErrClockError):
 			c.JSON(http.StatusConflict, gin.H{"error": "license_clock_error"})
+		case errors.Is(err, license.ErrNotBefore):
+			c.JSON(http.StatusBadRequest, gin.H{"error": "license_not_before"})
+		case errors.Is(err, license.ErrExpired):
+			c.JSON(http.StatusBadRequest, gin.H{"error": "license_expired"})
 		case errors.Is(err, domain.ErrForbidden):
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		default:

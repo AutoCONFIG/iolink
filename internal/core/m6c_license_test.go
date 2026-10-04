@@ -155,6 +155,32 @@ func TestLicenseStatus_reportsPersistedClockError(t *testing.T) {
 	}
 }
 
+func TestReconcileLicenseClock_clearsLatchAndAudits(t *testing.T) {
+	p := testdb.New(t)
+	ctx := context.Background()
+	if err := migrate.Up(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO users(id,open_id,authority) VALUES(7301,'m6c-reconcile-admin','ADMIN'); UPDATE license_clock SET clock_error=TRUE,max_seen_at=now()-interval '1 minute' WHERE singleton=TRUE`); err != nil {
+		t.Fatal(err)
+	}
+	svc, err := core.New(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := svc.ReconcileLicenseClock(ctx, 7301); err != nil {
+		t.Fatal(err)
+	}
+	var clockError bool
+	if err := p.QueryRow(ctx, `SELECT clock_error FROM license_clock WHERE singleton=TRUE`).Scan(&clockError); err != nil || clockError {
+		t.Fatalf("clock_error=%v err=%v", clockError, err)
+	}
+	var audits int
+	if err := p.QueryRow(ctx, `SELECT count(*) FROM audit_events WHERE action='license.clock_reconciled' AND actor_id=7301`).Scan(&audits); err != nil || audits != 1 {
+		t.Fatalf("audits=%d err=%v", audits, err)
+	}
+}
+
 func TestRegisterDevice_rejectsWhenLicenseVerificationIsUnavailable(t *testing.T) {
 	p := testdb.New(t)
 	ctx := context.Background()

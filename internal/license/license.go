@@ -26,6 +26,8 @@ var (
 	ErrQuotaExceeded    = errors.New("license: device quota exceeded")
 	ErrFeatureDenied    = errors.New("license: feature unavailable")
 	ErrClockError       = errors.New("license: clock error")
+	ErrNotBefore        = errors.New("license: not yet valid")
+	ErrExpired          = errors.New("license: expired")
 )
 
 type State string

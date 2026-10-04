@@ -542,7 +542,7 @@ paths:
       tags:
       - devices
       summary: 注册设备并返回一次性 secret
-      description: 强制绑定已存在 pond_id；无裸设备/裸解绑状态。device_no 服务端生成且永久唯一。secret 只在本次响应显示，服务端仅存摘要。POST 非幂等，响应丢失不得自动重试；管理员核实后停用旧记录并重新注册。M6c 新增实例授权及配额守卫：无有效授权 403 license_required，设备额度不足 403 device_quota_exceeded，验签能力缺失 503 license_unavailable；拒绝不产生设备/凭据/审计/outbox 的部分业务写入。
+      description: 强制绑定已存在 pond_id；无裸设备/裸解绑状态。device_no 服务端生成且永久唯一。secret 只在本次响应显示，服务端仅存摘要。POST 非幂等，响应丢失不得自动重试；管理员核实后停用旧记录并重新注册。M6c 新增实例授权及配额守卫：无有效授权 403 license_required，设备额度不足 403 device_quota_exceeded，时钟回拨 409 license_clock_error，验签能力缺失 503 license_unavailable；拒绝不产生设备/凭据/审计/outbox 的部分业务写入。
       responses:
         '200':
           description: 成功
@@ -591,6 +591,11 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           description: forbidden / license_required / device_quota_exceeded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '409':
+          description: license_clock_error
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
@@ -669,6 +674,36 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalError'
+      parameters:
+      - *id005
+  /devices/{device_no}/restore:
+    post:
+      tags:
+      - devices
+      summary: 恢复停用设备
+      description: 仅当前租户 owner/admin 可恢复；重复恢复幂等。恢复前在授权额度事务内重验 License，成功后设备 offline、旧 session 和 shadow 失效。
+      responses:
+        '204':
+          description: 成功；响应无正文
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: forbidden / license_required / device_quota_exceeded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: conflict / license_clock_error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '503':
+          description: license_unavailable
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
       parameters:
       - *id005
   /devices/{device_no}/pond:

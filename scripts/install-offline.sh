@@ -21,7 +21,7 @@ umask 077
 test "$(docker image inspect "$IOLINKD_IMAGE" --format '{{.Id}}')" = "$(cat images/iolinkd.id)"
 test "$(docker image inspect "$IOLINK_DB_IMAGE" --format '{{.Id}}')" = "$(cat images/db.id)"
 if test ! -f .env; then
-  printf 'IOLINKD_IMAGE=%s\nIOLINK_DB_IMAGE=%s\nIOLINK_PG_PASSWORD=%s\nIOLINK_SECRET_KEY=%s\n' "$IOLINKD_IMAGE" "$IOLINK_DB_IMAGE" "$(od -An -N24 -tx1 /dev/urandom | tr -d ' \n')" "$(od -An -N48 -tx1 /dev/urandom | tr -d ' \n')" >.env
+  printf 'IOLINKD_IMAGE=%s\nIOLINK_DB_IMAGE=%s\nIOLINK_PG_PASSWORD=%s\nIOLINK_SECRET_KEY=%s\nIOLINK_LICENSE_PUBLIC_KEY_FILE=/run/iolink/secrets/license-public.pem\nIOLINK_LICENSE_KEY_ID=%s\n' "$IOLINKD_IMAGE" "$IOLINK_DB_IMAGE" "$(od -An -N24 -tx1 /dev/urandom | tr -d ' \n')" "$(od -An -N48 -tx1 /dev/urandom | tr -d ' \n')" "${IOLINK_LICENSE_KEY_ID:-}" >.env
 fi
 docker compose --env-file .env -f deploy/docker-compose.yaml up -d --wait db
 docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd migrate up
@@ -36,6 +36,8 @@ if test -z "${IOLINK_LICENSE_INPUT:-}" || test ! -f "$IOLINK_LICENSE_INPUT"; the
   echo 'set IOLINK_LICENSE_INPUT to a protected License envelope; installation stops before serving' >&2
   exit 3
 fi
+test -s secrets/license-public.pem || { echo 'place the issuer public key at secrets/license-public.pem before License import' >&2; exit 4; }
+test -n "${IOLINK_LICENSE_KEY_ID:-}" || { echo 'set IOLINK_LICENSE_KEY_ID before License import' >&2; exit 4; }
 docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps -T iolinkd license import <"$IOLINK_LICENSE_INPUT"
 docker compose --env-file .env -f deploy/docker-compose.yaml up -d --pull never --wait iolinkd
 ./smoke.sh

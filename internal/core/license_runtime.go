@@ -12,6 +12,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/license"
 )
 
@@ -26,6 +27,15 @@ func (s *Service) LicenseStatus(ctx context.Context) (license.Status, error) {
 		return license.Status{}, fmt.Errorf("license status transaction: %w", err)
 	}
 	defer tx.Rollback(ctx)
+	if actor, ok := domain.PlatformActorFromContext(ctx); ok {
+		var current int
+		if err := tx.QueryRow(ctx, `SELECT token_version FROM users WHERE id=$1 AND authority='ADMIN' FOR SHARE`, actor.ID).Scan(&current); err != nil {
+			return license.Status{}, fmt.Errorf("license actor: %w", err)
+		}
+		if current != actor.TokenVersion {
+			return license.Status{}, domain.ErrForbidden
+		}
+	}
 	var deployment string
 	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&deployment); err != nil {
 		return license.Status{}, fmt.Errorf("license deployment: %w", err)
@@ -103,6 +113,9 @@ func (s *Service) checkDeviceAdmission(ctx context.Context, tx pgx.Tx) error {
 	if s.license.PublicKey == nil || s.license.KeyID == "" {
 		return license.ErrUnavailable
 	}
+	if err := observeLicenseClock(ctx, tx); err != nil {
+		return err
+	}
 	var deployment string
 	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&deployment); err != nil {
 		return fmt.Errorf("license deployment: %w", err)
@@ -148,6 +161,15 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 		return fmt.Errorf("license import transaction: %w", err)
 	}
 	defer tx.Rollback(ctx)
+	if actor, ok := domain.PlatformActorFromContext(ctx); ok {
+		var current int
+		if err := tx.QueryRow(ctx, `SELECT token_version FROM users WHERE id=$1 AND authority='ADMIN' FOR SHARE`, actor.ID).Scan(&current); err != nil {
+			return fmt.Errorf("license actor: %w", err)
+		}
+		if current != actor.TokenVersion {
+			return domain.ErrForbidden
+		}
+	}
 	reject := func(reason string, cause error) error {
 		_ = tx.Rollback(ctx)
 		_ = s.recordLicenseRejection(ctx, envelope, actorID, reason)
@@ -174,14 +196,31 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 	}
 	if state == license.StateNotBefore || state == license.StateExpired || state == license.StateClockError {
 		reason := "license_invalid"
+		cause := license.ErrInvalidPayload
 		if state == license.StateClockError {
 			reason = "license_clock_error"
+		} else if state == license.StateNotBefore {
+			reason = "license_not_before"
+			cause = license.ErrNotBefore
+		} else if state == license.StateExpired {
+			reason = "license_expired"
+			cause = license.ErrExpired
 		}
-		return reject(reason, license.ErrInvalidPayload)
+		return reject(reason, cause)
 	}
 	features, err := json.Marshal(verified.Payload.Features)
 	if err != nil {
 		return fmt.Errorf("license features: %w", err)
+	}
+	var existingSHA string
+	if err := tx.QueryRow(ctx, `SELECT coalesce(payload_sha256,'') FROM license_state WHERE singleton=TRUE FOR UPDATE`).Scan(&existingSHA); err != nil {
+		return fmt.Errorf("license existing state: %w", err)
+	}
+	if existingSHA == verified.SHA256 {
+		if err := tx.Commit(ctx); err != nil {
+			return fmt.Errorf("license import commit: %w", err)
+		}
+		return nil
 	}
 	if _, err := tx.Exec(ctx, `UPDATE license_state SET license_id=$1,deployment_id=$2,key_id=$3,issued_at=$4,not_before=$5,expires_at=$6,max_devices=$7,features=$8,payload=$9,signature=$10,payload_sha256=$11,state=$12,imported_at=now(),imported_by=$13 WHERE singleton=TRUE`, verified.Payload.LicenseID, verified.Payload.DeploymentID, verified.Payload.KeyID, verified.Payload.IssuedAt, verified.Payload.NotBefore, verified.Payload.ExpiresAt, verified.Payload.MaxDevices, features, verified.PayloadRaw, verified.Signature, verified.SHA256, state, actorID); err != nil {
 		return fmt.Errorf("license persist: %w", err)
@@ -213,6 +252,36 @@ func (s *Service) observeLicenseClock(ctx context.Context) error {
 // ObserveLicenseClock records the process clock high-water mark in its own
 // short transaction so a later business rollback cannot erase it.
 func (s *Service) ObserveLicenseClock(ctx context.Context) error { return s.observeLicenseClock(ctx) }
+
+func (s *Service) ReconcileLicenseClock(ctx context.Context, actorID int64) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("license clock reconcile transaction: %w", err)
+	}
+	defer tx.Rollback(ctx)
+	var maxSeen *time.Time
+	var clockError bool
+	if err := tx.QueryRow(ctx, `SELECT max_seen_at,clock_error FROM license_clock WHERE singleton=TRUE FOR UPDATE`).Scan(&maxSeen, &clockError); err != nil {
+		return fmt.Errorf("license clock reconcile state: %w", err)
+	}
+	now := time.Now().UTC()
+	if maxSeen != nil && now.Before(*maxSeen) {
+		return license.ErrClockError
+	}
+	if !clockError {
+		return nil
+	}
+	if _, err := tx.Exec(ctx, `UPDATE license_clock SET clock_error=FALSE,updated_at=$1 WHERE singleton=TRUE`, now); err != nil {
+		return fmt.Errorf("license clock reconcile update: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id,metadata) VALUES((SELECT id FROM tenants WHERE name='__iolink_system__'),$1,'license.clock_reconciled','license','clock','{}'::jsonb)`, actorID); err != nil {
+		return fmt.Errorf("license clock reconcile audit: %w", err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("license clock reconcile commit: %w", err)
+	}
+	return nil
+}
 
 func (s *Service) RecordLicenseRejection(ctx context.Context, raw []byte, actorID int64, reason string) error {
 	tx, err := s.pool.Begin(ctx)

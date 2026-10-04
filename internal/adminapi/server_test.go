@@ -596,8 +596,11 @@ func TestRestoreDeviceMapsLicenseErrors(t *testing.T) {
 	}{
 		{name: "success", code: http.StatusNoContent},
 		{name: "not found", err: domain.ErrNotFound, code: http.StatusNotFound, body: `{"error":"not_found"}`},
+		{name: "forbidden", err: domain.ErrForbidden, code: http.StatusForbidden, body: `{"error":"forbidden"}`},
 		{name: "required", err: license.ErrRequired, code: http.StatusForbidden, body: `{"error":"license_required"}`},
 		{name: "quota", err: license.ErrQuotaExceeded, code: http.StatusForbidden, body: `{"error":"device_quota_exceeded"}`},
+		{name: "clock", err: license.ErrClockError, code: http.StatusConflict, body: `{"error":"license_clock_error"}`},
+		{name: "conflict", err: domain.ErrConflict, code: http.StatusConflict, body: `{"error":"conflict"}`},
 		{name: "unavailable", err: license.ErrUnavailable, code: http.StatusServiceUnavailable, body: `{"error":"license_unavailable"}`},
 	} {
 		t.Run(tt.name, func(t *testing.T) {

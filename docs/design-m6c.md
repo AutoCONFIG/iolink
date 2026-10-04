@@ -24,7 +24,7 @@ DDL 提案为 `docs/m6c-schema.sql`，设计通过后新增运行迁移 011。`d
 
 签名向量在实现测试中使用临时 RSA key：有效有期限 payload、expires_at=null/features=[] 永久 payload；逐字段删除、未知字段、features=null/重复/未知、负数/小数/超 int64、时间倒序/非 UTC、有效 JSON 但变更一个字节、不同 key/盐长度都必须拒绝。原始 payload 含任意有效 UTF-8（包括多字节 ID）验签一致；payload/envelope 重复键/尾随内容仍拒绝。
 
-设备恢复新增 `POST /admin/v1/devices/{device_no}/restore`：按当前租户管理员授权，成功 204，跨租户 404，无权限 403，非法或状态不允许 409，License/配额拒绝 403（稳定码 `license_required` / `device_quota_exceeded`），服务能力缺失 503。恢复成功使设备 offline、last_seen_at 清空、session_version 增加，旧 session/旧 shadow 失效；重复恢复不占第二份额度。停用重复幂等。后续所有可选 HTTP/MQTT/worker 执行入口调用同一 feature gate；M6c 只用 fake future executor 验证每个 feature，真实 future 入口仍为 R39.b 待各阶段实现。
+设备恢复新增 `POST /admin/v1/devices/{device_no}/restore`：按当前租户管理员授权，成功 204，跨租户 404，无权限 403，非法或状态不允许 409，License/配额拒绝 403（稳定码 `license_required` / `device_quota_exceeded`），时钟回拨 409 `license_clock_error`，服务能力缺失 503。恢复成功使设备 offline、last_seen_at 清空、session_version 增加，旧 session/旧 shadow 失效；重复恢复不占第二份额度。停用重复幂等。后续所有可选 HTTP/MQTT/worker 执行入口调用同一 feature gate；M6c 只用 fake future executor 验证每个 feature，真实 future 入口仍为 R39.b 待各阶段实现。
 
 状态是证书状态，`overage` 单独表示 max(used-limit,0)，有效证书超额时 API `state=overage`，授权决策仍按原证书 features 但设备新增拒绝。失效仍可展示已验签的到期时间和额度，不能用展示缓存授权。`features` 固定数组，missing 时为 []；时间字段 missing 时 null。所有错误响应形状为 `{error:稳定错误码}`，不返回解析器/密码/上传原文错误。
 

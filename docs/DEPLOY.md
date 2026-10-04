@@ -95,7 +95,10 @@ IOLINK_DB_IMAGE=timescale/timescaledb:latest-pg16 \
 
 ```bash
 chmod 600 setup-input.json
-IOLINK_SETUP_INPUT=$PWD/setup-input.json ./install.sh
+mkdir -p secrets
+cp /protected/issuer/public-key.pem secrets/license-public.pem
+chmod 600 secrets/license-public.pem
+IOLINK_LICENSE_KEY_ID=production-2026-01 IOLINK_SETUP_INPUT=$PWD/setup-input.json ./install.sh
 ```
 
 脚本会先校验所有 SHA-256，再 `docker load`、启动数据库、运行 `migrate up`、执行同一事务内的 `setup init`、显示 `setup status`，导入 License 后才启动应用并检查 `/healthz` 与 `/readyz`。签发方提供 License 时，把 envelope 保存到受限文件并同时设置 `IOLINK_LICENSE_INPUT`；缺少 License 时安装在授权步骤停止，不会启动未完成首启的服务。`./uninstall.sh` 默认只停止并移除容器，保留数据库卷；删除数据必须显式执行 Compose 的 `down -v`。
