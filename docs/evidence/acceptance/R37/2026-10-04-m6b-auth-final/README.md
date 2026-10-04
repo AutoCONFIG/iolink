@@ -1,5 +1,7 @@
 # M6b live write authorization final candidate
 
+Historical candidate only: independent review rejected `c56cb22b00712d1cd8b2624af60e7f06636fbf24` for permission-version bypasses, partial alarm context authorization, and missing source-bound full verification artifacts. The PASS claims below are retained as historical prose and do not certify that candidate. The replacement receipt is [version revocation](../2026-10-04-version-revocation/README.md).
+
 This receipt covers the M6b R36.a/R37.a authorization-boundary correction at source `e4608328e31915a7fb3f4d5c78cb2fcf8c0fdf9b`. The checked web submodule is `e84092326d9979e066c611e2be8eb6b9736e09f3`.
 
 ## Environment

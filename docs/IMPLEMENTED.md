@@ -31,7 +31,7 @@
 | R28 | 软件通过，外部阻塞 | durable outbox/worker、WeChat HTTP adapter、重试/lease/归属重验及失败状态 | 真微信凭据、授权和设备回执缺失，外部实发为 `external_blocked` |
 | R29–R33 | 软件通过，适用外部阻塞 | health/readiness、metrics、10秒有界排空、固定监听/TLS反代模板、整库custom备份恢复、容量烟测与CI | 真实TLS主机、100GiB恢复、发布中断和24小时500设备/90天容量演练为 `external_blocked` |
 | R34–R35 | 软件验收通过 | M6a 产品模型、版本发布/分配、通用遥测、兼容投影、fixture 回填 | 外部不适用；证据见 docs/evidence/acceptance/R34/ 与 R35/ |
-| R36–R37 | 修复候选，待最终验证与双审 | 租户上下文、成员/RBAC、Casbin策略、资源隔离、权限撤销及组织后台；新增统一 live mutation authorization，农场/成员撤权 HTTP 回归和 fake executor 上下文/失效场景已在最终 source `7ea4790cadb319ff734b80e044c4326a19ee8757` 通过真实 Timescale；D12/D13/D15/D16/D17 已整合 | 最终候选须完成完整验证及两位独立审阅者批准；R36.b/R37.b 后续资源按对应阶段验收；外部输入仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [R37](evidence/acceptance/R37/2026-10-04-m6b-revocation/) |
+| R36–R37 | 软件验证通过，待最终双审 | 租户上下文、成员/RBAC、Casbin策略、资源隔离、权限撤销及组织后台；事务写入校验实时权限，遥测/报警校验权限版本，不完整报警上下文拒绝；source `ef6510ffa5e43fd9796352ae324e09dfc3820c68` 的完整检查、真实 Timescale HTTP 正反向回归与生产授权器 fake executor 验证通过；D12/D13/D15/D16/D17 已整合 | R36.a/R37.a 候选仍须两位独立审阅者批准同一最终快照；R36.b/R37.b 后续资源按对应阶段验收；外部输入仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [最终验证](evidence/acceptance/R37/2026-10-04-version-revocation/) |
 | R38–R42 | 未实现 | 文档设计 | License、离线包、开放平台待实施 |
 | R43–R45 | 未实现 | 文档设计 | 视频/地图/大屏待实施；真实验收所需外部输入未就绪 |
 | R46–R54 | 未实现 | MQTT命令结构预留/调试CLI | 命令生命周期、HTTP/Modbus/网关/转发/调度/联动/Web调试/报表待实施 |
