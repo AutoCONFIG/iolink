@@ -1,0 +1,22 @@
+[WebServer] (node:874364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:874377) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 11 tests using 1 worker
+
+(node:874399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 e2e/m6c.spec.ts:26:3 › License valid renders signed details (628ms)
+  ✓   2 e2e/m6c.spec.ts:26:3 › License permanent renders signed details (604ms)
+  ✓   3 e2e/m6c.spec.ts:26:3 › License overage renders signed details (593ms)
+  ✓   4 e2e/m6c.spec.ts:26:3 › License missing renders signed details (596ms)
+  ✓   5 e2e/m6c.spec.ts:26:3 › License expired renders signed details (588ms)
+  ✓   6 e2e/m6c.spec.ts:26:3 › License clock_error renders signed details (584ms)
+  ✓   7 e2e/m6c.spec.ts:43:1 › 403 hides import and status (568ms)
+  ✓   8 e2e/m6c.spec.ts:52:1 › load failure retries; rejected raw upload retains license and prevents duplicate submit (1.4s)
+  ✓   9 e2e/m6c.spec.ts:87:1 › server 401 returns to login (244ms)
+  ✓  10 e2e/m6c.spec.ts:94:1 › device disable releases action and restore reports quota before succeeding (1.8s)
+  ✓  11 e2e/m6c.spec.ts:138:1 › license loading keeps import disabled (586ms)
+
+  11 passed (9.1s)

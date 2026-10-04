@@ -86,9 +86,12 @@ def test_rejects_invalid_manifest_when_adversarial_change(manifests, change, exp
     assert any(expected in error for error in errors), errors
 
 
-@pytest.mark.parametrize("gate", ["M0", "M6a"])
+@pytest.mark.parametrize("gate", ["M0", "M6a", "M6c"])
 def test_gate_fails_when_requirements_are_not_run(manifests, monkeypatch, capsys, gate):
     # Given: valid manifests recording not_run rather than accepted outcomes.
+    for item in manifests["acceptance-map"]["requirements"]:
+        if item["id"] in manifests["acceptance-map"]["gate_scope"][gate]:
+            item["software_status"] = "not_run"
     assert validate(manifests) == []
     monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", gate])
     # When: the gate is evaluated through the CLI.
@@ -100,24 +103,25 @@ def test_gate_fails_when_requirements_are_not_run(manifests, monkeypatch, capsys
     assert "not_run" in output.err
 
 
-def test_gate_emits_json_only_when_recorded_evidence_passes(manifests, monkeypatch, capsys):
-    # Given: both M6a requirements with actual recorded evidence.
+@pytest.mark.parametrize(("gate", "ids"), [("M6a", ["R34", "R35"]), ("M6c", ["R38", "R39", "R40"])])
+def test_gate_emits_json_only_when_recorded_evidence_passes(manifests, monkeypatch, capsys, gate, ids):
+    # Given: every scoped requirement with actual recorded evidence.
     evidence = checker.ROOT / "docs/evidence/acceptance"
     for item in manifests["acceptance-map"]["requirements"]:
-        if item["wave"] == "M6a":
+        if item["wave"] == gate:
             item["software_status"] = "passed"
             path = evidence / item["id"]
-            path.mkdir(parents=True)
+            path.mkdir(parents=True, exist_ok=True)
             (path / "result.txt").write_text("independent acceptance result", encoding="utf-8")
     assert validate(manifests) == []
-    monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", "M6a"])
+    monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", gate])
     # When: the valid gate runs.
     result = checker.main()
     # Then: the CLI returns machine-readable evidence.
     output = capsys.readouterr()
     assert result == 0
-    assert '"gate": "M6a"' in output.out
-    assert '"R34"' in output.out and '"R35"' in output.out
+    assert f'"gate": "{gate}"' in output.out
+    assert all(f'"{rid}"' in output.out for rid in ids)
     assert output.err == ""
 
 

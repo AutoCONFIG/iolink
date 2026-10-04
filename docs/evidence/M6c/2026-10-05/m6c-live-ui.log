@@ -1,0 +1,59 @@
+- region:
+  - text: "IoLink 智慧水产管理平台 AQUACULTURE INTELLIGENCE"
+  - heading "让每一口池塘都清晰可见" [level=1]: "让每一口池塘 都清晰可见"
+  - text: "统一监测水质、设备在线状态与阈值报警，让异常更早被发现，让现场处置更有依据。"
+- region:
+  - heading "欢迎回来" [level=2]
+  - text: "登录 IoLink 管理控制台"
+  - form:
+    - label: "*管理员账号"
+    - textbox "*管理员账号" [ref=e1] [placeholder="请输入用户名"]
+    - label: "*登录密码"
+    - textbox "*登录密码" [ref=e2] [placeholder="请输入密码"]
+    - button "进入控制台" [ref=e3]
+- complementary:
+  - text: "IoLink 智慧水产管理平台"
+  - navigation:
+    - link "运营总览" [ref=e1]
+    - link "养殖场与池塘" [ref=e2]
+    - link "设备管理" [ref=e3]
+    - link "产品与物模型" [ref=e4]
+    - link "报警规则" [ref=e5]
+    - link "报警中心" [ref=e6]
+    - link "系统设置" [ref=e7]
+    - link "组织与成员" [ref=e8]
+  - text: "服务状态待后端健康检查"
+- region:
+  - banner:
+    - button "收起导航" [ref=e9]
+    - heading "系统设置" [level=1]
+    - text: "监测水质、设备与报警状态 同源 API · /admin/v1"
+    - button "管 管理员⌄" [ref=e10]
+  - main:
+    - heading "系统设置" [level=2]
+    - text: "维护管理员登录安全与部署接入信息。"
+    - region "系统授权" [ref=e11]:
+      - heading "系统授权" [level=3]
+      - text: "状态 permanent 实例 923f4a64-2baf-438a-9317-cf401f019989 使用额度 1/3 License offline-fixture 签发时间 2026/1/1 08:00:00 生效时间 2026/1/1 08:00:00 到期时间 永久 摘要 176905308cebddf21e6ddc075f65b12b51c1dc6fa5f30c678abf45a224f15d4d 功能：reports"
+      - label:
+        - text: "License 文件"
+        - button "License 文件" [ref=e12]
+      - button "导入 License" [ref=e13] [disabled]
+    - region:
+      - heading "修改管理员密码" [level=3]
+      - form:
+        - label: "*当前密码"
+        - textbox "*当前密码" [ref=e14]
+        - label: "*新密码"
+        - textbox "*新密码" [ref=e15] [placeholder="至少 8 位"]
+        - label: "*确认新密码"
+        - textbox "*确认新密码" [ref=e16]
+        - button "更新密码" [ref=e17]
+    - complementary:
+      - heading "部署接入提示" [level=3]
+      - text: "管理后台与服务端集成在同一个 iolink 镜像中，可通过部署地址直接访问。"
+      - list:
+        - listitem "公网使用 HTTPS 与 MQTTS" [ref=e18]
+        - listitem "首次部署使用本地向导设置管理员与租户账号" [ref=e19]
+        - listitem "使用强随机登录签名密钥" [ref=e20]
+real embedded browser and License API passed

@@ -20,7 +20,7 @@ providers:
     status: partial
     command: IOLINK_TEST_PG_DSN="$DSN" make integration
     evidence_path: docs/evidence/rebuild/foundation-guidance.txt
-    supports: [M0, M1, M2, M5, M6a, M6b, M6d, M8a, M8b, M8c, M8d]
+    supports: [M0, M1, M2, M5, M6a, M6b, M6c, M6d, M8a, M8b, M8c, M8d]
   - id: embedded-mqtt
     name: Embedded MQTT broker
     role: device_messaging
@@ -38,7 +38,7 @@ providers:
     status: partial
     command: make verify-contracts
     evidence_path: docs/evidence/rebuild/foundation-guidance.txt
-    supports: [M0, M1, M2, M3, M4, M5, M6a, M6b, M6d, M7b, M8a, M8b, M8c, M8d]
+    supports: [M0, M1, M2, M3, M4, M5, M6a, M6b, M6c, M6d, M7b, M8a, M8b, M8c, M8d]
   - id: wechat
     name: WeChat adapter
     role: login_and_notifications
@@ -119,7 +119,7 @@ capabilities:
   - {id: notifications_tls_backup_capacity, phase: M5, provider: postgres-timescale, operation: durable_notifications_tls_restore_and_capacity, required_level: L3, status: partial, command: "make verify && make integration", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [notification_delivery_restore_and_capacity_run]}
   - {id: product_models_and_compatibility, phase: M6a, provider: postgres-timescale, operation: product_model_versions_and_compatibility_projection, required_level: L4, status: implemented, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R34/README.md, evidence: [second_product_and_legacy_reconciliation, dual_independent_approval]}
   - {id: tenant_and_rbac_isolation, phase: M6b, provider: postgres-timescale, operation: tenant_membership_rbac_and_resource_isolation, required_level: L4, status: implemented, command: "IOLINK_TEST_PG_DSN=postgres://iolink:iolink-test-only@127.0.0.1:55439/iolink?sslmode=disable make verify", evidence_path: docs/evidence/acceptance/R36/README.md, evidence: [tenant_role_and_resource_isolation_tests, m6b_browser_and_contract_checks, dual_independent_approval]}
-  - {id: license_and_offline_install, phase: M6c, provider: tls-reverse-proxy, operation: offline_license_verification_and_install, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM6c' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [signed_license_import_and_clean_offline_install]}
+  - {id: license_and_offline_install, phase: M6c, provider: [postgres-timescale, embedded-http], operation: stdlib_rsa_pss_license_and_offline_install, required_level: L4, status: partial, command: "make verify && make verify-contracts; go test -race -shuffle=on ./cmd/iolinkd ./internal/migrate ./internal/core ./internal/notifications ./internal/persistence ./internal/platform ./internal/wechat -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md, evidence: [signed_license_import, R39a_feature_quota_guards, isolated_offline_stop_resume_and_report, actual_issuer_and_clean_customer_host_external_blocked]}
   - {id: open_api_keys_signing_rate_limits, phase: M6d, provider: embedded-http, operation: signed_keys_replay_protection_and_rate_limits, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM6d' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [signature_replay_revocation_and_rate_limit_tests]}
   - {id: video_streaming_and_signaling, phase: M7a, provider: gb28181-adapter, operation: camera_signaling_and_playback_tokens, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM7a' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [camera_samples_and_browser_wechat_playback]}
   - {id: map_and_read_only_dashboard, phase: M7b, provider: map-provider, operation: coordinate_map_and_tenant_filtered_dashboard, required_level: L4, status: not_implemented, command: "go test ./... -run 'TestM7b' -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt, evidence: [map_key_location_and_dashboard_tests]}

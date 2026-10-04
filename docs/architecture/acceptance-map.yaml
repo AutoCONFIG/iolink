@@ -6,6 +6,7 @@ gate_scope:
   M5: [R28, R29, R30, R31, R32, R33]
   M6a: [R34, R35]
   M6b: [R36, R37]
+  M6c: [R38, R39, R40]
 provider_operations:
   - {id: R01, provider: go-toolchain, operation: reproducible_build, required_level: L3, status: not_run, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R02, provider: embedded-http, operation: contract_validation, required_level: L3, status: not_run, command: "make verify-contracts", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
@@ -44,9 +45,9 @@ provider_operations:
   - {id: R35, provider: postgres-timescale, operation: compatibility_projection, required_level: L4, status: passed, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R35/README.md}
   - {id: R36, provider: postgres-timescale, operation: tenant_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R36/README.md}
   - {id: R37, provider: postgres-timescale, operation: rbac_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R37/README.md}
-  - {id: R38, provider: tls-reverse-proxy, operation: license_verification, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
-  - {id: R39, provider: tls-reverse-proxy, operation: feature_quota_guards, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
-  - {id: R40, provider: tls-reverse-proxy, operation: offline_install, required_level: L4, status: external_blocked, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R38, provider: [postgres-timescale, embedded-http], operation: license_verification, required_level: L4, status: not_run, command: "go test -race -shuffle=on ./internal/license ./internal/core ./internal/adminapi ./cmd/license-sign ./cmd/iolinkd -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
+  - {id: R39, provider: [postgres-timescale, embedded-http], operation: feature_quota_guards_R39a, required_level: L4, status: not_run, command: "go test -race -shuffle=on ./internal/core -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
+  - {id: R40, provider: [postgres-timescale, embedded-http], operation: offline_install, required_level: L4, status: external_blocked, command: "sh scripts/build-offline-bundle.sh .tmp/offline-bundle; .tmp/offline-bundle/install.sh", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
   - {id: R41, provider: embedded-http, operation: open_api_keys, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R42, provider: embedded-http, operation: signed_requests_and_rate_limits, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R43, provider: gb28181-adapter, operation: video_signaling, required_level: L4, status: external_blocked, command: "go test ./... -run TestM7a -count=1", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
@@ -403,7 +404,7 @@ requirements:
     required_level: software
     software_status: not_run
     external_status: not_applicable
-    verification: "planned: go test ./internal/...; exercise license status table and signing-key packaging check"
+    verification: "make verify; real Timescale integration; signed-state HTTP/CLI and browser evidence in docs/evidence/M6c/2026-10-05/; dual approval pending"
     evidence: docs/evidence/acceptance/R38/
   - id: R39
     wave: M6c
@@ -412,7 +413,7 @@ requirements:
     required_level: software
     software_status: not_run
     external_status: not_applicable
-    verification: "planned: go test ./internal/...; verify concurrent quota registration cases"
+    verification: "real Timescale concurrent admission/restore and all signed features through production guard/fake executor (R39.a); R39.b real future entry points remain pending"
     evidence: docs/evidence/acceptance/R39/
   - id: R40
     wave: M6c
@@ -421,7 +422,7 @@ requirements:
     required_level: software_and_external
     software_status: not_run
     external_status: blocked
-    verification: "planned: validate offline package; external: first-boot on clean disconnected x86_64 host with Docker"
+    verification: "isolated internal Docker network: fresh stop, resumable signed install and simulator telemetry; external: actual issuer and clean disconnected customer x86_64 host within 30 minutes remain blocked"
     evidence: docs/evidence/acceptance/R40/
   - id: R41
     wave: M6d

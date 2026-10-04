@@ -1,0 +1,95 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.03kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/alpine:3.20
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/golang:1.26-alpine
+#3 DONE 0.7s
+
+#4 [internal] load metadata for docker.io/library/node:24-alpine
+#4 DONE 0.7s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 256B done
+#5 DONE 0.0s
+
+#6 [stage-2 1/5] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#6 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 0.0s done
+#6 DONE 0.0s
+
+#7 [build 1/9] FROM docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c
+#7 resolve docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c 0.0s done
+#7 DONE 0.0s
+
+#8 [frontend 1/6] FROM docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+#8 resolve docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 0.0s done
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 transferring context: 938.29kB 0.2s done
+#9 DONE 0.2s
+
+#10 [frontend 2/6] WORKDIR /web
+#10 CACHED
+
+#11 [frontend 3/6] COPY web/package.json web/package-lock.json ./
+#11 CACHED
+
+#12 [frontend 5/6] COPY web/ ./
+#12 CACHED
+
+#13 [frontend 4/6] RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
+#13 CACHED
+
+#14 [frontend 6/6] RUN npm run build
+#14 CACHED
+
+#15 [build 3/9] COPY go.mod go.sum ./
+#15 CACHED
+
+#16 [build 2/9] WORKDIR /src
+#16 CACHED
+
+#17 [build 4/9] RUN --mount=type=cache,target=/go/pkg/mod go mod download
+#17 CACHED
+
+#18 [build 5/9] COPY . .
+#18 DONE 1.4s
+
+#19 [build 6/9] COPY --from=frontend /web/dist ./web/dist
+#19 DONE 0.1s
+
+#20 [build 7/9] RUN sh scripts/embed-frontend.sh
+#20 DONE 0.1s
+
+#21 [build 8/9] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/iolinkd ./cmd/iolinkd
+#21 DONE 1.3s
+
+#22 [build 9/9] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/mqtt-sim ./cmd/mqtt-sim
+#22 DONE 0.3s
+
+#23 [stage-2 2/5] RUN apk add --no-cache ca-certificates tzdata wget
+#23 CACHED
+
+#24 [stage-2 4/5] COPY --from=build /out/iolinkd /app/iolinkd
+#24 CACHED
+
+#25 [stage-2 3/5] WORKDIR /app
+#25 CACHED
+
+#26 [stage-2 5/5] COPY --from=build /out/mqtt-sim /app/mqtt-sim
+#26 CACHED
+
+#27 exporting to image
+#27 exporting layers done
+#27 exporting manifest sha256:1315751355f6d5ba54f195a3143610d659a5e7574f19fd1afa0c361bd63ed980 0.0s done
+#27 exporting config sha256:3eac47104af24757683b4815e2699d0203dee35f4ab1a84951342c64532602e1 0.0s done
+#27 exporting attestation manifest sha256:4d6d1421ffa6dec16a03f0f102664a70795753cdca6430da75e4f7c9ebd79b4e 0.0s done
+#27 exporting manifest list sha256:60f87d30159cca4a601a0dce7b4e20af170a0f4c44a20c91f2ad03507bc10b2a 0.0s done
+#27 naming to docker.io/local/iolinkd:m6c-333fc42 done
+#27 unpacking to docker.io/local/iolinkd:m6c-333fc42 done
+#27 DONE 0.1s

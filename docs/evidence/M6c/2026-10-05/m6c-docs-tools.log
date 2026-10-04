@@ -1,0 +1,25 @@
+python3 -m venv .venv/contracts
+.venv/contracts/bin/python -m pip install -r scripts/requirements-docs.txt
+Requirement already satisfied: openapi-spec-validator==0.9.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 2)) (0.9.0)
+Requirement already satisfied: openapi-schema-validator==0.9.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 3)) (0.9.0)
+Requirement already satisfied: jsonschema==4.26.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 4)) (4.26.0)
+Requirement already satisfied: jsonschema-path==0.5.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 5)) (0.5.0)
+Requirement already satisfied: pathable==0.6.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 6)) (0.6.0)
+Requirement already satisfied: lazy-object-proxy==1.12.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 7)) (1.12.0)
+Requirement already satisfied: PyYAML==6.0.3 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 8)) (6.0.3)
+Requirement already satisfied: rfc3339-validator==0.1.4 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 9)) (0.1.4)
+Requirement already satisfied: six==1.17.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 10)) (1.17.0)
+Requirement already satisfied: attrs==26.1.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 11)) (26.1.0)
+Requirement already satisfied: jsonschema-specifications==2025.9.1 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 12)) (2025.9.1)
+Requirement already satisfied: referencing==0.37.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 13)) (0.37.0)
+Requirement already satisfied: rpds-py==0.28.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 14)) (0.28.0)
+Requirement already satisfied: pydantic==2.13.4 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 15)) (2.13.4)
+Requirement already satisfied: pydantic-core==2.46.4 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 16)) (2.46.4)
+Requirement already satisfied: pydantic-settings==2.14.2 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 17)) (2.14.2)
+Requirement already satisfied: annotated-types==0.7.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 18)) (0.7.0)
+Requirement already satisfied: typing_extensions==4.16.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 19)) (4.16.0)
+Requirement already satisfied: typing-inspection==0.4.2 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 20)) (0.4.2)
+Requirement already satisfied: python-dotenv==1.2.1 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 21)) (1.2.1)
+
+[notice] A new release of pip is available: 26.1.2 -> 26.2.1
+[notice] To update, run: /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.venv/contracts/bin/python -m pip install --upgrade pip

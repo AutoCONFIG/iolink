@@ -1,0 +1,91 @@
+./VERSION: OK
+./deploy/.env.example: OK
+./deploy/docker-compose.yaml: OK
+./deploy/reverse-proxy.optional.yaml: OK
+./deploy/streaming.optional.yaml: OK
+./docs/DEPLOY.md: OK
+./docs/design-m6c.md: OK
+./frontend/admin-dist/assets/AdminLayout-TgM-zApy.js: OK
+./frontend/admin-dist/assets/AlarmsView-CyNXbrt0.js: OK
+./frontend/admin-dist/assets/DashboardView-hmt9v8e3.js: OK
+./frontend/admin-dist/assets/DevicesView-DV-u77s5.js: OK
+./frontend/admin-dist/assets/LoginView-BQcAYzBu.js: OK
+./frontend/admin-dist/assets/MetricGrid.vue_vue_type_script_setup_true_lang-BaPlMPYJ.js: OK
+./frontend/admin-dist/assets/PondsView-BAC-PSJB.js: OK
+./frontend/admin-dist/assets/ProductsView-DY-L-zJk.css: OK
+./frontend/admin-dist/assets/ProductsView-LiKp7QFQ.js: OK
+./frontend/admin-dist/assets/RulesView-B_jCuG2W.js: OK
+./frontend/admin-dist/assets/SystemView-DScyJkzV.css: OK
+./frontend/admin-dist/assets/SystemView-fOpIkvwb.js: OK
+./frontend/admin-dist/assets/TenantsView-CthDnldy.css: OK
+./frontend/admin-dist/assets/TenantsView-igxpADne.js: OK
+./frontend/admin-dist/assets/index-D6CmpLJq.css: OK
+./frontend/admin-dist/assets/index-DqSSulF8.js: OK
+./frontend/admin-dist/assets/metrics-mFZmf0P5.js: OK
+./frontend/admin-dist/index.html: OK
+./images/db.id: OK
+./images/db.manifest.json: OK
+./images/db.tar.gz: OK
+./images/iolinkd.id: OK
+./images/iolinkd.manifest.json: OK
+./images/iolinkd.tar.gz: OK
+./images/refs.env: OK
+./install.sh: OK
+./metadata/db.repo-digests.json: OK
+./metadata/go-dependencies.txt: OK
+./metadata/iolinkd.repo-digests.json: OK
+./metadata/licenses.txt: OK
+./metadata/manifest.json: OK
+./metadata/sbom.spdx.json: OK
+./metadata/web-package-lock.json: OK
+./migrations/sql/001_initial.sql: OK
+./migrations/sql/002_bootstrap.sql: OK
+./migrations/sql/003_ingestion.sql: OK
+./migrations/sql/004_m2_lifecycle.sql: OK
+./migrations/sql/005_persistence_foundation.sql: OK
+./migrations/sql/006_notification_delivery.sql: OK
+./migrations/sql/007_product_models.sql: OK
+./migrations/sql/008_generic_telemetry.sql: OK
+./migrations/sql/009_telemetry_backfill_checkpoint.sql: OK
+./migrations/sql/010_tenant_rbac.sql: OK
+./migrations/sql/011_license.sql: OK
+./smoke.sh: OK
+./uninstall.sh: OK
+Loaded image: local/iolinkd:m6c-333fc42
+Loaded image: timescale/timescaledb:latest-pg16
+ Container iolink_m6c_resume_333fc42-db-1 Running 
+ Container iolink_m6c_resume_333fc42-db-1 Waiting 
+ Container iolink_m6c_resume_333fc42-db-1 Healthy 
+ Container iolink_m6c_resume_333fc42-iolinkd-run-e097318b26eb Creating 
+ Container iolink_m6c_resume_333fc42-iolinkd-run-e097318b26eb Created 
+ Container iolink_m6c_resume_333fc42-iolinkd-run-d77564ec5cfb Creating 
+ Container iolink_m6c_resume_333fc42-iolinkd-run-d77564ec5cfb Created 
+{"deployment_id":"923f4a64-2baf-438a-9317-cf401f019989","platform_ready":true,"tenant_ready":true,"license_present":false}
+ Container iolink_m6c_resume_333fc42-iolinkd-run-24f5bc159e24 Creating 
+ Container iolink_m6c_resume_333fc42-iolinkd-run-24f5bc159e24 Created 
+ Container iolink_m6c_resume_333fc42-db-1 Running 
+ Container iolink_m6c_resume_333fc42-iolinkd-1 Creating 
+ Container iolink_m6c_resume_333fc42-iolinkd-1 Created 
+ Container iolink_m6c_resume_333fc42-db-1 Waiting 
+ Container iolink_m6c_resume_333fc42-db-1 Healthy 
+ Container iolink_m6c_resume_333fc42-iolinkd-1 Starting 
+ Container iolink_m6c_resume_333fc42-iolinkd-1 Started 
+ Container iolink_m6c_resume_333fc42-iolinkd-1 Waiting 
+ Container iolink_m6c_resume_333fc42-db-1 Waiting 
+ Container iolink_m6c_resume_333fc42-db-1 Healthy 
+ Container iolink_m6c_resume_333fc42-iolinkd-1 Healthy 
+Spider mode enabled. Check if remote file exists.
+--2026-10-04 20:15:56--  http://127.0.0.1:8080/healthz
+Connecting to 127.0.0.1:8080... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3 [text/plain]
+Remote file exists.
+
+Spider mode enabled. Check if remote file exists.
+--2026-10-04 20:15:56--  http://127.0.0.1:8080/readyz
+Connecting to 127.0.0.1:8080... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 6 [text/plain]
+Remote file exists.
+
+offline health and readiness smoke passed
