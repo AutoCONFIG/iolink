@@ -18,19 +18,19 @@ DDL 提案为 `docs/m6c-schema.sql`，设计通过后新增运行迁移 011。`d
 
 ## HTTP 契约
 
-管理端 `GET /admin/v1/license` 返回状态、实例 ID、摘要、额度和 feature 列表；`POST /admin/v1/license` 只接受 `{payload_b64,signature_b64}`，成功 204，字段/签名/实例/未生效/过期无效 400，clock_error 为 409，缺少验证能力为 503，当前有效证书不因失败上传改变。两操作均只允许实时有效平台管理员，普通租户主体 403；平台 token 版本在事务内重验。支持证书重导入，摘要相同仍为 204、无重复业务副作用。最大上传 64KiB，严格拒绝额外字段、重复 JSON 键、尾随对象、无效 UTF-8、features=null、缺省必填字段；features=[] 合法，表示只授权基础监测。RSA-PSS salt 长度为 SHA-256 的 32 字节。契约详见 `docs/api/license-openapi.yaml`。
+管理端 `GET /admin/v1/license` 返回状态、实例 ID、摘要、额度和 feature 列表；`POST /admin/v1/license` 只接受 `{payload_b64,signature_b64}`，成功 204，字段/签名/实例/未生效/过期无效 400，clock_error 为 409，缺少验证能力为 503，当前有效证书不因失败上传改变。两操作均只允许实时有效平台管理员，普通租户主体 403；平台 token 版本在事务内重验。`key_id` 必须与当前配置的 `IOLINK_LICENSE_KEY_ID` 相等；多把公钥时按 key_id 选择固定配置，未知 key_id 拒绝。支持证书重导入，摘要相同仍为 204、无重复业务副作用。最大 envelope 为 64KiB，payload_b64 最多 62000 个字符；严格拒绝额外字段、重复 JSON 键、尾随对象、无效 UTF-8、features=null、缺省必填字段；features=[] 合法，表示只授权基础监测。RSA-PSS salt 长度为 SHA-256 的 32 字节。契约详见 `docs/api/license-openapi.yaml`。
 
-离线签发工具为独立源码入口 `cmd/license-sign`，不得复制到 runtime Dockerfile 或客户离线包。调用 `license-sign --private-key /protected/issuer.pem < payload.json > license.json`，私钥只从本地 0600 PEM 文件读取（RSA PKCS#1 或 PKCS#8，至少 2048 位），payload 从 stdin 最多 48KiB。工具严格解析 `SignedPayload` 完整字段，时间使用 UTC RFC3339（秒或纳秒、Z 后缀），issued_at<=not_before、expires_at=null 或 expires_at>not_before；max_devices 为十进制 int64 整数 0..9223372036854775807，不接受小数/指数形式；ID 为 1..128 UTF-8 字节且无前后空格。允许 features=[]，不接受重复/未知值/null。以经验证的输入原始字节签名，输出仅标准 Base64 的两个 envelope 字段和换行到 stdout；错误写 stderr，仅安全类别，不输出密钥或 payload。算法 RSA-PSS-SHA256、salt 32，验签无需重新序列化；私钥、公钥生成步骤在签发方文档，临时测试密钥不进版本库。
+离线签发工具为独立源码入口 `cmd/license-sign`，不得复制到 runtime Dockerfile 或客户离线包。调用 `license-sign --private-key /protected/issuer.pem < payload.json > license.json`，私钥只从本地 0600 PEM 文件读取（RSA PKCS#1 或 PKCS#8，至少 2048 位），payload 从 stdin 最多 45KiB。45KiB 原文编码后不超过 61440 个 Base64 字符，加上签名和 JSON 字段仍低于 64KiB envelope 上限；实现必须有 45KiB 接受、45KiB+1 拒绝、最大输出可导入的边界测试。工具严格解析 `SignedPayload` 完整字段，时间只接受 UTC RFC3339 秒或纳秒的 `Z` 后缀，issued_at<=not_before、expires_at=null 或 expires_at>not_before；max_devices 为十进制 int64 整数 0..9223372036854775807，不接受小数/指数形式；ID 为 1..128 UTF-8 字节且无前后空格。允许 features=[]，不接受重复/未知值/null。以经验证的输入原始字节签名，输出仅标准 Base64 的两个 envelope 字段和换行到 stdout；错误写 stderr，仅安全类别，不输出密钥或 payload。算法 RSA-PSS-SHA256、salt 32，验签无需重新序列化；私钥、公钥生成步骤在签发方文档，临时测试密钥不进版本库。
 
 签名向量在实现测试中使用临时 RSA key：有效有期限 payload、expires_at=null/features=[] 永久 payload；逐字段删除、未知字段、features=null/重复/未知、负数/小数/超 int64、时间倒序/非 UTC、有效 JSON 但变更一个字节、不同 key/盐长度都必须拒绝。原始 payload 含任意有效 UTF-8（包括多字节 ID）验签一致；payload/envelope 重复键/尾随内容仍拒绝。
 
 设备恢复新增 `POST /admin/v1/devices/{device_no}/restore`：按当前租户管理员授权，成功 204，跨租户 404，无权限 403，非法或状态不允许 409，License/配额拒绝 403（稳定码 `license_required` / `device_quota_exceeded`），服务能力缺失 503。恢复成功使设备 offline、last_seen_at 清空、session_version 增加，旧 session/旧 shadow 失效；重复恢复不占第二份额度。停用重复幂等。后续所有可选 HTTP/MQTT/worker 执行入口调用同一 feature gate；M6c 只用 fake future executor 验证每个 feature，真实 future 入口仍为 R39.b 待各阶段实现。
 
-状态是证书状态，`overage` 单独表示 max(used-limit,0)，有效超额显示 `overage` 状态但保留已授权 features。失效仍可展示已验签的到期时间和额度，不能用展示缓存授权。`features` 固定数组，missing 时为 []；时间字段 missing 时 null。所有错误响应形状为 `{error:稳定错误码}`，不返回解析器/密码/上传原文错误。
+状态是证书状态，`overage` 单独表示 max(used-limit,0)，有效证书超额时 API `state=overage`，授权决策仍按原证书 features 但设备新增拒绝。失效仍可展示已验签的到期时间和额度，不能用展示缓存授权。`features` 固定数组，missing 时为 []；时间字段 missing 时 null。所有错误响应形状为 `{error:稳定错误码}`，不返回解析器/密码/上传原文错误。
 
 ## 首启和离线包
 
-首启为本地分步 CLI 向导，避免暴露未认证的远程安装入口：①连接测试、显式 migrate up；② `setup status` 显示 deployment_id；③ `setup init PLATFORM_USER TENANT_USER` 从受保护 stdin JSON 接收两个自设强密码及默认租户名，在同事务创建平台管理员、独立 USER 租户 owner、默认租户 membership 及审计（系统租户仍保留用于系统审计）；④ `license import` 从 stdin 导入签发方对该 ID 的 License；⑤ `setup status` 显示每步状态。重复初始化拒绝，失败不留下部分账户或 membership。密码 12..256 UTF-8 字节，至少含字母及非字母且不全相同，不公开默认口令；旧 `admin init/reset-password` 本地恢复入口保留。平台管理员默认无业务读取权限，租户 owner 只在默认租户管理业务。
+首启为本地分步 CLI 向导，避免暴露未认证的远程安装入口：①连接测试、显式 migrate up；② `setup status` 显示 deployment_id；③ `setup init PLATFORM_USER TENANT_USER` 从受保护 stdin JSON 接收两个自设强密码及默认租户名，在同事务创建平台管理员、独立 USER 租户 owner、默认租户 membership 及审计（系统租户仍保留用于系统审计）；④ `license import` 从 stdin 导入签发方对该 ID 的 License；⑤ `setup status` 显示每步状态。重复初始化拒绝，失败不留下部分账户或 membership；连接、迁移、初始化、密码校验失败都写安全类别审计并不写密钥/密码，事务回滚后只保留失败审计。密码 12..256 UTF-8 字节，至少含字母及非字母且不全相同，不公开默认口令；旧 `admin init/reset-password` 本地恢复入口保留。平台管理员默认无业务读取权限，租户 owner 只在默认租户管理业务。
 
 后台“系统授权”页：平台主体显示实例 ID、状态、签发/生效/到期时间、使用/上限/超额、features、摘要和文件导入；使用平台权限真实 403 呈现无权状态。上传不显示原始证书，成功重拉状态；覆盖加载、missing/empty、错误/重试、登录过期、签名拒绝保留旧显示与额度拒绝。设备页增加停用/恢复动作与额度错误提示，菜单隐藏不代替服务端 gate。
 

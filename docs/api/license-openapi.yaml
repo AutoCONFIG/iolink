@@ -60,7 +60,7 @@ components:
       required: [payload_b64, signature_b64]
       additionalProperties: false
       properties:
-        payload_b64: { type: string, format: byte, minLength: 1, maxLength: 64000 }
+        payload_b64: { type: string, format: byte, minLength: 1, maxLength: 62000 }
         signature_b64: { type: string, format: byte, minLength: 1, maxLength: 1500 }
     SignedPayload:
       type: object
