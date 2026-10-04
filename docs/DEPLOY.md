@@ -4,13 +4,13 @@
 
 ## 配套服务与版本
 
-核心iolinkd（含构建后的管理前端）、PG16+TimescaleDB、TLS反代；M7另有流媒体。发布包固定镜像版本和digest，Go/Node/前端依赖锁文件及扩展版本写manifest；不能用latest作为可复现证据。起始验收机4vCPU/8GiB/SSD、Linux x86_64、Docker Engine+Compose v2，记录精确版本；ARM64另验。
+核心iolinkd（含构建后的管理前端）、PG16+TimescaleDB、TLS反代；M7另有流媒体。测试服务器应用镜像使用 `latest`，数据库使用 `timescale/timescaledb:latest-pg16`，两者在执行 `docker compose up` 时拉取，数据库保持 PG16 主版本。镜像更新仍按下节停应用、迁移、启动流程执行；验收记录实际拉取的 digest 和扩展版本，以便复现。Go/Node/前端依赖由锁文件固定。起始验收机4vCPU/8GiB/SSD、Linux x86_64、Docker Engine+Compose v2，记录精确版本；ARM64另验。
 
 配置包含HTTP/MQTT监听地址、PG_DSN、SECRET_KEY（至少32字节随机）、微信三项和模板字段映射、每设备上报周期/离线倍数、日志级别；生产缺关键配置拒绝启动。凭据用受限权限文件或secret注入，日志/备份清单脱敏。首次安装由本地CLI设置管理员，旧默认密码必须变更后才能开放业务入口。
 
 ## M0 已实现的安装入口
 
-先构建 `go build -o /tmp/iolinkd ./cmd/iolinkd`。在隔离开发环境可用 `docker compose -p iolink-dev -f deploy/docker-compose.yml up -d --wait` 起数据库；开发Compose仅本机监听，固定开发口令不用于生产。提供 `IOLINK_PG_DSN` 和至少32字节随机 `IOLINK_SECRET_KEY` 后运行：
+先构建 `go build -o /tmp/iolinkd ./cmd/iolinkd`。本地数据库使用下节的开发 Compose 覆盖文件发布 loopback 端口；配置 `deploy/.env` 后可用 `docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml up -d --wait db`。提供指向本地数据库的 `IOLINK_PG_DSN` 和至少32字节随机 `IOLINK_SECRET_KEY` 后运行：
 
 ```bash
 /tmp/iolinkd migrate status
@@ -23,17 +23,56 @@
 
 `migrate adopt-legacy` 仅用于隔离的非生产旧schema fixture/恢复演练：它只接管与仓库遗留DDL指纹、Timescale时序表和13个月保留策略匹配的八表库；出现未知表或漂移即拒绝，不能绕过检查硬写版本。fixture 需先快照/备份，演练应核对数据保留与失败恢复。该入口不构成已部署客户数据升级支持。旧公开默认密码被强制门禁阻止，需运行 `admin reset-password admin < /run/secrets/iolink-admin-password` 后才能启动。新版本/checksum不兼容也拒绝启动。当前M0仅递增token_version，既有HTTP token的撤销校验还在M2待实现；本地重置需先停服务并轮换根密钥，再启动以使既有令牌失效。
 
-生产Compose须在 `deploy/.env` 受限文件配置强随机PG口令、根密钥，支持 `IOLINK_REPORT_INTERVAL=60|300`（默认60）和 `IOLINK_OFFLINE_GRACE=1..10`（默认3）。PG口令使用URL安全字符，例如随机hex，避免嵌入DSN产生URL歧义；任意口令须正确URL编码连接串。迁移和管理员命令在起常驻应用之前运行：
+## 测试服务器 Compose
+
+复制 `deploy/docker-compose.yaml` 和 `deploy/.env.example` 到服务器同一目录即可，无需克隆源码。文件内统一管理 iolinkd 与 PostgreSQL 16/TimescaleDB；MQTT 内嵌于 iolinkd，当前没有 Redis 依赖。下面命令都在该目录运行。
 
 ```bash
-docker build -t iolinkd:latest .
-docker compose -p iolink-prod -f deploy/docker-compose.prod.yml up -d --wait db
-docker compose -p iolink-prod -f deploy/docker-compose.prod.yml run --rm --no-deps iolinkd migrate up
-docker compose -p iolink-prod -f deploy/docker-compose.prod.yml run --rm --no-deps -T iolinkd admin init operator < /run/secrets/iolink-admin-password
-docker compose -p iolink-prod -f deploy/docker-compose.prod.yml up -d iolinkd
+cp .env.example .env
+chmod 600 .env
+openssl rand -hex 32
+openssl rand -hex 32
 ```
 
-上述容器流程提供已实现命令的使用方式；M0实际验收使用本机二进制+隔离Timescale容器，不冒称已完成生产容器/TLS验收。正式发布须使用固定发布标签/digest取代本地构建的latest标签。
+把两次生成的值分别填入 `.env` 的 `IOLINK_PG_PASSWORD` 和 `IOLINK_SECRET_KEY`。PG 口令必须使用 URL 安全字符（上述 hex 符合要求），因为 Compose 将其直接嵌入 PostgreSQL URL。准备受限权限的管理员口令文件 `/run/secrets/iolink-admin-password`，内容12–256字节、不含空白。支持 `IOLINK_REPORT_INTERVAL=60|300`（默认60）和 `IOLINK_OFFLINE_GRACE=1..10`（默认3）；微信功能需要同时配置 `IOLINK_WX_APPID`、`IOLINK_WX_SECRET`、`IOLINK_WX_TEMPLATE_ID`。
+
+首次启动：
+
+```bash
+docker compose pull
+docker compose up -d --wait db
+docker compose run --rm --pull never --no-deps iolinkd migrate up
+docker compose run --rm --pull never --no-deps -T iolinkd admin init operator < /run/secrets/iolink-admin-password
+docker compose up -d --pull never --wait iolinkd
+curl -f http://127.0.0.1:8080/readyz
+```
+
+`IOLINKD_IMAGE` 默认 `ghcr.io/autoconfig/iolink:latest`，`pull_policy: always` 在执行 `up` 时检查拉取镜像，不会在后台定时升级。需要更新时先备份数据库，显式停应用并迁移，再启动：
+
+```bash
+docker compose pull
+docker compose stop iolinkd
+docker compose run --rm --pull never --no-deps iolinkd migrate up
+docker compose up -d --pull never --wait iolinkd
+```
+
+数据库保存在项目的 `pgdata` 命名卷中，`docker compose down` 保留数据；`down -v` 会删除数据。内部 JSON 诊断日志保存在同目录的 `logs/iolinkd.jsonl`，容器内限制为20MB×5个备份，可通过 `IOLINK_LOG_LEVEL=debug|info|warn|error` 调整级别；日志目录和 Docker stdout/stderr 都有大小上限。默认仅监听 `127.0.0.1:8080/1883`，数据库不公开端口。测试机需从其他主机直接访问时，配置 `IOLINK_HTTP_BIND=0.0.0.0` / `IOLINK_MQTT_BIND=0.0.0.0` 并配置防火墙；公网部署按下节反代 TLS。
+
+`latest` 适合测试机追踪最新发布；正式发布和可复现验收应把 `IOLINKD_IMAGE` 固定为 tag 或 digest。该 Compose 不代表 TLS、容量、离线安装或 M6b 完整阶段验收已通过。
+
+## 从本地源码构建
+
+在仓库根目录先执行 `git submodule update --init web`，复制 `deploy/.env.example` 为 `deploy/.env` 并填写随机配置。开发文件覆盖镜像拉取规则，使用当前源码构建 Go 与管理前端，Docker cache 复用依赖和编译缓存，无需手工生成 `web/dist`。
+
+```bash
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml build iolinkd
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml up -d --wait db
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml run --rm --pull never --no-deps iolinkd migrate up
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml run --rm --pull never --no-deps -T iolinkd admin init operator < /run/secrets/iolink-admin-password
+docker compose -p iolink-dev -f deploy/docker-compose.yaml -f deploy/docker-compose.dev.yaml up -d --build --wait iolinkd
+```
+
+源码修改后再次执行最后一条命令即可重新构建。开发 DB 额外发布 `127.0.0.1:${IOLINK_DEV_PG_PORT:-5432}` 供宿主 Go 调试；该覆盖文件不要用于公网部署。`make dev` 只启动开发 DB，再用宿主 `go run` 迁移和服务，需要单独导出本地 `IOLINK_PG_DSN`、根密钥并已初始化管理员；它不会自动读取 `deploy/.env` 给 Go 进程。
 
 ## M1 迁移fixture注意
 
@@ -99,6 +138,25 @@ Timescale全库恢复准备/收尾及非并行限制参考[官方逻辑备份文
 `deploy/backup.sh`使用操作者提供的PG环境变量生成单个custom格式全库备份和sha256校验文件，校验文件只记录备份文件名，便于异机复制。`deploy/restore.sh`要求`IOLINK_RESTORE_TARGET=isolated`且目标数据库名匹配`iolink_restore_*`，在隔离目标校验后恢复并检查迁移表。两个脚本不记录DSN或口令，也不依赖固定Compose容器名。恢复演练仍需按本流程核对业务/时序摘要；未完成真实演练前不能称R31通过。无硬件或微信凭据不阻止恢复测试，但完整外部链路仍单列未验。
 
 ## 可观察性与关卡
+
+内部诊断日志输出 JSON 行，常驻服务写入 `deploy/logs/iolinkd.jsonl`，同时输出到 stderr。
+使用复制到服务器的文件时，日志目录是该 Compose 文件旁的 `logs/`。
+默认 `IOLINK_LOG_LEVEL=info`；排查内部采集/通知处理可临时设置 `debug` 并重建应用容器。
+`IOLINK_LOG_MAX_MB` 为每个文件的MB上限（1–1024，默认20），
+`IOLINK_LOG_BACKUPS` 为轮转备份数量（1–20，默认5），默认总预算约120MB。
+备份由轮转库以时间戳命名；不要让其他进程或宿主 logrotate 同时轮转这些文件。
+迁移和管理员 CLI 仅输出 stderr，避免与常驻服务争用同一日志文件。
+
+日志文件权限为0600，Docker 默认以 root 写入，宿主读取使用 `sudo tail -f logs/iolinkd.jsonl`；
+不应将日志目录作为公开静态文件目录。每个 API 请求返回服务器生成的 `X-Request-ID`，
+日志记录路由模板、状态码、耗时和已验证的租户/用户ID；不记录请求 body、header、query
+或原始动态路径。设备标识使用稳定 hash 关联，SDK packet/payload、密码、JWT、微信凭据
+以及原始数据库错误值均不进入日志。错误记录保留安全类别和 PostgreSQL SQLSTATE。
+未知错误记录类型，结合路由、处理阶段和指标定位，不输出原始错误文本中的数据。
+
+日志目录无法创建/打开时拒绝启动；运行中写入失败会在 stderr 报告并使 `/readyz` 返回503，
+修复磁盘或目录后重启服务。只读目录、非法级别/轮转范围也会拒绝启动。
+日志功能不替代通知 outbox、业务审计表或数据库备份。
 
 存活/就绪分开；就绪失败不接新业务；指标包括在线数、接入/持久化失败、遥测、报警、通知成功/失败、队列长度和任务延迟。日志可定位tenant/device/event而不含secret。SIGTERM先撤销就绪、停止MQTT接入、关闭HTTP新请求，再在10秒上限内排空通知；重复状态事件不导致在线数负值。
 

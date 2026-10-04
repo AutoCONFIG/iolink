@@ -1,0 +1,97 @@
+ Image iolinkd:local-dev Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 524B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 823B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/alpine:3.20
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/golang:1.26-alpine
+#4 DONE 0.7s
+
+#5 [internal] load metadata for docker.io/library/node:24-alpine
+#5 DONE 0.7s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 251B done
+#6 DONE 0.0s
+
+#7 [build 1/8] FROM docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c
+#7 resolve docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c 0.0s done
+#7 DONE 0.0s
+
+#8 [stage-2 1/4] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#8 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 0.0s done
+#8 DONE 0.0s
+
+#9 [frontend 1/6] FROM docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+#9 resolve docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 0.0s done
+#9 DONE 0.0s
+
+#10 [internal] load build context
+#10 transferring context: 1.54MB 0.0s done
+#10 DONE 0.0s
+
+#11 [build 2/8] WORKDIR /src
+#11 CACHED
+
+#12 [build 3/8] COPY go.mod go.sum ./
+#12 CACHED
+
+#13 [frontend 3/6] COPY web/package.json web/package-lock.json ./
+#13 CACHED
+
+#14 [frontend 4/6] RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
+#14 CACHED
+
+#15 [frontend 2/6] WORKDIR /web
+#15 CACHED
+
+#16 [frontend 5/6] COPY web/ ./
+#16 CACHED
+
+#17 [frontend 6/6] RUN npm run build
+#17 CACHED
+
+#18 [build 4/8] RUN --mount=type=cache,target=/go/pkg/mod go mod download
+#18 CACHED
+
+#19 [build 5/8] COPY . .
+#19 DONE 0.1s
+
+#20 [build 6/8] COPY --from=frontend /web/dist ./web/dist
+#20 DONE 0.0s
+
+#21 [build 7/8] RUN sh scripts/embed-frontend.sh
+#21 DONE 0.2s
+
+#22 [build 8/8] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/iolinkd ./cmd/iolinkd
+#22 DONE 0.8s
+
+#23 [stage-2 2/4] RUN apk add --no-cache ca-certificates tzdata wget
+#23 CACHED
+
+#24 [stage-2 3/4] WORKDIR /app
+#24 CACHED
+
+#25 [stage-2 4/4] COPY --from=build /out/iolinkd /app/iolinkd
+#25 DONE 0.1s
+
+#26 exporting to image
+#26 exporting layers
+#26 exporting layers 0.6s done
+#26 exporting manifest sha256:f929873380a111bd800192a60aa4ee313a4e8be14d0d5c283e77baa975b36baa 0.0s done
+#26 exporting config sha256:946afcd9c02db4103097c3b9fe943d31aabc045c594136e935860542319e80d8 0.0s done
+#26 exporting attestation manifest sha256:400191769b0a865bd3625bbef18b6d4c616924b088947894c4fc33f63f285cec 0.0s done
+#26 exporting manifest list sha256:6dcef8ed26e713fe7ab024124e62950f5368d58cff61de325b104ba392e17c63 0.0s done
+#26 naming to docker.io/library/iolinkd:local-dev done
+#26 unpacking to docker.io/library/iolinkd:local-dev 0.1s done
+#26 DONE 0.8s
+
+#27 resolving provenance for metadata file
+#27 DONE 0.0s
+ Image iolinkd:local-dev Built

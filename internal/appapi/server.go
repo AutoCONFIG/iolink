@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"time"
 
+	"git.hyhy.fun/rsplab/iolink/internal/operations"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -77,7 +78,7 @@ func New(cfg Config, deps Deps, log *slog.Logger) *Server {
 // Routes builds the gin engine with all /api/v1 routes.
 func (s *Server) Routes() http.Handler {
 	r := gin.New()
-	r.Use(gin.Recovery(), gin.LoggerWithConfig(gin.LoggerConfig{SkipPaths: []string{"/healthz"}}))
+	r.Use(operations.RequestLogging(s.log))
 
 	v1 := r.Group("/api/v1")
 	v1.POST("/auth/login", s.login)
