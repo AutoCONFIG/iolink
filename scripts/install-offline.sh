@@ -23,6 +23,7 @@ test "$(docker image inspect "$IOLINK_DB_IMAGE" --format '{{.Id}}')" = "$(cat im
 if test ! -f .env; then
   printf 'IOLINKD_IMAGE=%s\nIOLINK_DB_IMAGE=%s\nIOLINK_PG_PASSWORD=%s\nIOLINK_SECRET_KEY=%s\nIOLINK_LICENSE_PUBLIC_KEY_FILE=/run/iolink/secrets/license-public.pem\nIOLINK_LICENSE_KEY_ID=%s\n' "$IOLINKD_IMAGE" "$IOLINK_DB_IMAGE" "$(od -An -N24 -tx1 /dev/urandom | tr -d ' \n')" "$(od -An -N48 -tx1 /dev/urandom | tr -d ' \n')" "${IOLINK_LICENSE_KEY_ID:-}" >.env
 fi
+mkdir -p secrets
 docker compose --env-file .env -f deploy/docker-compose.yaml up -d --wait db
 docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd migrate up
 setup_status=$(docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd setup status)
