@@ -60,8 +60,33 @@ components:
       required: [payload_b64, signature_b64]
       additionalProperties: false
       properties:
-        payload_b64: { type: string, minLength: 1 }
-        signature_b64: { type: string, minLength: 1 }
+        payload_b64: { type: string, format: byte, minLength: 1, maxLength: 64000 }
+        signature_b64: { type: string, format: byte, minLength: 1, maxLength: 1500 }
+    SignedPayload:
+      type: object
+      description: 原始 UTF-8 JSON 字节按 RSA-PSS-SHA256 签名，salt 32 字节；不得重序列化后验签。issued_at 不晚于 not_before，expires_at 非空时严格晚于 not_before。
+      required: [license_id, deployment_id, issued_at, not_before, expires_at, max_devices, features, key_id]
+      additionalProperties: false
+      properties:
+        license_id: { type: string, minLength: 1, maxLength: 128 }
+        deployment_id: { type: string, minLength: 1, maxLength: 128 }
+        issued_at: { type: string, format: date-time }
+        not_before: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time, nullable: true }
+        max_devices: { type: integer, format: int64, minimum: 0 }
+        features:
+          type: array
+          uniqueItems: true
+          items: { type: string, enum: [video, openapi, automation, reports] }
+        key_id: { type: string, minLength: 1, maxLength: 128 }
+    Error:
+      type: object
+      required: [error]
+      additionalProperties: false
+      properties:
+        error:
+          type: string
+          enum: [invalid_request, license_invalid, license_signature_invalid, license_instance_mismatch, license_not_before, license_expired, license_clock_error, unauthorized, forbidden, license_required, device_quota_exceeded, not_found, conflict, license_unavailable, internal_error]
     LicenseStatus:
       type: object
       required: [state, deployment_id, license_id, key_id, issued_at, not_before, expires_at, max_devices, features, used_devices, overage, payload_sha256]
@@ -83,14 +108,20 @@ components:
         payload_sha256: { type: string, pattern: '^[0-9a-f]{64}$', nullable: true }
   responses:
     BadRequest:
-      description: 请求或授权文件无效
+      description: invalid_request / license_invalid / license_signature_invalid / license_instance_mismatch / license_not_before / license_expired
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
     Unauthorized:
-      description: 未认证
+      description: unauthorized
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
     Conflict:
-      description: 当前授权状态不允许替换
+      description: license_clock_error（导入）/ conflict（设备恢复冲突）
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
     Forbidden:
-      description: 当前主体无操作权限或 License/额度拒绝
+      description: forbidden（权限）/ license_required（设备准入）/ device_quota_exceeded（额度）
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
     NotFound:
-      description: 设备不存在或不属于当前租户
+      description: not_found（设备不存在或不属于当前租户）
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
     Unavailable:
-      description: 授权验证能力不可用
+      description: license_unavailable（验证能力缺失）/ internal_error（数据库不可用）
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }

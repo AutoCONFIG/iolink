@@ -8,7 +8,7 @@
 
 ## 数据和事务
 
-DDL 提案为 `internal/migrate/sql/011_license.sql`（设计通过后才作为运行迁移）。`deployment_config` 保存安装实例 ID；首次迁移使用 PostgreSQL 16 内置 `gen_random_uuid()`，备份恢复保留 ID。单行 `license_state` 是实例额度锁，所有增加设备数的操作先锁该行，再锁设备行/计数；导入也锁同一行。按 `disabled_at IS NULL` 跨租户计数；网关和子设备使用同一设备表计数模型。停用释放额度，恢复重新检查额度。无证书或验签失败均拒绝设备准入；不得以尚未配置 guard 绕过。
+DDL 提案为 `docs/m6c-schema.sql`，设计通过后新增运行迁移 011。`deployment_config` 保存安装实例 ID；首次迁移使用 PostgreSQL 16 内置 `gen_random_uuid()`，备份恢复保留 ID。单行 `license_state` 是实例额度锁，所有增加设备数的操作先锁该行，再锁设备行/计数；导入也锁同一行。按 `disabled_at IS NULL` 跨租户计数；网关和子设备使用同一设备表计数模型。停用释放额度，恢复重新检查额度。无证书或验签失败均拒绝设备准入；不得以尚未配置 guard 绕过。签名原文是唯一授权依据，数据库不存第二份可独立修改的字段缓存。
 
 新增纯业务包 `internal/license` 只依赖标准库。应用编排通过窄小的 `license.Runtime`/`license.DeviceAdmission` 能力消费授权，不引用 pgx；PostgreSQL adapter 使用数据库事务协调 License、配额和业务写入。现有 core 的设备 SQL 属于已有 adapter seam，迁移只在此 seam 接入事务额度检查，后续拆分不扩展此次范围。
 

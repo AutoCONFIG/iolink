@@ -542,7 +542,7 @@ paths:
       tags:
       - devices
       summary: 注册设备并返回一次性 secret
-      description: 强制绑定已存在 pond_id；无裸设备/裸解绑状态。device_no 服务端生成且永久唯一。secret 只在本次响应显示，服务端仅存摘要。POST 非幂等，响应丢失不得自动重试；管理员核实后停用旧记录并重新注册。
+      description: 强制绑定已存在 pond_id；无裸设备/裸解绑状态。device_no 服务端生成且永久唯一。secret 只在本次响应显示，服务端仅存摘要。POST 非幂等，响应丢失不得自动重试；管理员核实后停用旧记录并重新注册。M6c 新增实例授权及配额守卫：无有效授权 403 license_required，设备额度不足 403 device_quota_exceeded，验签能力缺失 503 license_unavailable；拒绝不产生设备/凭据/审计/outbox 的部分业务写入。
       responses:
         '200':
           description: 成功
@@ -589,6 +589,16 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: forbidden / license_required / device_quota_exceeded
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '503':
+          description: license_unavailable
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
