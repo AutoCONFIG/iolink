@@ -1,8 +1,12 @@
 # 当前实现状态与证据
 
 附加部署里程碑：统一服务器 `deploy/docker-compose.yaml` 与源码构建覆盖
-`deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，待同快照双审和发布。
-证据见 [Compose](evidence/deployment/2026-10-03-compose/)。此项不改变 M6b 及 TLS/容量阶段状态；内部日志转储另行开发。
+`deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，并发布至 v0.0.6；用户明确免除该配置变更的双审。
+数据库追踪 `timescale/timescaledb:latest-pg16`，启动时拉取。证据见 [Compose](evidence/deployment/2026-10-03-compose/)。
+
+附加日志里程碑：JSON 文件持久化、轮转、内部采集/通知事件、HTTP 请求关联和脱敏已实现，
+固定源码 `e1b78e12d9dea3c1f60412fce1bcdaa0adb33b0e` 的真实隔离 DB/MQTT/HTTP/重启链路及完整检查通过，待双审。
+证据见 [日志转储](evidence/deployment/2026-10-03-logging/)。此项不改变 M6b 及 TLS/容量阶段状态。
 
 基线代码：b71095bbb6b228caed74adf47c48ca4c6b07c92b，检查日期2026-09-19。文档双审通过后已实施M0及M1软件部分；旧文档的“全部完成/全绿”不构成本轮验收。需求细项见 ACCEPTANCE.md。
 

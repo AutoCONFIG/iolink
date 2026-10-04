@@ -1,0 +1,502 @@
+{
+  "source": "e1b78e12d9dea3c1f60412fce1bcdaa0adb33b0e",
+  "project": "iolink-logging-16d7a1ee",
+  "date": "2026-10-03",
+  "result": "PASS",
+  "http": "ready200/login200/auth401",
+  "mqtt": "QoS1 → PG committed → debug internal event",
+  "persistence": "request ID retained after restart",
+  "secrets": "all generated password/key/MQTT values and raw request/query excluded",
+  "receipts": [
+    {
+      "name": "compose-config",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "config",
+        "--quiet"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.048
+    },
+    {
+      "name": "docker-build",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "build",
+        "iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 2.831
+    },
+    {
+      "name": "database-up",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "up",
+        "-d",
+        "--pull",
+        "never",
+        "--wait",
+        "db"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 5.786
+    },
+    {
+      "name": "docker-version",
+      "command": [
+        "docker",
+        "version",
+        "--format",
+        "{{.Server.Version}}"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.019
+    },
+    {
+      "name": "compose-version",
+      "command": [
+        "docker",
+        "compose",
+        "version",
+        "--short"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.036
+    },
+    {
+      "name": "database-image",
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "timescale/timescaledb:latest-pg16",
+        "--format",
+        "{{json .RepoDigests}}"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.038
+    },
+    {
+      "name": "migrate",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--no-deps",
+        "iolinkd",
+        "migrate",
+        "up"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.575
+    },
+    {
+      "name": "database-version",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "exec",
+        "-T",
+        "db",
+        "psql",
+        "-U",
+        "iolink",
+        "-d",
+        "iolink",
+        "-Atc",
+        "SELECT version(); SELECT extversion FROM pg_extension WHERE extname='timescaledb'"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.08
+    },
+    {
+      "name": "admin-init",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--no-deps",
+        "-T",
+        "iolinkd",
+        "admin",
+        "init",
+        "operator"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.419
+    },
+    {
+      "name": "fixtures",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "exec",
+        "-T",
+        "db",
+        "psql",
+        "-U",
+        "iolink",
+        "-d",
+        "iolink",
+        "-v",
+        "ON_ERROR_STOP=1"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.086
+    },
+    {
+      "name": "application-up",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "up",
+        "-d",
+        "--pull",
+        "never",
+        "--wait",
+        "iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 11.237
+    },
+    {
+      "name": "telemetry-count",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "exec",
+        "-T",
+        "db",
+        "psql",
+        "-U",
+        "iolink",
+        "-d",
+        "iolink",
+        "-Atc",
+        "SELECT count(*) FROM sensor_data WHERE device_no='diagnostics-fixture' AND temperature=26"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.081
+    },
+    {
+      "name": "persistent-json",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "exec",
+        "-T",
+        "iolinkd",
+        "cat",
+        "/var/log/iolink/iolinkd.jsonl"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.069
+    },
+    {
+      "name": "restart",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "restart",
+        "iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.34
+    },
+    {
+      "name": "restart-wait",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "up",
+        "-d",
+        "--pull",
+        "never",
+        "--wait",
+        "iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 10.084
+    },
+    {
+      "name": "restart-json",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "exec",
+        "-T",
+        "iolinkd",
+        "cat",
+        "/var/log/iolink/iolinkd.jsonl"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.065
+    },
+    {
+      "name": "invalid-level",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--no-deps",
+        "-e",
+        "IOLINK_LOG_LEVEL=invalid",
+        "iolinkd",
+        "serve"
+      ],
+      "code": 1,
+      "expected": 1,
+      "seconds": 0.308
+    },
+    {
+      "name": "invalid-path",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "iolink-logging-16d7a1ee",
+        "-f",
+        "deploy/docker-compose.yaml",
+        "-f",
+        "deploy/docker-compose.dev.yaml",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--no-deps",
+        "-e",
+        "IOLINK_LOG_DIR=/proc/iolink-unwritable",
+        "iolinkd",
+        "serve"
+      ],
+      "code": 1,
+      "expected": 1,
+      "seconds": 0.313
+    },
+    {
+      "name": "go-verify",
+      "command": [
+        "make",
+        "verify"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 19.34
+    },
+    {
+      "name": "logging-focused",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-shuffle=on",
+        "-count=1",
+        "-v",
+        "./internal/observability",
+        "./internal/operations"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 1.744
+    },
+    {
+      "name": "cli-focused",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-shuffle=on",
+        "-count=1",
+        "-v",
+        "./cmd/iolinkd"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 1.811
+    },
+    {
+      "name": "web-tests",
+      "command": [
+        "npm",
+        "--prefix",
+        "web",
+        "run",
+        "test"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.558
+    },
+    {
+      "name": "web-typecheck",
+      "command": [
+        "npm",
+        "--prefix",
+        "web",
+        "run",
+        "typecheck"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 2.073
+    },
+    {
+      "name": "web-build",
+      "command": [
+        "npm",
+        "--prefix",
+        "web",
+        "run",
+        "build"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 5.797
+    },
+    {
+      "name": "contracts",
+      "command": [
+        "make",
+        "verify-contracts"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.355
+    },
+    {
+      "name": "manifests",
+      "command": [
+        ".venv/contracts/bin/python",
+        "scripts/check_architecture_manifests.py",
+        "--all"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.094
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "code": 0,
+      "expected": 0,
+      "seconds": 0.006
+    }
+  ]
+}

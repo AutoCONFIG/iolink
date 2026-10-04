@@ -158,8 +158,10 @@ func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 	finishCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
 	defer cancel()
 	if err = w.cfg.Store.Finish(finishCtx, c, result, now); err != nil {
+		w.cfg.Logger.Debug("notification result persistence failed", "stage", "outbox", "err", err)
 		return true, err
 	}
+	w.cfg.Logger.Debug("notification attempt completed", "stage", "outbox", "outcome", result.Status, "duration_ms", time.Since(started).Milliseconds())
 	if sendErr != nil {
 		if w.cfg.OnFailure != nil {
 			w.cfg.OnFailure()

@@ -1,0 +1,13 @@
+{"time":"2026-10-03T09:24:24.972838551Z","level":"INFO","msg":"added hook","hook":"redacted"}
+{"time":"2026-10-03T09:24:24.972857397Z","level":"INFO","msg":"iolinkd started","http":":8080","mqtt":":1883"}
+{"time":"2026-10-03T09:24:24.973100935Z","level":"INFO","msg":"attached listener","id":"redacted","protocol":"redacted","address":"redacted"}
+{"time":"2026-10-03T09:24:24.973111936Z","level":"INFO","msg":"mochi mqtt starting","version":"redacted"}
+{"time":"2026-10-03T09:24:24.973191576Z","level":"DEBUG","msg":"system event loop started"}
+{"time":"2026-10-03T09:24:24.973224778Z","level":"INFO","msg":"mochi mqtt server started"}
+{"time":"2026-10-03T09:24:35.578938652Z","level":"INFO","msg":"http request","request_id":"WX2N5BJTCZY53ZQTHBL4EAD77D","route":"/admin/v1/login","method":"POST","status":200,"duration_ms":89,"tenant_id":0,"actor_id":0}
+{"time":"2026-10-03T09:24:35.580487579Z","level":"WARN","msg":"http request","request_id":"ZM2SYWTPQTDIWXFGXDX35L42QL","route":"/api/v2/devices/:device_no/history","method":"GET","status":401,"duration_ms":0,"tenant_id":0,"actor_id":0}
+{"time":"2026-10-03T09:24:35.587035998Z","level":"DEBUG","msg":"device event persisted","device_hash":"040a71551fd5d258be1c4c0a","kind":"status_change","fields":0,"duration_ms":2}
+{"time":"2026-10-03T09:24:35.591113114Z","level":"DEBUG","msg":"device event persisted","device_hash":"040a71551fd5d258be1c4c0a","kind":"status_change","fields":0,"duration_ms":1}
+{"time":"2026-10-03T09:24:35.630024424Z","level":"DEBUG","msg":"device event persisted","device_hash":"040a71551fd5d258be1c4c0a","kind":"properties","fields":1,"duration_ms":38}
+{"time":"2026-10-03T09:24:35.63043644Z","level":"DEBUG","msg":"client disconnected","error":"redacted","client":"redacted","remote":"redacted","listener":"redacted"}
+{"time":"2026-10-03T09:24:35.633016498Z","level":"DEBUG","msg":"device event persisted","device_hash":"040a71551fd5d258be1c4c0a","kind":"status_change","fields":0,"duration_ms":2}

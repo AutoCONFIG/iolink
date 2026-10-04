@@ -18,6 +18,14 @@
 
 在操作边界执行认证、授权及资源归属校验，拒绝未授权和跨用户/租户访问。相关数据库变更使用明确事务边界；业务状态与 outbox 意图须原子提交，外部副作用在事务外执行，并显式处理重试、重复和未知结果。错误、能力不足或校验失败不得留下部分状态。
 
+## 诊断日志
+
+使用 composition root 注入的 slog logger；常驻服务由 internal/observability 统一输出脱敏 JSON。
+消息保持常量，动态数据使用字段；HTTP 只记录路由模板和服务器生成的请求 ID，禁止记录
+body、header、query、原始 URL、密码、JWT、MQTT/微信 secret 或完整遥测 payload。
+新增字段须检查 observability 的安全字段规则；设备标识使用 hash，错误仅保留安全类别/SQLSTATE。
+迁移与管理员 CLI 仅写 stderr，不与常驻服务争用轮转文件。
+
 ## 验证
 
 根据改动运行相关测试与契约检查；常用仓库检查：`make verify`、`make docs-tools`、`make verify-contracts`。真实 PostgreSQL/Timescale 集成测试使用隔离的 `IOLINK_TEST_PG_DSN`；未设置时跳过不算通过。只在具备相应凭据、设备或外部服务证据时报告外部验收通过；否则标为 `external_blocked`。

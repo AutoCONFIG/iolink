@@ -1,0 +1,63 @@
+-test.shuffle 1791019506509578160
+=== RUN   TestLogConfigRejectsInvalidBounds
+--- PASS: TestLogConfigRejectsInvalidBounds (0.00s)
+=== RUN   TestSinkClosedCannotReopenFile
+--- PASS: TestSinkClosedCannotReopenFile (0.00s)
+=== RUN   TestSinkFailureDegradesReadinessAndRetainsStderr
+--- PASS: TestSinkFailureDegradesReadinessAndRetainsStderr (0.00s)
+=== RUN   TestStructuredFileLoggingLevelsAndRedaction
+--- PASS: TestStructuredFileLoggingLevelsAndRedaction (0.00s)
+=== RUN   TestConcurrentLoggingProducesCompleteJSONAndSurvivesReopen
+--- PASS: TestConcurrentLoggingProducesCompleteJSONAndSurvivesReopen (0.02s)
+=== RUN   TestStructuredFileLoggingRotates
+--- PASS: TestStructuredFileLoggingRotates (0.43s)
+=== RUN   TestInvalidLogPathFailsStartup
+--- PASS: TestInvalidLogPathFailsStartup (0.00s)
+=== RUN   TestErrorsKeepSafeClassificationWithoutValues
+--- PASS: TestErrorsKeepSafeClassificationWithoutValues (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	1.468s
+-test.shuffle 1791019506658379786
+=== RUN   TestHealthEndpointsFailClosedOnDependencyErrors
+--- PASS: TestHealthEndpointsFailClosedOnDependencyErrors (0.00s)
+=== RUN   TestHealthEndpointsReportDependenciesAndDrainState
+--- PASS: TestHealthEndpointsReportDependenciesAndDrainState (0.00s)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/success
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/denied
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/failure
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/panic
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/unmatched
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+--- PASS: TestRequestLogsCorrelateWithoutUntrustedContent (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/success (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/denied (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/failure (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/panic (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/unmatched (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.025s
