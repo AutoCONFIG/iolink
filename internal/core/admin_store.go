@@ -91,6 +91,9 @@ func (s *Service) CreateFarm(ctx context.Context, ownerID *int64, name, location
 		return domain.Farm{}, err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "farms", "write"); err != nil {
+		return domain.Farm{}, err
+	}
 	var tenantID int64
 	if scopedTenant, scoped := domain.TenantID(ctx); scoped {
 		tenantID = scopedTenant
@@ -253,6 +256,9 @@ func (s *Service) SetFarmMember(ctx context.Context, farmID, userID int64, role 
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "farm_members", "write"); err != nil {
+		return err
+	}
 	var tenantID int64
 	q := `SELECT tenant_id FROM farms WHERE id=$1`
 	args := []any{farmID}
@@ -299,6 +305,9 @@ func (s *Service) SetFarmOwnerByActor(ctx context.Context, id int64, ownerID *in
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "farms", "write"); err != nil {
+		return err
+	}
 	var previous *int64
 	var tenantID int64
 	q := `SELECT owner_id,tenant_id FROM farms WHERE id=$1`
@@ -383,17 +392,28 @@ func nullableID(id *int64) string {
 }
 
 func (s *Service) UpdateFarm(ctx context.Context, id int64, name, location string) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "farms", "write"); err != nil {
+		return err
+	}
 	q := `UPDATE farms SET name=$2, location=$3 WHERE id=$1`
 	args := []any{id, name, location}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
 		q += ` AND tenant_id=$4`
 		args = append(args, tenantID)
 	}
-	ct, err := s.pool.Exec(ctx, q, args...)
+	ct, err := tx.Exec(ctx, q, args...)
 	if err == nil && ct.RowsAffected() == 0 {
 		return domain.ErrNotFound
 	}
-	return err
+	if err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 func (s *Service) FindAdminByID(ctx context.Context, id int64) (*domain.User, error) {
@@ -423,6 +443,9 @@ func (s *Service) ChangeAdminPassword(ctx context.Context, id int64, oldPassword
 }
 
 func (s *Service) DeleteFarm(ctx context.Context, id int64) error {
+	if err := s.authorizeTenantWriteNow(ctx, "farms", "write"); err != nil {
+		return err
+	}
 	var n int
 	q := `SELECT count(*) FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.farm_id=$1`
 	args := []any{id}
@@ -484,6 +507,9 @@ func (s *Service) FarmExists(ctx context.Context, id int64) (bool, error) {
 }
 
 func (s *Service) CreatePond(ctx context.Context, farmID int64, name string, areaMu float64) (domain.Pond, error) {
+	if err := s.authorizeTenantWriteNow(ctx, "ponds", "write"); err != nil {
+		return domain.Pond{}, err
+	}
 	var ok bool
 	q := `SELECT EXISTS(SELECT 1 FROM farms WHERE id=$1)`
 	args := []any{farmID}
@@ -506,6 +532,9 @@ func (s *Service) CreatePond(ctx context.Context, farmID int64, name string, are
 }
 
 func (s *Service) UpdatePond(ctx context.Context, id int64, name string, areaMu float64) error {
+	if err := s.authorizeTenantWriteNow(ctx, "ponds", "write"); err != nil {
+		return err
+	}
 	q := `UPDATE ponds p SET name=$2, area_mu=$3 FROM farms f WHERE p.farm_id=f.id AND p.id=$1`
 	args := []any{id, name, areaMu}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
@@ -520,6 +549,9 @@ func (s *Service) UpdatePond(ctx context.Context, id int64, name string, areaMu 
 }
 
 func (s *Service) DeletePond(ctx context.Context, id int64) error {
+	if err := s.authorizeTenantWriteNow(ctx, "ponds", "write"); err != nil {
+		return err
+	}
 	var n int
 	q := `SELECT count(*) FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND (EXISTS(SELECT 1 FROM devices WHERE pond_id=$1) OR EXISTS(SELECT 1 FROM sensor_data WHERE pond_id=$1) OR EXISTS(SELECT 1 FROM alarms WHERE pond_id=$1) OR EXISTS(SELECT 1 FROM alarm_rules WHERE pond_id=$1))`
 	args := []any{id}
@@ -550,6 +582,9 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 // RegisterDevice generates a unique device_no and a one-time secret
 // (only sha256 is persisted).
 func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (domain.Device, string, error) {
+	if err := s.authorizeTenantWriteNow(ctx, "devices", "write"); err != nil {
+		return domain.Device{}, "", err
+	}
 	if reportInterval != 0 && reportInterval != 60 && reportInterval != 300 {
 		return domain.Device{}, "", domain.ErrInvalidRange
 	}
@@ -677,6 +712,9 @@ func (s *Service) MoveDevice(ctx context.Context, deviceNo string, pondID int64)
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "devices", "write"); err != nil {
+		return err
+	}
 	var id int64
 	var disabled *time.Time
 	q := `SELECT d.id,d.disabled_at FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
@@ -718,6 +756,9 @@ func (s *Service) MoveDevice(ctx context.Context, deviceNo string, pondID int64)
 }
 
 func (s *Service) DeleteDevice(ctx context.Context, deviceNo string) error {
+	if err := s.authorizeTenantWriteNow(ctx, "devices", "write"); err != nil {
+		return err
+	}
 	q := `UPDATE devices d SET disabled_at=coalesce(d.disabled_at,now()),status='offline',session_version=session_version+1 FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE d.pond_id=p.id AND d.device_no=$1`
 	args := []any{deviceNo}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
@@ -762,6 +803,9 @@ func (s *Service) ListRules(ctx context.Context) ([]domain.AlarmRule, error) {
 }
 
 func (s *Service) CreateRule(ctx context.Context, rule domain.AlarmRule) (domain.AlarmRule, error) {
+	if err := s.authorizeTenantWriteNow(ctx, "alarm_rules", "write"); err != nil {
+		return domain.AlarmRule{}, err
+	}
 	if err := validateRule(rule); err != nil {
 		return domain.AlarmRule{}, err
 	}
@@ -785,6 +829,9 @@ func (s *Service) CreateRule(ctx context.Context, rule domain.AlarmRule) (domain
 }
 
 func (s *Service) UpdateRule(ctx context.Context, rule domain.AlarmRule) error {
+	if err := s.authorizeTenantWriteNow(ctx, "alarm_rules", "write"); err != nil {
+		return err
+	}
 	if err := validateRule(rule); err != nil {
 		return err
 	}
@@ -802,6 +849,9 @@ func (s *Service) UpdateRule(ctx context.Context, rule domain.AlarmRule) error {
 }
 
 func (s *Service) DeleteRule(ctx context.Context, id int64) error {
+	if err := s.authorizeTenantWriteNow(ctx, "alarm_rules", "write"); err != nil {
+		return err
+	}
 	q := `DELETE FROM alarm_rules r USING ponds p JOIN farms f ON f.id=p.farm_id WHERE r.id=$1 AND r.pond_id=p.id`
 	args := []any{id}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {

@@ -111,6 +111,9 @@ func (s *Service) SetTenantActive(ctx context.Context, tenantID int64, active bo
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "tenant_members", "write"); err != nil {
+		return err
+	}
 	ct, err := tx.Exec(ctx, `UPDATE tenants SET active=$2,permission_version=permission_version+1 WHERE id=$1`, tenantID, active)
 	if err != nil {
 		return err
@@ -166,6 +169,9 @@ func (s *Service) SetTenantMember(ctx context.Context, tenantID, userID int64, r
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorizeTenantWrite(ctx, tx, "tenant_members", "write"); err != nil {
+		return err
+	}
 	var exists bool
 	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM tenants WHERE id=$1)`, tenantID).Scan(&exists); err != nil {
 		return err
