@@ -1,6 +1,6 @@
 # M6b live write authorization final candidate
 
-This receipt covers the M6b R36.a/R37.a authorization-boundary correction at source `4c63d4199430dc08bea98837358615664a3bff95`. The checked web submodule is `e84092326d9979e066c611e2be8eb6b9736e09f3`.
+This receipt covers the M6b R36.a/R37.a authorization-boundary correction at source `45f473f0cbbf0b9a123448286bd847531d3a6484`. The checked web submodule is `e84092326d9979e066c611e2be8eb6b9736e09f3`.
 
 ## Environment
 
