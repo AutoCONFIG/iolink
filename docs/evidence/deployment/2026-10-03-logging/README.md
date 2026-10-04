@@ -3,7 +3,8 @@
 User-requested additional deployment milestone, 2026-10-03; related boundaries R04/R29.
 Behavior source: `e1b78e12d9dea3c1f60412fce1bcdaa0adb33b0e`.
 Published frontend gitlink: `c54237e9d1a424bc9cb0b3f700014e2e966cf2cc`.
-This receipt adds evidence and status only; dual review is pending on the resulting frozen snapshot.
+The frozen snapshot received two independent approvals: gate review
+`.omo/evidence/logging-gate-review.md` and code review `code-review.md`.
 
 Environment: Docker 29.8.2, Compose 5.5.1, PostgreSQL 16.15, TimescaleDB 2.30.2.
 Exact image digest is in `logs/database-image.log`. All database tests used a fresh
