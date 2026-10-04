@@ -32,6 +32,7 @@ type fakeStore struct {
 	imports          []license.Envelope
 	rejections       [][]byte
 	registerErr      error
+	restoreErr       error
 }
 
 func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.User, error) {
@@ -93,6 +94,9 @@ func (f *fakeStore) DeleteDevice(_ context.Context, no string) error {
 	return nil
 }
 func (f *fakeStore) RestoreDevice(_ context.Context, no string) error {
+	if f.restoreErr != nil {
+		return f.restoreErr
+	}
 	if _, ok := f.devices[no]; !ok {
 		return domain.ErrNotFound
 	}
@@ -573,6 +577,55 @@ func TestRegisterDeviceMapsLicenseErrors(t *testing.T) {
 			}
 			if resp.StatusCode != tt.code || got["error"] != strings.TrimSuffix(strings.TrimPrefix(tt.body, `{"error":"`), `"}`) {
 				t.Fatalf("status=%d body=%v want status=%d body=%s", resp.StatusCode, got, tt.code, tt.body)
+			}
+		})
+	}
+}
+
+func TestRestoreDeviceMapsLicenseErrors(t *testing.T) {
+	hash := platform.HashPassword("admin123")
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tt := range []struct {
+		name string
+		err  error
+		code int
+		body string
+	}{
+		{name: "success", code: http.StatusNoContent},
+		{name: "not found", err: domain.ErrNotFound, code: http.StatusNotFound, body: `{"error":"not_found"}`},
+		{name: "required", err: license.ErrRequired, code: http.StatusForbidden, body: `{"error":"license_required"}`},
+		{name: "quota", err: license.ErrQuotaExceeded, code: http.StatusForbidden, body: `{"error":"device_quota_exceeded"}`},
+		{name: "unavailable", err: license.ErrUnavailable, code: http.StatusServiceUnavailable, body: `{"error":"license_unavailable"}`},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			store := &fakeStore{admin: &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "ADMIN"}, devices: map[string]domain.Device{"dev-restore": {DeviceNo: "dev-restore"}}, rules: map[int64]domain.AlarmRule{}, restoreErr: tt.err}
+			ts := httptest.NewServer(New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: store, Policy: policy}).Routes())
+			defer ts.Close()
+			token := adminLogin(t, ts)
+			req, err := http.NewRequest(http.MethodPost, ts.URL+"/admin/v1/devices/dev-restore/restore", nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			req.Header.Set("Authorization", "Bearer "+token)
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode != tt.code {
+				t.Fatalf("status=%d want=%d", resp.StatusCode, tt.code)
+			}
+			if tt.body != "" {
+				var got map[string]string
+				if err := json.NewDecoder(resp.Body).Decode(&got); err != nil {
+					t.Fatal(err)
+				}
+				if got["error"] != strings.TrimSuffix(strings.TrimPrefix(tt.body, `{"error":"`), `"}`) {
+					t.Fatalf("body=%v want=%s", got, tt.body)
+				}
 			}
 		})
 	}
