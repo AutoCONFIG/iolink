@@ -15,9 +15,20 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type ProductStore struct{ pool *pgxpool.Pool }
+type ProductStore struct {
+	pool   *pgxpool.Pool
+	policy domain.PermissionPolicy
+}
 
 func NewProductStore(pool *pgxpool.Pool) *ProductStore { return &ProductStore{pool: pool} }
+
+func NewProductStoreWithPolicy(pool *pgxpool.Pool, policy domain.PermissionPolicy) *ProductStore {
+	return &ProductStore{pool: pool, policy: policy}
+}
+
+func (s *ProductStore) authorize(ctx context.Context, tx pgx.Tx, resource string) error {
+	return AuthorizeTenantWrite(ctx, tx, s.policy, resource, "write")
+}
 
 func (s *ProductStore) DefaultTenantID(ctx context.Context) (int64, error) {
 	var id int64
@@ -152,6 +163,9 @@ func (s *ProductStore) CreateProduct(ctx context.Context, tenantID int64, name s
 		return domain.Product{}, err
 	}
 	defer tx.Rollback(ctx)
+	if err = s.authorize(ctx, tx, "products"); err != nil {
+		return domain.Product{}, err
+	}
 	if err = activeTenant(ctx, tx, tenantID); err != nil {
 		return domain.Product{}, err
 	}
@@ -211,6 +225,9 @@ func (s *ProductStore) CreateProductModel(ctx context.Context, tenantID, product
 		return domain.ProductModel{}, err
 	}
 	defer tx.Rollback(ctx)
+	if err := s.authorize(ctx, tx, "products"); err != nil {
+		return domain.ProductModel{}, err
+	}
 	if err = activeTenant(ctx, tx, tenantID); err != nil {
 		return domain.ProductModel{}, err
 	}
@@ -243,6 +260,9 @@ func (s *ProductStore) PublishProductModel(ctx context.Context, tenantID, produc
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err = s.authorize(ctx, tx, "products"); err != nil {
+		return err
+	}
 	if err = activeTenant(ctx, tx, tenantID); err != nil {
 		return err
 	}
@@ -338,6 +358,12 @@ func (s *ProductStore) AssignDeviceProductByActor(ctx context.Context, tenantID 
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if err = AuthorizeTenantTarget(ctx, tenantID, actorID); err != nil {
+		return err
+	}
+	if err = s.authorize(ctx, tx, "devices"); err != nil {
+		return err
+	}
 	if err = activeTenant(ctx, tx, tenantID); err != nil {
 		return err
 	}

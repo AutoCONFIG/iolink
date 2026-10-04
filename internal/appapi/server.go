@@ -342,6 +342,7 @@ func (s *Server) authRequired(c *gin.Context) {
 		requestContext := iolinkcontractsdomain.WithTenantID(c.Request.Context(), int64(tenantRaw))
 		requestContext = iolinkcontractsdomain.WithTenantRole(requestContext, role)
 		requestContext = iolinkcontractsdomain.WithTenantUserID(requestContext, int64(uid))
+		requestContext = iolinkcontractsdomain.WithTenantPermissionVersion(requestContext, int64(membershipRaw))
 		c.Request = c.Request.WithContext(requestContext)
 	}
 	c.Next()

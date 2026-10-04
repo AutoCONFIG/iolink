@@ -341,6 +341,10 @@ func (s *Server) createFarm(c *gin.Context) {
 	}
 	f, err := s.deps.Store.CreateFarm(c.Request.Context(), req.OwnerID, req.Name, req.Location)
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "owner not found"})
 			return
@@ -370,6 +374,10 @@ func (s *Server) setFarmOwner(c *gin.Context) {
 		err = s.deps.Store.SetFarmOwner(c.Request.Context(), id, req.OwnerID)
 	}
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "farm or user not found"})
 			return
@@ -392,6 +400,10 @@ func (s *Server) updateFarm(c *gin.Context) {
 		return
 	}
 	if err := s.deps.Store.UpdateFarm(c.Request.Context(), id, req.Name, req.Location); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
 			return
@@ -409,6 +421,10 @@ func (s *Server) deleteFarm(c *gin.Context) {
 		return
 	}
 	if err := s.deps.Store.DeleteFarm(c.Request.Context(), id); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrFarmHasPonds) {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
@@ -567,6 +583,10 @@ func (s *Server) createPond(c *gin.Context) {
 	}
 	p, err := s.deps.Store.CreatePond(c.Request.Context(), req.FarmID, req.Name, req.AreaMu)
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
 			return
@@ -589,6 +609,10 @@ func (s *Server) updatePond(c *gin.Context) {
 		return
 	}
 	if err := s.deps.Store.UpdatePond(c.Request.Context(), id, req.Name, req.AreaMu); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
 			return
@@ -606,6 +630,10 @@ func (s *Server) deletePond(c *gin.Context) {
 		return
 	}
 	if err := s.deps.Store.DeletePond(c.Request.Context(), id); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrPondHasDevices) {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
@@ -638,6 +666,10 @@ func (s *Server) registerDevice(c *gin.Context) {
 	}
 	dev, secret, err := s.deps.Store.RegisterDevice(c.Request.Context(), req.PondID, req.Name, req.Model, req.ReportInterval)
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrInvalidRange) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "report_interval must be 60 or 300"})
 			return
@@ -733,6 +765,10 @@ func (s *Server) moveDevice(c *gin.Context) {
 		return
 	}
 	if err := s.deps.Store.MoveDevice(c.Request.Context(), c.Param("device_no"), pondID.PondID); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "device or pond not found"})
 			return
@@ -750,6 +786,10 @@ func (s *Server) moveDevice(c *gin.Context) {
 func (s *Server) deleteDevice(c *gin.Context) {
 	no := c.Param("device_no")
 	if err := s.deps.Store.DeleteDevice(c.Request.Context(), no); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
 			return
@@ -827,6 +867,10 @@ func (s *Server) createRule(c *gin.Context) {
 	}
 	rule, err := s.deps.Store.CreateRule(c.Request.Context(), req.toDomain())
 	if err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrConflict) {
 			c.JSON(http.StatusConflict, gin.H{"error": "rule already exists"})
 			return
@@ -859,6 +903,10 @@ func (s *Server) updateRule(c *gin.Context) {
 	rule := req.toDomain()
 	rule.ID = id
 	if err := s.deps.Store.UpdateRule(c.Request.Context(), rule); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrConflict) {
 			c.JSON(http.StatusConflict, gin.H{"error": "rule already exists"})
 			return
@@ -880,6 +928,10 @@ func (s *Server) deleteRule(c *gin.Context) {
 		return
 	}
 	if err := s.deps.Store.DeleteRule(c.Request.Context(), id); err != nil {
+		if errors.Is(err, domain.ErrForbidden) {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
 		if errors.Is(err, domain.ErrNotFound) {
 			c.Status(http.StatusNoContent)
 			return

@@ -31,7 +31,11 @@ func TestM6bTenantMembershipVersionAndRevocation(t *testing.T) {
 	if _, err := p.Exec(ctx, `INSERT INTO farm_memberships(tenant_id,farm_id,user_id,role) VALUES (601,601,603,'member')`); err != nil {
 		t.Fatal(err)
 	}
-	svc, err := corepkg.New(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	svc, err := corepkg.NewWithPolicy(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)), policy)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,6 +62,9 @@ func TestM6bTenantMembershipVersionAndRevocation(t *testing.T) {
 	if _, err := svc.TenantMembershipVersion(ctx, 601, 601); err == nil {
 		t.Fatal("inactive membership accepted")
 	}
+	if _, err := p.Exec(ctx, `UPDATE tenant_memberships SET active=true WHERE tenant_id=601 AND user_id=601`); err != nil {
+		t.Fatal(err)
+	}
 	if err := svc.SetTenantMember(ctx, 602, 601, "viewer", true, nil, 601); err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +84,8 @@ func TestM6bTenantMembershipVersionAndRevocation(t *testing.T) {
 	if err := svc.SetFarmOwner(domain.WithTenantID(ctx, 601), 601, ptr(604)); !errors.Is(err, domain.ErrNotFound) {
 		t.Fatalf("cross-tenant owner assignment err=%v", err)
 	}
-	if err := svc.SetFarmOwner(domain.WithTenantID(ctx, 601), 601, ptr(603)); err != nil {
+	adminCtx := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(ctx, 601), "admin"), 601)
+	if err := svc.SetFarmOwner(adminCtx, 601, ptr(603)); err != nil {
 		t.Fatal(err)
 	}
 	supportCtx := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(ctx, 601), "support"), 603)
@@ -154,7 +162,7 @@ func TestM6bTenantMembershipVersionAndRevocation(t *testing.T) {
 	if err != nil || len(assignedPonds) != 1 || assignedPonds[0].ID != 601 {
 		t.Fatalf("assigned farm ponds=%+v err=%v", assignedPonds, err)
 	}
-	device, secret, err := svc.RegisterDevice(domain.WithTenantID(ctx, 601), 601, "m6b-device", "water", 60)
+	device, secret, err := svc.RegisterDevice(adminCtx, 601, "m6b-device", "water", 60)
 	if err != nil {
 		t.Fatal(err)
 	}

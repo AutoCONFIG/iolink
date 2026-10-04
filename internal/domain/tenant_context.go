@@ -6,9 +6,10 @@ import (
 )
 
 type (
-	tenantContextKey     struct{}
-	tenantRoleContextKey struct{}
-	tenantUserContextKey struct{}
+	tenantContextKey        struct{}
+	tenantRoleContextKey    struct{}
+	tenantUserContextKey    struct{}
+	tenantVersionContextKey struct{}
 )
 
 type PermissionPolicy interface {
@@ -40,6 +41,19 @@ func WithTenantUserID(ctx context.Context, userID int64) context.Context {
 func TenantUserID(ctx context.Context) (int64, bool) {
 	id, ok := ctx.Value(tenantUserContextKey{}).(int64)
 	return id, ok && id > 0
+}
+
+func HasTenantScope(ctx context.Context) bool {
+	return ctx.Value(tenantContextKey{}) != nil || ctx.Value(tenantRoleContextKey{}) != nil || ctx.Value(tenantUserContextKey{}) != nil || ctx.Value(tenantVersionContextKey{}) != nil
+}
+
+func WithTenantPermissionVersion(ctx context.Context, version int64) context.Context {
+	return context.WithValue(ctx, tenantVersionContextKey{}, version)
+}
+
+func TenantPermissionVersion(ctx context.Context) (int64, bool) {
+	version, ok := ctx.Value(tenantVersionContextKey{}).(int64)
+	return version, ok
 }
 
 type TenantMembership struct {

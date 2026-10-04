@@ -85,7 +85,8 @@ func TestM6bLegacyPlatformOwnerBusinessBoundary(t *testing.T) {
 	if err := svc.SetTenantMember(ctx, tenantID, 9201, "support", true, &expiry, 9202); err != nil {
 		t.Fatal(err)
 	}
-	if err := svc.SetFarmMember(domain.WithTenantID(ctx, tenantID), 9202, 9201, "support", true, &expiry, 9202); err != nil {
+	ownerCtx := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(ctx, tenantID), "owner"), 9202)
+	if err := svc.SetFarmMember(ownerCtx, 9202, 9201, "support", true, &expiry, 9202); err != nil {
 		t.Fatal(err)
 	}
 	token := ownerLogin(t, server.URL, "legacy-platform")

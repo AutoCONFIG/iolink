@@ -280,6 +280,9 @@ func (s *Server) authRequired(c *gin.Context) {
 	}
 	platformAdmin := admin.Authority == "ADMIN"
 	c.Set("platform_admin", platformAdmin)
+	if platformAdmin {
+		c.Request = c.Request.WithContext(domain.WithPlatformActor(c.Request.Context(), domain.PlatformActor{ID: int64(aid), TokenVersion: current}))
+	}
 	if tenants, ok := s.deps.Store.(adminTenantStore); ok {
 		tenantRaw, tenantOK := claims["tenant_id"].(float64)
 		membershipRaw, membershipOK := claims["tenant_ver"].(float64)
@@ -316,6 +319,7 @@ func (s *Server) authRequired(c *gin.Context) {
 			return
 		}
 		requestContext := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(c.Request.Context(), int64(tenantRaw)), role), int64(aid))
+		requestContext = domain.WithTenantPermissionVersion(requestContext, int64(membershipRaw))
 		c.Set("tenant_id", int64(tenantRaw))
 		c.Request = c.Request.WithContext(requestContext)
 	}
