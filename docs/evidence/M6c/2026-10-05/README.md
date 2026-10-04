@@ -4,8 +4,8 @@
 
 ## 快照与环境
 
-- 运行源码：`333fc427a4cd9c49715193176993c1e1827dedc6`。
-- 测试配置候选：`67199df37f2979bfa8130d9917271ffc5c624340`，相对运行源码只更新 web gitlink。
+- 运行源码：M6c runtime `333fc427a4cd9c49715193176993c1e1827dedc6`；当前发布快照 `ec89218`（完整 SHA 在 Git 记录中）。
+- 测试配置候选：`67199df37f2979bfa8130d9917271ffc5c624340`，随后 `ec89218` 只修复 License-first 锁顺序与 restore 安全错误映射。
 - web：`0aa7771acf0ef6322c9ac1e4c9839616646bb675`；运行构建使用 `0f3869c0c813bcb906b05eb52c9983e4b148db4f`，二者差异仅为默认 Playwright 配置排除专用生产模式测试，产品源码相同。
 - 本索引提交另加入 M6c 架构门禁支持、测试、manifest 修正和证据；不改变运行代码。
 - Linux amd64，Go 1.26.8、Node 24.21.0、npm 11.19.0、Docker 29.8.2、Compose 5.6.0。
@@ -16,15 +16,15 @@
 
 | 需求/场景 | 已执行命令或操作 | 结果与保留产物 |
 |---|---|---|
-| Go 全库、签名解析与密钥边界 | `TMPDIR="$PWD/.tmp" make verify` | PASS，[完整日志](m6c-verify-final.log)。未设置 DSN 的集成跳过不计通过，真实 DB 由下一行覆盖；真实 8193 位负面密钥、45KiB 与 2048/4096/8192 位签发均覆盖 |
-| R38/R39.a/首启真实事务与并发 | 设置隔离 DSN 后 `go test -race -shuffle=on ./cmd/iolinkd ./internal/migrate ./internal/core ./internal/notifications ./internal/persistence ./internal/platform ./internal/wechat -count=1` | 七包 PASS，[日志](m6c-integration-final.log)；含 latch 持久化、锁内时钟重验、单连接池、原始文件拒绝审计及错误传播、无 CLI 在线状态副作用 |
+| Go 全库、签名解析与密钥边界 | `TMPDIR="$PWD/.tmp" make verify` | PASS，[原始日志](m6c-verify-final.log)；最终快照复跑 PASS，[ec89218 日志](m6c-verify-ec89218.log)。未设置 DSN 的集成跳过不计通过，真实 DB 由下一行覆盖 |
+| R38/R39.a/首启真实事务与并发 | 设置隔离 DSN 后 `go test -race -shuffle=on ./cmd/iolinkd ./internal/migrate ./internal/core ./internal/notifications ./internal/persistence ./internal/platform ./internal/wechat -count=1` | 原始七包 PASS；锁顺序/错误映射修复后的最终快照复跑 PASS，[日志](m6c-integration-ec89218.log) |
 | signed-only 011 schema 回归 | 设置隔离 DSN 后运行 License/admission/restore/setup focused tests | PASS，[日志](m6c-focused-new-schema.log)；命令选择见测试源码，完整包级运行以上一行为准 |
 | 版本契约 | `make docs-tools`、`make verify-contracts` | PASS，[依赖日志](m6c-docs-tools.log)、[契约日志](m6c-contracts.log)：57 操作、284 合成 fixture，非全部真实接口验收 |
 | 前端类型与业务回归 | `npm test --prefix web`、`npm run build --prefix web` | 28 测试 PASS，[测试](m6c-web-tests.log)、[构建](m6c-web-build.log)；现有 bundle size / Zod 注释警告保留 |
 | License UI 正向/错误/权限/状态 | `cd web && npx playwright test --config playwright.m6c.config.ts` | 11 场景 PASS，[日志](m6c-browser.log)、[39 张截图](browser/)；375/768/1440 宽度、无溢出。使用生产预览与 wire fixture，不能冒充真实数据库联调 |
 | 既有页面回归 | `cd web && npx playwright test` | 16 场景 PASS，[日志](m6c-web-existing-e2e.log)，默认 demo 配置与 M6c 实 API 模式分开 |
 | 集成镜像 | `docker build --label org.opencontainers.image.revision=333fc427a4cd9c49715193176993c1e1827dedc6 -t local/iolinkd:m6c-333fc42 .` | PASS，[日志](m6c-docker-final.log)，同时包含后端与编译后的 web |
-| 架构脚本 | `python3 scripts/check_architecture_manifests.py --all`、`python3 -m pytest scripts/test_check_architecture_manifests.py -q` | manifest PASS，30 测试 PASS，[测试日志](architecture-tests.log)；M6c gate 当前预期阻塞，[门禁日志](architecture-gate.log)，等待双审后登记 |
+| 架构脚本 | `python3 scripts/check_architecture_manifests.py --all`、`python3 -m pytest scripts/test_check_architecture_manifests.py -q` | manifest PASS，30 测试 PASS，[最终测试日志](architecture-tests-ec89218.log)；M6c gate 当前预期阻塞，[门禁日志](architecture-gate.log)，等待双审后登记 |
 
 ## 实际离线链路
 
