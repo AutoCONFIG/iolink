@@ -12,4 +12,6 @@ if test ! -f .env; then
   . ./images/refs.env
   printf 'IOLINKD_IMAGE=%s\nIOLINK_DB_IMAGE=%s\nIOLINK_PG_PASSWORD=%s\nIOLINK_SECRET_KEY=%s\n' "$IOLINKD_IMAGE" "$IOLINK_DB_IMAGE" "$(od -An -N24 -tx1 /dev/urandom | tr -d ' \n')" "$(od -An -N48 -tx1 /dev/urandom | tr -d ' \n')" >.env
 fi
-docker compose --env-file .env -f deploy/docker-compose.yaml up -d --wait
+docker compose --env-file .env -f deploy/docker-compose.yaml up -d --wait db
+docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd migrate up
+docker compose --env-file .env -f deploy/docker-compose.yaml up -d --pull never --wait iolinkd
