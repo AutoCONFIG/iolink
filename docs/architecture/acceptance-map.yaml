@@ -45,8 +45,8 @@ provider_operations:
   - {id: R35, provider: postgres-timescale, operation: compatibility_projection, required_level: L4, status: passed, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R35/README.md}
   - {id: R36, provider: postgres-timescale, operation: tenant_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R36/README.md}
   - {id: R37, provider: postgres-timescale, operation: rbac_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R37/README.md}
-  - {id: R38, provider: [postgres-timescale, embedded-http], operation: license_verification, required_level: L4, status: not_run, command: "go test -race -shuffle=on ./internal/license ./internal/core ./internal/adminapi ./cmd/license-sign ./cmd/iolinkd -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
-  - {id: R39, provider: [postgres-timescale, embedded-http], operation: feature_quota_guards_R39a, required_level: L4, status: not_run, command: "go test -race -shuffle=on ./internal/core -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
+  - {id: R38, provider: [postgres-timescale, embedded-http], operation: license_verification, required_level: L4, status: passed, command: "go test -race -shuffle=on ./internal/license ./internal/core ./internal/adminapi ./cmd/license-sign ./cmd/iolinkd -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
+  - {id: R39, provider: [postgres-timescale, embedded-http], operation: feature_quota_guards_R39a, required_level: L4, status: passed, command: "go test -race -shuffle=on ./internal/core -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
   - {id: R40, provider: [postgres-timescale, embedded-http], operation: offline_install, required_level: L4, status: external_blocked, command: "sh scripts/build-offline-bundle.sh .tmp/offline-bundle; .tmp/offline-bundle/install.sh", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
   - {id: R41, provider: embedded-http, operation: open_api_keys, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R42, provider: embedded-http, operation: signed_requests_and_rate_limits, required_level: L4, status: not_run, command: "go test ./internal/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
@@ -402,16 +402,16 @@ requirements:
     owner: 10
     provider: software
     required_level: software
-    software_status: not_run
+    software_status: passed
     external_status: not_applicable
-    verification: "make verify; real Timescale integration; signed-state HTTP/CLI and browser evidence in docs/evidence/M6c/2026-10-05/; dual approval pending"
+    verification: "make verify; real Timescale integration; signed-state HTTP/CLI and browser evidence in docs/evidence/M6c/2026-10-05/; same-source 8ad5505 dual approval recorded"
     evidence: docs/evidence/acceptance/R38/
   - id: R39
     wave: M6c
     owner: 10
     provider: software
     required_level: software
-    software_status: not_run
+    software_status: passed
     external_status: not_applicable
     verification: "real Timescale concurrent admission/restore and all signed features through production guard/fake executor (R39.a); R39.b real future entry points remain pending"
     evidence: docs/evidence/acceptance/R39/
@@ -420,7 +420,7 @@ requirements:
     owner: 10
     provider: software+external
     required_level: software_and_external
-    software_status: not_run
+    software_status: passed
     external_status: blocked
     verification: "isolated internal Docker network: fresh stop, resumable signed install and simulator telemetry; external: actual issuer and clean disconnected customer x86_64 host within 30 minutes remain blocked"
     evidence: docs/evidence/acceptance/R40/

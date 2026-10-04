@@ -1,0 +1,9 @@
+A	docs/evidence/M6c/2026-10-05/adminapi-restore-regression.log
+M	internal/adminapi/server_test.go
+M	docs/evidence/M6c/2026-10-05/README.md
+A	docs/evidence/M6c/2026-10-05/adminapi-restore-regression.log
+A	docs/evidence/M6c/2026-10-05/architecture-manifests-ec89218.log
+A	docs/evidence/M6c/2026-10-05/architecture-tests-ec89218.log
+A	docs/evidence/M6c/2026-10-05/m6c-integration-ec89218.log
+A	docs/evidence/M6c/2026-10-05/m6c-verify-ec89218.log
+M	internal/adminapi/server_test.go

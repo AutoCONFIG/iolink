@@ -1,10 +1,20 @@
 # M6c 固定源码与软件验证
 
-日期：2026-10-05（Asia/Shanghai）。当前为候选，尚未取得最终快照双审。
+日期：2026-10-05（Asia/Shanghai）。最终软件快照 `8ad550552d56f061222cd1ff53226000003c703e` 已获两位独立审阅者明确批准。
+
+## 双审收据
+
+| 独立审阅 | 同一源码快照 | 结论 | 报告 |
+|---|---|---|---|
+| quality final | `8ad550552d56f061222cd1ff53226000003c703e` | APPROVE，无阻断 | [完整报告](reviews/m6c-quality-final-8ad5505.md) |
+| acceptance final | `8ad550552d56f061222cd1ff53226000003c703e` | APPROVE，无阻断 | [完整报告](reviews/m6c-acceptance-final-8ad5505.md) |
+
+两位均未参与实现，独立锁定工作树；web 同为 `0aa7771acf0ef6322c9ac1e4c9839616646bb675`。报告中 `/tmp/` 证据的归档副本保存在本目录 `reviews/`，保持原文。后续只登记收据/状态，不改产品、测试源码或范围。
+最终 adminapi race 回归见 [日志](adminapi-restore-regression.log)，两审各自的九类 restore 结果检查见 reviews 日志。此前 af20fcc 一审 REJECT，阻断已修复，不沿用其批准。
 
 ## 快照与环境
 
-- 运行源码：M6c runtime `333fc427a4cd9c49715193176993c1e1827dedc6`；当前发布快照 `ec89218`（完整 SHA 在 Git 记录中）。
+- 运行镜像源码：`333fc427a4cd9c49715193176993c1e1827dedc6`；最终软件快照 `8ad550552d56f061222cd1ff53226000003c703e`。镜像证据不冒充后续锁顺序修复的同镜像执行；CLI/安装/签名/UI 源码未受该修复影响，受影响的注册/恢复由最终源码真实 DB/HTTP 回归及双审覆盖。
 - 测试配置候选：`67199df37f2979bfa8130d9917271ffc5c624340`，随后 `ec89218` 只修复 License-first 锁顺序与 restore 安全错误映射。
 - web：`0aa7771acf0ef6322c9ac1e4c9839616646bb675`；运行构建使用 `0f3869c0c813bcb906b05eb52c9983e4b148db4f`，二者差异仅为默认 Playwright 配置排除专用生产模式测试，产品源码相同。
 - 本索引提交另加入 M6c 架构门禁支持、测试、manifest 修正和证据；不改变运行代码。
@@ -50,4 +60,4 @@ OS/数据库内部软件未做完整许可证扫描，镜像由 manifest 标识�
 - 实际签发方授权包、干净客户断网 x86_64 主机 30 分钟首启：`external_blocked`。隔离容器安装仅为软件链路证据。
 - ARM64 未构建或验收；当前离线包限定 linux/amd64。
 - 真微信、实体设备及后续可选功能入口未验收。R39.a 为当前配额和共享生产 guard + fake executor；R39.b 随真实功能阶段验证。
-- 最终两位独立审阅者须针对同一快照明确批准后，才能把 M6c 软件阶段登记完成。
+- M6c 软件同快照双审已通过；本目录中 architecture-gate.log 保留审阅前阻塞结果，最终门禁结果另存 architecture-gate-approved.log。
