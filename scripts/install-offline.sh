@@ -32,8 +32,10 @@ fi
 umask 077
 docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps -T iolinkd setup init <"$IOLINK_SETUP_INPUT"
 docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd setup status
-if test -n "${IOLINK_LICENSE_INPUT:-}"; then
-  docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps -T iolinkd license import <"$IOLINK_LICENSE_INPUT"
+if test -z "${IOLINK_LICENSE_INPUT:-}" || test ! -f "$IOLINK_LICENSE_INPUT"; then
+  echo 'set IOLINK_LICENSE_INPUT to a protected License envelope; installation stops before serving' >&2
+  exit 3
 fi
+docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps -T iolinkd license import <"$IOLINK_LICENSE_INPUT"
 docker compose --env-file .env -f deploy/docker-compose.yaml up -d --pull never --wait iolinkd
 ./smoke.sh

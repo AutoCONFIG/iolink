@@ -98,7 +98,7 @@ chmod 600 setup-input.json
 IOLINK_SETUP_INPUT=$PWD/setup-input.json ./install.sh
 ```
 
-脚本会先校验所有 SHA-256，再 `docker load`、启动数据库、运行 `migrate up`、执行同一事务内的 `setup init`、显示 `setup status`，最后启动应用并检查 `/healthz` 与 `/readyz`。签发方提供 License 时，把 envelope 保存到受限文件并同时设置 `IOLINK_LICENSE_INPUT`；没有 License 时安装在授权步骤前停止，不会启动未完成首启的服务。`./uninstall.sh` 默认只停止并移除容器，保留数据库卷；删除数据必须显式执行 Compose 的 `down -v`。
+脚本会先校验所有 SHA-256，再 `docker load`、启动数据库、运行 `migrate up`、执行同一事务内的 `setup init`、显示 `setup status`，导入 License 后才启动应用并检查 `/healthz` 与 `/readyz`。签发方提供 License 时，把 envelope 保存到受限文件并同时设置 `IOLINK_LICENSE_INPUT`；缺少 License 时安装在授权步骤停止，不会启动未完成首启的服务。`./uninstall.sh` 默认只停止并移除容器，保留数据库卷；删除数据必须显式执行 Compose 的 `down -v`。
 
 离线 Compose 使用 `pull_policy: never` 和内部网络；`deploy/reverse-proxy.optional.yaml` 与 `deploy/streaming.optional.yaml` 目前明确标记为 `optional_unimplemented`，不能当作已交付的视频或反代服务。
 
