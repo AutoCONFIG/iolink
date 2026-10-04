@@ -57,11 +57,11 @@ func printFailure(stderr io.Writer, err error) {
 
 func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
-		fmt.Fprintln(stdout, "iolinkd [serve | migrate up | migrate status | migrate adopt-legacy | admin init USER | admin reset-password USER]\nAdmin commands read a new password from redirected stdin, never argv. Back up before adopt-legacy or upgrades.")
+		fmt.Fprintln(stdout, "iolinkd [serve | migrate up | migrate status | migrate adopt-legacy | admin init USER | admin reset-password USER | setup status | setup init | license import]\nSetup and admin commands read protected JSON/password input from stdin, never argv. Back up before adopt-legacy or upgrades.")
 		return nil
 	}
 	serving := len(args) == 0 || (len(args) == 1 && args[0] == "serve")
-	valid := serving || (len(args) == 2 && args[0] == "migrate" && (args[1] == "up" || args[1] == "status" || args[1] == "adopt-legacy")) || (len(args) == 3 && args[0] == "admin" && (args[1] == "init" || args[1] == "reset-password"))
+	valid := serving || (len(args) == 2 && args[0] == "migrate" && (args[1] == "up" || args[1] == "status" || args[1] == "adopt-legacy")) || (len(args) == 3 && args[0] == "admin" && (args[1] == "init" || args[1] == "reset-password")) || (len(args) == 2 && args[0] == "setup" && (args[1] == "status" || args[1] == "init")) || (len(args) == 2 && args[0] == "license" && args[1] == "import")
 	if !valid {
 		return &startupError{errors.New("unknown command; use iolinkd --help")}
 	}
@@ -120,6 +120,59 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 		}
 		if err := migrate.CheckLatest(cmdCtx, pool); err != nil {
 			return err
+		}
+		if args[0] == "setup" && args[1] == "status" {
+			status, err := platform.SetupStatusJSON(cmdCtx, pool)
+			if err != nil {
+				return err
+			}
+			_, err = stdout.Write(append(status, '\n'))
+			return err
+		}
+		if args[0] == "setup" && args[1] == "init" {
+			if f, ok := stdin.(*os.File); ok {
+				if st, e := f.Stat(); e == nil && st.Mode()&os.ModeCharDevice != 0 {
+					return errors.New("redirect setup JSON from a protected file on stdin")
+				}
+			}
+			var input platform.SetupInput
+			decoder := json.NewDecoder(io.LimitReader(stdin, 4097))
+			decoder.DisallowUnknownFields()
+			if err := decoder.Decode(&input); err != nil {
+				return errors.New("invalid setup JSON")
+			}
+			return platform.SetupInit(cmdCtx, pool, input)
+		}
+		if args[0] == "license" && args[1] == "import" {
+			if cfg.LicensePublicKeyFile == "" || cfg.LicenseKeyID == "" {
+				return errors.New("license verification configuration unavailable")
+			}
+			rawKey, err := os.ReadFile(cfg.LicensePublicKeyFile)
+			if err != nil {
+				return errors.New("license public key unavailable")
+			}
+			publicKey, err := license.ParsePublicKey(string(rawKey))
+			if err != nil {
+				return errors.New("license public key invalid")
+			}
+			raw, err := io.ReadAll(io.LimitReader(stdin, license.MaxEnvelopeBytes+1))
+			if err != nil || len(raw) > license.MaxEnvelopeBytes {
+				return errors.New("license input exceeds 64 KiB")
+			}
+			envelope, err := license.ParseEnvelope(raw)
+			if err != nil {
+				return errors.New("license input invalid")
+			}
+			svc, err := core.New(cmdCtx, pool, log)
+			if err != nil {
+				return err
+			}
+			svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: publicKey, KeyID: cfg.LicenseKeyID})
+			var actorID int64
+			if err := pool.QueryRow(cmdCtx, `SELECT id FROM users WHERE authority='ADMIN' ORDER BY id LIMIT 1`).Scan(&actorID); err != nil {
+				return errors.New("platform administrator unavailable")
+			}
+			return svc.ImportLicense(cmdCtx, envelope, actorID)
 		}
 		if f, ok := stdin.(*os.File); ok {
 			if st, e := f.Stat(); e == nil && st.Mode()&os.ModeCharDevice != 0 {

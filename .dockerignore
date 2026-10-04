@@ -8,6 +8,7 @@ web/.playwright
 web/test-results
 web/playwright-report
 tmp
+.tmp
 .omo
 docs/evidence
 deploy/.env

@@ -150,15 +150,15 @@ func (s *Service) ImportLicense(ctx context.Context, envelope license.Envelope, 
 		_ = s.recordLicenseRejection(ctx, envelope, actorID, reason)
 		return cause
 	}
-	var deployment string
-	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE FOR UPDATE`).Scan(&deployment); err != nil {
-		return fmt.Errorf("license deployment: %w", err)
-	}
 	if err := observeLicenseClock(ctx, tx); err != nil {
 		if errors.Is(err, license.ErrClockError) {
 			return reject("license_clock_error", err)
 		}
 		return err
+	}
+	var deployment string
+	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE FOR UPDATE`).Scan(&deployment); err != nil {
+		return fmt.Errorf("license deployment: %w", err)
 	}
 	verified, err := license.Verify(envelope, s.license.PublicKey)
 	if err != nil {
