@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${IOLINK_PG_PASSWORD:?set IOLINK_PG_PASSWORD in .env}
       POSTGRES_DB: iolink
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U iolink -d iolink"]
       interval: 5s
@@ -18,7 +18,7 @@ services:
       driver: json-file
       options: {max-size: "10m", max-file: "3"}
 
-  iolink:
+  iolinkd:
     image: ${IOLINKD_IMAGE:-ghcr.io/autoconfig/iolink:latest}
     pull_policy: always
     restart: unless-stopped
@@ -60,3 +60,6 @@ services:
 networks:
   default:
     name: iolink-net
+
+volumes:
+  pgdata:
