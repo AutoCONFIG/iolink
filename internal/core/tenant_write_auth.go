@@ -24,15 +24,3 @@ func (s *Service) beginTenantWrite(ctx context.Context, resource string) (pgx.Tx
 	}
 	return tx, nil
 }
-
-func (s *Service) authorizeTenantWriteNow(ctx context.Context, resource, action string) error {
-	tx, err := s.pool.Begin(ctx)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback(ctx)
-	if err := s.authorizeTenantWrite(ctx, tx, resource, action); err != nil {
-		return err
-	}
-	return tx.Commit(ctx)
-}
