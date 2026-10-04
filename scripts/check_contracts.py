@@ -87,7 +87,7 @@ def main():
             assert checker.is_valid(dict(base, max_value=9))
         counts.append(count)
         print(f'{path.relative_to(ROOT)}: standard schema and {count} operation fixtures PASS')
-    assert sorted(counts) == [15, 38], counts
+    assert sorted(counts) == [3, 15, 38], counts
     print(f'{sum(counts)} target operations, {samples} synthetic request/response fixtures PASS; live handler verification is R02.c')
 
 if __name__ == '__main__':

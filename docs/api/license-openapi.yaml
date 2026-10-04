@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: IoLink License API
+  version: 1.0.0
+  description: |
+    M6c 管理授权契约。运行时只接受签名授权文件，不接收或保存签发私钥。
+    POST 导入失败时必须保留当前有效授权；所有摘要只使用 SHA-256 十六进制值。
+servers:
+  - url: http://localhost:8080/admin/v1
+security:
+  - BearerAuth: []
+paths:
+  /license:
+    get:
+      summary: 查询当前授权状态
+      responses:
+        '200':
+          description: 当前状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LicenseStatus'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    post:
+      summary: 导入签名授权文件
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicenseEnvelope'
+      responses:
+        '204': { description: 导入成功 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /devices/{device_no}/restore:
+    post:
+      summary: 恢复停用设备（租户管理员，事务配额校验）
+      parameters:
+        - { name: device_no, in: path, required: true, schema: { type: string, minLength: 1, maxLength: 64 } }
+      responses:
+        '204': { description: 成功，重复恢复幂等 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+components:
+  securitySchemes:
+    BearerAuth: { type: http, scheme: bearer }
+  schemas:
+    LicenseEnvelope:
+      type: object
+      required: [payload_b64, signature_b64]
+      additionalProperties: false
+      properties:
+        payload_b64: { type: string, minLength: 1 }
+        signature_b64: { type: string, minLength: 1 }
+    LicenseStatus:
+      type: object
+      required: [state, deployment_id, license_id, key_id, issued_at, not_before, expires_at, max_devices, features, used_devices, overage, payload_sha256]
+      additionalProperties: false
+      properties:
+        state: { type: string, enum: [missing, valid, permanent, not_before, expired, invalid, instance_mismatch, clock_error, overage] }
+        license_id: { type: string, nullable: true }
+        deployment_id: { type: string, nullable: true }
+        key_id: { type: string, nullable: true }
+        issued_at: { type: string, format: date-time, nullable: true }
+        not_before: { type: string, format: date-time, nullable: true }
+        expires_at: { type: string, format: date-time, nullable: true }
+        max_devices: { type: integer, minimum: 0 }
+        features:
+          type: array
+          items: { type: string, enum: [video, openapi, automation, reports] }
+        used_devices: { type: integer, minimum: 0 }
+        overage: { type: integer, minimum: 0 }
+        payload_sha256: { type: string, pattern: '^[0-9a-f]{64}$', nullable: true }
+  responses:
+    BadRequest:
+      description: 请求或授权文件无效
+    Unauthorized:
+      description: 未认证
+    Conflict:
+      description: 当前授权状态不允许替换
+    Forbidden:
+      description: 当前主体无操作权限或 License/额度拒绝
+    NotFound:
+      description: 设备不存在或不属于当前租户
+    Unavailable:
+      description: 授权验证能力不可用
