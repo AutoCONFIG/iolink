@@ -40,6 +40,9 @@ func appFarmConfirmScope(ctx context.Context, farm string, userArg int) string {
 	default:
 		roleScope = "false"
 	}
+	if version, present := domain.TenantPermissionVersion(ctx); present {
+		roleScope += fmt.Sprintf(" AND permission_version=%d", version)
+	}
 	return appFarmScope(ctx, farm, userArg) + fmt.Sprintf(` AND EXISTS (
  SELECT 1 FROM tenant_memberships WHERE tenant_id=%s.tenant_id AND user_id=$%d AND %s)`, farm, userArg, roleScope)
 }

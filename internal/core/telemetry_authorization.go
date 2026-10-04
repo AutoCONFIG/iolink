@@ -21,11 +21,12 @@ func (r *telemetryRepo) authorizeTelemetryWrite(ctx context.Context, tx pgx.Tx, 
 		return domain.ErrForbidden
 	}
 	var role string
-	err := tx.QueryRow(ctx, `SELECT tm.role FROM tenant_memberships tm
+	var version int64
+	err := tx.QueryRow(ctx, `SELECT tm.role,tm.permission_version FROM tenant_memberships tm
  JOIN tenants t ON t.id=tm.tenant_id AND t.active
  JOIN users u ON u.id=tm.user_id AND u.authority='USER'
  WHERE tm.tenant_id=$1 AND tm.user_id=$2 AND tm.active
- AND (tm.expires_at IS NULL OR tm.expires_at>now()) FOR SHARE OF tm,t,u`, tenantID, userID).Scan(&role)
+ AND (tm.expires_at IS NULL OR tm.expires_at>now()) FOR SHARE OF tm,t,u`, tenantID, userID).Scan(&role, &version)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return domain.ErrForbidden
 	}
@@ -33,6 +34,9 @@ func (r *telemetryRepo) authorizeTelemetryWrite(ctx context.Context, tx pgx.Tx, 
 		return fmt.Errorf("load telemetry write membership: %w", err)
 	}
 	if claimedRole != role {
+		return domain.ErrForbidden
+	}
+	if claimedVersion, present := domain.TenantPermissionVersion(ctx); present && claimedVersion != version {
 		return domain.ErrForbidden
 	}
 	allowed, err := r.policy.Allow(role, "telemetry", "write")

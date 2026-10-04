@@ -949,7 +949,7 @@ func (s *Service) ListAllAlarms(ctx context.Context, limit int) ([]domain.Alarm,
 }
 
 func (s *Service) ConfirmAlarm(ctx context.Context, id int64) error {
-	if domain.TenantRole(ctx) != "" {
+	if domain.HasTenantScope(ctx) {
 		actorID, _ := domain.TenantUserID(ctx)
 		return s.ConfirmAlarmByActor(ctx, id, actorID)
 	}
@@ -982,14 +982,14 @@ func (s *Service) ConfirmAlarm(ctx context.Context, id int64) error {
 func (s *Service) ConfirmAlarmByActor(ctx context.Context, id, actorID int64) error {
 	_, scoped := domain.TenantID(ctx)
 	contextActor, actorOK := domain.TenantUserID(ctx)
-	if !scoped || !actorOK || actorID <= 0 || contextActor != actorID {
+	if !scoped || !actorOK || actorID <= 0 || contextActor != actorID || domain.TenantRole(ctx) == "" {
 		return domain.ErrForbidden
 	}
 	return (&alarmRepo{s.pool}).ConfirmByUser(ctx, id, actorID)
 }
 
 func (s *Service) BatchConfirm(ctx context.Context, ids []int64) (int64, error) {
-	if role := domain.TenantRole(ctx); role != "" {
+	if domain.HasTenantScope(ctx) {
 		actorID, _ := domain.TenantUserID(ctx)
 		return s.BatchConfirmByActor(ctx, ids, actorID)
 	}

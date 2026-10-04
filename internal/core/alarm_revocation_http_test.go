@@ -38,7 +38,7 @@ func (p *revokeBeforeConfirm) Allow(role, resource, action string) (bool, error)
 
 func TestM6bAlarmHTTPRejectsRevocationAfterAuthentication(t *testing.T) {
 	for _, operation := range []string{"batch", "singular"} {
-		for _, change := range []string{"role", "membership", "tenant", "platform_authority"} {
+		for _, change := range []string{"role", "membership", "tenant", "platform_authority", "permission_version"} {
 			t.Run(operation+"_"+change, func(t *testing.T) {
 				f := newTelemetryPermissionFixture(t)
 				seedAppScopeReadings(t, f)
@@ -55,6 +55,7 @@ func TestM6bAlarmHTTPRejectsRevocationAfterAuthentication(t *testing.T) {
 					"membership":         `UPDATE tenant_memberships SET active=false,permission_version=permission_version+1 WHERE tenant_id=9401 AND user_id=9402`,
 					"tenant":             `UPDATE tenants SET active=false WHERE id=9401`,
 					"platform_authority": `UPDATE users SET authority='ADMIN' WHERE id=9402`,
+					"permission_version": `UPDATE tenant_memberships SET permission_version=permission_version+1 WHERE tenant_id=9401 AND user_id=9402`,
 				}[change]
 				policy, err := authorization.New()
 				if err != nil {
