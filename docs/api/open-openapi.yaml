@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: IOLink Open API
+  version: 0.0.10
+  description: Third party API authenticated with per-tenant HMAC API keys.
+servers:
+  - url: /
+security:
+  - OpenSignature: []
+paths:
+  /open/v1/ponds:
+    get:
+      summary: List ponds in the API key resource set
+      responses:
+        '200': {description: Ponds}
+        '401': {description: "Invalid signature, timestamp, or nonce"}
+        '403': {description: "Scope missing"}
+  /open/v1/devices:
+    get:
+      summary: List devices in the API key resource set
+      responses:
+        '200': {description: Devices}
+        '401': {description: "Invalid signature, timestamp, or nonce"}
+        '403': {description: "Scope missing"}
+  /open/v1/alarms:
+    get:
+      summary: List alarms in the API key resource set
+      responses:
+        '200': {description: Alarms}
+        '401': {description: "Invalid signature, timestamp, or nonce"}
+        '403': {description: "Scope missing"}
+components:
+  schemas: {}
+  securitySchemes:
+    OpenSignature:
+      type: apiKey
+      in: header
+      name: X-Signature
+      description: |-
+        Send X-Key-Id, X-Timestamp, X-Nonce and lowercase hex X-Signature.
+        Sign METHOD, raw path, RFC3986 sorted query, timestamp, nonce and
+        lowercase SHA-256 body hash joined by LF without a trailing LF.
+x-signature-vector:
+  method: GET
+  path: /open/v1/ponds
+  query: a=&a=hello%20world&b=one&b=two
+  timestamp: 1735689600
+  nonce: 0123456789abcdef0123456789abcdef
+  body_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  signing_key: documented-test-secret
+  signature: bcf8386ae0789327c5a6597a81eaa2f3121565d045012796e7e22bdba2a43149

@@ -27,6 +27,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
 	"git.hyhy.fun/rsplab/iolink/internal/notifications"
 	"git.hyhy.fun/rsplab/iolink/internal/observability"
+	"git.hyhy.fun/rsplab/iolink/internal/openapi"
 	"git.hyhy.fun/rsplab/iolink/internal/operations"
 	"git.hyhy.fun/rsplab/iolink/internal/persistence"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
@@ -222,6 +223,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	if err != nil {
 		return err
 	}
+	svc.SetAPIKeyRoot([]byte(cfg.SecretKey))
 	if err := svc.ObserveLicenseClock(ctx); err != nil && !errors.Is(err, license.ErrClockError) {
 		return err
 	}
@@ -276,7 +278,8 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	admin := adminapi.New(adminapi.Config{
 		SecretKey: cfg.SecretKey,
 		JWT:       12 * time.Hour,
-	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy, Logger: log})
+	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy, Logger: log, APIKeys: svc})
+	open := openapi.New(openapi.Deps{Auth: svc, Resources: svc})
 
 	// --- appapi: /api/v1 for the mini program, backed by core repos ---
 	api := appapi.New(appapi.Config{
@@ -320,6 +323,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	root.Handle("/readyz", health.Readyz())
 	root.Handle("/metrics", promhttp.Handler())
 	root.Handle("/admin/v1/", admin.Routes())
+	root.Handle("/open/v1/", open.Routes())
 	adminFS, err := web.Admin()
 	if err != nil {
 		return err

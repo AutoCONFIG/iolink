@@ -101,6 +101,14 @@ type Deps struct {
 	Telemetry domain.TelemetryRepo // optional; enables pond latest readings
 	Catalog   ProductCatalog
 	Policy    domain.PermissionPolicy
+	APIKeys   APIKeyAdminStore
+}
+
+type APIKeyAdminStore interface {
+	IssueAPIKey(context.Context, int64, string, []string, domain.APIKeyResourceScope, int64) (domain.APIKey, string, error)
+	ListAPIKeys(context.Context, int64, int64) ([]domain.APIKey, error)
+	RotateAPIKey(context.Context, int64, int64, string) (domain.APIKey, string, error)
+	RevokeAPIKey(context.Context, int64, int64, string) error
 }
 
 type ProductCatalog interface {
@@ -177,6 +185,10 @@ func (s *Server) Routes() http.Handler {
 		tenantAuth.POST("/alarms/batch-confirm", s.batchConfirm)
 
 		tenantAuth.GET("/stats", s.stats)
+		tenantAuth.GET("/api-keys", s.listAPIKeys)
+		tenantAuth.POST("/api-keys", s.createAPIKey)
+		tenantAuth.POST("/api-keys/:key_id/rotate", s.rotateAPIKey)
+		tenantAuth.POST("/api-keys/:key_id/revoke", s.revokeAPIKey)
 		tenantAuth.GET("/products", s.listProducts)
 		tenantAuth.POST("/products", s.createProduct)
 		tenantAuth.GET("/products/:product_id/models", s.listProductModels)

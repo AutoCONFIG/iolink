@@ -1,0 +1,117 @@
+package adminapi
+
+import (
+	"errors"
+	"net/http"
+	"strings"
+
+	"github.com/gin-gonic/gin"
+
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
+)
+
+type apiKeyCreateRequest struct {
+	Name      string                     `json:"name" binding:"required"`
+	Scopes    []string                   `json:"scopes" binding:"required"`
+	Resources domain.APIKeyResourceScope `json:"resources"`
+}
+
+func (s *Server) apiKeyStore(c *gin.Context) (APIKeyAdminStore, bool) {
+	if s.deps.APIKeys == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "api key management unavailable"})
+		return nil, false
+	}
+	return s.deps.APIKeys, true
+}
+
+func (s *Server) apiKeyTenant(c *gin.Context) (int64, bool) {
+	tenantID, ok := domain.TenantID(c.Request.Context())
+	if !ok {
+		c.JSON(http.StatusForbidden, gin.H{"error": "tenant context required"})
+		return 0, false
+	}
+	return tenantID, true
+}
+
+func apiKeyError(c *gin.Context, err error) {
+	switch {
+	case errors.Is(err, domain.ErrForbidden):
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+	case errors.Is(err, domain.ErrNotFound):
+		c.JSON(http.StatusNotFound, gin.H{"error": "api key not found"})
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
+	}
+}
+
+func (s *Server) listAPIKeys(c *gin.Context) {
+	store, ok := s.apiKeyStore(c)
+	if !ok {
+		return
+	}
+	tenantID, ok := s.apiKeyTenant(c)
+	if !ok {
+		return
+	}
+	keys, err := store.ListAPIKeys(c.Request.Context(), tenantID, aid(c))
+	if err != nil {
+		apiKeyError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, keys)
+}
+
+func (s *Server) createAPIKey(c *gin.Context) {
+	store, ok := s.apiKeyStore(c)
+	if !ok {
+		return
+	}
+	tenantID, ok := s.apiKeyTenant(c)
+	if !ok {
+		return
+	}
+	var req apiKeyCreateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
+		return
+	}
+	key, secret, err := store.IssueAPIKey(c.Request.Context(), tenantID, strings.TrimSpace(req.Name), req.Scopes, req.Resources, aid(c))
+	if err != nil {
+		apiKeyError(c, err)
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"key": key, "secret": secret})
+}
+
+func (s *Server) rotateAPIKey(c *gin.Context) {
+	store, ok := s.apiKeyStore(c)
+	if !ok {
+		return
+	}
+	tenantID, ok := s.apiKeyTenant(c)
+	if !ok {
+		return
+	}
+	key, secret, err := store.RotateAPIKey(c.Request.Context(), tenantID, aid(c), c.Param("key_id"))
+	if err != nil {
+		apiKeyError(c, err)
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"key": key, "secret": secret})
+}
+
+func (s *Server) revokeAPIKey(c *gin.Context) {
+	store, ok := s.apiKeyStore(c)
+	if !ok {
+		return
+	}
+	tenantID, ok := s.apiKeyTenant(c)
+	if !ok {
+		return
+	}
+	if err := store.RevokeAPIKey(c.Request.Context(), tenantID, aid(c), c.Param("key_id")); err != nil {
+		apiKeyError(c, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}

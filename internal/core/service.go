@@ -27,9 +27,12 @@ type Service struct {
 	policy          domain.PermissionPolicy
 	defaultInterval time.Duration
 	license         *LicenseRuntime
+	apiKeyRoot      []byte
 }
 
 func (s *Service) SetLicenseRuntime(runtime *LicenseRuntime) { s.license = runtime }
+
+func (s *Service) SetAPIKeyRoot(secret []byte) { s.apiKeyRoot = append([]byte(nil), secret...) }
 
 func New(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger, interval ...time.Duration) (*Service, error) {
 	return NewWithPolicy(ctx, pool, log, nil, interval...)

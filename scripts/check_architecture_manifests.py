@@ -166,7 +166,7 @@ def validate_manifests() -> list[str]:
     source = acceptance.get("source")
     if not isinstance(source, str) or not (ROOT / source).is_file(): errors.append(f"acceptance-map.yaml: source document does not exist: {source!r}")
     scope = acceptance.get("gate_scope")
-    expected_scope = {"M0": ["R01", "R03", "R04"], "M5": ["R28", "R29", "R30", "R31", "R32", "R33"], "M6a": ["R34", "R35"], "M6b": ["R36", "R37"], "M6c": ["R38", "R39", "R40"]}
+    expected_scope = {"M0": ["R01", "R03", "R04"], "M5": ["R28", "R29", "R30", "R31", "R32", "R33"], "M6a": ["R34", "R35"], "M6b": ["R36", "R37"], "M6c": ["R38", "R39", "R40"], "M6d": ["R41", "R42"]}
     if not isinstance(scope, dict) or scope != expected_scope: errors.append("acceptance-map.yaml: gate_scope must match PLAN.md stage exit requirements")
 
     operation_matrix = acceptance.get("provider_operations")
@@ -350,7 +350,7 @@ def has_file_evidence(relative: str) -> bool:
 def main() -> int:
     parser = ArgumentParser(description=__doc__)
     parser.add_argument("--all", action="store_true", help="validate all manifests")
-    parser.add_argument("--gate", choices=["M0", "M5", "M6a", "M6b", "M6c"], help="evaluate recorded stage acceptance")
+    parser.add_argument("--gate", choices=["M0", "M5", "M6a", "M6b", "M6c", "M6d"], help="evaluate recorded stage acceptance")
     args = parser.parse_args()
     errors = validate_manifests()
     if errors:
