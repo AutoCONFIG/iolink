@@ -80,6 +80,9 @@ func CanonicalOpenPath(path string) (string, error) {
 }
 
 func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, now time.Time) (domain.OpenPrincipal, error) {
+	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
+		return domain.OpenPrincipal{}, err
+	}
 	if len(s.apiKeyRoot) < 32 || req.KeyID == "" || req.Timestamp == 0 || len(req.Nonce) < 16 || req.Signature == "" {
 		return domain.OpenPrincipal{}, ErrOpenUnauthorized
 	}
@@ -141,17 +144,11 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 	if err := tx.QueryRow(ctx, `SELECT rate_tokens,rate_last_refill FROM api_keys WHERE key_id=$1 FOR UPDATE`, req.KeyID).Scan(&tokens, &last); err != nil {
 		return domain.OpenPrincipal{}, fmt.Errorf("load open rate: %w", err)
 	}
-	elapsed := now.Sub(last).Seconds()
-	if elapsed > 0 {
-		tokens += elapsed
-		if tokens > 10 {
-			tokens = 10
-		}
+	remaining, retryAfter := consumeOpenRate(tokens, last, now)
+	if retryAfter > 0 {
+		return domain.OpenPrincipal{}, &OpenRateLimitError{RetryAfter: retryAfter}
 	}
-	if tokens < 1 {
-		return domain.OpenPrincipal{}, &OpenRateLimitError{RetryAfter: 1}
-	}
-	tokens--
+	tokens = remaining
 	if _, err := tx.Exec(ctx, `UPDATE api_keys SET rate_tokens=$2,rate_last_refill=$3 WHERE key_id=$1`, req.KeyID, tokens, now); err != nil {
 		return domain.OpenPrincipal{}, fmt.Errorf("update open rate: %w", err)
 	}
@@ -163,6 +160,24 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 		return domain.OpenPrincipal{}, ErrOpenUnauthorized
 	}
 	return domain.OpenPrincipal{KeyID: req.KeyID, TenantID: tenantID, Scopes: scopes, Resources: resources}, nil
+}
+
+func consumeOpenRate(tokens float64, last, now time.Time) (float64, int) {
+	elapsed := now.Sub(last).Seconds()
+	if elapsed > 0 {
+		tokens += elapsed
+		if tokens > 10 {
+			tokens = 10
+		}
+	}
+	if tokens < 1 {
+		wait := int((1 - tokens) + 0.999999)
+		if wait < 1 {
+			wait = 1
+		}
+		return tokens, wait
+	}
+	return tokens - 1, 0
 }
 
 func rfc3986(value string) string {

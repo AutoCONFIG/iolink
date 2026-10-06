@@ -109,6 +109,7 @@ type APIKeyAdminStore interface {
 	ListAPIKeys(context.Context, int64, int64) ([]domain.APIKey, error)
 	RotateAPIKey(context.Context, int64, int64, string) (domain.APIKey, string, error)
 	RevokeAPIKey(context.Context, int64, int64, string) error
+	ListAPIKeyAuditEvents(context.Context, int64, int64, int) ([]domain.APIKeyAuditEvent, error)
 }
 
 type ProductCatalog interface {
@@ -186,6 +187,7 @@ func (s *Server) Routes() http.Handler {
 
 		tenantAuth.GET("/stats", s.stats)
 		tenantAuth.GET("/api-keys", s.listAPIKeys)
+		tenantAuth.GET("/api-keys/audit", s.listAPIKeyAudit)
 		tenantAuth.POST("/api-keys", s.createAPIKey)
 		tenantAuth.POST("/api-keys/:key_id/rotate", s.rotateAPIKey)
 		tenantAuth.POST("/api-keys/:key_id/revoke", s.revokeAPIKey)

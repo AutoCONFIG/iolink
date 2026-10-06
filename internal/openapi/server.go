@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"git.hyhy.fun/rsplab/iolink/internal/operations"
 )
 
@@ -61,6 +62,10 @@ func (s *Server) authenticate(c *gin.Context) {
 		if errors.As(err, &rate) {
 			c.Header("Retry-After", strconv.Itoa(rate.RetryAfterValue()))
 			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "rate_limited"})
+			return
+		}
+		if errors.Is(err, license.ErrUnavailable) || errors.Is(err, license.ErrRequired) || errors.Is(err, license.ErrFeatureDenied) || errors.Is(err, license.ErrClockError) {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "feature_unavailable"})
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {

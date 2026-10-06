@@ -1,5 +1,76 @@
 # 当前实现状态与证据
 
+## TODO 总览（2026-10-06 核对）
+
+当前推进位置：**TODO 10 / M6d（R41–R42）正在进行**。本地 source
+`724f02cf162de496714e4efdc8a72c8cbb6a6486`、web
+`dbce8a5bba548c4762abac8c15a61132da8b8b24` 是初版实现，不是已验收发布。
+最新已发布里程碑仍为 M6c / `v0.0.9`。
+
+本节是对已有证据的状态整理，不是重新运行验收。下方旧表、计划勾选和历史证据
+中的待审措辞存在滞后；有冲突时使用本节列出的范围和最终收据定位，不将旧勾选
+当成完成依据。历史软件通过只覆盖其被审快照，不认证后续修改或全部外部链路。
+
+五类状态：
+
+- **已完成已核验**：对应软件范围有执行证据及两位独立批准；外部范围另列。
+- **已完成待核验**：实现和已有测试可查，但该项真实环境验收或收据核对未完成。
+- **正在进行**：实现或验收仍在推进，不能登记完成。
+- **待完成已调研**：已有针对具体缺口的调查/审阅记录，仍需实现或闭环。
+- **待完成未调研**：有需求设计，但未找到该阶段的专项技术调研、契约冻结与执行证据。
+
+### 主清单
+
+| 位置 | 内容 | 状态 | 范围、缺口及定位 |
+|---|---|---|---|
+| TODO 1 | 项目指南、范围冻结、provider/验收映射 | 已完成已核验 | 指南与静态检查范围；[证据](evidence/rebuild/foundation-guidance.txt)，收据 `.omo/evidence/todo1-review-e-code-review.md`、`todo1-gate-review-c.md`；不代表 R01/R02 全部发布验收通过 |
+| TODO 2 | 领域规则、窄 ports、依赖边界与不变量 | 已完成已核验 | [证据](evidence/rebuild/contracts.txt)，收据 `.omo/evidence/todo2-review-f-code-review.md`、`todo2-gate-review-e.md` |
+| TODO 3 / M0 | PostgreSQL/Timescale 底座、迁移、事务、审计 | 已完成已核验 | 历史最终软件候选双审批准；[证据](evidence/rebuild/postgres-timescale.txt)，收据 `.omo/evidence/todo3-final-code-review-v3.md`、`todo3-final-gate-review-v3.md`；旧计划未勾选须对账 |
+| TODO 4 / M1 | MQTT 身份/ACL、采集、影子、历史、报警与 outbox | 已完成已核验 | 真实 DB/MQTT 软件链；[证据](evidence/rebuild/mqtt-ingestion.txt)，双审 `.omo/evidence/todo4-independent-{code,gate}-review.md`，同 manifest `d0dc8a9c…`；真实硬件另验 |
+| TODO 5 / M2 | 登录、归属转移、资源 API 与授权 | 已完成已核验 | [证据](evidence/rebuild/ownership-api.txt)，双审 `.omo/evidence/todo5-independent-{code,gate}-review.md`，同 manifest `c4a1c98e…`；微信真实用户流程另验 |
+| TODO 6 | 通知事务意图、持久 outbox、重试/租约与微信适配器 | 已完成已核验 | 软件范围；[证据](evidence/rebuild/notifications.txt)，双审 `.omo/evidence/todo6-independent-{code,gate}-review.md`，同 manifest `ef5bf5cf…`；微信实发另验 |
+| TODO 7 / M3 | 管理后台、生产构建与集成前端 | 已完成已核验 | 被审版本浏览器范围；[证据](evidence/rebuild/admin-frontend.txt)，双审 `.omo/evidence/todo7-independent-{code,gate}-review.md`，同 manifest `ed8887f0…`；后续新增页各阶段另验 |
+| TODO 8 / M4 | 小程序六页、登录、订阅及 API 集成 | 待完成已调研 | 适配器/测试/构建已有；`.omo/evidence/todo8-independent-gate-review.md` 最后追加的 final-tree re-review 仍 REJECT；`web-mini/src/pages/AlarmsPage.vue` 仍为静态页面，订阅授权未接入；[证据](evidence/rebuild/m4-mini-program.txt)及旧勾选需重新闭环，不能仅列作外部阻塞 |
+| TODO 9 / M5 | 健康、指标、停机、备份恢复、TLS/容量/CI 基础 | 已完成已核验 | 软件范围；[证据](evidence/rebuild/m5-operations.txt)、[gate](evidence/rebuild/gates/M5.json)，批准 `.omo/evidence/todo9-independent-code-review.md`、`todo9-final-gate-review.md`；公网 TLS、大规模演练及远端 CI另列 |
+| TODO 10a / M6a | 产品/物模型版本、通用遥测、兼容投影 | 已完成已核验 | R34–R35；[R34](evidence/acceptance/R34/README.md)、[R35](evidence/acceptance/R35/README.md)明确最终工作树双审通过 |
+| TODO 10b / M6b | 多租户、成员/RBAC、撤权与当前资源隔离 | 已完成已核验 | R36.a/R37.a；同候选 `0335438` 双审；[最终证据](evidence/acceptance/R37/2026-10-04-version-revocation/README.md)、[gate](evidence/rebuild/gates/M6b.json)；未来资源随其阶段另验 |
+| TODO 10c / M6c | License、配额/功能守卫、离线包与安装恢复 | 已完成已核验 | R38/R39.a/R40 软件范围；`8ad5505` 同快照双审、发布 v0.0.9；[证据](evidence/M6c/2026-10-05/README.md)；实际签发方/客户安装及 R39.b另列 |
+| **TODO 10d / M6d** | **开放 Key、签名、重放、限流与后台** | **正在进行** | R41–R42；本地初版已提交；[初步记录](evidence/M6d/2026-10-05/README.md)不构成完整验收。需补权限/License、资源配置与日志页、完整契约、并发/重启/错误测试、真实 HTTP/浏览器及同快照双审；审阅调用遭遇 API429/中断，无批准 |
+| TODO 11a / M7a | RTSP/GB28181、媒体接入、播放鉴权及双端播放 | 待完成未调研 | R43；已有 [M7需求](EXTENSIONS.md)，未找到专项媒体接入/部署契约与阶段执行证据；需摄像机/GB参数/端口/微信真机 |
+| TODO 11b / M7b | 坐标/腾讯地图、双端定位与只读大屏 | 待完成未调研 | R44–R45；有设计，尚无阶段实施调研证据；需权限过滤、WGS84/GCJ-02对照、断网/无Key状态、20屏刷新性能 |
+| TODO 12a / M8a | 持久命令、回执、TTL、取消、幂等及周期调整 | 待完成未调研 | R46；有状态设计，待冻结命令接口和 worker/固件能力契约；模拟与真实硬件分别验收 |
+| TODO 12b / M8b | HTTP签名上报、TCP网关桥接、Modbus TCP/RTU、子设备 | 待完成未调研 | R47–R49；有范围设计，待设备/寄存器/桥接专项调查与协议契约；写操作依赖 M8a |
+| TODO 12c / M8c | HTTP/MQTT转发、cron、场景联动与调试台 | 待完成未调研 | R50–R53；有重试/租约/时区/防环设计，待专项执行方案与实现；依赖 M8a/M8b |
+| TODO 12d / M8d | CSV/XLSX异步导出、日报、下载鉴权及清理 | 待完成未调研 | R54；有100万行/公式安全/5分钟下载/7天清理需求，待导出实现与SQL对账设计；日报依赖 M8c |
+| TODO 13 / R55 | 同版本全量验收、缺陷关闭、手册与交付包审计 | 待完成未调研 | 有验收清单，尚无最终发布候选审计；前置所有软件及适用外部验收。F1–F4见下表 |
+
+“未调研”指本次未找到阶段专项调研证据；不表示没有需求设计。M7/M8详细内容仍以
+[EXTENSIONS](EXTENSIONS.md)及[ACCEPTANCE](ACCEPTANCE.md)为准，不在此改变范围。
+
+### 补充 TODO 与遗留验收
+
+| 位置 | 内容 | 状态 | 下一步与依据 |
+|---|---|---|---|
+| S1 | 服务器/开发两份 Compose、latest-pg16 | 已完成已核验 | 用户免双审；隔离构建/首启/重启通过；[证据](evidence/deployment/2026-10-03-compose/) |
+| S2 | JSON日志转储、轮转、关联ID、脱敏及健康状态 | 已完成已核验 | 双审都批准 `1bc74b8`，验证 source `e1b78e1`；[证据](evidence/deployment/2026-10-03-logging/README.md)、`code-review.md`及 `.omo/evidence/logging-gate-review.md`；下方旧“待双审”已过时 |
+| V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 已完成待核验 | 实现/历史批准已存在，文档同步尚未完整核对：TODO 3未勾、TODO 8有拒绝、R36/R37 manifest仍not_run、旧 Dxx仍待审；不得直接批量改 passed |
+| V2 | 微信真实登录、订阅、通知及用户归属流程 | 已完成待核验 | 仅指已有服务端/适配器软件；真实凭据、资质、用户/真机为 external_blocked；小程序页面缺口另属 TODO 8 |
+| V3 | 实际签发方License导入/续期与客户离线安装 | 已完成待核验 | 已有工具/软件链；真实签发方、干净断网x86_64客户主机30分钟安装及ARM64证据待提供 |
+| V4 | 公网TLS/网络暴露、100GiB恢复、发布中断、长时容量 | 已完成待核验 | 已有脚本/模板/软件烟测；真实主机、证书、恢复介质及24小时500设备/90天fixture演练为 external_blocked |
+| V5 | 现有采集固件的实际值对照与断线恢复 | 已完成待核验 | 已有MQTT/DB软件证据；真实设备验收 external_blocked，后续控制/网关硬件功能还需开发 |
+| V6 | 远端CI运行与当前发布版本产物核对 | 已完成待核验 | CI配置存在，不能把本地命令当远端CI通过；保留用户未提交 `.github/workflows/ci.yml` 改动 |
+| X1 | R36.b/R37.b/R39.b 后续资源权限、执行撤权和License复验 | 待完成已调研 | 跨阶段规则已明确；Key/播放/命令/jobs/下载的真实入口按 M6d–M8d分别实现验收 |
+| D12/D13/D15/D16/D17 | 平台owner边界、遥测角色、支持到期时区/精度、租户管理员资源范围 | 已完成已核验 | 已纳入 M6b `0335438` 同候选批准；[gate](evidence/rebuild/gates/M6b.json)明确列出 fixed_defects；旧计划未勾需同步 |
+| D14 | M6b证据归档与同快照批准绑定 | 已完成待核验 | gate和批准文件已存在，但manifest及旧表仍不同步；纳入 V1，完成对账后关闭 |
+| D01–D11 | 历史构建/迁移/API/报警/通知/运维缺陷登记 | 已完成待核验 | 多项已有阶段修复与批准；逐项核对最终关闭证据，适用外部部分保留阻塞；不沿用旧表来推断当前代码缺陷 |
+| F1 | 全量范围、Rxx归属、provider与证据追溯审计 | 待完成未调研 | TODO 13最终发布快照审计，现有manifest检查不代替该轮核验 |
+| F2 | 最终架构/代码质量、安全与依赖边界审计 | 待完成未调研 | TODO 13，待全部功能完成后冻结候选执行 |
+| F3 | 最终完整软件/真实链路/前端及适用外部QA | 待完成未调研 | TODO 13，必须重新绑定最终版本，不能拼接不同版本的passed |
+| F4 | 最终范围、发布产物、手册与恢复流程一致性审计 | 待完成未调研 | TODO 13，和F1–F3汇总至R55；适用外部未通过不能称全部完成 |
+
+推荐下一步：先关闭 V1 的状态冲突及 TODO 8 的已知软件缺口，完成 M6d 的全面验收和
+同快照双审，再进入 M7/M8。此前“剩8阶段”仅统计 M6d–R55 路线，不含这些补项。
+
 附加部署里程碑：统一服务器 `deploy/docker-compose.yaml` 与源码构建覆盖
 `deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，并发布至 v0.0.6；用户明确免除该配置变更的双审。
 数据库追踪 `timescale/timescaledb:latest-pg16`，启动时拉取。证据见 [Compose](evidence/deployment/2026-10-03-compose/)。

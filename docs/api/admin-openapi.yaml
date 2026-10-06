@@ -1104,6 +1104,23 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '500': { $ref: '#/components/responses/InternalError' }
+  /api-keys/audit:
+    get:
+      tags: [auth]
+      summary: API Key 操作日志
+      description: 只返回签发、轮换、撤销动作及其资源标识；不会返回 secret、签名原文或请求体。
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/APIKeyAuditEvent' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
 components:
   securitySchemes:
     BearerAuth:
@@ -1705,4 +1722,16 @@ components:
         role: { type: string, enum: [owner, admin, member, viewer, support] }
         active: { type: boolean }
         expires_at: { type: string, format: date-time, nullable: true }
+      additionalProperties: false
+    APIKeyAuditEvent:
+      type: object
+      required: [id, tenant_id, action, resource_id, metadata, created_at]
+      properties:
+        id: { type: integer, format: int64 }
+        tenant_id: { type: integer, format: int64 }
+        actor_id: { type: integer, format: int64, nullable: true }
+        action: { type: string, enum: [api_key.issued, api_key.rotated, api_key.revoked] }
+        resource_id: { type: string }
+        metadata: { type: object, additionalProperties: true }
+        created_at: { type: string, format: date-time }
       additionalProperties: false

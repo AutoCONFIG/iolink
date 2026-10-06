@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type APIKeyResourceScope struct {
 	FarmIDs   []int64  `json:"farm_ids,omitempty"`
@@ -9,13 +12,23 @@ type APIKeyResourceScope struct {
 }
 
 type APIKey struct {
-	KeyID      string             `json:"key_id"`
-	TenantID   int64              `json:"tenant_id"`
-	Name       string             `json:"name"`
-	Scopes     []string           `json:"scopes"`
-	Resources  APIKeyResourceScope `json:"resources"`
-	CreatedAt  time.Time          `json:"created_at"`
-	RevokedAt  *time.Time         `json:"revoked_at,omitempty"`
+	KeyID     string              `json:"key_id"`
+	TenantID  int64               `json:"tenant_id"`
+	Name      string              `json:"name"`
+	Scopes    []string            `json:"scopes"`
+	Resources APIKeyResourceScope `json:"resources"`
+	CreatedAt time.Time           `json:"created_at"`
+	RevokedAt *time.Time          `json:"revoked_at,omitempty"`
+}
+
+type APIKeyAuditEvent struct {
+	ID         int64           `json:"id"`
+	TenantID   int64           `json:"tenant_id"`
+	ActorID    *int64          `json:"actor_id,omitempty"`
+	Action     string          `json:"action"`
+	ResourceID string          `json:"resource_id"`
+	Metadata   json.RawMessage `json:"metadata"`
+	CreatedAt  time.Time       `json:"created_at"`
 }
 
 type OpenRequest struct {

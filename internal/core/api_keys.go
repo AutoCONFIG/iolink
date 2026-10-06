@@ -2,10 +2,7 @@ package core
 
 import (
 	"context"
-	"crypto/aes"
-	"crypto/cipher"
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -46,6 +43,9 @@ func validateAPIKeyInput(name string, scopes []string, resources domain.APIKeyRe
 }
 
 func (s *Service) IssueAPIKey(ctx context.Context, tenantID int64, name string, scopes []string, resources domain.APIKeyResourceScope, actorID int64) (domain.APIKey, string, error) {
+	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
+		return domain.APIKey{}, "", err
+	}
 	if err := validateAPIKeyInput(name, scopes, resources); err != nil {
 		return domain.APIKey{}, "", err
 	}
@@ -92,6 +92,9 @@ func (s *Service) IssueAPIKey(ctx context.Context, tenantID int64, name string, 
 }
 
 func (s *Service) ListAPIKeys(ctx context.Context, tenantID, actorID int64) ([]domain.APIKey, error) {
+	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
+		return nil, err
+	}
 	if tenantID <= 0 {
 		return nil, errors.New("tenant is required")
 	}
@@ -119,11 +122,43 @@ func (s *Service) ListAPIKeys(ctx context.Context, tenantID, actorID int64) ([]d
 	return out, rows.Err()
 }
 
+func (s *Service) ListAPIKeyAuditEvents(ctx context.Context, tenantID, actorID int64, limit int) ([]domain.APIKeyAuditEvent, error) {
+	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
+		return nil, err
+	}
+	if err := s.authorizeAPIKeyRead(ctx, tenantID, actorID); err != nil {
+		return nil, err
+	}
+	if limit <= 0 || limit > 200 {
+		limit = 100
+	}
+	rows, err := s.pool.Query(ctx, `SELECT id,tenant_id,actor_id,action,resource_id,metadata,created_at FROM audit_events WHERE tenant_id=$1 AND action LIKE 'api_key.%' ORDER BY created_at DESC,id DESC LIMIT $2`, tenantID, limit)
+	if err != nil {
+		return nil, fmt.Errorf("list api key audit: %w", err)
+	}
+	defer rows.Close()
+	var out []domain.APIKeyAuditEvent
+	for rows.Next() {
+		var item domain.APIKeyAuditEvent
+		if err := rows.Scan(&item.ID, &item.TenantID, &item.ActorID, &item.Action, &item.ResourceID, &item.Metadata, &item.CreatedAt); err != nil {
+			return nil, fmt.Errorf("scan api key audit: %w", err)
+		}
+		out = append(out, item)
+	}
+	return out, rows.Err()
+}
+
 func (s *Service) RevokeAPIKey(ctx context.Context, tenantID, actorID int64, keyID string) error {
+	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
+		return err
+	}
 	return s.updateAPIKeyState(ctx, tenantID, actorID, keyID, false)
 }
 
 func (s *Service) RotateAPIKey(ctx context.Context, tenantID, actorID int64, keyID string) (domain.APIKey, string, error) {
+	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
+		return domain.APIKey{}, "", err
+	}
 	if err := s.authorizeAPIKeyRead(ctx, tenantID, actorID); err != nil {
 		return domain.APIKey{}, "", err
 	}
@@ -232,54 +267,4 @@ func (s *Service) authorizeAPIKeyAdmin(ctx context.Context, tx pgx.Tx, tenantID,
 		return err
 	}
 	return nil
-}
-
-func (s *Service) rootSecret() []byte { return append([]byte(nil), s.apiKeyRoot...) }
-
-func randomKeyID() (string, error) {
-	raw := make([]byte, 16)
-	if _, err := rand.Read(raw); err != nil {
-		return "", fmt.Errorf("random key id: %w", err)
-	}
-	return "ik_" + base64.RawURLEncoding.EncodeToString(raw), nil
-}
-
-func encryptAPISecret(root, secret []byte) ([]byte, []byte, error) {
-	if len(root) < 32 {
-		return nil, nil, errors.New("api key encryption key unavailable")
-	}
-	key := sha256.Sum256(append(append([]byte{}, root...), []byte(":api-key")...))
-	block, err := aes.NewCipher(key[:])
-	if err != nil {
-		return nil, nil, fmt.Errorf("api key cipher: %w", err)
-	}
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return nil, nil, fmt.Errorf("api key gcm: %w", err)
-	}
-	nonce := make([]byte, gcm.NonceSize())
-	if _, err := rand.Read(nonce); err != nil {
-		return nil, nil, fmt.Errorf("api key nonce: %w", err)
-	}
-	return gcm.Seal(nil, nonce, secret, nil), nonce, nil
-}
-
-func decryptAPISecret(root, ciphertext, nonce []byte) ([]byte, error) {
-	if len(root) < 32 {
-		return nil, errors.New("api key encryption key unavailable")
-	}
-	key := sha256.Sum256(append(append([]byte{}, root...), []byte(":api-key")...))
-	block, err := aes.NewCipher(key[:])
-	if err != nil {
-		return nil, fmt.Errorf("api key cipher: %w", err)
-	}
-	gcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return nil, fmt.Errorf("api key gcm: %w", err)
-	}
-	secret, err := gcm.Open(nil, nonce, ciphertext, nil)
-	if err != nil {
-		return nil, errors.New("api key secret unavailable")
-	}
-	return secret, nil
 }

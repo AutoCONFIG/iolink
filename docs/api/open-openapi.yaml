@@ -12,25 +12,70 @@ paths:
     get:
       summary: List ponds in the API key resource set
       responses:
-        '200': {description: Ponds}
-        '401': {description: "Invalid signature, timestamp, or nonce"}
-        '403': {description: "Scope missing"}
+        '200': {description: Ponds, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/Pond'}}}}}
+        '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
   /open/v1/devices:
     get:
       summary: List devices in the API key resource set
       responses:
-        '200': {description: Devices}
-        '401': {description: "Invalid signature, timestamp, or nonce"}
-        '403': {description: "Scope missing"}
+        '200': {description: Devices, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/Device'}}}}}
+        '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
   /open/v1/alarms:
     get:
       summary: List alarms in the API key resource set
       responses:
-        '200': {description: Alarms}
-        '401': {description: "Invalid signature, timestamp, or nonce"}
-        '403': {description: "Scope missing"}
+        '200': {description: Alarms, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/Alarm'}}}}}
+        '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
 components:
-  schemas: {}
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: {type: string}
+    Pond:
+      type: object
+      required: [id, farm_id, name, area_mu, created_at]
+      properties:
+        id: {type: integer, format: int64}
+        farm_id: {type: integer, format: int64}
+        name: {type: string}
+        area_mu: {type: number, format: double}
+        created_at: {type: string, format: date-time}
+    Device:
+      type: object
+      required: [id, pond_id, device_no, name, model, status, report_interval, created_at]
+      properties:
+        id: {type: integer, format: int64}
+        pond_id: {type: integer, format: int64}
+        device_no: {type: string}
+        name: {type: string}
+        model: {type: string}
+        status: {type: string}
+        last_seen_at: {type: string, format: date-time, nullable: true}
+        created_at: {type: string, format: date-time}
+        disabled_at: {type: string, format: date-time, nullable: true}
+        report_interval: {type: integer}
+    Alarm:
+      type: object
+      required: [id, device_no, pond_id, metric, current_value, threshold, level, message, created_at]
+      properties:
+        id: {type: integer, format: int64}
+        device_no: {type: string}
+        pond_id: {type: integer, format: int64}
+        metric: {type: string}
+        current_value: {type: number, format: double}
+        threshold: {type: number, format: double}
+        level: {type: string}
+        message: {type: string}
+        confirmed_at: {type: string, format: date-time, nullable: true}
+        created_at: {type: string, format: date-time}
   securitySchemes:
     OpenSignature:
       type: apiKey
@@ -49,3 +94,9 @@ x-signature-vector:
   body_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
   signing_key: documented-test-secret
   signature: bcf8386ae0789327c5a6597a81eaa2f3121565d045012796e7e22bdba2a43149
+  curl: >-
+    curl -sS http://localhost:8080/open/v1/ponds
+    -H 'X-Key-Id: ik_documented'
+    -H 'X-Timestamp: 1735689600'
+    -H 'X-Nonce: 0123456789abcdef0123456789abcdef'
+    -H 'X-Signature: bcf8386ae0789327c5a6597a81eaa2f3121565d045012796e7e22bdba2a43149'

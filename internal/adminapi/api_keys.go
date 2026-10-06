@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/license"
 )
 
 type apiKeyCreateRequest struct {
@@ -35,6 +36,8 @@ func (s *Server) apiKeyTenant(c *gin.Context) (int64, bool) {
 
 func apiKeyError(c *gin.Context, err error) {
 	switch {
+	case errors.Is(err, license.ErrUnavailable) || errors.Is(err, license.ErrRequired) || errors.Is(err, license.ErrFeatureDenied) || errors.Is(err, license.ErrClockError):
+		c.JSON(http.StatusForbidden, gin.H{"error": "feature_unavailable"})
 	case errors.Is(err, domain.ErrForbidden):
 		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 	case errors.Is(err, domain.ErrNotFound):
@@ -59,6 +62,23 @@ func (s *Server) listAPIKeys(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, keys)
+}
+
+func (s *Server) listAPIKeyAudit(c *gin.Context) {
+	store, ok := s.apiKeyStore(c)
+	if !ok {
+		return
+	}
+	tenantID, ok := s.apiKeyTenant(c)
+	if !ok {
+		return
+	}
+	items, err := store.ListAPIKeyAuditEvents(c.Request.Context(), tenantID, aid(c), 100)
+	if err != nil {
+		apiKeyError(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, items)
 }
 
 func (s *Server) createAPIKey(c *gin.Context) {

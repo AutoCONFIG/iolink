@@ -26,6 +26,10 @@ import (
 )
 
 func installTestLicense(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDevices int64) *rsa.PrivateKey {
+	return installTestLicenseWithFeatures(t, p, svc, maxDevices, []string{})
+}
+
+func installTestLicenseWithFeatures(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDevices int64, features []string) *rsa.PrivateKey {
 	t.Helper()
 	ctx := context.Background()
 	key, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -33,7 +37,7 @@ func installTestLicense(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDev
 		t.Fatal(err)
 	}
 	now := time.Now().UTC().Truncate(time.Second)
-	payload := license.Payload{LicenseID: "test-license", IssuedAt: now.Add(-2 * time.Minute), NotBefore: now.Add(-time.Minute), MaxDevices: maxDevices, Features: []string{}, KeyID: "test-key"}
+	payload := license.Payload{LicenseID: "test-license", IssuedAt: now.Add(-2 * time.Minute), NotBefore: now.Add(-time.Minute), MaxDevices: maxDevices, Features: features, KeyID: "test-key"}
 	if err := p.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&payload.DeploymentID); err != nil {
 		t.Fatal(err)
 	}
