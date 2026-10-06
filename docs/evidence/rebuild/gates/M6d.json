@@ -1,0 +1,16 @@
+{
+  "gate": "M6d",
+  "source": "9f9824a",
+  "web": "caf2281",
+  "requirements": ["R41", "R42"],
+  "checks": {
+    "real_timescale_m6d": "passed",
+    "go_race_shuffle": "passed",
+    "contracts": "passed",
+    "architecture": "passed",
+    "web_unit_type_build": "passed",
+    "browser": "passed",
+    "docker_build": "passed"
+  },
+  "dual_review": "pending"
+}
