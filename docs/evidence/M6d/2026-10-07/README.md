@@ -5,8 +5,8 @@
 
 ## 冻结候选与环境
 
-- 测试源码：`b4b93359976c0529c8f52f50b02a968e3f99750e`。
-- web：`207dcfa751545e11a63a3a013da7e60552fecd75`。
+- 测试源码：`21c3704197f89a91387084ed092af8e79c757eb2`。
+- web：`3c1d860e2cca0b6ed8207142f5506784f5fef452`。
 - 基线：source `v0.0.9` / `9f46b6e549d36a6eac8c197acfbe64d2a91585a4`；
   web `0aa7771acf0ef6322c9ac1e4c9839616646bb675`。
 - Go 1.26.8、Node 24.21.0、Chrome Playwright、Linux amd64。
@@ -19,18 +19,23 @@
 
 ## 执行命令
 
-frozen 日志只对应上述候选；其他 logs 为调查历史，不代替最终验收。
+`final-2-go-verify.log` 对应上述候选；`final-06d2486-*` 的全库运行因新增浏览器
+重复提示定位失败，修正只涉及 live 测试等待，产品代码完全相同。
+同次契约、45个web单元测试、typecheck/build、17个默认浏览器回归、镜像构建通过；
+这些检查及镜像不依赖新增的 live 提示等待，继续适用。
+`frozen-*` 对应旧 b4b9335/web207dcfa，
+该快照在 d82aa82 审阅中被拒绝，不能用于批准新候选。其他 logs 为调查历史。
 
 | 验证面 | 命令与证据 | 结果 |
 |---|---|---|
-| 全库构建/vet/竞态/乱序/真实 DB 与 UI | `GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated> IOLINK_M6D_BROWSER=1 make verify`；[日志](logs/frozen-go-verify.log) | passed |
-| 契约 | `make verify-contracts`；67 operations / 333 synthetic fixtures | passed |
+| 全库构建/vet/竞态/乱序/真实 DB 与 UI | `GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated> IOLINK_M6D_BROWSER=1 make verify`；[日志](logs/final-2-go-verify.log) | passed |
+| 契约 | `make verify-contracts`；67 operations / 334 synthetic fixtures | passed |
 | 架构映射 | `python3 scripts/check_architecture_manifests.py --all` | passed |
-| web | `npm test --prefix web -- --run`、`npm run typecheck --prefix web`、`npm run build --prefix web`；44 unit tests | passed |
+| web | `npm test --prefix web -- --run`、`npm run typecheck --prefix web`、`npm run build --prefix web`；45 unit tests；[日志](logs/review-fixes-final-web.log) | passed |
 | 既有管理浏览器回归 | `npm run e2e --prefix web -- --reporter=line`；17 scenarios，与真实管理单列 | passed |
-| 集成镜像 | `docker build -t iolink:m6d-b4b9335 .` | passed |
+| 集成镜像 | `docker build -t iolink:m6d-06d2486 .` | passed |
 
-契约、架构、web、容器连续输出见 [日志](logs/frozen-contracts-web-docker.log)。
+契约、架构、浏览器回归、容器连续输出见 [日志](logs/final-06d2486-contracts-web-docker.log)。
 `make docs-tools` 同日已执行，见 [日志](logs/candidate-contracts-web-docker.log)。
 合成契约不替代 handler 测试。保留既有 Rollup 注释/bundle 大小提示；
 不声称 Lighthouse 或远端 CI 已通过。
@@ -42,10 +47,12 @@ frozen 日志只对应上述候选；其他 logs 为调查历史，不代替最�
 | R41 Key 生命周期 | Secret 一次性展示、AES 加密库存；轮换旧 Key 和撤销即时失效；审计无 Secret | `TestM6dIssueAndAuthenticateOpenKey`、真实管理浏览器 |
 | R41 权限和 License | viewer/member、停租户、缺 feature 拒绝；撤权上下文不能签发且无部分写入 | `TestM6dAdministration_rejectsStaleMembershipWithoutPartialWrite`、`TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays`、原 M6d integration |
 | R41 资源限制 | 农场/池塘/设备单独限制的列表过滤；无权限及跨租户详情 404 | `TestM6dResourceHTTP_filtersListsAndDetails`、`TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms` |
-| R41 UI/API 边界 | 新租户列表 `[]`；未知 camelCase 请求字段 400；坏 ID 不签发；scopes 选择/展示和 snake_case 资源实际持久化；坏成功响应拒绝 | `m6d-live.spec.ts`、`api-key-scope.test.ts`、`api-key-api.test.ts` |
+| R41 UI/API 边界 | 新租户列表 `[]`；未知字段、null、非法资源项 400；外租户资源 404；坏 ID/设备逗号输入无请求且不签发；scopes 选择/展示和 snake_case 资源实际持久化；坏成功响应拒绝 | `m6d-live.spec.ts`、`api-key-scope.test.ts`、`api-key-api.test.ts` |
+| R41 范围变更完整性 | 签发校验当前租户存在且启用的资源；轮换重新校验归属；拒绝无 Key/审计部分写入且保留旧 Key | `TestM6dResourceValidation*`、`TestM6dRotation_rejectsChangedResourceOwnershipWithoutWrites` |
 | R42 签名 | 发布固定向量调用生产验证器；RFC3986/重复与空查询/路径/时间窗；body-only 篡改拒绝且不占 nonce | `TestM6dPublishedVector_authenticatesWithProductionVerifier`、`TestCanonicalOpen*`、`TestM6dBodyDigest_rejectsOnlyChangedBodyAndPreservesNonce` |
 | R42 body 上限 | 4 MiB 可认证，多 1 byte 在认证前 413，不接受未签名尾部 | `TestRoutesRejectOversizedBody` |
 | R42 replay/rate | 并发 nonce 仅一个成功；burst10 和 60/min refill；真实 429+正数 Retry-After | `TestM6dConcurrentNonceAndRateLimit`、`TestConsumeOpenRate*`、真实 signed HTTP |
+| R42 时间窗/配置 | 正确重签的 ±300/±301、零/负数/int64 极值/溢出差值；部署 30/min burst2 的初始化、轮换、补充和 HTTP Retry-After2；非法配置拒绝 | `TestM6dTimestampWindow*`、`TestConfiguredOpenRate*`、`TestM6dConfiguredRate*`、`TestOpenAPIRateConfig*` |
 | R42 持久状态 | 新 Service 拒绝已用 nonce，读取共享 DB rate state | `TestM6dRestart_preservesConsumedNonceAndRateState`；不是进程崩溃恢复演练 |
 
 真实浏览器覆盖签发、刷新后 Secret 消失、轮换、撤销、日志导航；375/768/1440
@@ -67,9 +74,22 @@ R41/R42 为软件范围；跨阶段微信/硬件/客户安装仍 `external_block
 Redis 仅调研，不代表已支持。两位未参与编辑的独立审阅者须针对同一冻结候选
 明确 APPROVE，之后再更新 IMPLEMENTED、acceptance/provider 与 release gate。
 
-镜像配置 ID：`sha256:0a6aa019ff7030e5229b90d2a328d7fa64d84cedf93a931f8ab1d9156c04ad82`。
-最终全库 core 竞态测试 91.454s，真实浏览器在该次执行中开启。
-执行者逐张打开最终 375/768/1440 签发截图及审计截图，确认 Secret 遮罩、页面
-排版及审计记录；窄屏表格使用内部横向滚动，不代表全部列同时显示。
+## d82aa82 审阅修复
+
+[独立代码报告](reviews/code-d82aa82.md)明确 REQUEST_CHANGES：设备逗号输入扩大范围、
+时间差 int64 溢出、持久化非法/null资源、缺少部署限流配置。代码审阅已落盘后通道中断；
+gate 通道因平台内容审核中断，无最终结论，记录为 INCONCLUSIVE。
+两者均不算批准。代码报告中的重复响应解析、无用 activation 分支与误导测试也已简化。
+时间窗 [red](logs/time-window-red.log)证明原缺陷；最终
+[focused green](logs/review-fixes-final-focused.log)使用真实隔离 DB 与 race/shuffle。
+浏览器回归新增逗号-only、混合空设备项、null/错误资源和外租户请求，截图重新生成；
+旧截图可在 d82aa82 的 Git 快照查看。
+
+镜像导出配置 digest：`sha256:04c78e0f12910b5297950b34f4986233a1a172a7a257bd420ed09da876d884ff`；
+本地镜像 manifest list ID：`sha256:c8890869080e5eb0b30ae6f3f85549aa291e573672b85d2d521e68dfeb8d2a87`。
+最终全库 core 竞态测试94.435s，真实管理浏览器在该次运行开启并通过。
+执行者已逐张打开本轮375/768/1440签发图和审计图，
+确认遮罩整个Secret提示及三条审计动作。窄屏表格使用内部横向滚动，
+不代表全部列同时显示。
 冻结源码之后仅归档日志和更新 pending 文档；审阅候选中的产品代码必须与上述
 测试源码一致，最终完成登记也只允许修改证据和状态文档。

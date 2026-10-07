@@ -1,0 +1,2479 @@
+diff --git a/cmd/iolinkd/main.go b/cmd/iolinkd/main.go
+index efd6779..814ada6 100644
+--- a/cmd/iolinkd/main.go
++++ b/cmd/iolinkd/main.go
+@@ -27,6 +27,7 @@ import (
+ 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
+ 	"git.hyhy.fun/rsplab/iolink/internal/notifications"
+ 	"git.hyhy.fun/rsplab/iolink/internal/observability"
++	"git.hyhy.fun/rsplab/iolink/internal/openapi"
+ 	"git.hyhy.fun/rsplab/iolink/internal/operations"
+ 	"git.hyhy.fun/rsplab/iolink/internal/persistence"
+ 	"git.hyhy.fun/rsplab/iolink/internal/platform"
+@@ -222,6 +223,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
+ 	if err != nil {
+ 		return err
+ 	}
++	svc.SetAPIKeyRoot([]byte(cfg.SecretKey))
+ 	if err := svc.ObserveLicenseClock(ctx); err != nil && !errors.Is(err, license.ErrClockError) {
+ 		return err
+ 	}
+@@ -276,7 +278,8 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
+ 	admin := adminapi.New(adminapi.Config{
+ 		SecretKey: cfg.SecretKey,
+ 		JWT:       12 * time.Hour,
+-	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy, Logger: log})
++	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy, Logger: log, APIKeys: svc})
++	open := openapi.New(openapi.Deps{Logger: log, Auth: svc, Resources: svc})
+ 
+ 	// --- appapi: /api/v1 for the mini program, backed by core repos ---
+ 	api := appapi.New(appapi.Config{
+@@ -320,6 +323,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
+ 	root.Handle("/readyz", health.Readyz())
+ 	root.Handle("/metrics", promhttp.Handler())
+ 	root.Handle("/admin/v1/", admin.Routes())
++	root.Handle("/open/v1/", open.Routes())
+ 	adminFS, err := web.Admin()
+ 	if err != nil {
+ 		return err
+diff --git a/docs/api/admin-openapi.yaml b/docs/api/admin-openapi.yaml
+index fb92c13..d28e584 100644
+--- a/docs/api/admin-openapi.yaml
++++ b/docs/api/admin-openapi.yaml
+@@ -1104,6 +1104,72 @@ paths:
+         '404': { $ref: '#/components/responses/NotFound' }
+         '409': { $ref: '#/components/responses/Conflict' }
+         '500': { $ref: '#/components/responses/InternalError' }
++  /api-keys:
++    get:
++      tags: [auth]
++      summary: List tenant API keys without secrets
++      responses:
++        '200': {description: Keys, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/APIKey'}}}}}
++        '401': {$ref: '#/components/responses/Unauthorized'}
++        '403': {$ref: '#/components/responses/Forbidden'}
++        '500': {$ref: '#/components/responses/InternalError'}
++    post:
++      tags: [auth]
++      summary: Issue a scoped API key; secret is returned once
++      requestBody:
++        required: true
++        content:
++          application/json:
++            schema: {$ref: '#/components/schemas/APIKeyCreate'}
++      responses:
++        '201': {description: Issued key and one-time base64url secret, content: {application/json: {schema: {$ref: '#/components/schemas/APIKeyIssued'}}}}
++        '400': {$ref: '#/components/responses/BadRequest'}
++        '401': {$ref: '#/components/responses/Unauthorized'}
++        '403': {$ref: '#/components/responses/Forbidden'}
++        '500': {$ref: '#/components/responses/InternalError'}
++  /api-keys/{key_id}/rotate:
++    post:
++      tags: [auth]
++      summary: Atomically revoke the old key and issue a new secret once
++      parameters:
++        - {name: key_id, in: path, required: true, schema: {type: string}}
++      responses:
++        '201': {description: Rotated key, content: {application/json: {schema: {$ref: '#/components/schemas/APIKeyIssued'}}}}
++        '400': {$ref: '#/components/responses/BadRequest'}
++        '401': {$ref: '#/components/responses/Unauthorized'}
++        '403': {$ref: '#/components/responses/Forbidden'}
++        '404': {$ref: '#/components/responses/NotFound'}
++        '500': {$ref: '#/components/responses/InternalError'}
++  /api-keys/{key_id}/revoke:
++    post:
++      tags: [auth]
++      summary: Revoke a tenant API key immediately
++      parameters:
++        - {name: key_id, in: path, required: true, schema: {type: string}}
++      responses:
++        '204': {description: Revoked}
++        '400': {$ref: '#/components/responses/BadRequest'}
++        '401': {$ref: '#/components/responses/Unauthorized'}
++        '403': {$ref: '#/components/responses/Forbidden'}
++        '404': {$ref: '#/components/responses/NotFound'}
++        '500': {$ref: '#/components/responses/InternalError'}
++  /api-keys/audit:
++    get:
++      tags: [auth]
++      summary: API Key 操作日志
++      description: 只返回签发、轮换、撤销动作及其资源标识；不会返回 secret、签名原文或请求体。
++      responses:
++        '200':
++          description: 成功
++          content:
++            application/json:
++              schema:
++                type: array
++                items: { $ref: '#/components/schemas/APIKeyAuditEvent' }
++        '401': { $ref: '#/components/responses/Unauthorized' }
++        '403': { $ref: '#/components/responses/Forbidden' }
++        '500': { $ref: '#/components/responses/InternalError' }
++
+ components:
+   securitySchemes:
+     BearerAuth:
+@@ -1706,3 +1772,50 @@ components:
+         active: { type: boolean }
+         expires_at: { type: string, format: date-time, nullable: true }
+       additionalProperties: false
++    APIKeyResourceScope:
++      type: object
++      description: Empty arrays mean unrestricted within the tenant; nonempty dimensions intersect. Device-only scope limits ponds to current enabled-device locations.
++      properties:
++        farm_ids: {type: array, maxItems: 100, items: {type: integer, format: int64, minimum: 1}}
++        pond_ids: {type: array, maxItems: 100, items: {type: integer, format: int64, minimum: 1}}
++        device_nos: {type: array, maxItems: 100, items: {type: string, minLength: 1}}
++      additionalProperties: false
++    APIKeyCreate:
++      type: object
++      required: [name, scopes]
++      properties:
++        name: {type: string, minLength: 1, maxLength: 128}
++        scopes: {type: array, minItems: 1, maxItems: 16, uniqueItems: true, items: {type: string, enum: ['ponds:read', 'devices:read', 'alarms:read']}}
++        resources: {$ref: '#/components/schemas/APIKeyResourceScope'}
++      additionalProperties: false
++    APIKey:
++      type: object
++      required: [key_id, tenant_id, name, scopes, resources, created_at]
++      properties:
++        key_id: {type: string}
++        tenant_id: {type: integer, format: int64}
++        name: {type: string}
++        scopes: {type: array, items: {type: string}}
++        resources: {$ref: '#/components/schemas/APIKeyResourceScope'}
++        created_at: {type: string, format: date-time}
++        revoked_at: {type: string, format: date-time, nullable: true}
++      additionalProperties: false
++    APIKeyIssued:
++      type: object
++      required: [key, secret]
++      properties:
++        key: {$ref: '#/components/schemas/APIKey'}
++        secret: {type: string, description: 32 random bytes encoded as unpadded base64url; never returned by list or audit}
++      additionalProperties: false
++    APIKeyAuditEvent:
++      type: object
++      required: [id, tenant_id, action, resource_id, metadata, created_at]
++      properties:
++        id: { type: integer, format: int64 }
++        tenant_id: { type: integer, format: int64 }
++        actor_id: { type: integer, format: int64, nullable: true }
++        action: { type: string, enum: [api_key.issued, api_key.rotated, api_key.revoked] }
++        resource_id: { type: string }
++        metadata: { type: object, additionalProperties: true }
++        created_at: { type: string, format: date-time }
++      additionalProperties: false
+diff --git a/docs/api/open-openapi.yaml b/docs/api/open-openapi.yaml
+new file mode 100644
+index 0000000..fdc3587
+--- /dev/null
++++ b/docs/api/open-openapi.yaml
+@@ -0,0 +1,143 @@
++openapi: 3.0.3
++info:
++  title: IOLink Open API
++  version: 0.0.10
++  description: Third party API authenticated with per-tenant HMAC API keys.
++servers:
++  - url: /
++security:
++  - OpenSignature: []
++paths:
++  /open/v1/ponds:
++    get:
++      summary: List ponds in the API key resource set
++      responses:
++        '200': {description: Ponds, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/Pond'}}}}}
++        '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++        '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++        '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++  /open/v1/ponds/{id}:
++    get:
++      summary: Get an authorized pond; inaccessible resources return 404
++      parameters:
++        - {name: id, in: path, required: true, schema: {type: integer, format: int64, minimum: 1}}
++      responses:
++        '200': {description: Pond, content: {application/json: {schema: {$ref: '#/components/schemas/Pond'}}}}
++        '401': {$ref: '#/components/responses/Unauthorized'}
++        '403': {$ref: '#/components/responses/Forbidden'}
++        '404': {$ref: '#/components/responses/NotFound'}
++        '413': {$ref: '#/components/responses/TooLarge'}
++        '429': {$ref: '#/components/responses/RateLimited'}
++  /open/v1/devices/{device_no}:
++    get:
++      summary: Get an authorized device; inaccessible resources return 404
++      parameters:
++        - {name: device_no, in: path, required: true, schema: {type: string, minLength: 1}}
++      responses:
++        '200': {description: Device, content: {application/json: {schema: {$ref: '#/components/schemas/Device'}}}}
++        '401': {$ref: '#/components/responses/Unauthorized'}
++        '403': {$ref: '#/components/responses/Forbidden'}
++        '404': {$ref: '#/components/responses/NotFound'}
++        '413': {$ref: '#/components/responses/TooLarge'}
++        '429': {$ref: '#/components/responses/RateLimited'}
++  /open/v1/devices:
++    get:
++      summary: List devices in the API key resource set
++      responses:
++        '200': {description: Devices, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/Device'}}}}}
++        '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++        '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++        '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++  /open/v1/alarms:
++    get:
++      summary: List alarms in the API key resource set
++      responses:
++        '200': {description: Alarms, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/Alarm'}}}}}
++        '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++        '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++        '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
++components:
++  responses:
++    Unauthorized:
++      description: Invalid signature, timestamp, nonce, revoked key or inactive tenant
++      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
++    Forbidden:
++      description: Scope or feature unavailable
++      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
++    NotFound:
++      description: Missing or unauthorized resource
++      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
++    TooLarge:
++      description: Request body exceeds 4 MiB; no authentication or nonce consumption
++      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
++    RateLimited:
++      description: Rate limit exceeded
++      headers: {Retry-After: {schema: {type: integer, minimum: 1}}}
++      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
++  schemas:
++    Error:
++      type: object
++      required: [error]
++      properties:
++        error: {type: string}
++    Pond:
++      type: object
++      required: [id, farm_id, name, area_mu, created_at]
++      properties:
++        id: {type: integer, format: int64}
++        farm_id: {type: integer, format: int64}
++        name: {type: string}
++        area_mu: {type: number, format: double}
++        created_at: {type: string, format: date-time}
++    Device:
++      type: object
++      required: [id, pond_id, device_no, name, model, status, report_interval, created_at]
++      properties:
++        id: {type: integer, format: int64}
++        pond_id: {type: integer, format: int64}
++        device_no: {type: string}
++        name: {type: string}
++        model: {type: string}
++        status: {type: string}
++        last_seen_at: {type: string, format: date-time, nullable: true}
++        created_at: {type: string, format: date-time}
++        disabled_at: {type: string, format: date-time, nullable: true}
++        report_interval: {type: integer}
++    Alarm:
++      type: object
++      required: [id, device_no, pond_id, metric, current_value, threshold, level, message, created_at]
++      properties:
++        id: {type: integer, format: int64}
++        device_no: {type: string}
++        pond_id: {type: integer, format: int64}
++        metric: {type: string}
++        current_value: {type: number, format: double}
++        threshold: {type: number, format: double}
++        level: {type: string}
++        message: {type: string}
++        confirmed_at: {type: string, format: date-time, nullable: true}
++        created_at: {type: string, format: date-time}
++  securitySchemes:
++    OpenSignature:
++      type: apiKey
++      in: header
++      name: X-Signature
++      description: |-
++        Send X-Key-Id, X-Timestamp, X-Nonce and lowercase hex X-Signature.
++        Sign METHOD, raw path, RFC3986 sorted query, timestamp, nonce and
++        lowercase SHA-256 body hash joined by LF without a trailing LF.
++x-signature-vector:
++  method: GET
++  path: /open/v1/ponds
++  query: a=&a=hello%20world&b=one&b=two
++  timestamp: 1735689600
++  nonce: 0123456789abcdef0123456789abcdef
++  body_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
++  signing_key: documented-test-secret
++  signature: bcf8386ae0789327c5a6597a81eaa2f3121565d045012796e7e22bdba2a43149
++  curl: >-
++    curl -sS 'http://localhost:8080/open/v1/ponds?a=&a=hello%20world&b=one&b=two'
++    -H 'X-Key-Id: ik_documented'
++    -H 'X-Timestamp: 1735689600'
++    -H 'X-Nonce: 0123456789abcdef0123456789abcdef'
++    -H 'X-Signature: bcf8386ae0789327c5a6597a81eaa2f3121565d045012796e7e22bdba2a43149'
+diff --git a/docs/architecture/acceptance-map.yaml b/docs/architecture/acceptance-map.yaml
+index c7969b6..6dde146 100644
+--- a/docs/architecture/acceptance-map.yaml
++++ b/docs/architecture/acceptance-map.yaml
+@@ -7,6 +7,7 @@ gate_scope:
+   M6a: [R34, R35]
+   M6b: [R36, R37]
+   M6c: [R38, R39, R40]
++  M6d: [R41, R42]
+ provider_operations:
+   - {id: R01, provider: go-toolchain, operation: reproducible_build, required_level: L3, status: not_run, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+   - {id: R02, provider: embedded-http, operation: contract_validation, required_level: L3, status: not_run, command: "make verify-contracts", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+@@ -431,7 +432,7 @@ requirements:
+     required_level: software
+     software_status: not_run
+     external_status: not_applicable
+-    verification: "planned: go test ./internal/...; verify key issuance, rotation, revocation, and scope cases"
++    verification: "b4b9335/web207dcfa: real Timescale HTTP and production management browser, full race/shuffle verify passed; independent dual review pending, see docs/evidence/M6d/2026-10-07/README.md"
+     evidence: docs/evidence/acceptance/R41/
+   - id: R42
+     wave: M6d
+@@ -440,7 +441,7 @@ requirements:
+     required_level: software
+     software_status: not_run
+     external_status: not_applicable
+-    verification: "planned: go test ./internal/...; verify fixed signature vectors, replay, and rate-limit cases"
++    verification: "b4b9335/web207dcfa: production vector, body-only tampering, concurrent nonce, persisted state and HTTP 429 passed; independent dual review pending, see docs/evidence/M6d/2026-10-07/README.md"
+     evidence: docs/evidence/acceptance/R42/
+   - id: R43
+     wave: M7a
+diff --git a/internal/adminapi/api_keys.go b/internal/adminapi/api_keys.go
+new file mode 100644
+index 0000000..a5d658c
+--- /dev/null
++++ b/internal/adminapi/api_keys.go
+@@ -0,0 +1,146 @@
++package adminapi
++
++import (
++	"encoding/json"
++	"errors"
++	"io"
++	"net/http"
++	"strings"
++
++	"github.com/gin-gonic/gin"
++
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"git.hyhy.fun/rsplab/iolink/internal/license"
++)
++
++type apiKeyCreateRequest struct {
++	Name      string                     `json:"name" binding:"required"`
++	Scopes    []string                   `json:"scopes" binding:"required"`
++	Resources domain.APIKeyResourceScope `json:"resources"`
++}
++
++func (s *Server) apiKeyStore(c *gin.Context) (APIKeyAdminStore, bool) {
++	if s.deps.APIKeys == nil {
++		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "api key management unavailable"})
++		return nil, false
++	}
++	return s.deps.APIKeys, true
++}
++
++func (s *Server) apiKeyTenant(c *gin.Context) (int64, bool) {
++	tenantID, ok := domain.TenantID(c.Request.Context())
++	if !ok {
++		c.JSON(http.StatusForbidden, gin.H{"error": "tenant context required"})
++		return 0, false
++	}
++	return tenantID, true
++}
++
++func apiKeyError(c *gin.Context, err error) {
++	switch {
++	case errors.Is(err, license.ErrUnavailable) || errors.Is(err, license.ErrRequired) || errors.Is(err, license.ErrFeatureDenied) || errors.Is(err, license.ErrClockError):
++		c.JSON(http.StatusForbidden, gin.H{"error": "feature_unavailable"})
++	case errors.Is(err, domain.ErrForbidden):
++		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
++	case errors.Is(err, domain.ErrNotFound):
++		c.JSON(http.StatusNotFound, gin.H{"error": "api key not found"})
++	default:
++		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
++	}
++}
++
++func (s *Server) listAPIKeys(c *gin.Context) {
++	store, ok := s.apiKeyStore(c)
++	if !ok {
++		return
++	}
++	tenantID, ok := s.apiKeyTenant(c)
++	if !ok {
++		return
++	}
++	keys, err := store.ListAPIKeys(c.Request.Context(), tenantID, aid(c))
++	if err != nil {
++		apiKeyError(c, err)
++		return
++	}
++	c.JSON(http.StatusOK, keys)
++}
++
++func (s *Server) listAPIKeyAudit(c *gin.Context) {
++	store, ok := s.apiKeyStore(c)
++	if !ok {
++		return
++	}
++	tenantID, ok := s.apiKeyTenant(c)
++	if !ok {
++		return
++	}
++	items, err := store.ListAPIKeyAuditEvents(c.Request.Context(), tenantID, aid(c), 100)
++	if err != nil {
++		apiKeyError(c, err)
++		return
++	}
++	c.JSON(http.StatusOK, items)
++}
++
++func (s *Server) createAPIKey(c *gin.Context) {
++	store, ok := s.apiKeyStore(c)
++	if !ok {
++		return
++	}
++	tenantID, ok := s.apiKeyTenant(c)
++	if !ok {
++		return
++	}
++	var req apiKeyCreateRequest
++	decoder := json.NewDecoder(http.MaxBytesReader(c.Writer, c.Request.Body, 1<<20))
++	decoder.DisallowUnknownFields()
++	if err := decoder.Decode(&req); err != nil {
++		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
++		return
++	}
++	var trailing json.RawMessage
++	if err := decoder.Decode(&trailing); !errors.Is(err, io.EOF) {
++		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
++		return
++	}
++	key, secret, err := store.IssueAPIKey(c.Request.Context(), tenantID, strings.TrimSpace(req.Name), req.Scopes, req.Resources, aid(c))
++	if err != nil {
++		apiKeyError(c, err)
++		return
++	}
++	c.JSON(http.StatusCreated, gin.H{"key": key, "secret": secret})
++}
++
++func (s *Server) rotateAPIKey(c *gin.Context) {
++	store, ok := s.apiKeyStore(c)
++	if !ok {
++		return
++	}
++	tenantID, ok := s.apiKeyTenant(c)
++	if !ok {
++		return
++	}
++	key, secret, err := store.RotateAPIKey(c.Request.Context(), tenantID, aid(c), c.Param("key_id"))
++	if err != nil {
++		apiKeyError(c, err)
++		return
++	}
++	c.JSON(http.StatusCreated, gin.H{"key": key, "secret": secret})
++}
++
++func (s *Server) revokeAPIKey(c *gin.Context) {
++	store, ok := s.apiKeyStore(c)
++	if !ok {
++		return
++	}
++	tenantID, ok := s.apiKeyTenant(c)
++	if !ok {
++		return
++	}
++	if err := store.RevokeAPIKey(c.Request.Context(), tenantID, aid(c), c.Param("key_id")); err != nil {
++		apiKeyError(c, err)
++		return
++	}
++	c.Status(http.StatusNoContent)
++}
+diff --git a/internal/adminapi/server.go b/internal/adminapi/server.go
+index 9872465..09ae85e 100644
+--- a/internal/adminapi/server.go
++++ b/internal/adminapi/server.go
+@@ -101,6 +101,15 @@ type Deps struct {
+ 	Telemetry domain.TelemetryRepo // optional; enables pond latest readings
+ 	Catalog   ProductCatalog
+ 	Policy    domain.PermissionPolicy
++	APIKeys   APIKeyAdminStore
++}
++
++type APIKeyAdminStore interface {
++	IssueAPIKey(context.Context, int64, string, []string, domain.APIKeyResourceScope, int64) (domain.APIKey, string, error)
++	ListAPIKeys(context.Context, int64, int64) ([]domain.APIKey, error)
++	RotateAPIKey(context.Context, int64, int64, string) (domain.APIKey, string, error)
++	RevokeAPIKey(context.Context, int64, int64, string) error
++	ListAPIKeyAuditEvents(context.Context, int64, int64, int) ([]domain.APIKeyAuditEvent, error)
+ }
+ 
+ type ProductCatalog interface {
+@@ -177,6 +186,11 @@ func (s *Server) Routes() http.Handler {
+ 		tenantAuth.POST("/alarms/batch-confirm", s.batchConfirm)
+ 
+ 		tenantAuth.GET("/stats", s.stats)
++		tenantAuth.GET("/api-keys", s.listAPIKeys)
++		tenantAuth.GET("/api-keys/audit", s.listAPIKeyAudit)
++		tenantAuth.POST("/api-keys", s.createAPIKey)
++		tenantAuth.POST("/api-keys/:key_id/rotate", s.rotateAPIKey)
++		tenantAuth.POST("/api-keys/:key_id/revoke", s.revokeAPIKey)
+ 		tenantAuth.GET("/products", s.listProducts)
+ 		tenantAuth.POST("/products", s.createProduct)
+ 		tenantAuth.GET("/products/:product_id/models", s.listProductModels)
+diff --git a/internal/authorization/policy.go b/internal/authorization/policy.go
+index f1482c7..38e98ed 100644
+--- a/internal/authorization/policy.go
++++ b/internal/authorization/policy.go
+@@ -31,7 +31,7 @@ func New() (*Policy, error) {
+ 		return nil, err
+ 	}
+ 	for _, role := range []string{"owner", "admin"} {
+-		for _, resource := range []string{"farms", "farm_members", "users", "ponds", "devices", "alarm_rules", "alarms", "stats", "products", "tenant_members", "telemetry"} {
++		for _, resource := range []string{"farms", "farm_members", "users", "ponds", "devices", "alarm_rules", "alarms", "stats", "products", "tenant_members", "telemetry", "api-keys"} {
+ 			if _, err := e.AddPolicy(role, resource, "*"); err != nil {
+ 				return nil, err
+ 			}
+diff --git a/internal/core/api_key_admin.go b/internal/core/api_key_admin.go
+new file mode 100644
+index 0000000..3906419
+--- /dev/null
++++ b/internal/core/api_key_admin.go
+@@ -0,0 +1,67 @@
++package core
++
++import (
++	"context"
++	"fmt"
++
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"git.hyhy.fun/rsplab/iolink/internal/persistence"
++	"github.com/jackc/pgx/v5"
++)
++
++func (s *Service) ListAPIKeyAuditEvents(ctx context.Context, tenantID, actorID int64, limit int) ([]domain.APIKeyAuditEvent, error) {
++	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
++		return nil, err
++	}
++	if err := s.authorizeAPIKeyRead(ctx, tenantID, actorID); err != nil {
++		return nil, err
++	}
++	if limit <= 0 || limit > 200 {
++		limit = 100
++	}
++	rows, err := s.pool.Query(ctx, `SELECT id,tenant_id,actor_id,action,resource_id,metadata,created_at FROM audit_events WHERE tenant_id=$1 AND action LIKE 'api_key.%' ORDER BY created_at DESC,id DESC LIMIT $2`, tenantID, limit)
++	if err != nil {
++		return nil, fmt.Errorf("list api key audit: %w", err)
++	}
++	defer rows.Close()
++	out := make([]domain.APIKeyAuditEvent, 0)
++	for rows.Next() {
++		var item domain.APIKeyAuditEvent
++		if err := rows.Scan(&item.ID, &item.TenantID, &item.ActorID, &item.Action, &item.ResourceID, &item.Metadata, &item.CreatedAt); err != nil {
++			return nil, fmt.Errorf("scan api key audit: %w", err)
++		}
++		out = append(out, item)
++	}
++	return out, rows.Err()
++}
++
++func (s *Service) authorizeAPIKeyRead(ctx context.Context, tenantID, actorID int64) error {
++	tx, err := s.pool.Begin(ctx)
++	if err != nil {
++		return err
++	}
++	defer tx.Rollback(ctx)
++	if err := s.authorizeAPIKeyAdmin(ctx, tx, tenantID, actorID); err != nil {
++		return err
++	}
++	return tx.Commit(ctx)
++}
++
++func (s *Service) authorizeAPIKeyAdmin(ctx context.Context, tx pgx.Tx, tenantID, actorID int64) error {
++	if actor, ok := domain.PlatformActorFromContext(ctx); ok {
++		if actor.ID != actorID {
++			return domain.ErrForbidden
++		}
++		return persistence.AuthorizePlatformWrite(ctx, tx, actorID)
++	}
++	scoped, ok := domain.TenantID(ctx)
++	actor, actorOK := domain.TenantUserID(ctx)
++	if !ok || !actorOK || scoped != tenantID || actor != actorID {
++		return domain.ErrForbidden
++	}
++	role := domain.TenantRole(ctx)
++	if role != "owner" && role != "admin" {
++		return domain.ErrForbidden
++	}
++	return persistence.AuthorizeTenantWrite(ctx, tx, s.policy, "api-keys", "write")
++}
+diff --git a/internal/core/api_key_crypto.go b/internal/core/api_key_crypto.go
+new file mode 100644
+index 0000000..36dd4a7
+--- /dev/null
++++ b/internal/core/api_key_crypto.go
+@@ -0,0 +1,61 @@
++package core
++
++import (
++	"crypto/aes"
++	"crypto/cipher"
++	"crypto/rand"
++	"crypto/sha256"
++	"encoding/base64"
++	"errors"
++	"fmt"
++)
++
++func (s *Service) rootSecret() []byte { return append([]byte(nil), s.apiKeyRoot...) }
++
++func randomKeyID() (string, error) {
++	raw := make([]byte, 16)
++	if _, err := rand.Read(raw); err != nil {
++		return "", fmt.Errorf("random key id: %w", err)
++	}
++	return "ik_" + base64.RawURLEncoding.EncodeToString(raw), nil
++}
++
++func encryptAPISecret(root, secret []byte) ([]byte, []byte, error) {
++	if len(root) < 32 {
++		return nil, nil, errors.New("api key encryption key unavailable")
++	}
++	key := sha256.Sum256(append(append([]byte{}, root...), []byte(":api-key")...))
++	block, err := aes.NewCipher(key[:])
++	if err != nil {
++		return nil, nil, fmt.Errorf("api key cipher: %w", err)
++	}
++	gcm, err := cipher.NewGCM(block)
++	if err != nil {
++		return nil, nil, fmt.Errorf("api key gcm: %w", err)
++	}
++	nonce := make([]byte, gcm.NonceSize())
++	if _, err := rand.Read(nonce); err != nil {
++		return nil, nil, fmt.Errorf("api key nonce: %w", err)
++	}
++	return gcm.Seal(nil, nonce, secret, nil), nonce, nil
++}
++
++func decryptAPISecret(root, ciphertext, nonce []byte) ([]byte, error) {
++	if len(root) < 32 {
++		return nil, errors.New("api key encryption key unavailable")
++	}
++	key := sha256.Sum256(append(append([]byte{}, root...), []byte(":api-key")...))
++	block, err := aes.NewCipher(key[:])
++	if err != nil {
++		return nil, fmt.Errorf("api key cipher: %w", err)
++	}
++	gcm, err := cipher.NewGCM(block)
++	if err != nil {
++		return nil, fmt.Errorf("api key gcm: %w", err)
++	}
++	secret, err := gcm.Open(nil, nonce, ciphertext, nil)
++	if err != nil {
++		return nil, errors.New("api key secret unavailable")
++	}
++	return secret, nil
++}
+diff --git a/internal/core/api_keys.go b/internal/core/api_keys.go
+new file mode 100644
+index 0000000..43c15c0
+--- /dev/null
++++ b/internal/core/api_keys.go
+@@ -0,0 +1,214 @@
++package core
++
++import (
++	"context"
++	"crypto/rand"
++	"encoding/base64"
++	"encoding/json"
++	"errors"
++	"fmt"
++	"strings"
++	"time"
++
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"github.com/jackc/pgx/v5"
++)
++
++var validOpenScopes = map[string]bool{
++	"ponds:read": true, "devices:read": true, "alarms:read": true,
++}
++
++func validateAPIKeyInput(name string, scopes []string, resources domain.APIKeyResourceScope) error {
++	if strings.TrimSpace(name) == "" || len([]byte(name)) > 128 {
++		return errors.New("invalid api key name")
++	}
++	if len(scopes) == 0 || len(scopes) > 16 {
++		return errors.New("invalid api key scopes")
++	}
++	seen := make(map[string]struct{}, len(scopes))
++	for _, scope := range scopes {
++		if !validOpenScopes[scope] {
++			return fmt.Errorf("unsupported api key scope %q", scope)
++		}
++		if _, ok := seen[scope]; ok {
++			return errors.New("duplicate api key scope")
++		}
++		seen[scope] = struct{}{}
++	}
++	if len(resources.FarmIDs) > 100 || len(resources.PondIDs) > 100 || len(resources.DeviceNos) > 100 {
++		return errors.New("api key resource scope too large")
++	}
++	return nil
++}
++
++func (s *Service) IssueAPIKey(ctx context.Context, tenantID int64, name string, scopes []string, resources domain.APIKeyResourceScope, actorID int64) (domain.APIKey, string, error) {
++	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
++		return domain.APIKey{}, "", err
++	}
++	if err := validateAPIKeyInput(name, scopes, resources); err != nil {
++		return domain.APIKey{}, "", err
++	}
++	tx, err := s.pool.Begin(ctx)
++	if err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("begin api key issue: %w", err)
++	}
++	defer tx.Rollback(ctx)
++	if err := s.authorizeAPIKeyAdmin(ctx, tx, tenantID, actorID); err != nil {
++		return domain.APIKey{}, "", err
++	}
++	keyID, err := randomKeyID()
++	if err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("generate api key id: %w", err)
++	}
++	secret := make([]byte, 32)
++	if _, err := rand.Read(secret); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("generate api key secret: %w", err)
++	}
++	ciphertext, nonce, err := encryptAPISecret(s.rootSecret(), secret)
++	if err != nil {
++		return domain.APIKey{}, "", err
++	}
++	resourceJSON, err := json.Marshal(resources)
++	if err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("encode api key resources: %w", err)
++	}
++	if _, err := tx.Exec(ctx, `INSERT INTO api_keys(key_id,tenant_id,name,scopes,resources,encrypted_secret,secret_nonce,created_by) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8)`, keyID, tenantID, strings.TrimSpace(name), scopes, resourceJSON, ciphertext, nonce, actorID); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("insert api key: %w", err)
++	}
++	metadata, err := json.Marshal(struct {
++		Scopes []string `json:"scopes"`
++	}{Scopes: scopes})
++	if err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("encode api key audit: %w", err)
++	}
++	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id,metadata) VALUES($1,$2,'api_key.issued','api_key',$3,$4::jsonb)`, tenantID, actorID, keyID, metadata); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("audit api key issue: %w", err)
++	}
++	if err := tx.Commit(ctx); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("commit api key issue: %w", err)
++	}
++	return domain.APIKey{KeyID: keyID, TenantID: tenantID, Name: strings.TrimSpace(name), Scopes: scopes, Resources: resources, CreatedAt: time.Now().UTC()}, base64.RawURLEncoding.EncodeToString(secret), nil
++}
++
++func (s *Service) ListAPIKeys(ctx context.Context, tenantID, actorID int64) ([]domain.APIKey, error) {
++	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
++		return nil, err
++	}
++	if tenantID <= 0 {
++		return nil, errors.New("tenant is required")
++	}
++	if err := s.authorizeAPIKeyRead(ctx, tenantID, actorID); err != nil {
++		return nil, err
++	}
++	rows, err := s.pool.Query(ctx, `SELECT key_id,name,scopes,resources,created_at,revoked_at FROM api_keys WHERE tenant_id=$1 ORDER BY created_at DESC`, tenantID)
++	if err != nil {
++		return nil, fmt.Errorf("list api keys: %w", err)
++	}
++	defer rows.Close()
++	out := make([]domain.APIKey, 0)
++	for rows.Next() {
++		var key domain.APIKey
++		var raw []byte
++		if err := rows.Scan(&key.KeyID, &key.Name, &key.Scopes, &raw, &key.CreatedAt, &key.RevokedAt); err != nil {
++			return nil, fmt.Errorf("scan api key: %w", err)
++		}
++		if err := json.Unmarshal(raw, &key.Resources); err != nil {
++			return nil, fmt.Errorf("decode api key resources: %w", err)
++		}
++		key.TenantID = tenantID
++		out = append(out, key)
++	}
++	return out, rows.Err()
++}
++
++func (s *Service) RevokeAPIKey(ctx context.Context, tenantID, actorID int64, keyID string) error {
++	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
++		return err
++	}
++	return s.updateAPIKeyState(ctx, tenantID, actorID, keyID, false)
++}
++
++func (s *Service) RotateAPIKey(ctx context.Context, tenantID, actorID int64, keyID string) (domain.APIKey, string, error) {
++	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
++		return domain.APIKey{}, "", err
++	}
++	if err := s.authorizeAPIKeyRead(ctx, tenantID, actorID); err != nil {
++		return domain.APIKey{}, "", err
++	}
++	tx, err := s.pool.Begin(ctx)
++	if err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("begin api key rotation: %w", err)
++	}
++	defer tx.Rollback(ctx)
++	var old domain.APIKey
++	if err := s.authorizeAPIKeyAdmin(ctx, tx, tenantID, actorID); err != nil {
++		return domain.APIKey{}, "", err
++	}
++	var raw []byte
++	if err := tx.QueryRow(ctx, `SELECT name,scopes,resources FROM api_keys WHERE key_id=$1 AND tenant_id=$2 AND revoked_at IS NULL FOR UPDATE`, keyID, tenantID).Scan(&old.Name, &old.Scopes, &raw); err != nil {
++		if errors.Is(err, pgx.ErrNoRows) {
++			return domain.APIKey{}, "", domain.ErrNotFound
++		}
++		return domain.APIKey{}, "", fmt.Errorf("lock api key rotation: %w", err)
++	}
++	if err := json.Unmarshal(raw, &old.Resources); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("decode api key rotation: %w", err)
++	}
++	newID, err := randomKeyID()
++	if err != nil {
++		return domain.APIKey{}, "", err
++	}
++	secret := make([]byte, 32)
++	if _, err := rand.Read(secret); err != nil {
++		return domain.APIKey{}, "", err
++	}
++	ciphertext, nonce, err := encryptAPISecret(s.rootSecret(), secret)
++	if err != nil {
++		return domain.APIKey{}, "", err
++	}
++	resourceJSON, err := json.Marshal(old.Resources)
++	if err != nil {
++		return domain.APIKey{}, "", err
++	}
++	if _, err := tx.Exec(ctx, `UPDATE api_keys SET revoked_at=now() WHERE key_id=$1`, keyID); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("revoke old api key: %w", err)
++	}
++	if _, err := tx.Exec(ctx, `INSERT INTO api_keys(key_id,tenant_id,name,scopes,resources,encrypted_secret,secret_nonce,created_by,rotated_from) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9)`, newID, tenantID, old.Name, old.Scopes, resourceJSON, ciphertext, nonce, actorID, keyID); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("insert rotated api key: %w", err)
++	}
++	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id,metadata) VALUES($1,$2,'api_key.rotated','api_key',$3,$4::jsonb)`, tenantID, actorID, newID, fmt.Sprintf(`{"rotated_from":%q}`, keyID)); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("audit api key rotation: %w", err)
++	}
++	if err := tx.Commit(ctx); err != nil {
++		return domain.APIKey{}, "", fmt.Errorf("commit api key rotation: %w", err)
++	}
++	return domain.APIKey{KeyID: newID, TenantID: tenantID, Name: old.Name, Scopes: old.Scopes, Resources: old.Resources, CreatedAt: time.Now().UTC()}, base64.RawURLEncoding.EncodeToString(secret), nil
++}
++
++func (s *Service) updateAPIKeyState(ctx context.Context, tenantID, actorID int64, keyID string, active bool) error {
++	tx, err := s.pool.Begin(ctx)
++	if err != nil {
++		return fmt.Errorf("begin api key state: %w", err)
++	}
++	defer tx.Rollback(ctx)
++	if err := s.authorizeAPIKeyAdmin(ctx, tx, tenantID, actorID); err != nil {
++		return err
++	}
++	var query string
++	if active {
++		query = `UPDATE api_keys SET revoked_at=NULL WHERE key_id=$1 AND tenant_id=$2`
++	} else {
++		query = `UPDATE api_keys SET revoked_at=coalesce(revoked_at,now()) WHERE key_id=$1 AND tenant_id=$2`
++	}
++	result, err := tx.Exec(ctx, query, keyID, tenantID)
++	if err != nil {
++		return fmt.Errorf("update api key state: %w", err)
++	}
++	if result.RowsAffected() != 1 {
++		return domain.ErrNotFound
++	}
++	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id) VALUES($1,$2,$3,'api_key',$4)`, tenantID, actorID, map[bool]string{false: "api_key.revoked", true: "api_key.activated"}[active], keyID); err != nil {
++		return fmt.Errorf("audit api key state: %w", err)
++	}
++	return tx.Commit(ctx)
++}
+diff --git a/internal/core/m6c_license_test.go b/internal/core/m6c_license_test.go
+index 43cfc51..c6c4683 100644
+--- a/internal/core/m6c_license_test.go
++++ b/internal/core/m6c_license_test.go
+@@ -26,6 +26,10 @@ import (
+ )
+ 
+ func installTestLicense(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDevices int64) *rsa.PrivateKey {
++	return installTestLicenseWithFeatures(t, p, svc, maxDevices, []string{})
++}
++
++func installTestLicenseWithFeatures(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDevices int64, features []string) *rsa.PrivateKey {
+ 	t.Helper()
+ 	ctx := context.Background()
+ 	key, err := rsa.GenerateKey(rand.Reader, 2048)
+@@ -33,7 +37,7 @@ func installTestLicense(t *testing.T, p *pgxpool.Pool, svc *core.Service, maxDev
+ 		t.Fatal(err)
+ 	}
+ 	now := time.Now().UTC().Truncate(time.Second)
+-	payload := license.Payload{LicenseID: "test-license", IssuedAt: now.Add(-2 * time.Minute), NotBefore: now.Add(-time.Minute), MaxDevices: maxDevices, Features: []string{}, KeyID: "test-key"}
++	payload := license.Payload{LicenseID: "test-license", IssuedAt: now.Add(-2 * time.Minute), NotBefore: now.Add(-time.Minute), MaxDevices: maxDevices, Features: features, KeyID: "test-key"}
+ 	if err := p.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&payload.DeploymentID); err != nil {
+ 		t.Fatal(err)
+ 	}
+diff --git a/internal/core/m6d_browser_test.go b/internal/core/m6d_browser_test.go
+new file mode 100644
+index 0000000..e014cf4
+--- /dev/null
++++ b/internal/core/m6d_browser_test.go
+@@ -0,0 +1,71 @@
++package core_test
++
++import (
++	"io"
++	"log/slog"
++	"net/http"
++	"net/http/httptest"
++	"os"
++	"os/exec"
++	"path/filepath"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/golang-jwt/jwt/v5"
++
++	"git.hyhy.fun/rsplab/iolink/internal/adminapi"
++	"git.hyhy.fun/rsplab/iolink/internal/authorization"
++	"git.hyhy.fun/rsplab/iolink/internal/platform"
++	webassets "git.hyhy.fun/rsplab/iolink/internal/web"
++)
++
++func TestM6dBrowser_realManagementFlow(t *testing.T) {
++	if os.Getenv("IOLINK_M6D_BROWSER") != "1" {
++		t.Skip("set IOLINK_M6D_BROWSER=1 after a production frontend build")
++	}
++	f := newM6dHTTPFixture(t)
++	policy, err := authorization.New()
++	if err != nil {
++		t.Fatal(err)
++	}
++	rootSecret := strings.Repeat("s", 32)
++	mux := http.NewServeMux()
++	mux.Handle("/admin/v1/", adminapi.New(adminapi.Config{SecretKey: rootSecret, JWT: time.Hour}, adminapi.Deps{Logger: slog.New(slog.NewJSONHandler(io.Discard, nil)), Store: f.svc, APIKeys: f.svc, Policy: policy}).Routes())
++	assets, err := webassets.Admin()
++	if err != nil {
++		t.Fatal(err)
++	}
++	files := http.FileServerFS(assets)
++	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
++		if r.URL.Path == "/system" || r.URL.Path == "/api-keys/audit" {
++			copy := r.Clone(r.Context())
++			copy.URL.Path = "/"
++			files.ServeHTTP(w, copy)
++			return
++		}
++		files.ServeHTTP(w, r)
++	})
++	server := httptest.NewServer(mux)
++	defer server.Close()
++	version, err := f.svc.TenantMembershipVersion(t.Context(), 8301, 8301)
++	if err != nil {
++		t.Fatal(err)
++	}
++	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"aid": 8301, "ver": 0, "tenant_id": 8301, "tenant_ver": version, "tenant_role": "owner", "exp": time.Now().Add(time.Hour).Unix()}).SignedString(platform.DeriveAdminKey(rootSecret))
++	if err != nil {
++		t.Fatal(err)
++	}
++	root, err := filepath.Abs("../..")
++	if err != nil {
++		t.Fatal(err)
++	}
++	cmd := exec.CommandContext(t.Context(), "npm", "run", "e2e", "--", "--config", "playwright.m6d.config.ts", "--reporter=line")
++	cmd.Dir = filepath.Join(root, "web")
++	cmd.Env = append(os.Environ(), "IOLINK_M6D_URL="+server.URL, "IOLINK_M6D_TOKEN="+token)
++	output, err := cmd.CombinedOutput()
++	if err != nil {
++		t.Fatalf("real management browser: %v\n%s", err, output)
++	}
++	t.Log(string(output))
++}
+diff --git a/internal/core/m6d_http_helpers_test.go b/internal/core/m6d_http_helpers_test.go
+new file mode 100644
+index 0000000..e96a06d
+--- /dev/null
++++ b/internal/core/m6d_http_helpers_test.go
+@@ -0,0 +1,123 @@
++package core_test
++
++import (
++	"context"
++	"crypto/hmac"
++	"crypto/rsa"
++	"crypto/sha256"
++	"encoding/base64"
++	"encoding/hex"
++	"fmt"
++	"io"
++	"log/slog"
++	"net/http"
++	"net/http/httptest"
++	"strconv"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/jackc/pgx/v5/pgxpool"
++
++	"git.hyhy.fun/rsplab/iolink/internal/authorization"
++	"git.hyhy.fun/rsplab/iolink/internal/core"
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"git.hyhy.fun/rsplab/iolink/internal/migrate"
++	"git.hyhy.fun/rsplab/iolink/internal/openapi"
++	"git.hyhy.fun/rsplab/iolink/internal/testdb"
++)
++
++type m6dHTTPFixture struct {
++	pool       *pgxpool.Pool
++	svc        *core.Service
++	owner      context.Context
++	server     *httptest.Server
++	licenseKey *rsa.PrivateKey
++}
++
++func newM6dHTTPFixture(t *testing.T) m6dHTTPFixture {
++	t.Helper()
++	p := testdb.New(t)
++	ctx := context.Background()
++	if err := migrate.Up(ctx, p); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := p.Exec(ctx, `
++		INSERT INTO users(id,open_id,authority) VALUES(8301,'m6d-http-owner','USER'),(8303,'m6d-http-other','USER');
++		INSERT INTO tenants(id,name) VALUES(8301,'m6d-http'),(8303,'m6d-http-other');
++		INSERT INTO tenant_memberships(tenant_id,user_id,role) VALUES(8301,8301,'owner'),(8303,8303,'owner');
++		INSERT INTO farms(id,tenant_id,owner_id,name) VALUES(8301,8301,8301,'allowed'),(8302,8301,8301,'hidden'),(8303,8303,8303,'foreign');
++		INSERT INTO ponds(id,farm_id,name) VALUES(8301,8301,'allowed'),(8302,8302,'hidden'),(8303,8303,'foreign');
++		INSERT INTO devices(pond_id,device_no,secret_hash) VALUES(8301,'m6d-allowed','hash'),(8302,'m6d-hidden','hash'),(8303,'m6d-foreign','hash');
++		INSERT INTO alarms(device_no,pond_id,metric,current_value,threshold,level) VALUES
++		('m6d-allowed',8301,'temperature',30,25,'warning'),('m6d-hidden',8302,'temperature',30,25,'warning'),('m6d-foreign',8303,'temperature',30,25,'warning');`); err != nil {
++		t.Fatal(err)
++	}
++	policy, err := authorization.New()
++	if err != nil {
++		t.Fatal(err)
++	}
++	svc, err := core.NewWithPolicy(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)), policy)
++	if err != nil {
++		t.Fatal(err)
++	}
++	licenseKey := installTestLicenseWithFeatures(t, p, svc, 100, []string{"openapi"})
++	svc.SetAPIKeyRoot([]byte(strings.Repeat("r", 32)))
++	owner := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(ctx, 8301), "owner"), 8301)
++	server := httptest.NewServer(openapi.New(openapi.Deps{Auth: svc, Resources: svc}).Routes())
++	t.Cleanup(server.Close)
++	return m6dHTTPFixture{pool: p, svc: svc, owner: owner, server: server, licenseKey: licenseKey}
++}
++
++func (f m6dHTTPFixture) issue(t *testing.T, scopes []string, resources domain.APIKeyResourceScope) (domain.APIKey, string) {
++	t.Helper()
++	key, secret, err := f.svc.IssueAPIKey(f.owner, 8301, "http-test", scopes, resources, 8301)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return key, secret
++}
++
++func m6dSignedHTTP(t *testing.T, server *httptest.Server, key domain.APIKey, secretText, path, nonce string) (int, http.Header, []byte) {
++	t.Helper()
++	return m6dSignedHTTPBody(t, server, key, secretText, path, nonce, "", "")
++}
++
++func m6dSignedHTTPBody(t *testing.T, server *httptest.Server, key domain.APIKey, secretText, path, nonce, signedBody, actualBody string) (int, http.Header, []byte) {
++	t.Helper()
++	secret, err := base64.RawURLEncoding.DecodeString(secretText)
++	if err != nil {
++		t.Fatal(err)
++	}
++	timestamp := strconv.FormatInt(time.Now().UTC().Unix(), 10)
++	hash := sha256.Sum256([]byte(signedBody))
++	signed := strings.Join([]string{"GET", path, "", timestamp, nonce, hex.EncodeToString(hash[:])}, "\n")
++	mac := hmac.New(sha256.New, secret)
++	if _, err := mac.Write([]byte(signed)); err != nil {
++		t.Fatal(err)
++	}
++	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, server.URL+path, strings.NewReader(actualBody))
++	if err != nil {
++		t.Fatal(err)
++	}
++	req.Header.Set("X-Key-Id", key.KeyID)
++	req.Header.Set("X-Timestamp", timestamp)
++	req.Header.Set("X-Nonce", nonce)
++	req.Header.Set("X-Signature", hex.EncodeToString(mac.Sum(nil)))
++	resp, err := server.Client().Do(req)
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer resp.Body.Close()
++	body, err := io.ReadAll(resp.Body)
++	if err != nil {
++		t.Fatal(err)
++	}
++	return resp.StatusCode, resp.Header, body
++}
++
++func m6dNonce(t *testing.T) string {
++	t.Helper()
++	hash := sha256.Sum256([]byte(fmt.Sprintf("%s/%d", t.Name(), time.Now().UnixNano())))
++	return hex.EncodeToString(hash[:])
++}
+diff --git a/internal/core/m6d_open_api_test.go b/internal/core/m6d_open_api_test.go
+new file mode 100644
+index 0000000..7c0bc71
+--- /dev/null
++++ b/internal/core/m6d_open_api_test.go
+@@ -0,0 +1,237 @@
++package core_test
++
++import (
++	"context"
++	"crypto/hmac"
++	"crypto/sha256"
++	"encoding/base64"
++	"encoding/hex"
++	"errors"
++	"fmt"
++	"io"
++	"log/slog"
++	"net/http"
++	"net/http/httptest"
++	"strconv"
++	"strings"
++	"sync"
++	"testing"
++	"time"
++
++	"git.hyhy.fun/rsplab/iolink/internal/authorization"
++	"git.hyhy.fun/rsplab/iolink/internal/core"
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"git.hyhy.fun/rsplab/iolink/internal/migrate"
++	"git.hyhy.fun/rsplab/iolink/internal/openapi"
++	"git.hyhy.fun/rsplab/iolink/internal/testdb"
++)
++
++func TestM6dIssueAndAuthenticateOpenKey(t *testing.T) {
++	p := testdb.New(t)
++	ctx := context.Background()
++	if err := migrate.Up(ctx, p); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := p.Exec(ctx, `INSERT INTO users(id,open_id,authority) VALUES(8101,'m6d-user','USER'); INSERT INTO tenants(id,name,active) VALUES(8101,'m6d-tenant',true); INSERT INTO tenant_memberships(tenant_id,user_id,role,active) VALUES(8101,8101,'owner',true); INSERT INTO farms(id,owner_id,tenant_id,name) VALUES(8101,8101,8101,'m6d-farm'); INSERT INTO ponds(id,farm_id,name) VALUES(8101,8101,'m6d-pond')`); err != nil {
++		t.Fatal(err)
++	}
++	policy, err := authorization.New()
++	if err != nil {
++		t.Fatal(err)
++	}
++	svc, err := core.NewWithPolicy(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)), policy)
++	if err != nil {
++		t.Fatal(err)
++	}
++	licenseKey := installTestLicenseWithFeatures(t, p, svc, 100, []string{"openapi"})
++	svc.SetAPIKeyRoot([]byte(strings.Repeat("r", 32)))
++	ownerCtx := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(ctx, 8101), "owner"), 8101)
++	key, secretText, err := svc.IssueAPIKey(ownerCtx, 8101, "integration", []string{"ponds:read"}, domain.APIKeyResourceScope{}, 8101)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if secretText == "" || key.KeyID == "" {
++		t.Fatal("issue returned no credentials")
++	}
++	secret, err := base64.RawURLEncoding.DecodeString(secretText)
++	if err != nil {
++		t.Fatal(err)
++	}
++	now := time.Now().UTC().Truncate(time.Second)
++	body := []byte{}
++	bodyHash := sha256.Sum256(body)
++	nonce := "0123456789abcdef0123456789abcdef"
++	signed := strings.Join([]string{"GET", "/open/v1/ponds", "", strconv.FormatInt(now.Unix(), 10), nonce, hex.EncodeToString(bodyHash[:])}, "\n")
++	mac := hmac.New(sha256.New, secret)
++	_, _ = mac.Write([]byte(signed))
++	req := domain.OpenRequest{KeyID: key.KeyID, Timestamp: now.Unix(), Nonce: nonce, Signature: hex.EncodeToString(mac.Sum(nil)), Method: "GET", Path: "/open/v1/ponds", Body: body}
++	bad := req
++	bad.Signature = strings.Repeat("0", 64)
++	if _, err := svc.AuthenticateOpen(ctx, bad, now); err == nil {
++		t.Fatal("invalid signature accepted")
++	}
++	stale := req
++	stale.Timestamp = now.Add(-301 * time.Second).Unix()
++	if _, err := svc.AuthenticateOpen(ctx, stale, now); !errors.Is(err, core.ErrOpenUnauthorized) {
++		t.Fatalf("stale timestamp error=%v", err)
++	}
++	future := req
++	future.Timestamp = now.Add(301 * time.Second).Unix()
++	if _, err := svc.AuthenticateOpen(ctx, future, now); !errors.Is(err, core.ErrOpenUnauthorized) {
++		t.Fatalf("future timestamp error=%v", err)
++	}
++	principal, err := svc.AuthenticateOpen(ctx, req, now)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if principal.TenantID != 8101 {
++		t.Fatalf("tenant = %d", principal.TenantID)
++	}
++	if _, err := svc.AuthenticateOpen(ctx, req, now); err == nil {
++		t.Fatal("replayed nonce accepted")
++	}
++	httpNow := time.Now().UTC().Truncate(time.Second)
++	httpNonce := "abcdef0123456789abcdef0123456789"
++	httpHash := sha256.Sum256(nil)
++	httpSigned := strings.Join([]string{"GET", "/open/v1/ponds", "", strconv.FormatInt(httpNow.Unix(), 10), httpNonce, hex.EncodeToString(httpHash[:])}, "\n")
++	httpMAC := hmac.New(sha256.New, secret)
++	_, _ = httpMAC.Write([]byte(httpSigned))
++	httpReq := httptest.NewRequest(http.MethodGet, "/open/v1/ponds", nil)
++	httpReq.Header.Set("X-Key-Id", key.KeyID)
++	httpReq.Header.Set("X-Timestamp", strconv.FormatInt(httpNow.Unix(), 10))
++	httpReq.Header.Set("X-Nonce", httpNonce)
++	httpReq.Header.Set("X-Signature", hex.EncodeToString(httpMAC.Sum(nil)))
++	httpRec := httptest.NewRecorder()
++	openapi.New(openapi.Deps{Auth: svc, Resources: svc}).Routes().ServeHTTP(httpRec, httpReq)
++	if httpRec.Code != http.StatusOK || !strings.Contains(httpRec.Body.String(), "m6d-pond") {
++		t.Fatalf("open http status=%d body=%s", httpRec.Code, httpRec.Body.String())
++	}
++	tamperedReq := httptest.NewRequest(http.MethodGet, "/open/v1/ponds", strings.NewReader("tampered"))
++	tamperedReq.Header.Set("X-Key-Id", key.KeyID)
++	tamperedReq.Header.Set("X-Timestamp", strconv.FormatInt(httpNow.Unix(), 10))
++	tamperedReq.Header.Set("X-Nonce", "tampered-0123456789abcdef0123456")
++	tamperedReq.Header.Set("X-Signature", hex.EncodeToString(httpMAC.Sum(nil)))
++	tamperedRec := httptest.NewRecorder()
++	openapi.New(openapi.Deps{Auth: svc, Resources: svc}).Routes().ServeHTTP(tamperedRec, tamperedReq)
++	if tamperedRec.Code != http.StatusUnauthorized {
++		t.Fatalf("tampered body status=%d", tamperedRec.Code)
++	}
++	restarted, err := core.NewWithPolicy(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)), policy)
++	if err != nil {
++		t.Fatal(err)
++	}
++	restarted.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: &licenseKey.PublicKey, KeyID: "test-key"})
++	restarted.SetAPIKeyRoot([]byte(strings.Repeat("r", 32)))
++	restartNow := time.Now().UTC().Truncate(time.Second)
++	restartNonce := "restart-0123456789abcdef0123456789"
++	restartHash := sha256.Sum256(nil)
++	restartSigned := strings.Join([]string{"GET", "/open/v1/ponds", "", strconv.FormatInt(restartNow.Unix(), 10), restartNonce, hex.EncodeToString(restartHash[:])}, "\n")
++	restartMAC := hmac.New(sha256.New, secret)
++	_, _ = restartMAC.Write([]byte(restartSigned))
++	if _, err := restarted.AuthenticateOpen(ctx, domain.OpenRequest{KeyID: key.KeyID, Timestamp: restartNow.Unix(), Nonce: restartNonce, Signature: hex.EncodeToString(restartMAC.Sum(nil)), Method: "GET", Path: "/open/v1/ponds"}, restartNow); err != nil {
++		t.Fatalf("post-restart key authentication: %v", err)
++	}
++	keys, err := svc.ListAPIKeys(ownerCtx, 8101, 8101)
++	if err != nil || len(keys) != 1 {
++		t.Fatalf("keys = %d err=%v", len(keys), err)
++	}
++	rotated, rotatedSecretText, err := svc.RotateAPIKey(ownerCtx, 8101, 8101, key.KeyID)
++	if err != nil {
++		t.Fatal(err)
++	}
++	if rotated.KeyID == key.KeyID || rotatedSecretText == secretText {
++		t.Fatal("rotation did not create fresh credentials")
++	}
++	if _, err := svc.AuthenticateOpen(ctx, req, now); !errors.Is(err, core.ErrOpenUnauthorized) {
++		t.Fatalf("revoked key error=%v", err)
++	}
++	if err := svc.RevokeAPIKey(ownerCtx, 8101, 8101, rotated.KeyID); err != nil {
++		t.Fatal(err)
++	}
++	rotatedSecret, err := base64.RawURLEncoding.DecodeString(rotatedSecretText)
++	if err != nil {
++		t.Fatal(err)
++	}
++	rotatedHash := sha256.Sum256(nil)
++	rotatedNonce := "rotated-0123456789abcdef012345678"
++	rotatedSigned := strings.Join([]string{"GET", "/open/v1/ponds", "", strconv.FormatInt(now.Unix(), 10), rotatedNonce, hex.EncodeToString(rotatedHash[:])}, "\n")
++	rotatedMAC := hmac.New(sha256.New, rotatedSecret)
++	_, _ = rotatedMAC.Write([]byte(rotatedSigned))
++	if _, err := svc.AuthenticateOpen(ctx, domain.OpenRequest{KeyID: rotated.KeyID, Timestamp: now.Unix(), Nonce: rotatedNonce, Signature: hex.EncodeToString(rotatedMAC.Sum(nil)), Method: "GET", Path: "/open/v1/ponds"}, now); !errors.Is(err, core.ErrOpenUnauthorized) {
++		t.Fatalf("revoked rotated key error=%v", err)
++	}
++	audit, err := svc.ListAPIKeyAuditEvents(ownerCtx, 8101, 8101, 100)
++	if err != nil || len(audit) < 3 {
++		t.Fatalf("api key audit events=%d err=%v", len(audit), err)
++	}
++}
++
++func TestM6dConcurrentNonceAndRateLimit(t *testing.T) {
++	p := testdb.New(t)
++	ctx := context.Background()
++	if err := migrate.Up(ctx, p); err != nil {
++		t.Fatal(err)
++	}
++	if _, err := p.Exec(ctx, `INSERT INTO users(id,open_id,authority) VALUES(8201,'m6d-concurrent','USER'); INSERT INTO tenants(id,name,active) VALUES(8201,'m6d-concurrent-tenant',true); INSERT INTO tenant_memberships(tenant_id,user_id,role,active) VALUES(8201,8201,'owner',true); INSERT INTO farms(id,owner_id,tenant_id,name) VALUES(8201,8201,8201,'m6d-concurrent-farm'); INSERT INTO ponds(id,farm_id,name) VALUES(8201,8201,'m6d-concurrent-pond')`); err != nil {
++		t.Fatal(err)
++	}
++	policy, err := authorization.New()
++	if err != nil {
++		t.Fatal(err)
++	}
++	svc, err := core.NewWithPolicy(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)), policy)
++	if err != nil {
++		t.Fatal(err)
++	}
++	installTestLicenseWithFeatures(t, p, svc, 100, []string{"openapi"})
++	svc.SetAPIKeyRoot([]byte(strings.Repeat("r", 32)))
++	ownerCtx := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(ctx, 8201), "owner"), 8201)
++	key, secretText, err := svc.IssueAPIKey(ownerCtx, 8201, "concurrent", []string{"ponds:read"}, domain.APIKeyResourceScope{}, 8201)
++	if err != nil {
++		t.Fatal(err)
++	}
++	secret, err := base64.RawURLEncoding.DecodeString(secretText)
++	if err != nil {
++		t.Fatal(err)
++	}
++	now := time.Now().UTC().Truncate(time.Second)
++	makeRequest := func(nonce string) domain.OpenRequest {
++		hash := sha256.Sum256(nil)
++		signed := strings.Join([]string{"GET", "/open/v1/ponds", "", strconv.FormatInt(now.Unix(), 10), nonce, hex.EncodeToString(hash[:])}, "\n")
++		mac := hmac.New(sha256.New, secret)
++		_, _ = mac.Write([]byte(signed))
++		return domain.OpenRequest{KeyID: key.KeyID, Timestamp: now.Unix(), Nonce: nonce, Signature: hex.EncodeToString(mac.Sum(nil)), Method: "GET", Path: "/open/v1/ponds"}
++	}
++	const nonce = "fedcba9876543210fedcba98765432"
++	var wg sync.WaitGroup
++	results := make(chan error, 2)
++	for i := 0; i < 2; i++ {
++		wg.Add(1)
++		go func() {
++			defer wg.Done()
++			_, callErr := svc.AuthenticateOpen(ctx, makeRequest(nonce), now)
++			results <- callErr
++		}()
++	}
++	wg.Wait()
++	close(results)
++	var success, replay int
++	for callErr := range results {
++		if callErr == nil {
++			success++
++		} else if errors.Is(callErr, core.ErrOpenReplay) {
++			replay++
++		}
++	}
++	if success != 1 || replay != 1 {
++		t.Fatalf("concurrent nonce success=%d replay=%d", success, replay)
++	}
++	for i := 0; i < 9; i++ {
++		if _, err := svc.AuthenticateOpen(ctx, makeRequest(fmt.Sprintf("rate-%02d-0123456789abcdef", i)), now); err != nil {
++			t.Fatalf("burst request %d: %v", i, err)
++		}
++	}
++	if _, err := svc.AuthenticateOpen(ctx, makeRequest("rate-limit-0123456789abcdef"), now); !errors.As(err, new(*core.OpenRateLimitError)) {
++		t.Fatalf("rate limit error=%v", err)
++	}
++}
+diff --git a/internal/core/m6d_persistence_http_test.go b/internal/core/m6d_persistence_http_test.go
+new file mode 100644
+index 0000000..3086c43
+--- /dev/null
++++ b/internal/core/m6d_persistence_http_test.go
+@@ -0,0 +1,94 @@
++package core_test
++
++import (
++	"context"
++	"crypto/aes"
++	"crypto/cipher"
++	"crypto/sha256"
++	"io"
++	"log/slog"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++	"time"
++
++	"git.hyhy.fun/rsplab/iolink/internal/authorization"
++	"git.hyhy.fun/rsplab/iolink/internal/core"
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"git.hyhy.fun/rsplab/iolink/internal/openapi"
++)
++
++func TestM6dBodyDigest_rejectsOnlyChangedBodyAndPreservesNonce(t *testing.T) {
++	f := newM6dHTTPFixture(t)
++	key, secret := f.issue(t, []string{"ponds:read"}, domain.APIKeyResourceScope{})
++	nonce := m6dNonce(t)
++	status, _, _ := m6dSignedHTTPBody(t, f.server, key, secret, "/open/v1/ponds", nonce, "original", "modified")
++	if status != http.StatusUnauthorized {
++		t.Fatalf("changed body status=%d", status)
++	}
++	status, _, _ = m6dSignedHTTPBody(t, f.server, key, secret, "/open/v1/ponds", nonce, "original", "original")
++	if status != http.StatusOK {
++		t.Fatalf("rejected signature consumed nonce: status=%d", status)
++	}
++}
++
++func TestM6dRestart_preservesConsumedNonceAndRateState(t *testing.T) {
++	f := newM6dHTTPFixture(t)
++	key, secret := f.issue(t, []string{"ponds:read"}, domain.APIKeyResourceScope{})
++	nonce := m6dNonce(t)
++	status, _, _ := m6dSignedHTTP(t, f.server, key, secret, "/open/v1/ponds", nonce)
++	if status != http.StatusOK {
++		t.Fatalf("initial status=%d", status)
++	}
++	policy, err := authorization.New()
++	if err != nil {
++		t.Fatal(err)
++	}
++	restarted, err := core.NewWithPolicy(t.Context(), f.pool, slog.New(slog.NewTextHandler(io.Discard, nil)), policy)
++	if err != nil {
++		t.Fatal(err)
++	}
++	restarted.SetAPIKeyRoot([]byte(strings.Repeat("r", 32)))
++	restarted.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: &f.licenseKey.PublicKey, KeyID: "test-key"})
++	server := httptest.NewServer(openapi.New(openapi.Deps{Auth: restarted, Resources: restarted}).Routes())
++	defer server.Close()
++	status, _, _ = m6dSignedHTTP(t, server, key, secret, "/open/v1/ponds", nonce)
++	if status != http.StatusUnauthorized {
++		t.Fatalf("restart replay status=%d", status)
++	}
++	if _, err := f.pool.Exec(t.Context(), `UPDATE api_keys SET rate_tokens=0,rate_last_refill=now()+interval '1 hour' WHERE key_id=$1`, key.KeyID); err != nil {
++		t.Fatal(err)
++	}
++	status, _, _ = m6dSignedHTTP(t, server, key, secret, "/open/v1/ponds", m6dNonce(t))
++	if status != http.StatusTooManyRequests {
++		t.Fatalf("restart rate status=%d", status)
++	}
++}
++
++func TestM6dPublishedVector_authenticatesWithProductionVerifier(t *testing.T) {
++	f := newM6dHTTPFixture(t)
++	key, _ := f.issue(t, []string{"ponds:read"}, domain.APIKeyResourceScope{})
++	rootHash := sha256.Sum256([]byte(strings.Repeat("r", 32) + ":api-key"))
++	block, err := aes.NewCipher(rootHash[:])
++	if err != nil {
++		t.Fatal(err)
++	}
++	gcm, err := cipher.NewGCM(block)
++	if err != nil {
++		t.Fatal(err)
++	}
++	nonce := make([]byte, gcm.NonceSize())
++	sealed := gcm.Seal(nil, nonce, []byte("documented-test-secret"), nil)
++	if _, err := f.pool.Exec(t.Context(), `UPDATE api_keys SET encrypted_secret=$2,secret_nonce=$3 WHERE key_id=$1`, key.KeyID, sealed, nonce); err != nil {
++		t.Fatal(err)
++	}
++	request := domain.OpenRequest{KeyID: key.KeyID, Method: "GET", Path: "/open/v1/ponds", Query: "b=two&a=hello%20world&a=&b=one", Timestamp: 1735689600, Nonce: "0123456789abcdef0123456789abcdef", Signature: "bcf8386ae0789327c5a6597a81eaa2f3121565d045012796e7e22bdba2a43149"}
++	principal, err := f.svc.AuthenticateOpen(context.Background(), request, time.Unix(request.Timestamp, 0))
++	if err != nil {
++		t.Fatalf("published vector rejected: %v", err)
++	}
++	if principal.KeyID != key.KeyID || principal.TenantID != 8301 {
++		t.Fatal("wrong principal")
++	}
++}
+diff --git a/internal/core/m6d_resource_http_test.go b/internal/core/m6d_resource_http_test.go
+new file mode 100644
+index 0000000..3a27a02
+--- /dev/null
++++ b/internal/core/m6d_resource_http_test.go
+@@ -0,0 +1,153 @@
++package core_test
++
++import (
++	"context"
++	"encoding/json"
++	"errors"
++	"net/http"
++	"strconv"
++	"testing"
++
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++)
++
++func TestM6dResourceHTTP_filtersListsAndDetails(t *testing.T) {
++	// Given: two farms in one tenant plus a foreign tenant, served by real HTTP and Timescale.
++	f := newM6dHTTPFixture(t)
++	for _, scope := range []struct {
++		name      string
++		resources domain.APIKeyResourceScope
++	}{
++		{"farm", domain.APIKeyResourceScope{FarmIDs: []int64{8301}}},
++		{"pond", domain.APIKeyResourceScope{PondIDs: []int64{8301}}},
++		{"device", domain.APIKeyResourceScope{DeviceNos: []string{"m6d-allowed"}}},
++	} {
++		key, secret := f.issue(t, []string{"ponds:read", "devices:read", "alarms:read"}, scope.resources)
++		for _, path := range []string{"/open/v1/ponds", "/open/v1/devices", "/open/v1/alarms"} {
++			t.Run(scope.name+path, func(t *testing.T) {
++				// When: a limited key reads a resource list.
++				status, _, body := m6dSignedHTTP(t, f.server, key, secret, path, m6dNonce(t))
++				// Then: only the permitted resource is visible.
++				if status != http.StatusOK {
++					t.Fatalf("status=%d", status)
++				}
++				var rows []struct {
++					ID       int64  `json:"id"`
++					PondID   int64  `json:"pond_id"`
++					DeviceNo string `json:"device_no"`
++				}
++				if err := json.Unmarshal(body, &rows); err != nil {
++					t.Fatal(err)
++				}
++				if len(rows) != 1 {
++					t.Fatalf("rows=%d want 1", len(rows))
++				}
++				if path == "/open/v1/ponds" && rows[0].ID != 8301 {
++					t.Fatal("unexpected pond")
++				}
++				if path != "/open/v1/ponds" && rows[0].DeviceNo != "m6d-allowed" {
++					t.Fatal("unexpected device")
++				}
++			})
++		}
++		for _, path := range []string{"/open/v1/ponds/8302", "/open/v1/ponds/8303", "/open/v1/devices/m6d-hidden", "/open/v1/devices/m6d-foreign"} {
++			t.Run(scope.name+path, func(t *testing.T) {
++				status, _, _ := m6dSignedHTTP(t, f.server, key, secret, path, m6dNonce(t))
++				if status != http.StatusNotFound {
++					t.Fatalf("status=%d want 404", status)
++				}
++			})
++		}
++	}
++}
++
++func TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms(t *testing.T) {
++	f := newM6dHTTPFixture(t)
++	key, secret := f.issue(t, []string{"devices:read", "alarms:read"}, domain.APIKeyResourceScope{DeviceNos: []string{"m6d-allowed"}})
++	for _, path := range []string{"/open/v1/devices", "/open/v1/alarms"} {
++		t.Run(path, func(t *testing.T) {
++			status, _, body := m6dSignedHTTP(t, f.server, key, secret, path, m6dNonce(t))
++			var rows []struct {
++				DeviceNo string `json:"device_no"`
++			}
++			if err := json.Unmarshal(body, &rows); err != nil {
++				t.Fatal(err)
++			}
++			if status != http.StatusOK || len(rows) != 1 || rows[0].DeviceNo != "m6d-allowed" {
++				t.Fatal("device scope not enforced")
++			}
++		})
++	}
++}
++
++func TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays(t *testing.T) {
++	for _, scenario := range []struct {
++		name string
++		want int
++	}{
++		{"scope", http.StatusForbidden}, {"inactive tenant", http.StatusUnauthorized},
++		{"missing feature", http.StatusForbidden}, {"replay", http.StatusUnauthorized},
++		{"exhausted rate", http.StatusTooManyRequests},
++	} {
++		t.Run(scenario.name, func(t *testing.T) {
++			// Given: a valid signed key with a specific denial condition.
++			f := newM6dHTTPFixture(t)
++			scopes := []string{"ponds:read"}
++			if scenario.name == "scope" {
++				scopes = []string{"devices:read"}
++			}
++			key, secret := f.issue(t, scopes, domain.APIKeyResourceScope{})
++			nonce := m6dNonce(t)
++			switch scenario.name {
++			case "inactive tenant":
++				if _, err := f.pool.Exec(t.Context(), `UPDATE tenants SET active=false WHERE id=8301`); err != nil {
++					t.Fatal(err)
++				}
++			case "missing feature":
++				installTestLicense(t, f.pool, f.svc, 100)
++			case "replay":
++				status, _, _ := m6dSignedHTTP(t, f.server, key, secret, "/open/v1/ponds", nonce)
++				if status != http.StatusOK {
++					t.Fatalf("first request=%d", status)
++				}
++			case "exhausted rate":
++				if _, err := f.pool.Exec(t.Context(), `UPDATE api_keys SET rate_tokens=0,rate_last_refill=now()+interval '1 hour' WHERE key_id=$1`, key.KeyID); err != nil {
++					t.Fatal(err)
++				}
++			}
++			// When: the real signed HTTP endpoint is called.
++			status, headers, _ := m6dSignedHTTP(t, f.server, key, secret, "/open/v1/ponds", nonce)
++			// Then: fail closed and expose retry information for rate rejection.
++			if status != scenario.want {
++				t.Fatalf("status=%d want=%d", status, scenario.want)
++			}
++			if scenario.want == http.StatusTooManyRequests {
++				retry, err := strconv.Atoi(headers.Get("Retry-After"))
++				if err != nil || retry < 1 {
++					t.Fatal("missing positive Retry-After")
++				}
++			}
++		})
++	}
++}
++
++func TestM6dAdministration_rejectsStaleMembershipWithoutPartialWrite(t *testing.T) {
++	// Given: previously authorized context whose membership has been revoked.
++	f := newM6dHTTPFixture(t)
++	if _, err := f.pool.Exec(context.Background(), `UPDATE tenant_memberships SET active=false WHERE tenant_id=8301 AND user_id=8301`); err != nil {
++		t.Fatal(err)
++	}
++	// When: application use case attempts issuance with the old context.
++	_, _, err := f.svc.IssueAPIKey(f.owner, 8301, "revoked", []string{"ponds:read"}, domain.APIKeyResourceScope{}, 8301)
++	// Then: current database authorization wins, with no key/audit rows.
++	if !errors.Is(err, domain.ErrForbidden) {
++		t.Fatalf("revoked membership error=%v", err)
++	}
++	var count int
++	if err := f.pool.QueryRow(t.Context(), `SELECT count(*) FROM api_keys`).Scan(&count); err != nil {
++		t.Fatal(err)
++	}
++	if count != 0 {
++		t.Fatal("unauthorized key persisted")
++	}
++}
+diff --git a/internal/core/open_auth.go b/internal/core/open_auth.go
+new file mode 100644
+index 0000000..f073ea2
+--- /dev/null
++++ b/internal/core/open_auth.go
+@@ -0,0 +1,201 @@
++package core
++
++import (
++	"context"
++	"crypto/hmac"
++	"crypto/sha256"
++	"crypto/subtle"
++	"encoding/hex"
++	"encoding/json"
++	"errors"
++	"fmt"
++	"net/url"
++	"sort"
++	"strings"
++	"time"
++
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"github.com/jackc/pgx/v5"
++	"github.com/jackc/pgx/v5/pgconn"
++)
++
++var ErrOpenUnauthorized = errors.New("open api authentication failed")
++var ErrOpenReplay = errors.New("open api nonce replay")
++
++type OpenRateLimitError struct{ RetryAfter int }
++
++func (e *OpenRateLimitError) Error() string        { return "open api rate limit exceeded" }
++func (e *OpenRateLimitError) RetryAfterValue() int { return e.RetryAfter }
++
++func CanonicalOpenQuery(raw string) (string, error) {
++	if raw == "" {
++		return "", nil
++	}
++	type pair struct{ key, value string }
++	pairs := make([]pair, 0)
++	for _, item := range strings.Split(raw, "&") {
++		parts := strings.SplitN(item, "=", 2)
++		key, err := url.PathUnescape(parts[0])
++		if err != nil {
++			return "", errors.New("invalid query encoding")
++		}
++		value := ""
++		if len(parts) == 2 {
++			value, err = url.PathUnescape(parts[1])
++			if err != nil {
++				return "", errors.New("invalid query encoding")
++			}
++		}
++		pairs = append(pairs, pair{key: rfc3986(key), value: rfc3986(value)})
++	}
++	sort.SliceStable(pairs, func(i, j int) bool {
++		if pairs[i].key == pairs[j].key {
++			return pairs[i].value < pairs[j].value
++		}
++		return pairs[i].key < pairs[j].key
++	})
++	parts := make([]string, len(pairs))
++	for i, p := range pairs {
++		parts[i] = p.key + "=" + p.value
++	}
++	return strings.Join(parts, "&"), nil
++}
++
++func CanonicalOpenPath(path string) (string, error) {
++	if path == "" || !strings.HasPrefix(path, "/") || strings.Contains(path, "\\") {
++		return "", errors.New("invalid path")
++	}
++	if strings.Contains(strings.ToLower(path), "%2e") || strings.Contains(strings.ToLower(path), "%2f") || strings.Contains(strings.ToLower(path), "%5c") {
++		return "", errors.New("ambiguous path")
++	}
++	decoded, err := url.PathUnescape(path)
++	if err != nil {
++		return "", errors.New("invalid path encoding")
++	}
++	for _, segment := range strings.Split(decoded, "/") {
++		if segment == "." || segment == ".." {
++			return "", errors.New("ambiguous path")
++		}
++	}
++	return path, nil
++}
++
++func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, now time.Time) (domain.OpenPrincipal, error) {
++	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
++		return domain.OpenPrincipal{}, err
++	}
++	if len(s.apiKeyRoot) < 32 || req.KeyID == "" || req.Timestamp == 0 || len(req.Nonce) < 16 || req.Signature == "" {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	path, err := CanonicalOpenPath(req.Path)
++	if err != nil {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	query, err := CanonicalOpenQuery(req.Query)
++	if err != nil {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	if now.Unix()-req.Timestamp > 300 || req.Timestamp-now.Unix() > 300 {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	sig, err := hex.DecodeString(req.Signature)
++	if err != nil || len(sig) != sha256.Size || strings.ToLower(req.Signature) != req.Signature {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	tx, err := s.pool.Begin(ctx)
++	if err != nil {
++		return domain.OpenPrincipal{}, fmt.Errorf("begin open authentication: %w", err)
++	}
++	defer tx.Rollback(ctx)
++	var tenantID int64
++	var scopes []string
++	var resourcesRaw []byte
++	var encrypted, nonce []byte
++	if err := tx.QueryRow(ctx, `SELECT tenant_id,scopes,resources,encrypted_secret,secret_nonce FROM api_keys WHERE key_id=$1 AND revoked_at IS NULL FOR UPDATE`, req.KeyID).Scan(&tenantID, &scopes, &resourcesRaw, &encrypted, &nonce); err != nil {
++		if errors.Is(err, pgx.ErrNoRows) {
++			return domain.OpenPrincipal{}, ErrOpenUnauthorized
++		}
++		return domain.OpenPrincipal{}, fmt.Errorf("load open api key: %w", err)
++	}
++	var active bool
++	if err := tx.QueryRow(ctx, `SELECT active FROM tenants WHERE id=$1`, tenantID).Scan(&active); err != nil || !active {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	secret, err := decryptAPISecret(s.apiKeyRoot, encrypted, nonce)
++	if err != nil {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	bodyHash := sha256.Sum256(req.Body)
++	signed := strings.Join([]string{strings.ToUpper(req.Method), path, query, fmt.Sprint(req.Timestamp), req.Nonce, hex.EncodeToString(bodyHash[:])}, "\n")
++	mac := hmac.New(sha256.New, secret)
++	_, _ = mac.Write([]byte(signed))
++	if subtle.ConstantTimeCompare(mac.Sum(nil), sig) != 1 {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	var resources domain.APIKeyResourceScope
++	if err := json.Unmarshal(resourcesRaw, &resources); err != nil {
++		return domain.OpenPrincipal{}, ErrOpenUnauthorized
++	}
++	if _, err := tx.Exec(ctx, `DELETE FROM api_key_nonces WHERE expires_at < now()`); err != nil {
++		return domain.OpenPrincipal{}, fmt.Errorf("expire open nonces: %w", err)
++	}
++	nonceHash := sha256.Sum256([]byte(req.Nonce))
++	if _, err := tx.Exec(ctx, `INSERT INTO api_key_nonces(key_id,nonce_hash,expires_at) VALUES($1,$2,now()+interval '10 minutes')`, req.KeyID, nonceHash[:]); err != nil {
++		var postgresError *pgconn.PgError
++		if errors.As(err, &postgresError) && postgresError.Code == "23505" {
++			return domain.OpenPrincipal{}, ErrOpenReplay
++		}
++		return domain.OpenPrincipal{}, fmt.Errorf("store open nonce: %w", err)
++	}
++	var tokens float64
++	var last time.Time
++	if err := tx.QueryRow(ctx, `SELECT rate_tokens,rate_last_refill FROM api_keys WHERE key_id=$1 FOR UPDATE`, req.KeyID).Scan(&tokens, &last); err != nil {
++		return domain.OpenPrincipal{}, fmt.Errorf("load open rate: %w", err)
++	}
++	remaining, retryAfter := consumeOpenRate(tokens, last, now)
++	if retryAfter > 0 {
++		return domain.OpenPrincipal{}, &OpenRateLimitError{RetryAfter: retryAfter}
++	}
++	tokens = remaining
++	if _, err := tx.Exec(ctx, `UPDATE api_keys SET rate_tokens=$2,rate_last_refill=$3 WHERE key_id=$1`, req.KeyID, tokens, now); err != nil {
++		return domain.OpenPrincipal{}, fmt.Errorf("update open rate: %w", err)
++	}
++	if err := tx.Commit(ctx); err != nil {
++		return domain.OpenPrincipal{}, fmt.Errorf("commit open authentication: %w", err)
++	}
++	return domain.OpenPrincipal{KeyID: req.KeyID, TenantID: tenantID, Scopes: scopes, Resources: resources}, nil
++}
++
++func consumeOpenRate(tokens float64, last, now time.Time) (float64, int) {
++	elapsed := now.Sub(last).Seconds()
++	if elapsed > 0 {
++		tokens += elapsed
++		if tokens > 10 {
++			tokens = 10
++		}
++	}
++	if tokens < 1 {
++		wait := int((1 - tokens) + 0.999999)
++		if wait < 1 {
++			wait = 1
++		}
++		return tokens, wait
++	}
++	return tokens - 1, 0
++}
++
++func rfc3986(value string) string {
++	const hexChars = "0123456789ABCDEF"
++	var b strings.Builder
++	for i := 0; i < len(value); i++ {
++		c := value[i]
++		if (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || strings.ContainsRune("-._~", rune(c)) {
++			b.WriteByte(c)
++		} else {
++			b.WriteByte('%')
++			b.WriteByte(hexChars[c>>4])
++			b.WriteByte(hexChars[c&15])
++		}
++	}
++	return b.String()
++}
+diff --git a/internal/core/open_auth_test.go b/internal/core/open_auth_test.go
+new file mode 100644
+index 0000000..8f6f906
+--- /dev/null
++++ b/internal/core/open_auth_test.go
+@@ -0,0 +1,68 @@
++package core
++
++import (
++	"crypto/hmac"
++	"crypto/sha256"
++	"encoding/hex"
++	"strings"
++	"testing"
++	"time"
++)
++
++func TestCanonicalOpenQuery(t *testing.T) {
++	got, err := CanonicalOpenQuery("b=two&a=hello%20world&a=&b=one")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if got != "a=&a=hello%20world&b=one&b=two" {
++		t.Fatalf("canonical query = %q", got)
++	}
++}
++
++func TestCanonicalOpenPathRejectsAmbiguity(t *testing.T) {
++	for _, path := range []string{"/open/v1/../ponds", "/open/v1/%2e%2e/ponds", "/open/v1/%2fponds", "/open/v1\\ponds"} {
++		if _, err := CanonicalOpenPath(path); err == nil {
++			t.Fatalf("accepted ambiguous path %q", path)
++		}
++	}
++}
++
++func TestCanonicalOpenPathKeepsEncodedSafePath(t *testing.T) {
++	got, err := CanonicalOpenPath("/open/v1/ponds/%E4%B8%AD")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if got != "/open/v1/ponds/%E4%B8%AD" {
++		t.Fatalf("path = %q", got)
++	}
++}
++
++func TestConsumeOpenRateAllowsBurstAndRefillsAtOnePerSecond(t *testing.T) {
++	now := time.Unix(1000, 0)
++	tokens, last := 10.0, now
++	for i := 0; i < 10; i++ {
++		var retry int
++		tokens, retry = consumeOpenRate(tokens, last, now)
++		if retry != 0 {
++			t.Fatalf("burst request %d retry=%d", i, retry)
++		}
++	}
++	if _, retry := consumeOpenRate(tokens, last, now); retry != 1 {
++		t.Fatalf("exhausted bucket retry=%d", retry)
++	}
++	refilled, retry := consumeOpenRate(tokens, last, now.Add(3*time.Second))
++	if retry != 0 || refilled != 2 {
++		t.Fatalf("refill tokens=%v retry=%d", refilled, retry)
++	}
++}
++
++func TestOpenSignatureMatchesPublishedVector(t *testing.T) {
++	bodyHash := "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
++	canonical := strings.Join([]string{"GET", "/open/v1/ponds", "a=&a=hello%20world&b=one&b=two", "1735689600", "0123456789abcdef0123456789abcdef", bodyHash}, "\n")
++	mac := hmac.New(sha256.New, []byte("documented-test-secret"))
++	_, _ = mac.Write([]byte(canonical))
++	got := hex.EncodeToString(mac.Sum(nil))
++	if got != "bcf8386ae0789327c5a6597a81eaa2f3121565d045012796e7e22bdba2a43149" {
++		t.Fatalf("signature=%s", got)
++	}
++}
+diff --git a/internal/core/open_resources.go b/internal/core/open_resources.go
+new file mode 100644
+index 0000000..3decaeb
+--- /dev/null
++++ b/internal/core/open_resources.go
+@@ -0,0 +1,110 @@
++package core
++
++import (
++	"context"
++	"fmt"
++
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++)
++
++func (s *Service) ListOpenPonds(ctx context.Context, tenantID int64, scope domain.APIKeyResourceScope) ([]domain.Pond, error) {
++	q := `SELECT p.id,p.farm_id,p.name,coalesce(p.area_mu,0),p.created_at FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE f.tenant_id=$1`
++	args := []any{tenantID}
++	if len(scope.FarmIDs) > 0 {
++		q += ` AND f.id=ANY($2)`
++		args = append(args, scope.FarmIDs)
++	}
++	idx := len(args) + 1
++	if len(scope.PondIDs) > 0 {
++		q += fmt.Sprintf(` AND p.id=ANY($%d)`, idx)
++		args = append(args, scope.PondIDs)
++		idx++
++	}
++	if len(scope.DeviceNos) > 0 {
++		q += fmt.Sprintf(` AND EXISTS(SELECT 1 FROM devices d WHERE d.pond_id=p.id AND d.device_no=ANY($%d) AND d.disabled_at IS NULL)`, idx)
++		args = append(args, scope.DeviceNos)
++	}
++	q += ` ORDER BY p.id`
++	rows, err := s.pool.Query(ctx, q, args...)
++	if err != nil {
++		return nil, err
++	}
++	defer rows.Close()
++	out := make([]domain.Pond, 0)
++	for rows.Next() {
++		var p domain.Pond
++		if err := rows.Scan(&p.ID, &p.FarmID, &p.Name, &p.AreaMu, &p.CreatedAt); err != nil {
++			return nil, err
++		}
++		out = append(out, p)
++	}
++	return out, rows.Err()
++}
++
++func (s *Service) ListOpenDevices(ctx context.Context, tenantID int64, scope domain.APIKeyResourceScope) ([]domain.Device, error) {
++	q := `SELECT d.id,d.pond_id,d.device_no,coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,60) FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE f.tenant_id=$1 AND d.disabled_at IS NULL`
++	args := []any{tenantID}
++	if len(scope.FarmIDs) > 0 {
++		q += ` AND f.id=ANY($2)`
++		args = append(args, scope.FarmIDs)
++	}
++	idx := len(args) + 1
++	if len(scope.PondIDs) > 0 {
++		q += fmt.Sprintf(` AND p.id=ANY($%d)`, idx)
++		args = append(args, scope.PondIDs)
++		idx++
++	}
++	if len(scope.DeviceNos) > 0 {
++		q += fmt.Sprintf(` AND d.device_no=ANY($%d)`, idx)
++		args = append(args, scope.DeviceNos)
++	}
++	q += ` ORDER BY d.id`
++	rows, err := s.pool.Query(ctx, q, args...)
++	if err != nil {
++		return nil, err
++	}
++	defer rows.Close()
++	out := make([]domain.Device, 0)
++	for rows.Next() {
++		var d domain.Device
++		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval); err != nil {
++			return nil, err
++		}
++		out = append(out, d)
++	}
++	return out, rows.Err()
++}
++
++func (s *Service) ListOpenAlarms(ctx context.Context, tenantID int64, scope domain.APIKeyResourceScope) ([]domain.Alarm, error) {
++	q := `SELECT a.id,a.device_no,a.pond_id,a.metric,a.current_value,a.threshold,a.level,coalesce(a.message,''),a.confirmed_at,a.created_at FROM alarms a JOIN ponds p ON p.id=a.pond_id JOIN farms f ON f.id=p.farm_id WHERE f.tenant_id=$1`
++	args := []any{tenantID}
++	if len(scope.FarmIDs) > 0 {
++		q += ` AND f.id=ANY($2)`
++		args = append(args, scope.FarmIDs)
++	}
++	idx := len(args) + 1
++	if len(scope.PondIDs) > 0 {
++		q += fmt.Sprintf(` AND p.id=ANY($%d)`, idx)
++		args = append(args, scope.PondIDs)
++		idx++
++	}
++	if len(scope.DeviceNos) > 0 {
++		q += fmt.Sprintf(` AND a.device_no=ANY($%d)`, idx)
++		args = append(args, scope.DeviceNos)
++	}
++	q += ` ORDER BY a.created_at DESC,a.id DESC LIMIT 200`
++	rows, err := s.pool.Query(ctx, q, args...)
++	if err != nil {
++		return nil, err
++	}
++	defer rows.Close()
++	out := make([]domain.Alarm, 0)
++	for rows.Next() {
++		var a domain.Alarm
++		if err := rows.Scan(&a.ID, &a.DeviceNo, &a.PondID, &a.Metric, &a.CurrentValue, &a.Threshold, &a.Level, &a.Message, &a.ConfirmedAt, &a.CreatedAt); err != nil {
++			return nil, err
++		}
++		out = append(out, a)
++	}
++	return out, rows.Err()
++}
+diff --git a/internal/core/service.go b/internal/core/service.go
+index 4d25828..bb0bfeb 100644
+--- a/internal/core/service.go
++++ b/internal/core/service.go
+@@ -27,10 +27,13 @@ type Service struct {
+ 	policy          domain.PermissionPolicy
+ 	defaultInterval time.Duration
+ 	license         *LicenseRuntime
++	apiKeyRoot      []byte
+ }
+ 
+ func (s *Service) SetLicenseRuntime(runtime *LicenseRuntime) { s.license = runtime }
+ 
++func (s *Service) SetAPIKeyRoot(secret []byte) { s.apiKeyRoot = append([]byte(nil), secret...) }
++
+ func New(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger, interval ...time.Duration) (*Service, error) {
+ 	return NewWithPolicy(ctx, pool, log, nil, interval...)
+ }
+diff --git a/internal/domain/api_keys.go b/internal/domain/api_keys.go
+new file mode 100644
+index 0000000..b885532
+--- /dev/null
++++ b/internal/domain/api_keys.go
+@@ -0,0 +1,50 @@
++package domain
++
++import (
++	"encoding/json"
++	"time"
++)
++
++type APIKeyResourceScope struct {
++	FarmIDs   []int64  `json:"farm_ids,omitempty"`
++	PondIDs   []int64  `json:"pond_ids,omitempty"`
++	DeviceNos []string `json:"device_nos,omitempty"`
++}
++
++type APIKey struct {
++	KeyID     string              `json:"key_id"`
++	TenantID  int64               `json:"tenant_id"`
++	Name      string              `json:"name"`
++	Scopes    []string            `json:"scopes"`
++	Resources APIKeyResourceScope `json:"resources"`
++	CreatedAt time.Time           `json:"created_at"`
++	RevokedAt *time.Time          `json:"revoked_at,omitempty"`
++}
++
++type APIKeyAuditEvent struct {
++	ID         int64           `json:"id"`
++	TenantID   int64           `json:"tenant_id"`
++	ActorID    *int64          `json:"actor_id,omitempty"`
++	Action     string          `json:"action"`
++	ResourceID string          `json:"resource_id"`
++	Metadata   json.RawMessage `json:"metadata"`
++	CreatedAt  time.Time       `json:"created_at"`
++}
++
++type OpenRequest struct {
++	KeyID     string
++	Timestamp int64
++	Nonce     string
++	Signature string
++	Method    string
++	Path      string
++	Query     string
++	Body      []byte
++}
++
++type OpenPrincipal struct {
++	KeyID     string
++	TenantID  int64
++	Scopes    []string
++	Resources APIKeyResourceScope
++}
+diff --git a/internal/migrate/sql/012_open_api.sql b/internal/migrate/sql/012_open_api.sql
+new file mode 100644
+index 0000000..299d697
+--- /dev/null
++++ b/internal/migrate/sql/012_open_api.sql
+@@ -0,0 +1,23 @@
++CREATE TABLE IF NOT EXISTS api_keys (
++    key_id TEXT PRIMARY KEY CHECK (key_id ~ '^ik_[A-Za-z0-9_-]{22}$'),
++    tenant_id BIGINT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
++    name TEXT NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 128),
++    scopes TEXT[] NOT NULL CHECK (cardinality(scopes) > 0),
++    resources JSONB NOT NULL DEFAULT '{}'::jsonb,
++    encrypted_secret BYTEA NOT NULL,
++    secret_nonce BYTEA NOT NULL,
++    created_by BIGINT NOT NULL REFERENCES users(id),
++    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
++    revoked_at TIMESTAMPTZ,
++    rotated_from TEXT REFERENCES api_keys(key_id),
++    rate_tokens DOUBLE PRECISION NOT NULL DEFAULT 10,
++    rate_last_refill TIMESTAMPTZ NOT NULL DEFAULT now()
++);
++CREATE INDEX IF NOT EXISTS idx_api_keys_tenant ON api_keys(tenant_id) WHERE revoked_at IS NULL;
++CREATE TABLE IF NOT EXISTS api_key_nonces (
++    key_id TEXT NOT NULL REFERENCES api_keys(key_id) ON DELETE CASCADE,
++    nonce_hash BYTEA NOT NULL,
++    expires_at TIMESTAMPTZ NOT NULL,
++    PRIMARY KEY (key_id, nonce_hash)
++);
++CREATE INDEX IF NOT EXISTS idx_api_key_nonces_expiry ON api_key_nonces(expires_at);
+diff --git a/internal/openapi/server.go b/internal/openapi/server.go
+new file mode 100644
+index 0000000..a001e8a
+--- /dev/null
++++ b/internal/openapi/server.go
+@@ -0,0 +1,190 @@
++package openapi
++
++import (
++	"bytes"
++	"context"
++	"errors"
++	"io"
++	"log/slog"
++	"net/http"
++	"strconv"
++	"time"
++
++	"github.com/gin-gonic/gin"
++
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"git.hyhy.fun/rsplab/iolink/internal/license"
++	"git.hyhy.fun/rsplab/iolink/internal/operations"
++)
++
++type Authenticator interface {
++	AuthenticateOpen(context.Context, domain.OpenRequest, time.Time) (domain.OpenPrincipal, error)
++}
++
++type ResourceStore interface {
++	ListOpenPonds(context.Context, int64, domain.APIKeyResourceScope) ([]domain.Pond, error)
++	ListOpenDevices(context.Context, int64, domain.APIKeyResourceScope) ([]domain.Device, error)
++	ListOpenAlarms(context.Context, int64, domain.APIKeyResourceScope) ([]domain.Alarm, error)
++}
++
++type Deps struct {
++	Logger    *slog.Logger
++	Auth      Authenticator
++	Resources ResourceStore
++}
++
++type Server struct{ deps Deps }
++
++func New(deps Deps) *Server { return &Server{deps: deps} }
++
++func (s *Server) Routes() http.Handler {
++	r := gin.New()
++	r.Use(operations.RequestLogging(s.deps.Logger))
++	v1 := r.Group("/open/v1", s.authenticate)
++	v1.GET("/ponds", s.listPonds)
++	v1.GET("/ponds/:id", s.getPond)
++	v1.GET("/devices", s.listDevices)
++	v1.GET("/devices/:device_no", s.getDevice)
++	v1.GET("/alarms", s.listAlarms)
++	return r
++}
++
++func (s *Server) authenticate(c *gin.Context) {
++	body, err := io.ReadAll(http.MaxBytesReader(c.Writer, c.Request.Body, 4<<20))
++	if err != nil {
++		var oversized *http.MaxBytesError
++		if errors.As(err, &oversized) {
++			c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "body_too_large"})
++			return
++		}
++		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
++		return
++	}
++	c.Request.Body = io.NopCloser(bytes.NewReader(body))
++	principal, err := s.deps.Auth.AuthenticateOpen(c.Request.Context(), domain.OpenRequest{
++		KeyID: c.GetHeader("X-Key-Id"), Timestamp: parseInt64(c.GetHeader("X-Timestamp")), Nonce: c.GetHeader("X-Nonce"), Signature: c.GetHeader("X-Signature"), Method: c.Request.Method, Path: c.Request.URL.EscapedPath(), Query: c.Request.URL.RawQuery, Body: body,
++	}, time.Now().UTC())
++	if err != nil {
++		var rate interface{ RetryAfterValue() int }
++		if errors.As(err, &rate) {
++			c.Header("Retry-After", strconv.Itoa(rate.RetryAfterValue()))
++			c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "rate_limited"})
++			return
++		}
++		if errors.Is(err, license.ErrUnavailable) || errors.Is(err, license.ErrRequired) || errors.Is(err, license.ErrFeatureDenied) || errors.Is(err, license.ErrClockError) {
++			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "feature_unavailable"})
++			return
++		}
++		if errors.Is(err, domain.ErrNotFound) {
++			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "not_found"})
++			return
++		}
++		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
++		return
++	}
++	c.Set("open_principal", principal)
++	c.Next()
++}
++
++func principal(c *gin.Context) domain.OpenPrincipal {
++	value, _ := c.Get("open_principal")
++	return value.(domain.OpenPrincipal)
++}
++
++func hasScope(p domain.OpenPrincipal, name string) bool {
++	for _, scope := range p.Scopes {
++		if scope == name {
++			return true
++		}
++	}
++	return false
++}
++
++func (s *Server) listPonds(c *gin.Context) {
++	p := principal(c)
++	if !hasScope(p, "ponds:read") {
++		c.JSON(http.StatusForbidden, gin.H{"error": "scope_required"})
++		return
++	}
++	items, err := s.deps.Resources.ListOpenPonds(c.Request.Context(), p.TenantID, p.Resources)
++	if err != nil {
++		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
++		return
++	}
++	c.JSON(http.StatusOK, items)
++}
++
++func (s *Server) getPond(c *gin.Context) {
++	p := principal(c)
++	if !hasScope(p, "ponds:read") {
++		c.JSON(http.StatusForbidden, gin.H{"error": "scope_required"})
++		return
++	}
++	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
++	if err != nil {
++		c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
++		return
++	}
++	items, err := s.deps.Resources.ListOpenPonds(c.Request.Context(), p.TenantID, p.Resources)
++	if err != nil {
++		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
++		return
++	}
++	for _, item := range items {
++		if item.ID == id {
++			c.JSON(http.StatusOK, item)
++			return
++		}
++	}
++	c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
++}
++
++func (s *Server) listDevices(c *gin.Context) {
++	p := principal(c)
++	if !hasScope(p, "devices:read") {
++		c.JSON(http.StatusForbidden, gin.H{"error": "scope_required"})
++		return
++	}
++	items, err := s.deps.Resources.ListOpenDevices(c.Request.Context(), p.TenantID, p.Resources)
++	if err != nil {
++		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
++		return
++	}
++	c.JSON(http.StatusOK, items)
++}
++
++func (s *Server) getDevice(c *gin.Context) {
++	p := principal(c)
++	if !hasScope(p, "devices:read") {
++		c.JSON(http.StatusForbidden, gin.H{"error": "scope_required"})
++		return
++	}
++	items, err := s.deps.Resources.ListOpenDevices(c.Request.Context(), p.TenantID, p.Resources)
++	if err != nil {
++		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
++		return
++	}
++	for _, item := range items {
++		if item.DeviceNo == c.Param("device_no") {
++			c.JSON(http.StatusOK, item)
++			return
++		}
++	}
++	c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
++}
++
++func (s *Server) listAlarms(c *gin.Context) {
++	p := principal(c)
++	if !hasScope(p, "alarms:read") {
++		c.JSON(http.StatusForbidden, gin.H{"error": "scope_required"})
++		return
++	}
++	items, err := s.deps.Resources.ListOpenAlarms(c.Request.Context(), p.TenantID, p.Resources)
++	if err != nil {
++		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
++		return
++	}
++	c.JSON(http.StatusOK, items)
++}
++
++func parseInt64(value string) int64 { n, _ := strconv.ParseInt(value, 10, 64); return n }
+diff --git a/internal/openapi/server_test.go b/internal/openapi/server_test.go
+new file mode 100644
+index 0000000..38fa622
+--- /dev/null
++++ b/internal/openapi/server_test.go
+@@ -0,0 +1,101 @@
++package openapi
++
++import (
++	"context"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++	"time"
++
++	"git.hyhy.fun/rsplab/iolink/internal/core"
++	"git.hyhy.fun/rsplab/iolink/internal/domain"
++	"git.hyhy.fun/rsplab/iolink/internal/license"
++)
++
++type fakeAuth struct {
++	principal domain.OpenPrincipal
++	err       error
++}
++
++func (f fakeAuth) AuthenticateOpen(context.Context, domain.OpenRequest, time.Time) (domain.OpenPrincipal, error) {
++	return f.principal, f.err
++}
++
++type fakeResources struct{}
++
++func (fakeResources) ListOpenPonds(context.Context, int64, domain.APIKeyResourceScope) ([]domain.Pond, error) {
++	return []domain.Pond{{ID: 7}}, nil
++}
++func (fakeResources) ListOpenDevices(context.Context, int64, domain.APIKeyResourceScope) ([]domain.Device, error) {
++	return nil, nil
++}
++func (fakeResources) ListOpenAlarms(context.Context, int64, domain.APIKeyResourceScope) ([]domain.Alarm, error) {
++	return nil, nil
++}
++
++func TestRoutesScopeAndAuth(t *testing.T) {
++	s := New(Deps{Auth: fakeAuth{principal: domain.OpenPrincipal{TenantID: 1, Scopes: []string{"ponds:read"}}}, Resources: fakeResources{}})
++	ts := httptest.NewServer(s.Routes())
++	defer ts.Close()
++	resp, err := http.Get(ts.URL + "/open/v1/ponds")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if resp.StatusCode != http.StatusOK {
++		t.Fatalf("status=%d", resp.StatusCode)
++	}
++	resp.Body.Close()
++	resp, err = http.Get(ts.URL + "/open/v1/devices")
++	if err != nil {
++		t.Fatal(err)
++	}
++	if resp.StatusCode != http.StatusForbidden {
++		t.Fatalf("scope status=%d", resp.StatusCode)
++	}
++	resp.Body.Close()
++}
++
++func TestRoutesFailClosedWhenOpenAPIFeatureUnavailable(t *testing.T) {
++	s := New(Deps{Auth: fakeAuth{err: license.ErrUnavailable}, Resources: fakeResources{}})
++	ts := httptest.NewServer(s.Routes())
++	defer ts.Close()
++	resp, err := http.Get(ts.URL + "/open/v1/ponds")
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer resp.Body.Close()
++	if resp.StatusCode != http.StatusForbidden {
++		t.Fatalf("status=%d", resp.StatusCode)
++	}
++}
++
++func TestRoutesRateLimitIncludesRetryAfter(t *testing.T) {
++	s := New(Deps{Auth: fakeAuth{err: &core.OpenRateLimitError{RetryAfter: 3}}, Resources: fakeResources{}})
++	ts := httptest.NewServer(s.Routes())
++	defer ts.Close()
++	resp, err := http.Get(ts.URL + "/open/v1/ponds")
++	if err != nil {
++		t.Fatal(err)
++	}
++	defer resp.Body.Close()
++	if resp.StatusCode != http.StatusTooManyRequests || resp.Header.Get("Retry-After") != "3" {
++		t.Fatalf("status=%d retry=%q", resp.StatusCode, resp.Header.Get("Retry-After"))
++	}
++}
++
++func TestRoutesRejectOversizedBody(t *testing.T) {
++	s := New(Deps{Auth: fakeAuth{principal: domain.OpenPrincipal{TenantID: 1, Scopes: []string{"ponds:read"}}}, Resources: fakeResources{}})
++	for _, size := range []int{4 << 20, (4 << 20) + 1} {
++		req := httptest.NewRequest(http.MethodGet, "/open/v1/ponds", strings.NewReader(strings.Repeat("x", size)))
++		rec := httptest.NewRecorder()
++		s.Routes().ServeHTTP(rec, req)
++		want := http.StatusOK
++		if size > 4<<20 {
++			want = http.StatusRequestEntityTooLarge
++		}
++		if rec.Code != want {
++			t.Fatalf("body bytes=%d status=%d want=%d", size, rec.Code, want)
++		}
++	}
++}
+diff --git a/scripts/check_architecture_manifests.py b/scripts/check_architecture_manifests.py
+index cc3c60c..eabf18c 100644
+--- a/scripts/check_architecture_manifests.py
++++ b/scripts/check_architecture_manifests.py
+@@ -166,7 +166,7 @@ def validate_manifests() -> list[str]:
+     source = acceptance.get("source")
+     if not isinstance(source, str) or not (ROOT / source).is_file(): errors.append(f"acceptance-map.yaml: source document does not exist: {source!r}")
+     scope = acceptance.get("gate_scope")
+-    expected_scope = {"M0": ["R01", "R03", "R04"], "M5": ["R28", "R29", "R30", "R31", "R32", "R33"], "M6a": ["R34", "R35"], "M6b": ["R36", "R37"], "M6c": ["R38", "R39", "R40"]}
++    expected_scope = {"M0": ["R01", "R03", "R04"], "M5": ["R28", "R29", "R30", "R31", "R32", "R33"], "M6a": ["R34", "R35"], "M6b": ["R36", "R37"], "M6c": ["R38", "R39", "R40"], "M6d": ["R41", "R42"]}
+     if not isinstance(scope, dict) or scope != expected_scope: errors.append("acceptance-map.yaml: gate_scope must match PLAN.md stage exit requirements")
+ 
+     operation_matrix = acceptance.get("provider_operations")
+@@ -350,7 +350,7 @@ def has_file_evidence(relative: str) -> bool:
+ def main() -> int:
+     parser = ArgumentParser(description=__doc__)
+     parser.add_argument("--all", action="store_true", help="validate all manifests")
+-    parser.add_argument("--gate", choices=["M0", "M5", "M6a", "M6b", "M6c"], help="evaluate recorded stage acceptance")
++    parser.add_argument("--gate", choices=["M0", "M5", "M6a", "M6b", "M6c", "M6d"], help="evaluate recorded stage acceptance")
+     args = parser.parse_args()
+     errors = validate_manifests()
+     if errors:
+diff --git a/scripts/check_contracts.py b/scripts/check_contracts.py
+index 98ca9c5..8abae1c 100644
+--- a/scripts/check_contracts.py
++++ b/scripts/check_contracts.py
+@@ -106,7 +106,7 @@ def main():
+             samples += 5
+         counts.append(count)
+         print(f'{path.relative_to(ROOT)}: standard schema and {count} operation fixtures PASS')
+-    assert sorted(counts) == [3, 15, 39], counts
++    assert sorted(counts) == [3, 5, 15, 44], counts
+     print(f'{sum(counts)} target operations, {samples} synthetic request/response fixtures PASS; live handler verification is R02.c')
+ 
+ if __name__ == '__main__':
+diff --git a/web b/web
+index 0aa7771..207dcfa 160000
+--- a/web
++++ b/web
+@@ -1 +1 @@
+-Subproject commit 0aa7771acf0ef6322c9ac1e4c9839616646bb675
++Subproject commit 207dcfa751545e11a63a3a013da7e60552fecd75

@@ -1,0 +1,22 @@
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/past_bound
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/future_bound
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/now
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/too_old
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/too_new
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/minimum
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/maximum
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/overflow_delta
+    m6d_time_window_test.go:58: out-of-window timestamp error=<nil>
+--- FAIL: TestM6dTimestampWindow_signedBoundsAndExtremes (0.54s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/past_bound (0.01s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/future_bound (0.01s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/now (0.01s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/too_old (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/too_new (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/minimum (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/maximum (0.00s)
+    --- FAIL: TestM6dTimestampWindow_signedBoundsAndExtremes/overflow_delta (0.00s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	0.570s
+FAIL

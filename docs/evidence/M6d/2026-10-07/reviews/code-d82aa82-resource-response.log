@@ -1,0 +1,5 @@
+Exact web207dcfa parseAPIKeys response boundary, supplied the contract-invalid resources accepted/persisted by the real HTTP probe. No secrets or response bodies logged.
+{"resources":{"farm_ids":[0]},"wholeKeyListRejected":true}
+{"resources":{"farm_ids":[-1]},"wholeKeyListRejected":true}
+{"resources":{"pond_ids":[0]},"wholeKeyListRejected":true}
+{"resources":{"device_nos":[""]},"wholeKeyListRejected":true}

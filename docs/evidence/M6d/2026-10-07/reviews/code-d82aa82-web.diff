@@ -1,0 +1,469 @@
+diff --git a/DESIGN.md b/DESIGN.md
+index 5c1dae6..86aeac0 100644
+--- a/DESIGN.md
++++ b/DESIGN.md
+@@ -44,6 +44,7 @@
+ - **Loading / error**：页面请求期间使用 `v-loading` 遮罩；请求失败通过错误消息反馈并保留当前页面结构，用户可通过刷新重试。空集合显示明确的空状态。
+ - **License**：授权页独立显示加载与导入进度；403 显示平台权限提示并隐藏导入；其他失败保留上一份授权并提供重试。详情使用双列定义列表，摘要允许折行；未导入时明确显示空状态，所有时间为空时显示 `--`。
+ - **Session**：API 返回 401 时清除本地令牌并回到登录页；路由进入受保护页面前检查令牌过期时间。
++- **API Key**：scope 用带名称的 Element Plus checkbox group 显示；输入错误阻止提交，不丢弃错误 ID 或扩大权限。资源范围按已有表单和表格组件呈现。
+ 
+ ## 无障碍与响应式
+ 
+diff --git a/e2e/m6d-live.spec.ts b/e2e/m6d-live.spec.ts
+new file mode 100644
+index 0000000..c1b9aa1
+--- /dev/null
++++ b/e2e/m6d-live.spec.ts
+@@ -0,0 +1,70 @@
++import { expect, test } from '@playwright/test'
++import { z } from 'zod'
++
++test('real tenant owner issues a restricted key, rotates, revokes and reads safe audit', async ({ page }, info) => {
++  const token = process.env['IOLINK_M6D_TOKEN']
++  if (!token) throw new TypeError('IOLINK_M6D_TOKEN is required')
++  await page.addInitScript(value => {
++    localStorage.setItem('iolink.admin.token', value)
++    localStorage.setItem('iolink.admin.expires_at', String(Date.now() + 3600_000))
++  }, token)
++  await page.goto('/system')
++  const panel = page.getByRole('region', { name: '开放平台 API Key', exact: true })
++  await expect(panel.locator('.el-loading-mask')).toHaveCount(0)
++  const apiHeaders = { Authorization: `Bearer ${token}` }
++  const emptyKeys = await page.request.get('/admin/v1/api-keys', { headers: apiHeaders })
++  expect(await emptyKeys.json()).toEqual([])
++  const emptyAudit = await page.request.get('/admin/v1/api-keys/audit', { headers: apiHeaders })
++  expect(await emptyAudit.json()).toEqual([])
++  const invalidField = await page.request.post('/admin/v1/api-keys', { headers: apiHeaders, data: { name: 'wrong-field', scopes: ['ponds:read'], resources: { farmIds: [8301] } } })
++  expect(invalidField.status()).toBe(400)
++  await panel.getByPlaceholder('Key 名称').fill('browser-live')
++  await panel.getByPlaceholder('农场 ID（逗号分隔，可选）').fill('8301x')
++  await panel.getByRole('button', { name: '签发 Key' }).click()
++  await expect(page.getByText('资源 ID 必须是逗号分隔的正整数，请检查输入')).toBeVisible()
++  const unchanged = await page.request.get('/admin/v1/api-keys', { headers: apiHeaders })
++  expect(await unchanged.json()).toEqual([])
++  await panel.getByPlaceholder('农场 ID（逗号分隔，可选）').fill('8301')
++  await panel.getByPlaceholder('池塘 ID（逗号分隔，可选）').fill('8301')
++  await panel.getByPlaceholder('设备号（逗号分隔，可选）').fill('m6d-allowed')
++  await panel.getByText('设备读取', { exact: true }).click()
++  await panel.getByText('报警读取', { exact: true }).click()
++  await expect(panel.getByRole('checkbox', { name: '设备读取' })).not.toBeChecked()
++  await expect(panel.getByRole('checkbox', { name: '报警读取' })).not.toBeChecked()
++  const creation = page.waitForResponse(r => r.url().endsWith('/admin/v1/api-keys') && r.request().method() === 'POST')
++  await panel.getByRole('button', { name: '签发 Key' }).click()
++  const issued = await creation
++  expect(issued.status()).toBe(201)
++  const issuedSchema = z.object({ key: z.object({ key_id: z.string(), scopes: z.array(z.string()), resources: z.object({ farm_ids: z.array(z.number()), pond_ids: z.array(z.number()), device_nos: z.array(z.string()) }) }), secret: z.string() })
++  const data = issuedSchema.parse(await issued.json())
++  expect(data.key.scopes).toEqual(['ponds:read'])
++  expect(data.key.resources).toEqual({ farm_ids: [8301], pond_ids: [8301], device_nos: ['m6d-allowed'] })
++  expect(await panel.locator('code').textContent() === data.secret).toBe(true)
++  for (const width of [375, 768, 1440]) {
++    await page.setViewportSize({ width, height: 960 })
++    await page.screenshot({ path: info.outputPath(`key-issued-${width}.png`), fullPage: true, animations: 'disabled', mask: [panel.locator('.el-alert')] })
++    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
++  }
++  await page.reload()
++  await expect(panel.locator('code')).toHaveCount(0)
++  const keyTable = panel.locator('.el-table').first()
++  const row = keyTable.getByRole('row', { name: new RegExp(data.key.key_id) })
++  await expect(row.getByRole('cell', { name: 'ponds:read', exact: true })).toBeVisible()
++  const rotation = page.waitForResponse(r => r.url().endsWith('/rotate'))
++  await row.getByRole('button', { name: '轮换' }).click()
++  const rotated = issuedSchema.parse(await (await rotation).json())
++  expect(rotated.key.key_id).not.toBe(data.key.key_id)
++  expect(rotated.secret === data.secret).toBe(false)
++  await expect(row).toContainText('已撤销')
++  const fresh = keyTable.getByRole('row', { name: new RegExp(rotated.key.key_id) })
++  await fresh.getByRole('button', { name: '撤销' }).click()
++  await expect(fresh).toContainText('已撤销')
++  await page.getByRole('link', { name: '开放平台日志' }).click()
++  await expect(page.getByRole('heading', { name: '开放平台操作日志' })).toBeVisible()
++  for (const action of ['api_key.issued', 'api_key.rotated', 'api_key.revoked']) await expect(page.getByRole('cell', { name: action, exact: true })).toBeVisible()
++  expect((await page.locator('body').textContent())?.includes(data.secret)).toBe(false)
++  const audit = await page.request.get('/admin/v1/api-keys/audit', { headers: apiHeaders })
++  const safeAudit = await audit.text()
++  expect(safeAudit.includes(data.secret) || safeAudit.includes(rotated.secret)).toBe(false)
++  await page.screenshot({ path: info.outputPath('audit.png'), fullPage: true })
++})
+diff --git a/e2e/m6d.spec.ts b/e2e/m6d.spec.ts
+new file mode 100644
+index 0000000..f1a1a6c
+--- /dev/null
++++ b/e2e/m6d.spec.ts
+@@ -0,0 +1,21 @@
++import { expect, test } from '@playwright/test'
++
++async function authenticate(page: import('@playwright/test').Page) {
++  await page.addInitScript(() => {
++    localStorage.setItem('iolink.admin.token', 'm6d-browser-token')
++    localStorage.setItem('iolink.admin.expires_at', String(Date.now() + 3600_000))
++  })
++}
++
++test('API Key resource scope and audit page use the signed management contract', async ({ page }) => {
++  await authenticate(page)
++  await page.goto('/system')
++  await page.getByPlaceholder('Key 名称').fill('scope')
++  await page.getByPlaceholder('农场 ID（逗号分隔，可选）').fill('4')
++  await page.getByPlaceholder('池塘 ID（逗号分隔，可选）').fill('7')
++  await page.getByPlaceholder('设备号（逗号分隔，可选）').fill('dev-1')
++  await page.getByRole('button', { name: '签发 Key' }).click()
++  await expect(page.getByText('demo-secret-shown-once')).toBeVisible()
++  await page.getByRole('link', { name: '开放平台日志' }).click()
++  await expect(page.getByText('暂无 API Key 操作')).toBeVisible()
++})
+diff --git a/playwright.config.ts b/playwright.config.ts
+index 1a16e6f..b7f510b 100644
+--- a/playwright.config.ts
++++ b/playwright.config.ts
+@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test'
+ 
+ export default defineConfig({
+   testDir: './e2e',
+-  testIgnore: 'm6c.spec.ts',
++  testIgnore: ['m6c.spec.ts', 'm6d-live.spec.ts'],
+   timeout: 30_000,
+   use: {
+     baseURL: 'http://127.0.0.1:5173',
+diff --git a/playwright.m6d.config.ts b/playwright.m6d.config.ts
+new file mode 100644
+index 0000000..02ce5bf
+--- /dev/null
++++ b/playwright.m6d.config.ts
+@@ -0,0 +1,10 @@
++import { defineConfig } from '@playwright/test'
++
++export default defineConfig({
++  testDir: './e2e',
++  testMatch: 'm6d-live.spec.ts',
++  outputDir: '../docs/evidence/M6d/2026-10-07/browser',
++  timeout: 30_000,
++  workers: 1,
++  use: { baseURL: process.env['IOLINK_M6D_URL'], channel: 'chrome', viewport: { width: 1440, height: 960 } },
++})
+diff --git a/src/api/admin.ts b/src/api/admin.ts
+index 3fbab00..55c4f9b 100644
+--- a/src/api/admin.ts
++++ b/src/api/admin.ts
+@@ -1,8 +1,9 @@
+ import { http } from './http'
+ import { parseLicenseStatus } from './license'
+ import { normalizeAlarm, normalizeDevice, normalizeFarm, normalizePond, normalizeRule, normalizeStats } from './adapters'
++import { parseAPIKey, parseAPIKeys, parseAPIKeyAuditEvents, parseAPIKeySecret } from '@/domain/api-key'
+ import * as demo from './demo'
+-import type { AlarmRule, Device, Farm, LicenseStatus, LoginResponse, Pond, Product, ProductModel, ModelField, Tenant, TenantMember } from '@/types/api'
++import type { APIKey, APIKeyAuditEvent, AlarmRule, Device, Farm, LicenseStatus, LoginResponse, Pond, Product, ProductModel, ModelField, Tenant, TenantMember } from '@/types/api'
+ 
+ export const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
+ 
+@@ -69,6 +70,36 @@ export async function importLicense(file: File) {
+   await http.post('/license', file, { headers: { 'Content-Type': 'application/json' } })
+ }
+ 
++export async function getAPIKeys(): Promise<APIKey[]> {
++  if (demoMode) return JSON.parse(localStorage.getItem('iolink.demo.api-keys') ?? '[]') as APIKey[]
++  const { data } = await http.get<unknown>('/api-keys')
++  return parseAPIKeys(data)
++}
++
++export async function getAPIKeyAudit(): Promise<APIKeyAuditEvent[]> {
++	if (demoMode) return []
++	const { data } = await http.get<unknown>('/api-keys/audit')
++	return parseAPIKeyAuditEvents(data)
++}
++
++export async function createAPIKey(payload: { name: string; scopes: string[]; resources?: APIKey['resources'] }): Promise<{ key: APIKey; secret: string }> {
++	if (demoMode) { const key = { keyId: `ik_demo_${Date.now()}`, tenantId: 1, name: payload.name, scopes: payload.scopes, resources: payload.resources ?? {}, createdAt: new Date().toISOString(), revokedAt: null }; const keys = await getAPIKeys(); localStorage.setItem('iolink.demo.api-keys', JSON.stringify([...keys, key])); return { key, secret: 'demo-secret-shown-once' } }
++	const resources = payload.resources ? { farm_ids: payload.resources.farmIds ?? [], pond_ids: payload.resources.pondIds ?? [], device_nos: payload.resources.deviceNos ?? [] } : undefined
++	const { data } = await http.post('/api-keys', { name: payload.name, scopes: payload.scopes, resources })
++  return { key: parseAPIKey(data.key), secret: parseAPIKeySecret(data.secret) }
++}
++
++export async function rotateAPIKey(keyId: string): Promise<{ key: APIKey; secret: string }> {
++  if (demoMode) return { key: { keyId: `ik_demo_${Date.now()}`, tenantId: 1, name: 'demo rotation', scopes: ['ponds:read'], resources: {}, createdAt: new Date().toISOString(), revokedAt: null }, secret: 'demo-secret-shown-once' }
++  const { data } = await http.post(`/api-keys/${encodeURIComponent(keyId)}/rotate`)
++  return { key: parseAPIKey(data.key), secret: parseAPIKeySecret(data.secret) }
++}
++
++export async function revokeAPIKey(keyId: string) {
++  if (demoMode) { const keys = await getAPIKeys(); localStorage.setItem('iolink.demo.api-keys', JSON.stringify(keys.map((key) => key.keyId === keyId ? { ...key, revokedAt: new Date().toISOString() } : key))); return }
++  await http.post(`/api-keys/${encodeURIComponent(keyId)}/revoke`)
++}
++
+ export async function registerDevice(payload: Pick<Device, 'pondId' | 'model'>) {
+   if (demoMode) return demo.demoRegisterDevice(payload)
+   const { data } = await http.post('/devices', { pond_id: payload.pondId, model: payload.model })
+diff --git a/src/domain/api-key-scope.ts b/src/domain/api-key-scope.ts
+new file mode 100644
+index 0000000..564cb46
+--- /dev/null
++++ b/src/domain/api-key-scope.ts
+@@ -0,0 +1,14 @@
++import { z } from 'zod'
++
++const resourceID = z.string().regex(/^[1-9]\d*$/).transform(Number).pipe(z.number().int().positive().max(Number.MAX_SAFE_INTEGER))
++
++export class InvalidResourceIDs extends Error {
++  constructor() { super('资源 ID 必须是逗号分隔的正整数，请检查输入') }
++}
++
++export function parseResourceIDs(value: string): number[] {
++  if (!value.trim()) return []
++  const parsed = z.array(resourceID).max(100).safeParse(value.split(',').map(item => item.trim()))
++  if (!parsed.success) throw new InvalidResourceIDs()
++  return [...new Set(parsed.data)]
++}
+diff --git a/src/domain/api-key.ts b/src/domain/api-key.ts
+new file mode 100644
+index 0000000..651b601
+--- /dev/null
++++ b/src/domain/api-key.ts
+@@ -0,0 +1,67 @@
++import { z } from 'zod'
++
++const resourceSchema = z.object({
++  farm_ids: z.array(z.number().int().positive()).optional(),
++  pond_ids: z.array(z.number().int().positive()).optional(),
++  device_nos: z.array(z.string().min(1)).optional(),
++})
++
++const apiKeySchema = z.object({
++  key_id: z.string().min(1),
++  tenant_id: z.number().int().positive(),
++  name: z.string(),
++  scopes: z.array(z.string().min(1)),
++  resources: resourceSchema,
++  created_at: z.string().datetime({ offset: true }),
++  revoked_at: z.string().datetime({ offset: true }).nullable().optional(),
++})
++
++const auditSchema = z.object({
++  id: z.number().int().positive(),
++  tenant_id: z.number().int().positive(),
++  actor_id: z.number().int().positive().nullable().optional(),
++  action: z.string().min(1),
++  resource_id: z.string().min(1),
++  metadata: z.record(z.string(), z.unknown()),
++  created_at: z.string().datetime({ offset: true }),
++})
++
++const secretSchema = z.string().min(1)
++
++export function parseAPIKey(value: unknown) {
++  const parsed = apiKeySchema.parse(value)
++  return {
++    keyId: parsed.key_id,
++    tenantId: parsed.tenant_id,
++    name: parsed.name,
++    scopes: parsed.scopes,
++    resources: { farmIds: parsed.resources.farm_ids, pondIds: parsed.resources.pond_ids, deviceNos: parsed.resources.device_nos },
++    createdAt: parsed.created_at,
++    revokedAt: parsed.revoked_at ?? null,
++  }
++}
++
++export function parseAPIKeyAudit(value: unknown) {
++  const parsed = auditSchema.parse(value)
++  return {
++    id: parsed.id,
++    tenantId: parsed.tenant_id,
++    actorId: parsed.actor_id ?? undefined,
++    action: parsed.action,
++    resourceId: parsed.resource_id,
++    metadata: parsed.metadata,
++    createdAt: parsed.created_at,
++  }
++}
++
++export function parseAPIKeySecret(value: unknown) {
++  return secretSchema.parse(value)
++}
++
++export function parseAPIKeys(value: unknown) {
++  return z.array(apiKeySchema).parse(value).map(parseAPIKey)
++}
++
++export function parseAPIKeyAuditEvents(value: unknown) {
++  return z.array(auditSchema).parse(value).map(parseAPIKeyAudit)
++}
+diff --git a/src/layouts/AdminLayout.vue b/src/layouts/AdminLayout.vue
+index 200b451..f4e29a8 100644
+--- a/src/layouts/AdminLayout.vue
++++ b/src/layouts/AdminLayout.vue
+@@ -1,7 +1,7 @@
+ <script setup lang="ts">
+ import { computed, ref } from 'vue'
+ import { useRoute, useRouter } from 'vue-router'
+-import { Bell, DataAnalysis, MapLocation, Monitor, Operation, Setting, Fold, Expand, Goods, OfficeBuilding } from '@element-plus/icons-vue'
++import { Bell, DataAnalysis, MapLocation, Monitor, Operation, Setting, Fold, Expand, Goods, OfficeBuilding, Document } from '@element-plus/icons-vue'
+ import { useAuthStore } from '@/stores/auth'
+ import { demoMode } from '@/api/admin'
+ 
+@@ -18,6 +18,7 @@ const nav = [
+   { path: '/alarms/rules', label: '报警规则', icon: Operation },
+   { path: '/alarms', label: '报警中心', icon: Bell },
+   { path: '/system', label: '系统设置', icon: Setting },
++  { path: '/api-keys/audit', label: '开放平台日志', icon: Document },
+   { path: '/tenants', label: '组织与成员', icon: OfficeBuilding },
+ ]
+ 
+diff --git a/src/router/index.ts b/src/router/index.ts
+index 4d0013a..1d1b030 100644
+--- a/src/router/index.ts
++++ b/src/router/index.ts
+@@ -14,6 +14,7 @@ const routes = [
+       { path: 'alarm-rules', redirect: '/alarms/rules' },
+       { path: 'alarms', component: () => import('@/views/AlarmsView.vue'), meta: { title: '报警中心' } },
+       { path: 'system', component: () => import('@/views/SystemView.vue'), meta: { title: '系统设置' } },
++      { path: 'api-keys/audit', component: () => import('@/views/APIKeyAuditView.vue'), meta: { title: '开放平台日志' } },
+       { path: 'tenants', component: () => import('@/views/TenantsView.vue'), meta: { title: '组织与成员' } },
+     ],
+   },
+diff --git a/src/types/api.ts b/src/types/api.ts
+index 1f535c4..682e040 100644
+--- a/src/types/api.ts
++++ b/src/types/api.ts
+@@ -74,6 +74,8 @@ export interface Stats {
+ export interface LoginResponse { token: string; expiresIn: number }
+ export type LicenseState = 'missing' | 'valid' | 'permanent' | 'not_before' | 'expired' | 'invalid' | 'instance_mismatch' | 'clock_error' | 'overage'
+ export interface LicenseStatus { state: LicenseState; deploymentId: string; licenseId: string | null; keyId: string | null; issuedAt: string | null; notBefore: string | null; expiresAt: string | null; maxDevices: number; usedDevices: number; overage: number; features: string[]; payloadSha256: string | null }
++export interface APIKey { keyId: string; tenantId: number; name: string; scopes: string[]; resources: { farmIds?: number[]; pondIds?: number[]; deviceNos?: string[] }; createdAt: string; revokedAt?: string | null }
++export interface APIKeyAuditEvent { id: number; tenantId: number; actorId?: number; action: string; resourceId: string; metadata: Record<string, unknown>; createdAt: string }
+ export interface Tenant { id: number; name: string; active: boolean; permissionVersion?: number }
+ export interface TenantMember { tenantId: number; userId?: number; name: string; role: string; active?: boolean; expiresAt?: string | null }
+ export interface DeviceRegistration extends Device { secret: string }
+diff --git a/src/views/APIKeyAuditView.vue b/src/views/APIKeyAuditView.vue
+new file mode 100644
+index 0000000..15e9701
+--- /dev/null
++++ b/src/views/APIKeyAuditView.vue
+@@ -0,0 +1,23 @@
++<script setup lang="ts">
++import { onMounted, ref } from 'vue'
++import { ElMessage } from 'element-plus'
++import { getAPIKeyAudit } from '@/api/admin'
++import type { APIKeyAuditEvent } from '@/types/api'
++
++const loading = ref(false)
++const events = ref<APIKeyAuditEvent[]>([])
++
++async function load() {
++  loading.value = true
++  try { events.value = await getAPIKeyAudit() } catch (error) { ElMessage.error(error instanceof Error ? error.message : '日志加载失败') } finally { loading.value = false }
++}
++
++onMounted(load)
++</script>
++
++<template>
++  <div class="page-stack">
++    <div class="page-intro"><div><h2>开放平台操作日志</h2><p>只显示 API Key 管理动作，不记录 Secret 或签名原文。</p></div><el-button :loading="loading" @click="load">刷新</el-button></div>
++    <section v-loading="loading" class="surface" aria-label="开放平台操作日志"><div class="surface-body"><el-empty v-if="!events.length && !loading" description="暂无 API Key 操作" /><el-table v-else :data="events"><el-table-column prop="action" label="动作" /><el-table-column prop="resourceId" label="Key ID" /><el-table-column prop="actorId" label="操作者" /><el-table-column prop="createdAt" label="时间" /></el-table></div></section>
++  </div>
++</template>
+diff --git a/src/views/SystemView.vue b/src/views/SystemView.vue
+index a5a373a..470a762 100644
+--- a/src/views/SystemView.vue
++++ b/src/views/SystemView.vue
+@@ -2,9 +2,10 @@
+ import { reactive, ref } from 'vue'
+ import { useRouter } from 'vue-router'
+ import { ElMessage } from 'element-plus'
+-import { changePassword, demoMode, getLicense, importLicense } from '@/api/admin'
+-import type { LicenseStatus } from '@/types/api'
++import { changePassword, createAPIKey, demoMode, getAPIKeyAudit, getAPIKeys, getLicense, importLicense, revokeAPIKey, rotateAPIKey } from '@/api/admin'
++import type { APIKey, APIKeyAuditEvent, LicenseStatus } from '@/types/api'
+ import { useAuthStore } from '@/stores/auth'
++import { parseResourceIDs } from '@/domain/api-key-scope'
+ 
+ const router = useRouter()
+ const auth = useAuthStore()
+@@ -15,6 +16,11 @@ const licenseLoading = ref(false)
+ const importing = ref(false)
+ const licenseError = ref('')
+ const licenseForbidden = ref(false)
++const apiKeys = ref<APIKey[]>([])
++const apiKeyAudit = ref<APIKeyAuditEvent[]>([])
++const apiKeyLoading = ref(false)
++const apiKeyForm = reactive({ name: '', scopes: ['ponds:read', 'devices:read', 'alarms:read'], farmIds: '', pondIds: '', deviceNos: '' })
++const issuedSecret = ref('')
+ const form = reactive({ oldPassword: '', newPassword: '', confirmPassword: '' })
+ async function submit() {
+   if (!form.oldPassword || form.newPassword.length < 8) return ElMessage.warning('请填写旧密码，新密码至少 8 位')
+@@ -47,6 +53,12 @@ function onLicenseFile(event: Event) {
+   if (event.target instanceof HTMLInputElement) licenseFile.value = event.target.files?.[0] ?? null
+ }
+ loadLicense()
++async function loadAPIKeys() { apiKeyLoading.value = true; try { [apiKeys.value, apiKeyAudit.value] = await Promise.all([getAPIKeys(), getAPIKeyAudit()]) } catch (error) { ElMessage.error(error instanceof Error ? error.message : 'API Key 加载失败') } finally { apiKeyLoading.value = false } }
++function parseDeviceNos(value: string) { return value.split(',').map((item) => item.trim()).filter(Boolean) }
++async function issueAPIKey() { if (!apiKeyForm.name.trim()) return ElMessage.warning('请输入 Key 名称'); try { const result = await createAPIKey({ name: apiKeyForm.name.trim(), scopes: apiKeyForm.scopes, resources: { farmIds: parseResourceIDs(apiKeyForm.farmIds), pondIds: parseResourceIDs(apiKeyForm.pondIds), deviceNos: parseDeviceNos(apiKeyForm.deviceNos) } }); issuedSecret.value = result.secret; apiKeyForm.name = ''; await loadAPIKeys() } catch (error) { ElMessage.error(error instanceof Error ? error.message : 'API Key 创建失败') } }
++async function rotate(key: APIKey) { try { const result = await rotateAPIKey(key.keyId); issuedSecret.value = result.secret; await loadAPIKeys() } catch (error) { ElMessage.error(error instanceof Error ? error.message : 'API Key 轮换失败') } }
++async function revoke(key: APIKey) { try { await revokeAPIKey(key.keyId); await loadAPIKeys() } catch (error) { ElMessage.error(error instanceof Error ? error.message : 'API Key 撤销失败') } }
++loadAPIKeys()
+ </script>
+ 
+ <template>
+@@ -78,6 +90,7 @@ loadLicense()
+       </section>
+       <section class="surface"><div class="surface-head"><h3>修改管理员密码</h3></div><div class="surface-body"><el-form label-position="top" style="max-width:440px"><el-form-item label="当前密码" required><el-input v-model="form.oldPassword" type="password" show-password autocomplete="current-password" /></el-form-item><el-form-item label="新密码" required><el-input v-model="form.newPassword" type="password" show-password autocomplete="new-password" placeholder="至少 8 位" /></el-form-item><el-form-item label="确认新密码" required><el-input v-model="form.confirmPassword" type="password" show-password autocomplete="new-password" /></el-form-item><el-button type="primary" color="#0fae9b" :loading="loading" @click="submit">更新密码</el-button></el-form></div></section>
+       <aside class="info-panel"><h3>部署接入提示</h3><p>管理后台与服务端集成在同一个 iolink 镜像中，可通过部署地址直接访问。</p><ul><li>公网使用 HTTPS 与 MQTTS</li><li>首次部署使用本地向导设置管理员与租户账号</li><li>使用强随机登录签名密钥</li></ul></aside>
++      <section v-loading="apiKeyLoading" class="surface" aria-label="开放平台 API Key"><div class="surface-head"><h3>开放平台 API Key</h3></div><div class="surface-body"><el-form inline @submit.prevent="issueAPIKey"><el-input v-model="apiKeyForm.name" placeholder="Key 名称" /><el-input v-model="apiKeyForm.farmIds" placeholder="农场 ID（逗号分隔，可选）" /><el-input v-model="apiKeyForm.pondIds" placeholder="池塘 ID（逗号分隔，可选）" /><el-input v-model="apiKeyForm.deviceNos" placeholder="设备号（逗号分隔，可选）" /><el-checkbox-group v-model="apiKeyForm.scopes" aria-label="API Key 读取权限"><el-checkbox value="ponds:read">池塘读取</el-checkbox><el-checkbox value="devices:read">设备读取</el-checkbox><el-checkbox value="alarms:read">报警读取</el-checkbox></el-checkbox-group><el-button type="primary" :disabled="!apiKeyForm.scopes.length" @click="issueAPIKey">签发 Key</el-button></el-form><p class="muted">资源范围为空表示租户内全部资源；密钥只在签发或轮换后显示一次，请立即保存。</p><el-alert v-if="issuedSecret" title="请复制并安全保存 Secret" type="warning" :closable="false"><code>{{ issuedSecret }}</code></el-alert><el-table :data="apiKeys" style="width:100%;margin-top:16px"><el-table-column prop="name" label="名称" /><el-table-column prop="keyId" label="Key ID" /><el-table-column label="读取权限"><template #default="{ row }">{{ row.scopes.join('、') }}</template></el-table-column><el-table-column label="资源范围"><template #default="{ row }">{{ row.resources.farmIds?.length || row.resources.pondIds?.length || row.resources.deviceNos?.length ? '已限制' : '租户全部' }}</template></el-table-column><el-table-column label="状态"><template #default="{ row }">{{ row.revokedAt ? '已撤销' : '有效' }}</template></el-table-column><el-table-column label="操作" width="180"><template #default="{ row }"><el-button text type="primary" :disabled="!!row.revokedAt" @click="rotate(row)">轮换</el-button><el-button text type="danger" :disabled="!!row.revokedAt" @click="revoke(row)">撤销</el-button></template></el-table-column></el-table><h4 style="margin-top:24px">操作日志</h4><el-table :data="apiKeyAudit" size="small"><el-table-column prop="action" label="动作" /><el-table-column prop="resourceId" label="Key ID" /><el-table-column prop="createdAt" label="时间" /></el-table></div></section>
+     </div>
+   </div>
+ </template>
+diff --git a/tests/api-key-api.test.ts b/tests/api-key-api.test.ts
+new file mode 100644
+index 0000000..c388451
+--- /dev/null
++++ b/tests/api-key-api.test.ts
+@@ -0,0 +1,31 @@
++import { describe, expect, it } from 'vitest'
++import { parseAPIKey, parseAPIKeys, parseAPIKeyAudit, parseAPIKeyAuditEvents, parseAPIKeySecret } from '@/domain/api-key'
++
++const key = {
++  key_id: 'ik_123', tenant_id: 1, name: 'integration', scopes: ['ponds:read'],
++  resources: { farm_ids: [4], pond_ids: [], device_nos: [] },
++  created_at: '2026-10-07T00:00:00Z', revoked_at: null,
++}
++
++describe('API key response boundaries', () => {
++  it('maps the concrete wire shape without coercion', () => {
++    const { revoked_at: _revokedAt, ...issuedKey } = key
++    expect(parseAPIKey(issuedKey)).toMatchObject({ keyId: 'ik_123', tenantId: 1, resources: { farmIds: [4] }, revokedAt: null })
++    expect(parseAPIKeySecret('secret-value')).toBe('secret-value')
++  })
++  it.each([
++    { ...key, tenant_id: '1' },
++    { ...key, key_id: undefined },
++    { ...key, resources: { farm_ids: ['4'] } },
++  ])('rejects malformed key payload %j', invalid => expect(() => parseAPIKey(invalid)).toThrow())
++  it('rejects malformed audit and secret responses', () => {
++    expect(() => parseAPIKeyAudit({ id: 1 })).toThrow()
++    expect(() => parseAPIKeySecret(undefined)).toThrow()
++  })
++  it('accepts empty lists and rejects non-array success responses', () => {
++    expect(parseAPIKeys([])).toEqual([])
++    expect(parseAPIKeyAuditEvents([])).toEqual([])
++    expect(() => parseAPIKeys(null)).toThrow()
++    expect(() => parseAPIKeyAuditEvents({})).toThrow()
++  })
++})
+diff --git a/tests/api-key-scope.test.ts b/tests/api-key-scope.test.ts
+new file mode 100644
+index 0000000..6301e2b
+--- /dev/null
++++ b/tests/api-key-scope.test.ts
+@@ -0,0 +1,12 @@
++import { describe, expect, it } from 'vitest'
++import { InvalidResourceIDs, parseResourceIDs } from '@/domain/api-key-scope'
++
++describe('API key resource IDs', () => {
++  it('allows deliberate empty scope and normalizes explicit positive IDs', () => {
++    expect(parseResourceIDs('  ')).toEqual([])
++    expect(parseResourceIDs('4, 7,4')).toEqual([4, 7])
++  })
++  it.each(['4x', '4,invalid', '-1', '0', '1.5', '1e3', '9007199254740992', '4,', ','])('rejects %s instead of widening grants', value => {
++    expect(() => parseResourceIDs(value)).toThrow(InvalidResourceIDs)
++  })
++})

@@ -1,0 +1,13 @@
+=== RUN   TestGateM6d_TimestampWindowWithCorrectlyResignedInputs
+    m6d_open_api_test.go:255: delta_seconds=-301 timestamp=1791360745 accepted=false expected_accepted=false
+    m6d_open_api_test.go:255: delta_seconds=-300 timestamp=1791360746 accepted=true expected_accepted=true
+    m6d_open_api_test.go:255: delta_seconds=0 timestamp=1791361046 accepted=true expected_accepted=true
+    m6d_open_api_test.go:255: delta_seconds=300 timestamp=1791361346 accepted=true expected_accepted=true
+    m6d_open_api_test.go:255: delta_seconds=301 timestamp=1791361347 accepted=false expected_accepted=false
+    m6d_open_api_test.go:255: delta_seconds=-9223372036854775808 timestamp=-9223372035063414762 accepted=true expected_accepted=false
+    m6d_open_api_test.go:256: R42 timestamp window: delta=-9223372036854775808 accepted=true expected=false
+--- FAIL: TestGateM6d_TimestampWindowWithCorrectlyResignedInputs (0.62s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	0.653s
+FAIL
+probe_go_exit_code=1

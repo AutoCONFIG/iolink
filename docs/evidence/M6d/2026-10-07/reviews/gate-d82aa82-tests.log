@@ -1,0 +1,143 @@
+-test.shuffle 1791360570016230198
+=== RUN   TestM6dBodyDigest_rejectsOnlyChangedBodyAndPreservesNonce
+2026/10/07 16:09:30 WARN http request request_id=7IEVO7TS2SYVBRHQTMYGWUUU24 route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+2026/10/07 16:09:30 INFO http request request_id=PJJDJXJYVYCI36WDK77N4XQ5M3 route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+--- PASS: TestM6dBodyDigest_rejectsOnlyChangedBodyAndPreservesNonce (0.48s)
+=== RUN   TestM6dPublishedVector_authenticatesWithProductionVerifier
+--- PASS: TestM6dPublishedVector_authenticatesWithProductionVerifier (0.45s)
+=== RUN   TestM6dRestart_preservesConsumedNonceAndRateState
+2026/10/07 16:09:31 INFO http request request_id=D2RUNBGE2P6ITOS5A3OJPQ6ICI route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+2026/10/07 16:09:31 WARN http request request_id=SUJKSQDHFACHDNAH3JOGR5GSMB route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+2026/10/07 16:09:31 WARN http request request_id=IE37GFVFSBV3R2YU4VIBFDOOHW route=/open/v1/ponds method=GET status=429 duration_ms=2 tenant_id=0 actor_id=0
+--- PASS: TestM6dRestart_preservesConsumedNonceAndRateState (0.40s)
+=== RUN   TestCanonicalOpenQuery
+--- PASS: TestCanonicalOpenQuery (0.00s)
+=== RUN   TestConsumeOpenRateAllowsBurstAndRefillsAtOnePerSecond
+--- PASS: TestConsumeOpenRateAllowsBurstAndRefillsAtOnePerSecond (0.00s)
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds
+2026/10/07 16:09:31 INFO http request request_id=C2OC6NXUHOOAQES7WZE2MXTAEQ route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices
+2026/10/07 16:09:31 INFO http request request_id=NEEQZGQUMMHZNW4I66WSMSQDO3 route=/open/v1/devices method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/alarms
+2026/10/07 16:09:31 INFO http request request_id=LL43SGDS4JDHIMDEZTHCKRGD7B route=/open/v1/alarms method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8302
+2026/10/07 16:09:31 WARN http request request_id=FIIGAJY6XKGBKJK6GM2G3X5O6T route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8303
+2026/10/07 16:09:31 WARN http request request_id=ZZ6OTTYKCWZKUAII2XSUCGCAEY route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-hidden
+2026/10/07 16:09:31 WARN http request request_id=RA4WMIYLYZJJAMBBBQ44DWHJ5J route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-foreign
+2026/10/07 16:09:31 WARN http request request_id=TUW3Q2PB74FPS2JQEXCNPAY5WO route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds
+2026/10/07 16:09:31 INFO http request request_id=KK5HT7YFOFEXMVCPKNSCDBK274 route=/open/v1/ponds method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices
+2026/10/07 16:09:31 INFO http request request_id=2WI5PUYOH3CEJRCDCTMLLZARVB route=/open/v1/devices method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/alarms
+2026/10/07 16:09:31 INFO http request request_id=6VCCP26OXHXINRPVX4B7QB4XBK route=/open/v1/alarms method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8302
+2026/10/07 16:09:31 WARN http request request_id=SQCLCIG5PBWW3EA2IMQI5FEVAM route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8303
+2026/10/07 16:09:31 WARN http request request_id=K3CGWPPOEFF6QTIPHXYMFNJW3Y route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-hidden
+2026/10/07 16:09:31 WARN http request request_id=A2USG6PJ57EM3LQCWWMSQ24SR4 route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-foreign
+2026/10/07 16:09:31 WARN http request request_id=7TYF6J3ITOLM4NABA4CS7XQLMR route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds
+2026/10/07 16:09:31 INFO http request request_id=NYICOOMKGXTRJR3E25C2TWJ6E7 route=/open/v1/ponds method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices
+2026/10/07 16:09:31 INFO http request request_id=HD54VG6PSQER6TXJ2GRHDLCWGN route=/open/v1/devices method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/alarms
+2026/10/07 16:09:31 INFO http request request_id=SUYSKAGY4ZQSXG3FJBTIYAJAJ6 route=/open/v1/alarms method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8302
+2026/10/07 16:09:31 WARN http request request_id=PIHYFY7DCIMPBYM4UIULWUEC7B route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8303
+2026/10/07 16:09:31 WARN http request request_id=Z5T3W7FXB6UBYRST4DQCA2V46K route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-hidden
+2026/10/07 16:09:31 WARN http request request_id=OLBKJMTOBDJRO4V67S6UMEGGS5 route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-foreign
+2026/10/07 16:09:31 WARN http request request_id=PMLNMMZ5L3JBSNHSEE5HZ6OFO6 route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+--- PASS: TestM6dResourceHTTP_filtersListsAndDetails (0.49s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/alarms (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8302 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8303 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-hidden (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-foreign (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/alarms (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8302 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8303 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-hidden (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-foreign (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/alarms (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8302 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8303 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-hidden (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-foreign (0.00s)
+=== RUN   TestCanonicalOpenPathKeepsEncodedSafePath
+--- PASS: TestCanonicalOpenPathKeepsEncodedSafePath (0.00s)
+=== RUN   TestCanonicalOpenPathRejectsAmbiguity
+--- PASS: TestCanonicalOpenPathRejectsAmbiguity (0.00s)
+=== RUN   TestM6dConcurrentNonceAndRateLimit
+--- PASS: TestM6dConcurrentNonceAndRateLimit (0.52s)
+=== RUN   TestOpenSignatureMatchesPublishedVector
+--- PASS: TestOpenSignatureMatchesPublishedVector (0.00s)
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/devices
+2026/10/07 16:09:32 INFO http request request_id=ESY4O5OYT6FSHYQJWYXBXSLPYO route=/open/v1/devices method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/alarms
+2026/10/07 16:09:32 INFO http request request_id=PQQAVNT4AJTPGIX7P4UJ4OR67V route=/open/v1/alarms method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+--- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms (0.39s)
+    --- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/devices (0.01s)
+    --- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/alarms (0.00s)
+=== RUN   TestM6dBrowser_realManagementFlow
+    m6d_browser_test.go:25: set IOLINK_M6D_BROWSER=1 after a production frontend build
+--- SKIP: TestM6dBrowser_realManagementFlow (0.00s)
+=== RUN   TestM6dIssueAndAuthenticateOpenKey
+2026/10/07 16:09:33 INFO http request request_id=YIIBAWQRI6Y4HCDNENG4NK4SWX route=/open/v1/ponds method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/07 16:09:33 WARN http request request_id=OMRHX4PKZAJSGI3D2I7ZZAFF5Z route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+--- PASS: TestM6dIssueAndAuthenticateOpenKey (0.43s)
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/scope
+2026/10/07 16:09:33 WARN http request request_id=ZROVMA6BOO55VOLLGCQCWYMPXU route=/open/v1/ponds method=GET status=403 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/inactive_tenant
+2026/10/07 16:09:34 WARN http request request_id=L77XFY3MN7TBJFGZEAB6NKTV2Z route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/missing_feature
+2026/10/07 16:09:34 WARN http request request_id=ZMUTR4F72EMVLII3NYQIOOBO6Z route=/open/v1/ponds method=GET status=403 duration_ms=2 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/replay
+2026/10/07 16:09:34 INFO http request request_id=VVO2R7G5QD26TELRJIU7E7IC6G route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+2026/10/07 16:09:34 WARN http request request_id=JPZK4WEAEAXGZYQUZDV6WMS3JP route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/exhausted_rate
+2026/10/07 16:09:35 WARN http request request_id=A7H5ZBV65SCYOZYB2BI4AWZENS route=/open/v1/ponds method=GET status=429 duration_ms=3 tenant_id=0 actor_id=0
+--- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays (2.22s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/scope (0.39s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/inactive_tenant (0.52s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/missing_feature (0.41s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/replay (0.47s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/exhausted_rate (0.43s)
+=== RUN   TestM6dAdministration_rejectsStaleMembershipWithoutPartialWrite
+--- PASS: TestM6dAdministration_rejectsStaleMembershipWithoutPartialWrite (0.39s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	6.810s
+-test.shuffle 1791360570013132678
+=== RUN   TestRoutesRejectOversizedBody
+2026/10/07 16:09:30 INFO http request request_id=VLF77VGUFA6F7VSVTWQV26AGVZ route=/open/v1/ponds method=GET status=200 duration_ms=39 tenant_id=0 actor_id=0
+2026/10/07 16:09:30 WARN http request request_id=Y7J3FWRL462HICFZAMFVMYZRWV route=/open/v1/ponds method=GET status=413 duration_ms=35 tenant_id=0 actor_id=0
+--- PASS: TestRoutesRejectOversizedBody (0.09s)
+=== RUN   TestRoutesFailClosedWhenOpenAPIFeatureUnavailable
+2026/10/07 16:09:30 WARN http request request_id=N5AXRGROXXBLH3DSKTR54Z6V7P route=/open/v1/ponds method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestRoutesFailClosedWhenOpenAPIFeatureUnavailable (0.00s)
+=== RUN   TestRoutesScopeAndAuth
+2026/10/07 16:09:30 INFO http request request_id=FY46PPIGRE2LUJK7XXDGAFOBNF route=/open/v1/ponds method=GET status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/07 16:09:30 WARN http request request_id=2AL4PYBHCU3D4ODF5A2IMJFKNW route=/open/v1/devices method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestRoutesScopeAndAuth (0.00s)
+=== RUN   TestRoutesRateLimitIncludesRetryAfter
+2026/10/07 16:09:30 WARN http request request_id=XJB5DSFMBS336SUHOKQQ32YLNB route=/open/v1/ponds method=GET status=429 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestRoutesRateLimitIncludesRetryAfter (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/openapi	1.130s

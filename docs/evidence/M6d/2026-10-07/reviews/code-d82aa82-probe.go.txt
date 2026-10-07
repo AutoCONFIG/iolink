@@ -1,0 +1,138 @@
+package core_test
+
+import (
+    "bytes"
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/base64"
+    "encoding/hex"
+    "math"
+    "strconv"
+    "encoding/json"
+    "errors"
+    "io"
+    "log/slog"
+    "net/http"
+    "net/http/httptest"
+    "os"
+    "strings"
+    "testing"
+    "time"
+
+    "github.com/golang-jwt/jwt/v5"
+    "git.hyhy.fun/rsplab/iolink/internal/adminapi"
+    "git.hyhy.fun/rsplab/iolink/internal/authorization"
+    "git.hyhy.fun/rsplab/iolink/internal/core"
+    "git.hyhy.fun/rsplab/iolink/internal/domain"
+    "git.hyhy.fun/rsplab/iolink/internal/platform"
+)
+
+func reviewM6dAdmin(t *testing.T, f m6dHTTPFixture, role string) (*httptest.Server, string) {
+    t.Helper()
+    policy, err := authorization.New()
+    if err != nil { t.Fatal(err) }
+    root := strings.Repeat("s",32)
+    server := httptest.NewServer(adminapi.New(adminapi.Config{SecretKey:root,JWT:time.Hour},adminapi.Deps{Store:f.svc,APIKeys:f.svc,Policy:policy,Logger:slog.New(slog.NewJSONHandler(io.Discard,nil))}).Routes())
+    t.Cleanup(server.Close)
+    version, err := f.svc.TenantMembershipVersion(t.Context(),8301,8301)
+    if err != nil { t.Fatal(err) }
+    token, err := jwt.NewWithClaims(jwt.SigningMethodHS256,jwt.MapClaims{"aid":8301,"ver":0,"tenant_id":8301,"tenant_ver":version,"tenant_role":role,"exp":time.Now().Add(time.Hour).Unix()}).SignedString(platform.DeriveAdminKey(root))
+    if err != nil { t.Fatal(err) }
+    return server,token
+}
+
+func reviewM6dPost(t *testing.T, server *httptest.Server, token, body string) (int, []byte) {
+    t.Helper()
+    req,err:=http.NewRequestWithContext(t.Context(),http.MethodPost,server.URL+"/admin/v1/api-keys",bytes.NewBufferString(body))
+    if err != nil { t.Fatal(err) }
+    req.Header.Set("Authorization","Bearer "+token)
+    req.Header.Set("Content-Type","application/json")
+    response,err:=server.Client().Do(req)
+    if err != nil { t.Fatal(err) }
+    defer response.Body.Close()
+    payload,err:=io.ReadAll(response.Body)
+    if err != nil { t.Fatal(err) }
+    return response.StatusCode,payload
+}
+
+func TestReviewM6dMalformedDeviceGrant(t *testing.T) {
+    f:=newM6dHTTPFixture(t)
+    server,token:=reviewM6dAdmin(t,f,"owner")
+    var deviceNos []string
+    if err:=json.Unmarshal([]byte(os.Getenv("IOLINK_REVIEW_DEVICE_SCOPE")),&deviceNos);err!=nil { t.Fatal("invalid probe input") }
+    request,err:=json.Marshal(struct{Name string `json:"name"`;Scopes []string `json:"scopes"`;Resources domain.APIKeyResourceScope `json:"resources"`}{"comma-device-scope",[]string{"ponds:read","devices:read","alarms:read"},domain.APIKeyResourceScope{DeviceNos:deviceNos}})
+    if err!=nil {t.Fatal(err)}
+    status,payload:=reviewM6dPost(t,server,token,string(request))
+    if status!=http.StatusCreated {t.Fatalf("issuance status=%d",status)}
+    var issued struct { Key domain.APIKey `json:"key"`; Secret string `json:"secret"` }
+    if err:=json.Unmarshal(payload,&issued);err!=nil {t.Fatal("could not decode issued credentials")}
+    t.Logf("exact source parser result has %d devices; server issued key",len(deviceNos))
+    for _,path:=range []string{"/open/v1/ponds/8302","/open/v1/devices/m6d-hidden"} {
+        status,_,_:=m6dSignedHTTP(t,f.server,issued.Key,issued.Secret,path,m6dNonce(t))
+        t.Logf("unintended resource %s HTTP=%d",path,status)
+        if status!=http.StatusNotFound {t.Errorf("malformed device restriction became tenant-wide: HTTP=%d want404",status)}
+    }
+}
+
+func TestReviewM6dInvalidResourceHTTP(t *testing.T) {
+    for _,resources:=range []string{`{"farm_ids":[0]}`,`{"farm_ids":[-1]}`,`{"pond_ids":[0]}`,`{"device_nos":[""]}`,`{"farm_ids":null}`,`{"device_nos":null}`} {
+        t.Run(resources,func(t *testing.T){
+            f:=newM6dHTTPFixture(t)
+            server,token:=reviewM6dAdmin(t,f,"owner")
+            status,_:=reviewM6dPost(t,server,token,`{"name":"invalid-resources","scopes":["ponds:read"],"resources":`+resources+`}`)
+            var count int
+            if err:=f.pool.QueryRow(t.Context(),`SELECT count(*) FROM api_keys`).Scan(&count);err!=nil {t.Fatal(err)}
+            t.Logf("invalid resources %s: HTTP=%d persisted_keys=%d",resources,status,count)
+            if status!=http.StatusBadRequest || count!=0 {t.Errorf("invalid resource grant accepted: HTTP=%d persisted_keys=%d want400/0",status,count)}
+        })
+    }
+}
+
+func TestReviewM6dStaleRotationRevocation(t *testing.T) {
+    f:=newM6dHTTPFixture(t)
+    key,_:=f.issue(t,[]string{"ponds:read"},domain.APIKeyResourceScope{})
+    if _,err:=f.pool.Exec(t.Context(),`UPDATE tenant_memberships SET active=false,permission_version=permission_version+1 WHERE tenant_id=8301 AND user_id=8301`);err!=nil {t.Fatal(err)}
+    _,_,rotationErr:=f.svc.RotateAPIKey(f.owner,8301,8301,key.KeyID)
+    revokeErr:=f.svc.RevokeAPIKey(f.owner,8301,8301,key.KeyID)
+    if !errors.Is(rotationErr,domain.ErrForbidden) || !errors.Is(revokeErr,domain.ErrForbidden) {t.Fatal("stale key mutation allowed")}
+    var keys,audits int
+    if err:=f.pool.QueryRow(t.Context(),`SELECT (SELECT count(*) FROM api_keys WHERE revoked_at IS NULL),(SELECT count(*) FROM audit_events WHERE action LIKE 'api_key.%')`).Scan(&keys,&audits);err!=nil {t.Fatal(err)}
+    if keys!=1 || audits!=1 {t.Fatal("stale mutations left partial state")}
+    t.Log("stale rotate/revoke rejected; active key and audit counts unchanged")
+}
+
+func TestReviewM6dDeniedKeyRoles(t *testing.T) {
+    for _,role:=range []string{"member","viewer","support"} {
+        t.Run(role,func(t *testing.T){
+            f:=newM6dHTTPFixture(t)
+            if _,err:=f.pool.Exec(t.Context(),`UPDATE tenant_memberships SET role=$1,expires_at=CASE WHEN $1='support' THEN now()+interval '1 hour' ELSE NULL END WHERE tenant_id=8301 AND user_id=8301`,role);err!=nil {t.Fatal(err)}
+            server,token:=reviewM6dAdmin(t,f,role)
+            status,_:=reviewM6dPost(t,server,token,`{"name":"denied-role","scopes":["ponds:read"],"resources":{}}`)
+            if status!=http.StatusForbidden {t.Fatalf("role %s issued key:HTTP=%d",role,status)}
+            t.Logf("role %s issue HTTP=403",role)
+        })
+    }
+}
+
+func TestReviewM6dTimestampOverflow(t *testing.T) {
+    f:=newM6dHTTPFixture(t)
+    key,secretText:=f.issue(t,[]string{"ponds:read"},domain.APIKeyResourceScope{})
+    secret,err:=base64.RawURLEncoding.DecodeString(secretText)
+    if err!=nil {t.Fatal("invalid fixture credential")}
+    now:=time.Now().UTC().Truncate(time.Second)
+    for _,delta:=range []int64{-300,300,-301,301,math.MinInt64} {
+        timestamp:=now.Unix()+delta
+        nonce:=m6dNonce(t)
+        hash:=sha256.Sum256(nil)
+        canonical:=strings.Join([]string{"GET","/open/v1/ponds","",strconv.FormatInt(timestamp,10),nonce,hex.EncodeToString(hash[:])},"\n")
+        mac:=hmac.New(sha256.New,secret)
+        if _,err:=mac.Write([]byte(canonical));err!=nil {t.Fatal(err)}
+        _,err=f.svc.AuthenticateOpen(t.Context(),domain.OpenRequest{KeyID:key.KeyID,Timestamp:timestamp,Nonce:nonce,Signature:hex.EncodeToString(mac.Sum(nil)),Method:"GET",Path:"/open/v1/ponds"},now)
+        t.Logf("correctly signed timestamp delta=%d accepted=%t",delta,err==nil)
+        if delta>=-300 && delta<=300 {
+            if err!=nil {t.Error("in-window timestamp rejected")}
+        } else if !errors.Is(err,core.ErrOpenUnauthorized) {
+            t.Errorf("out-of-window timestamp delta=%d was not rejected as unauthorized",delta)
+        }
+    }
+}

@@ -1,0 +1,7 @@
+Review date 2026-10-07 Asia/Shanghai
+Source d82aa8249e70302ee70e8cacd5cef15177b31ef5; web 207dcfa751545e11a63a3a013da7e60552fecd75
+Go 1.26.8 linux/amd64; Node 24.21.0; PostgreSQL16.15; TimescaleDB2.30.0 (queried installed extension)
+Dedicated database endpoint 127.0.0.1:55439; credentials omitted. Each Go integration probe created/dropped its isolated database through internal/testdb.
+Separate locked source/web review worktrees used; product code unchanged.
+ulw-loop status --json: ULW_LOOP_PLAN_MISSING. No currentAttemptDir. Required fallback .omo/evidence/m6d-d82aa82-code-review.md. No notepad supplied or found under .omo.
+Main worktree CI and .tmp excluded.

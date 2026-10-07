@@ -1,0 +1,20 @@
+Immutable source d82aa8249e70302ee70e8cacd5cef15177b31ef5; web 207dcfa751545e11a63a3a013da7e60552fecd75
+Contracts virtualenv reused read-only; scripts and contracts from separate immutable worktree.
+
+Command: /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.venv/contracts/bin/python scripts/check_contracts.py
+docs/api/admin-openapi.yaml: standard schema and 44 operation fixtures PASS
+docs/api/license-openapi.yaml: standard schema and 3 operation fixtures PASS
+docs/api/open-openapi.yaml: standard schema and 5 operation fixtures PASS
+docs/api/openapi.yaml: standard schema and 15 operation fixtures PASS
+67 target operations, 333 synthetic request/response fixtures PASS; live handler verification is R02.c
+Exit code: 0
+
+Command: /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.venv/contracts/bin/python scripts/check_architecture_manifests.py --all
+architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+Exit code: 0
+
+Command: git diff --check 9f46b6e549d36a6eac8c197acfbe64d2a91585a4 d82aa8249e70302ee70e8cacd5cef15177b31ef5 -- cmd internal scripts docs/api
+Exit code: 0
+
+Command: git -C web diff --check 0aa7771acf0ef6322c9ac1e4c9839616646bb675 207dcfa751545e11a63a3a013da7e60552fecd75
+Exit code: 0

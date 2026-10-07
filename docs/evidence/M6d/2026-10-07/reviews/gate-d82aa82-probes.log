@@ -1,0 +1,19 @@
+=== RUN   TestGateM6d_SeparatorOnlyDeviceInputBroadensGrant
+2026/10/07 16:15:04 INFO http request request_id=OM7PEW2RLIY3ZLXZGNP2QVVK6R route=/open/v1/devices method=GET status=200 duration_ms=7 tenant_id=0 actor_id=0
+    m6d_resource_http_test.go:169: R41: nonempty device restriction ', ,' parsed to []; issuance succeeded; signed HTTP returned both tenant devices (rows=2)
+--- FAIL: TestGateM6d_SeparatorOnlyDeviceInputBroadensGrant (0.53s)
+=== RUN   TestGateM6d_RevokedMembershipMutationsHaveNoPartialState
+=== RUN   TestGateM6d_RevokedMembershipMutationsHaveNoPartialState/issue
+    m6d_resource_http_test.go:189: issue: forbidden; key=1 audit=1 revoked=0
+=== RUN   TestGateM6d_RevokedMembershipMutationsHaveNoPartialState/rotate
+    m6d_resource_http_test.go:189: rotate: forbidden; key=1 audit=1 revoked=0
+=== RUN   TestGateM6d_RevokedMembershipMutationsHaveNoPartialState/revoke
+    m6d_resource_http_test.go:189: revoke: forbidden; key=1 audit=1 revoked=0
+--- PASS: TestGateM6d_RevokedMembershipMutationsHaveNoPartialState (1.50s)
+    --- PASS: TestGateM6d_RevokedMembershipMutationsHaveNoPartialState/issue (0.49s)
+    --- PASS: TestGateM6d_RevokedMembershipMutationsHaveNoPartialState/rotate (0.45s)
+    --- PASS: TestGateM6d_RevokedMembershipMutationsHaveNoPartialState/revoke (0.57s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	2.073s
+FAIL
+probe_go_exit_code=1

@@ -1,0 +1,130 @@
+Immutable source d82aa8249e70302ee70e8cacd5cef15177b31ef5; web 207dcfa751545e11a63a3a013da7e60552fecd75
+Dedicated PostgreSQL16/Timescale at 127.0.0.1:55439; credentials omitted.
+Overlay adds read-only review probes; production code unchanged. Exact UI parser output [] from comma input is supplied to the issuance/HTTP probe. No browser launched.
+Command: GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated> go test -overlay /tmp/iolink-review-m6d-d82-code-overlay.json -race -count=1 ./internal/core -run ^TestReviewM6d -v
+=== RUN   TestReviewM6dMalformedDeviceGrant
+    m6d_review_probe_test.go:69: exact source parser result has 0 devices; server issued key
+2026/10/07 16:19:19 INFO http request request_id=S47KZUGG3L3WADUU2MGSLQ2G6B route=/open/v1/ponds/:id method=GET status=200 duration_ms=6 tenant_id=0 actor_id=0
+    m6d_review_probe_test.go:72: unintended resource /open/v1/ponds/8302 HTTP=200
+    m6d_review_probe_test.go:73: malformed device restriction became tenant-wide: HTTP=200 want404
+2026/10/07 16:19:19 INFO http request request_id=S57XADYRTKXNTNR3RAY43JKPEO route=/open/v1/devices/:device_no method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+    m6d_review_probe_test.go:72: unintended resource /open/v1/devices/m6d-hidden HTTP=200
+    m6d_review_probe_test.go:73: malformed device restriction became tenant-wide: HTTP=200 want404
+--- FAIL: TestReviewM6dMalformedDeviceGrant (0.47s)
+=== RUN   TestReviewM6dInvalidResourceHTTP
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"farm_ids":[0]}
+    m6d_review_probe_test.go:85: invalid resources {"farm_ids":[0]}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"farm_ids":[-1]}
+    m6d_review_probe_test.go:85: invalid resources {"farm_ids":[-1]}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"pond_ids":[0]}
+    m6d_review_probe_test.go:85: invalid resources {"pond_ids":[0]}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"device_nos":[""]}
+    m6d_review_probe_test.go:85: invalid resources {"device_nos":[""]}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"farm_ids":null}
+    m6d_review_probe_test.go:85: invalid resources {"farm_ids":null}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"device_nos":null}
+    m6d_review_probe_test.go:85: invalid resources {"device_nos":null}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+--- FAIL: TestReviewM6dInvalidResourceHTTP (2.43s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"farm_ids":[0]} (0.38s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"farm_ids":[-1]} (0.42s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"pond_ids":[0]} (0.41s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"device_nos":[""]} (0.43s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"farm_ids":null} (0.38s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"device_nos":null} (0.41s)
+=== RUN   TestReviewM6dStaleRotationRevocation
+    m6d_review_probe_test.go:101: stale rotate/revoke rejected; active key and audit counts unchanged
+--- PASS: TestReviewM6dStaleRotationRevocation (0.40s)
+=== RUN   TestReviewM6dDeniedKeyRoles
+=== RUN   TestReviewM6dDeniedKeyRoles/member
+    m6d_review_probe_test.go:112: role member issue HTTP=403
+=== RUN   TestReviewM6dDeniedKeyRoles/viewer
+    m6d_review_probe_test.go:112: role viewer issue HTTP=403
+=== RUN   TestReviewM6dDeniedKeyRoles/support
+    m6d_review_probe_test.go:108: ERROR: new row for relation "tenant_memberships" violates check constraint "tenant_memberships_support_expiry" (SQLSTATE 23514)
+--- FAIL: TestReviewM6dDeniedKeyRoles (1.25s)
+    --- PASS: TestReviewM6dDeniedKeyRoles/member (0.48s)
+    --- PASS: TestReviewM6dDeniedKeyRoles/viewer (0.39s)
+    --- FAIL: TestReviewM6dDeniedKeyRoles/support (0.37s)
+=== RUN   TestReviewM6dTimestampOverflow
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=-300 accepted=true
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=300 accepted=true
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=-301 accepted=false
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=301 accepted=false
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=-9223372036854775808 accepted=true
+    m6d_review_probe_test.go:135: out-of-window timestamp delta=-9223372036854775808 was not rejected as unauthorized
+--- FAIL: TestReviewM6dTimestampOverflow (0.41s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	4.992s
+FAIL
+
+Exit code: 1
+
+Rerun: corrected review-only support fixture to include its required future expiry; prior support failure was fixture CHECK violation and was not counted as product evidence.
+=== RUN   TestReviewM6dMalformedDeviceGrant
+    m6d_review_probe_test.go:69: exact source parser result has 0 devices; server issued key
+2026/10/07 16:21:51 INFO http request request_id=5GVSTCQ5WCYC7YQPTKJKRPTXCS route=/open/v1/ponds/:id method=GET status=200 duration_ms=6 tenant_id=0 actor_id=0
+    m6d_review_probe_test.go:72: unintended resource /open/v1/ponds/8302 HTTP=200
+    m6d_review_probe_test.go:73: malformed device restriction became tenant-wide: HTTP=200 want404
+2026/10/07 16:21:51 INFO http request request_id=TRDXDYTFNZHMQD2IQ7R2VGHWXH route=/open/v1/devices/:device_no method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+    m6d_review_probe_test.go:72: unintended resource /open/v1/devices/m6d-hidden HTTP=200
+    m6d_review_probe_test.go:73: malformed device restriction became tenant-wide: HTTP=200 want404
+--- FAIL: TestReviewM6dMalformedDeviceGrant (0.46s)
+=== RUN   TestReviewM6dInvalidResourceHTTP
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"farm_ids":[0]}
+    m6d_review_probe_test.go:85: invalid resources {"farm_ids":[0]}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"farm_ids":[-1]}
+    m6d_review_probe_test.go:85: invalid resources {"farm_ids":[-1]}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"pond_ids":[0]}
+    m6d_review_probe_test.go:85: invalid resources {"pond_ids":[0]}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"device_nos":[""]}
+    m6d_review_probe_test.go:85: invalid resources {"device_nos":[""]}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"farm_ids":null}
+    m6d_review_probe_test.go:85: invalid resources {"farm_ids":null}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+=== RUN   TestReviewM6dInvalidResourceHTTP/{"device_nos":null}
+    m6d_review_probe_test.go:85: invalid resources {"device_nos":null}: HTTP=201 persisted_keys=1
+    m6d_review_probe_test.go:86: invalid resource grant accepted: HTTP=201 persisted_keys=1 want400/0
+--- FAIL: TestReviewM6dInvalidResourceHTTP (2.97s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"farm_ids":[0]} (0.53s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"farm_ids":[-1]} (0.48s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"pond_ids":[0]} (0.51s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"device_nos":[""]} (0.56s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"farm_ids":null} (0.45s)
+    --- FAIL: TestReviewM6dInvalidResourceHTTP/{"device_nos":null} (0.44s)
+=== RUN   TestReviewM6dStaleRotationRevocation
+    m6d_review_probe_test.go:101: stale rotate/revoke rejected; active key and audit counts unchanged
+--- PASS: TestReviewM6dStaleRotationRevocation (0.48s)
+=== RUN   TestReviewM6dDeniedKeyRoles
+=== RUN   TestReviewM6dDeniedKeyRoles/member
+    m6d_review_probe_test.go:112: role member issue HTTP=403
+=== RUN   TestReviewM6dDeniedKeyRoles/viewer
+    m6d_review_probe_test.go:112: role viewer issue HTTP=403
+=== RUN   TestReviewM6dDeniedKeyRoles/support
+    m6d_review_probe_test.go:112: role support issue HTTP=403
+--- PASS: TestReviewM6dDeniedKeyRoles (1.44s)
+    --- PASS: TestReviewM6dDeniedKeyRoles/member (0.44s)
+    --- PASS: TestReviewM6dDeniedKeyRoles/viewer (0.53s)
+    --- PASS: TestReviewM6dDeniedKeyRoles/support (0.46s)
+=== RUN   TestReviewM6dTimestampOverflow
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=-300 accepted=true
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=300 accepted=true
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=-301 accepted=false
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=301 accepted=false
+    m6d_review_probe_test.go:131: correctly signed timestamp delta=-9223372036854775808 accepted=true
+    m6d_review_probe_test.go:135: out-of-window timestamp delta=-9223372036854775808 was not rejected as unauthorized
+--- FAIL: TestReviewM6dTimestampOverflow (0.47s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	5.848s
+FAIL
+
+Corrected probe rerun exit code: 1
