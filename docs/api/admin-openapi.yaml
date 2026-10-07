@@ -1104,6 +1104,55 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '500': { $ref: '#/components/responses/InternalError' }
+  /api-keys:
+    get:
+      tags: [auth]
+      summary: List tenant API keys without secrets
+      responses:
+        '200': {description: Keys, content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/APIKey'}}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '500': {$ref: '#/components/responses/InternalError'}
+    post:
+      tags: [auth]
+      summary: Issue a scoped API key; secret is returned once
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/APIKeyCreate'}
+      responses:
+        '201': {description: Issued key and one-time base64url secret, content: {application/json: {schema: {$ref: '#/components/schemas/APIKeyIssued'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '500': {$ref: '#/components/responses/InternalError'}
+  /api-keys/{key_id}/rotate:
+    post:
+      tags: [auth]
+      summary: Atomically revoke the old key and issue a new secret once
+      parameters:
+        - {name: key_id, in: path, required: true, schema: {type: string}}
+      responses:
+        '201': {description: Rotated key, content: {application/json: {schema: {$ref: '#/components/schemas/APIKeyIssued'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+  /api-keys/{key_id}/revoke:
+    post:
+      tags: [auth]
+      summary: Revoke a tenant API key immediately
+      parameters:
+        - {name: key_id, in: path, required: true, schema: {type: string}}
+      responses:
+        '204': {description: Revoked}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
   /api-keys/audit:
     get:
       tags: [auth]
@@ -1722,6 +1771,41 @@ components:
         role: { type: string, enum: [owner, admin, member, viewer, support] }
         active: { type: boolean }
         expires_at: { type: string, format: date-time, nullable: true }
+      additionalProperties: false
+    APIKeyResourceScope:
+      type: object
+      description: Empty arrays mean unrestricted within the tenant; nonempty dimensions intersect. Device-only scope limits ponds to current enabled-device locations.
+      properties:
+        farm_ids: {type: array, maxItems: 100, items: {type: integer, format: int64, minimum: 1}}
+        pond_ids: {type: array, maxItems: 100, items: {type: integer, format: int64, minimum: 1}}
+        device_nos: {type: array, maxItems: 100, items: {type: string, minLength: 1}}
+      additionalProperties: false
+    APIKeyCreate:
+      type: object
+      required: [name, scopes]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 128}
+        scopes: {type: array, minItems: 1, maxItems: 16, uniqueItems: true, items: {type: string, enum: ['ponds:read', 'devices:read', 'alarms:read']}}
+        resources: {$ref: '#/components/schemas/APIKeyResourceScope'}
+      additionalProperties: false
+    APIKey:
+      type: object
+      required: [key_id, tenant_id, name, scopes, resources, created_at]
+      properties:
+        key_id: {type: string}
+        tenant_id: {type: integer, format: int64}
+        name: {type: string}
+        scopes: {type: array, items: {type: string}}
+        resources: {$ref: '#/components/schemas/APIKeyResourceScope'}
+        created_at: {type: string, format: date-time}
+        revoked_at: {type: string, format: date-time, nullable: true}
+      additionalProperties: false
+    APIKeyIssued:
+      type: object
+      required: [key, secret]
+      properties:
+        key: {$ref: '#/components/schemas/APIKey'}
+        secret: {type: string, description: 32 random bytes encoded as unpadded base64url; never returned by list or audit}
       additionalProperties: false
     APIKeyAuditEvent:
       type: object

@@ -16,6 +16,30 @@ paths:
         '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+  /open/v1/ponds/{id}:
+    get:
+      summary: Get an authorized pond; inaccessible resources return 404
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer, format: int64, minimum: 1}}
+      responses:
+        '200': {description: Pond, content: {application/json: {schema: {$ref: '#/components/schemas/Pond'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '413': {$ref: '#/components/responses/TooLarge'}
+        '429': {$ref: '#/components/responses/RateLimited'}
+  /open/v1/devices/{device_no}:
+    get:
+      summary: Get an authorized device; inaccessible resources return 404
+      parameters:
+        - {name: device_no, in: path, required: true, schema: {type: string, minLength: 1}}
+      responses:
+        '200': {description: Device, content: {application/json: {schema: {$ref: '#/components/schemas/Device'}}}}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '413': {$ref: '#/components/responses/TooLarge'}
+        '429': {$ref: '#/components/responses/RateLimited'}
   /open/v1/devices:
     get:
       summary: List devices in the API key resource set
@@ -33,6 +57,23 @@ paths:
         '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
 components:
+  responses:
+    Unauthorized:
+      description: Invalid signature, timestamp, nonce, revoked key or inactive tenant
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    Forbidden:
+      description: Scope or feature unavailable
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    NotFound:
+      description: Missing or unauthorized resource
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    TooLarge:
+      description: Request body exceeds 4 MiB; no authentication or nonce consumption
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    RateLimited:
+      description: Rate limit exceeded
+      headers: {Retry-After: {schema: {type: integer, minimum: 1}}}
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
   schemas:
     Error:
       type: object
@@ -95,7 +136,7 @@ x-signature-vector:
   signing_key: documented-test-secret
   signature: bcf8386ae0789327c5a6597a81eaa2f3121565d045012796e7e22bdba2a43149
   curl: >-
-    curl -sS http://localhost:8080/open/v1/ponds
+    curl -sS 'http://localhost:8080/open/v1/ponds?a=&a=hello%20world&b=one&b=two'
     -H 'X-Key-Id: ik_documented'
     -H 'X-Timestamp: 1735689600'
     -H 'X-Nonce: 0123456789abcdef0123456789abcdef'

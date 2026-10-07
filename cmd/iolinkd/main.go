@@ -279,7 +279,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 		SecretKey: cfg.SecretKey,
 		JWT:       12 * time.Hour,
 	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy, Logger: log, APIKeys: svc})
-	open := openapi.New(openapi.Deps{Auth: svc, Resources: svc})
+	open := openapi.New(openapi.Deps{Logger: log, Auth: svc, Resources: svc})
 
 	// --- appapi: /api/v1 for the mini program, backed by core repos ---
 	api := appapi.New(appapi.Config{

@@ -105,7 +105,7 @@ func (s *Service) ListAPIKeys(ctx context.Context, tenantID, actorID int64) ([]d
 		return nil, fmt.Errorf("list api keys: %w", err)
 	}
 	defer rows.Close()
-	var out []domain.APIKey
+	out := make([]domain.APIKey, 0)
 	for rows.Next() {
 		var key domain.APIKey
 		var raw []byte
@@ -141,6 +141,9 @@ func (s *Service) RotateAPIKey(ctx context.Context, tenantID, actorID int64, key
 	}
 	defer tx.Rollback(ctx)
 	var old domain.APIKey
+	if err := s.authorizeAPIKeyAdmin(ctx, tx, tenantID, actorID); err != nil {
+		return domain.APIKey{}, "", err
+	}
 	var raw []byte
 	if err := tx.QueryRow(ctx, `SELECT name,scopes,resources FROM api_keys WHERE key_id=$1 AND tenant_id=$2 AND revoked_at IS NULL FOR UPDATE`, keyID, tenantID).Scan(&old.Name, &old.Scopes, &raw); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

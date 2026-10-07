@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -80,5 +81,21 @@ func TestRoutesRateLimitIncludesRetryAfter(t *testing.T) {
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusTooManyRequests || resp.Header.Get("Retry-After") != "3" {
 		t.Fatalf("status=%d retry=%q", resp.StatusCode, resp.Header.Get("Retry-After"))
+	}
+}
+
+func TestRoutesRejectOversizedBody(t *testing.T) {
+	s := New(Deps{Auth: fakeAuth{principal: domain.OpenPrincipal{TenantID: 1, Scopes: []string{"ponds:read"}}}, Resources: fakeResources{}})
+	for _, size := range []int{4 << 20, (4 << 20) + 1} {
+		req := httptest.NewRequest(http.MethodGet, "/open/v1/ponds", strings.NewReader(strings.Repeat("x", size)))
+		rec := httptest.NewRecorder()
+		s.Routes().ServeHTTP(rec, req)
+		want := http.StatusOK
+		if size > 4<<20 {
+			want = http.StatusRequestEntityTooLarge
+		}
+		if rec.Code != want {
+			t.Fatalf("body bytes=%d status=%d want=%d", size, rec.Code, want)
+		}
 	}
 }

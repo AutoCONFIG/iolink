@@ -18,6 +18,11 @@ func (s *Service) ListOpenPonds(ctx context.Context, tenantID int64, scope domai
 	if len(scope.PondIDs) > 0 {
 		q += fmt.Sprintf(` AND p.id=ANY($%d)`, idx)
 		args = append(args, scope.PondIDs)
+		idx++
+	}
+	if len(scope.DeviceNos) > 0 {
+		q += fmt.Sprintf(` AND EXISTS(SELECT 1 FROM devices d WHERE d.pond_id=p.id AND d.device_no=ANY($%d) AND d.disabled_at IS NULL)`, idx)
+		args = append(args, scope.DeviceNos)
 	}
 	q += ` ORDER BY p.id`
 	rows, err := s.pool.Query(ctx, q, args...)
@@ -25,7 +30,7 @@ func (s *Service) ListOpenPonds(ctx context.Context, tenantID int64, scope domai
 		return nil, err
 	}
 	defer rows.Close()
-	var out []domain.Pond
+	out := make([]domain.Pond, 0)
 	for rows.Next() {
 		var p domain.Pond
 		if err := rows.Scan(&p.ID, &p.FarmID, &p.Name, &p.AreaMu, &p.CreatedAt); err != nil {
@@ -59,7 +64,7 @@ func (s *Service) ListOpenDevices(ctx context.Context, tenantID int64, scope dom
 		return nil, err
 	}
 	defer rows.Close()
-	var out []domain.Device
+	out := make([]domain.Device, 0)
 	for rows.Next() {
 		var d domain.Device
 		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval); err != nil {
@@ -93,7 +98,7 @@ func (s *Service) ListOpenAlarms(ctx context.Context, tenantID int64, scope doma
 		return nil, err
 	}
 	defer rows.Close()
-	var out []domain.Alarm
+	out := make([]domain.Alarm, 0)
 	for rows.Next() {
 		var a domain.Alarm
 		if err := rows.Scan(&a.ID, &a.DeviceNo, &a.PondID, &a.Metric, &a.CurrentValue, &a.Threshold, &a.Level, &a.Message, &a.ConfirmedAt, &a.CreatedAt); err != nil {

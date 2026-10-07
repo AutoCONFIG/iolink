@@ -16,6 +16,7 @@ import (
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 var ErrOpenUnauthorized = errors.New("open api authentication failed")
@@ -131,10 +132,17 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 	if subtle.ConstantTimeCompare(mac.Sum(nil), sig) != 1 {
 		return domain.OpenPrincipal{}, ErrOpenUnauthorized
 	}
-	_, _ = tx.Exec(ctx, `DELETE FROM api_key_nonces WHERE expires_at < now()`)
+	var resources domain.APIKeyResourceScope
+	if err := json.Unmarshal(resourcesRaw, &resources); err != nil {
+		return domain.OpenPrincipal{}, ErrOpenUnauthorized
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM api_key_nonces WHERE expires_at < now()`); err != nil {
+		return domain.OpenPrincipal{}, fmt.Errorf("expire open nonces: %w", err)
+	}
 	nonceHash := sha256.Sum256([]byte(req.Nonce))
 	if _, err := tx.Exec(ctx, `INSERT INTO api_key_nonces(key_id,nonce_hash,expires_at) VALUES($1,$2,now()+interval '10 minutes')`, req.KeyID, nonceHash[:]); err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "duplicate") {
+		var postgresError *pgconn.PgError
+		if errors.As(err, &postgresError) && postgresError.Code == "23505" {
 			return domain.OpenPrincipal{}, ErrOpenReplay
 		}
 		return domain.OpenPrincipal{}, fmt.Errorf("store open nonce: %w", err)
@@ -154,10 +162,6 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 	}
 	if err := tx.Commit(ctx); err != nil {
 		return domain.OpenPrincipal{}, fmt.Errorf("commit open authentication: %w", err)
-	}
-	var resources domain.APIKeyResourceScope
-	if err := json.Unmarshal(resourcesRaw, &resources); err != nil {
-		return domain.OpenPrincipal{}, ErrOpenUnauthorized
 	}
 	return domain.OpenPrincipal{KeyID: req.KeyID, TenantID: tenantID, Scopes: scopes, Resources: resources}, nil
 }

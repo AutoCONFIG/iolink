@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -27,6 +28,7 @@ type ResourceStore interface {
 }
 
 type Deps struct {
+	Logger    *slog.Logger
 	Auth      Authenticator
 	Resources ResourceStore
 }
@@ -37,7 +39,7 @@ func New(deps Deps) *Server { return &Server{deps: deps} }
 
 func (s *Server) Routes() http.Handler {
 	r := gin.New()
-	r.Use(operations.RequestLogging(nil))
+	r.Use(operations.RequestLogging(s.deps.Logger))
 	v1 := r.Group("/open/v1", s.authenticate)
 	v1.GET("/ponds", s.listPonds)
 	v1.GET("/ponds/:id", s.getPond)
@@ -48,8 +50,13 @@ func (s *Server) Routes() http.Handler {
 }
 
 func (s *Server) authenticate(c *gin.Context) {
-	body, err := io.ReadAll(io.LimitReader(c.Request.Body, 4<<20))
+	body, err := io.ReadAll(http.MaxBytesReader(c.Writer, c.Request.Body, 4<<20))
 	if err != nil {
+		var oversized *http.MaxBytesError
+		if errors.As(err, &oversized) {
+			c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "body_too_large"})
+			return
+		}
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
 		return
 	}
