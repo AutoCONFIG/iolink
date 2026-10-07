@@ -432,7 +432,7 @@ requirements:
     required_level: software
     software_status: not_run
     external_status: not_applicable
-    verification: "planned: go test ./internal/...; verify key issuance, rotation, revocation, and scope cases"
+    verification: "b4b9335/web207dcfa: real Timescale HTTP and production management browser, full race/shuffle verify passed; independent dual review pending, see docs/evidence/M6d/2026-10-07/README.md"
     evidence: docs/evidence/acceptance/R41/
   - id: R42
     wave: M6d
@@ -441,7 +441,7 @@ requirements:
     required_level: software
     software_status: not_run
     external_status: not_applicable
-    verification: "planned: go test ./internal/...; verify fixed signature vectors, replay, and rate-limit cases"
+    verification: "b4b9335/web207dcfa: production vector, body-only tampering, concurrent nonce, persisted state and HTTP 429 passed; independent dual review pending, see docs/evidence/M6d/2026-10-07/README.md"
     evidence: docs/evidence/acceptance/R42/
   - id: R43
     wave: M7a

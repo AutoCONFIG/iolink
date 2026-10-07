@@ -1,18 +1,16 @@
 # R42 M6d signed request acceptance
 
-Candidate source: `51898df` (web submodule `248f100`).
+Tested source: `b4b93359976c0529c8f52f50b02a968e3f99750e`.
+Web: `207dcfa751545e11a63a3a013da7e60552fecd75`.
 
-Executed checks:
+Commands, environment, behavior matrix, red/green history, and screenshots:
+[M6d 2026-10-07](../../M6d/2026-10-07/README.md).
 
-```text
-IOLINK_TEST_PG_DSN=postgres://... go test ./internal/core -run 'TestM6d' -count=1 PASS
-IOLINK_TEST_PG_DSN=postgres://... go test -race -shuffle=on ./internal/core ./internal/openapi ./internal/adminapi ./internal/migrate ./internal/persistence ./internal/authorization -count=1 PASS
-go test ./internal/openapi -count=1 PASS
-make verify-contracts PASS (61 operations, 300 synthetic fixtures)
-```
+Dual review is pending. Earlier reports apply only to their recorded snapshots;
+this is not completed acceptance.
 
-The focused integration cases cover the published HMAC vector, RFC3986
-canonicalization, body tampering, stale and future timestamps, atomic concurrent
-nonce replay, burst-10 and 60/minute refill behavior, real 429 `Retry-After`,
-and successful signed HTTP access. The database-backed nonce and rate state is
-reloaded by a fresh service instance to verify restart persistence.
+Coverage: published vector through production verifier, RFC3986/path rules,
+body-only tampering without nonce consumption, timestamp bounds, concurrent
+durable replay, burst10/refill, HTTP 429+Retry-After, body overflow, and fresh
+Service reading persisted nonce/rate state. Reconstruction is not a process-crash
+recovery drill.

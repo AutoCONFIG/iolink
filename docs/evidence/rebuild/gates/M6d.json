@@ -1,7 +1,8 @@
 {
   "gate": "M6d",
-  "source": "51898df",
-  "web": "248f100",
+  "source": "b4b93359976c0529c8f52f50b02a968e3f99750e",
+  "web": "207dcfa751545e11a63a3a013da7e60552fecd75",
+  "evidence": "docs/evidence/M6d/2026-10-07/README.md",
   "requirements": ["R41", "R42"],
   "checks": {
     "real_timescale_m6d": "passed",

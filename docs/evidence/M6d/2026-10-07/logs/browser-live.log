@@ -1,0 +1,18 @@
+=== RUN   TestM6dBrowser_realManagementFlow
+    m6d_browser_test.go:70: 
+        > iolink-admin-ui@0.1.0 e2e
+        > playwright test --config playwright.m6d.config.ts --reporter=line
+        
+        
+        Running 1 test using 1 worker
+        
+        (node:1087499) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+        (Use `node --trace-warnings ...` to show where the warning was created)
+        
+        
+        [1/1] e2e/m6d-live.spec.ts:4:1 › real tenant owner issues a restricted key, rotates, revokes and reads safe audit
+          1 passed (2.9s)
+        
+--- PASS: TestM6dBrowser_realManagementFlow (6.21s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	7.249s

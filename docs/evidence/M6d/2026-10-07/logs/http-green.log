@@ -1,0 +1,254 @@
+-test.shuffle 1791357111593562374
+=== RUN   TestM6dIssueAndAuthenticateOpenKey
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:52 INFO http request request_id=TNMQQQC7OZZRIZLHJUWKGI7PTY route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:52 WARN http request request_id=6LWUTS4AXMTB72XYWADCCV55IN route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+--- PASS: TestM6dIssueAndAuthenticateOpenKey (0.59s)
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/scope
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:52 WARN http request request_id=CTUTE3XTVMWHHYE3VRURWW7WFB route=/open/v1/ponds method=GET status=403 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/inactive_tenant
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:53 WARN http request request_id=H3ALDQGNPYOYUKRJDQGPCL72GY route=/open/v1/ponds method=GET status=401 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/missing_feature
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:53 WARN http request request_id=XTB2IAGJLIWPVPPO3FBEDQJPU6 route=/open/v1/ponds method=GET status=403 duration_ms=2 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/replay
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:54 INFO http request request_id=YLUWOBFG765GW6E6D2JENIDT7B route=/open/v1/ponds method=GET status=200 duration_ms=6 tenant_id=0 actor_id=0
+2026/10/07 15:11:54 WARN http request request_id=IX4WZREDRWN5ERJUZW3ONKRGX2 route=/open/v1/ponds method=GET status=401 duration_ms=3 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/exhausted_rate
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:54 WARN http request request_id=U4H5GN3275HGGTRVQNG6L75XIR route=/open/v1/ponds method=GET status=429 duration_ms=4 tenant_id=0 actor_id=0
+--- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays (2.48s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/scope (0.44s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/inactive_tenant (0.54s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/missing_feature (0.56s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/replay (0.45s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/exhausted_rate (0.49s)
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/devices
+2026/10/07 15:11:55 INFO http request request_id=ATFYMR3BYFSDCQSVWOKZPNPWNH route=/open/v1/devices method=GET status=200 duration_ms=6 tenant_id=0 actor_id=0
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/alarms
+2026/10/07 15:11:55 INFO http request request_id=4Z7FGJIJK4D5SQCIJWAETRMY5U route=/open/v1/alarms method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+--- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms (0.52s)
+    --- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/devices (0.01s)
+    --- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/alarms (0.01s)
+=== RUN   TestM6dAdministration_rejectsStaleMembershipWithoutPartialWrite
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+--- PASS: TestM6dAdministration_rejectsStaleMembershipWithoutPartialWrite (0.49s)
+=== RUN   TestM6dConcurrentNonceAndRateLimit
+--- PASS: TestM6dConcurrentNonceAndRateLimit (0.61s)
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds
+2026/10/07 15:11:56 INFO http request request_id=6RCKM7GUBOSPGPD4YUVOXWQKWG route=/open/v1/ponds method=GET status=200 duration_ms=7 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices
+2026/10/07 15:11:56 INFO http request request_id=VCPW3YRGUJH32VKW6QXHY74H3W route=/open/v1/devices method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/alarms
+2026/10/07 15:11:56 INFO http request request_id=3JSIRN5WGY54ISYDB36YNELONQ route=/open/v1/alarms method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8302
+2026/10/07 15:11:56 WARN http request request_id=YSBWJJDN2JWVZQAHBRXWCAKIXB route=/open/v1/ponds/:id method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8303
+2026/10/07 15:11:56 WARN http request request_id=IO3CQ3HA3IWBTE7AWLXT2WOWAU route=/open/v1/ponds/:id method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-hidden
+2026/10/07 15:11:56 WARN http request request_id=332MNHJYOPRAMDP7LXN6LRXHNX route=/open/v1/devices/:device_no method=GET status=404 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-foreign
+2026/10/07 15:11:56 WARN http request request_id=DCA5CG5WB2WJAFX7UYHHSG254B route=/open/v1/devices/:device_no method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds
+2026/10/07 15:11:56 INFO http request request_id=LVZ7T6V66HWAHDW3MFN6HHOFYO route=/open/v1/ponds method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices
+2026/10/07 15:11:56 INFO http request request_id=2SDVBUBW5MR7MWL4SABD5MNXRA route=/open/v1/devices method=GET status=200 duration_ms=14 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/alarms
+2026/10/07 15:11:56 INFO http request request_id=56A6DJMO7SNGHTJGPSBXFFRTRM route=/open/v1/alarms method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8302
+2026/10/07 15:11:56 WARN http request request_id=I7LU5QHRPG6I52E5S4YE5TTNO2 route=/open/v1/ponds/:id method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8303
+2026/10/07 15:11:56 WARN http request request_id=5XJAIDL3S6CWRU6NQQ7IC4IJPP route=/open/v1/ponds/:id method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-hidden
+2026/10/07 15:11:56 WARN http request request_id=GFQ5GM3SFJPH6WSCTXJZSMGKOJ route=/open/v1/devices/:device_no method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-foreign
+2026/10/07 15:11:56 WARN http request request_id=OVX2UJAIUQNRBTF4EKBQKDDGRY route=/open/v1/devices/:device_no method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds
+2026/10/07 15:11:56 INFO http request request_id=4DVA3VARLKGC6Z6ESSITY632CY route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices
+2026/10/07 15:11:56 INFO http request request_id=SFQJLWXABAMXHB5LUMIVHTLBCS route=/open/v1/devices method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/alarms
+2026/10/07 15:11:56 INFO http request request_id=TLGATCMZMWLWGDKX72QISPWQV6 route=/open/v1/alarms method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8302
+2026/10/07 15:11:56 WARN http request request_id=CFOPB7ZFCTNLTPZCXC5XBFZ2HT route=/open/v1/ponds/:id method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8303
+2026/10/07 15:11:56 WARN http request request_id=QHEQATDLW3OMXEFTD5ZJQMJS6Z route=/open/v1/ponds/:id method=GET status=404 duration_ms=5 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-hidden
+2026/10/07 15:11:56 WARN http request request_id=MQQR4BJVXRECWILOHNOUCLDZAV route=/open/v1/devices/:device_no method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-foreign
+2026/10/07 15:11:56 WARN http request request_id=STFVRCTV4WYJJ7ZDIXFA52CGPF route=/open/v1/devices/:device_no method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+--- PASS: TestM6dResourceHTTP_filtersListsAndDetails (0.62s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/alarms (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8302 (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8303 (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-hidden (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-foreign (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/alarms (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8302 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8303 (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-hidden (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-foreign (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/alarms (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8302 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8303 (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-hidden (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-foreign (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	6.352s
+-test.shuffle 1791357111594264178
+=== RUN   TestRoutesRateLimitIncludesRetryAfter
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:51 WARN http request request_id=4T4J7ES3I6W4SDZPGPXAXSHSYP route=/open/v1/ponds method=GET status=429 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestRoutesRateLimitIncludesRetryAfter (0.00s)
+=== RUN   TestRoutesRejectOversizedBody
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:51 INFO http request request_id=L3KPPXDIFFFRYWEN4U6YNNBGH6 route=/open/v1/ponds method=GET status=200 duration_ms=40 tenant_id=0 actor_id=0
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:51 WARN http request request_id=UWMGW56SDSAGCMU4XYITDKVDDE route=/open/v1/ponds method=GET status=413 duration_ms=40 tenant_id=0 actor_id=0
+--- PASS: TestRoutesRejectOversizedBody (0.10s)
+=== RUN   TestRoutesScopeAndAuth
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:51 INFO http request request_id=4IB7CIKWVSYDGLNOBWDEAKHZTC route=/open/v1/ponds method=GET status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/07 15:11:51 WARN http request request_id=I2OM7YPAAMDRZ474W2YQTHNAO2 route=/open/v1/devices method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestRoutesScopeAndAuth (0.00s)
+=== RUN   TestRoutesFailClosedWhenOpenAPIFeatureUnavailable
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 15:11:51 WARN http request request_id=VDEALYUK6C3MP2F2S7IQ6ZQ5ZR route=/open/v1/ponds method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestRoutesFailClosedWhenOpenAPIFeatureUnavailable (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/openapi	1.143s

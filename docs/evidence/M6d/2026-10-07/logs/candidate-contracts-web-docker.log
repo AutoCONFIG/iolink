@@ -1,0 +1,289 @@
+python3 -m venv .venv/contracts
+.venv/contracts/bin/python -m pip install -r scripts/requirements-docs.txt
+Requirement already satisfied: openapi-spec-validator==0.9.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 2)) (0.9.0)
+Requirement already satisfied: openapi-schema-validator==0.9.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 3)) (0.9.0)
+Requirement already satisfied: jsonschema==4.26.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 4)) (4.26.0)
+Requirement already satisfied: jsonschema-path==0.5.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 5)) (0.5.0)
+Requirement already satisfied: pathable==0.6.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 6)) (0.6.0)
+Requirement already satisfied: lazy-object-proxy==1.12.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 7)) (1.12.0)
+Requirement already satisfied: PyYAML==6.0.3 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 8)) (6.0.3)
+Requirement already satisfied: rfc3339-validator==0.1.4 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 9)) (0.1.4)
+Requirement already satisfied: six==1.17.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 10)) (1.17.0)
+Requirement already satisfied: attrs==26.1.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 11)) (26.1.0)
+Requirement already satisfied: jsonschema-specifications==2025.9.1 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 12)) (2025.9.1)
+Requirement already satisfied: referencing==0.37.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 13)) (0.37.0)
+Requirement already satisfied: rpds-py==0.28.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 14)) (0.28.0)
+Requirement already satisfied: pydantic==2.13.4 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 15)) (2.13.4)
+Requirement already satisfied: pydantic-core==2.46.4 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 16)) (2.46.4)
+Requirement already satisfied: pydantic-settings==2.14.2 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 17)) (2.14.2)
+Requirement already satisfied: annotated-types==0.7.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 18)) (0.7.0)
+Requirement already satisfied: typing_extensions==4.16.0 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 19)) (4.16.0)
+Requirement already satisfied: typing-inspection==0.4.2 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 20)) (0.4.2)
+Requirement already satisfied: python-dotenv==1.2.1 in ./.venv/contracts/lib/python3.14/site-packages (from -r scripts/requirements-docs.txt (line 21)) (1.2.1)
+
+[notice] A new release of pip is available: 26.1.2 -> 26.2.1
+[notice] To update, run: /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.venv/contracts/bin/python -m pip install --upgrade pip
+.venv/contracts/bin/python scripts/check_contracts.py
+docs/api/admin-openapi.yaml: standard schema and 44 operation fixtures PASS
+docs/api/license-openapi.yaml: standard schema and 3 operation fixtures PASS
+docs/api/open-openapi.yaml: standard schema and 5 operation fixtures PASS
+docs/api/openapi.yaml: standard schema and 15 operation fixtures PASS
+67 target operations, 333 synthetic request/response fixtures PASS; live handler verification is R02.c
+architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+
+> iolink-admin-ui@0.1.0 test
+> vitest run tests --run
+
+
+ RUN  v5.0.1 /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/web
+
+
+ Test Files  5 passed (5)
+      Tests  43 passed (43)
+   Start at  15:56:33
+   Duration  152ms (transform 46%, import 42%, tests 8%, worker 4%)
+
+
+> iolink-admin-ui@0.1.0 typecheck
+> vue-tsc -b
+
+
+> iolink-admin-ui@0.1.0 build
+> vue-tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 1814 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                             0.47 kB │ gzip:   0.33 kB
+dist/assets/ProductsView-DY-L-zJk.css                                       0.36 kB │ gzip:   0.23 kB
+dist/assets/TenantsView-CthDnldy.css                                        0.43 kB │ gzip:   0.25 kB
+dist/assets/SystemView-0ECwcVMJ.css                                         0.43 kB │ gzip:   0.23 kB
+dist/assets/index-D6CmpLJq.css                                            369.56 kB │ gzip:  50.66 kB
+dist/assets/metrics-mFZmf0P5.js                                             0.47 kB │ gzip:   0.33 kB
+dist/assets/MetricGrid.vue_vue_type_script_setup_true_lang-7QmyTg9G.js      1.01 kB │ gzip:   0.61 kB
+dist/assets/APIKeyAuditView-BXO4Schx.js                                     1.27 kB │ gzip:   0.81 kB
+dist/assets/LoginView-Z4VNMPtj.js                                           2.59 kB │ gzip:   1.53 kB
+dist/assets/AdminLayout-BTR-_X-z.js                                         2.88 kB │ gzip:   1.52 kB
+dist/assets/DashboardView-lRNGYDsS.js                                       4.23 kB │ gzip:   2.00 kB
+dist/assets/TenantsView-BY9yaayE.js                                         4.69 kB │ gzip:   2.21 kB
+dist/assets/AlarmsView-B1Q2ac2T.js                                          4.69 kB │ gzip:   2.15 kB
+dist/assets/RulesView-BNiHCPJl.js                                           4.94 kB │ gzip:   2.02 kB
+dist/assets/PondsView-XqRe1-nV.js                                           5.51 kB │ gzip:   2.26 kB
+dist/assets/DevicesView-BVU7MKJU.js                                         5.85 kB │ gzip:   2.59 kB
+dist/assets/ProductsView-DK3FN_Yt.js                                        6.50 kB │ gzip:   2.52 kB
+dist/assets/SystemView-CIqZHhPT.js                                         10.09 kB │ gzip:   4.03 kB
+dist/assets/index-UBsKE5sn.js                                           1,195.11 kB │ gzip: 391.20 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 3.54s
+
+> iolink-admin-ui@0.1.0 e2e
+> playwright test --reporter=line
+
+[WebServer] (node:1133747) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 17 tests using 4 workers
+
+(node:1133769) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:1133770) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:1133771) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:1133777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/17] e2e/m6d.spec.ts:10:1 › API Key resource scope and audit page use the signed management contract
+[2/17] e2e/admin-pages.spec.ts:9:1 › 所有管理页面在桌面和窄屏保持可用
+[3/17] e2e/smoke.spec.ts:3:1 › 管理员可从登录进入运营总览
+[4/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：Asia/Shanghai › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37Z
+[5/17] e2e/smoke.spec.ts:15:1 › 主导航可进入设备管理
+[6/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：Asia/Shanghai › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z
+[7/17] e2e/support-expiry.spec.ts:43:5 › 支持到期：Asia/Shanghai › 上海时间显示、编辑、保存和重载保持同一瞬间
+[8/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37Z
+[9/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z
+[10/17] e2e/support-expiry.spec.ts:43:5 › 支持到期：UTC › 上海时间显示、编辑、保存和重载保持同一瞬间
+[11/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：America/New_York › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37Z
+[12/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：America/New_York › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z
+[13/17] e2e/support-expiry.spec.ts:43:5 › 支持到期：America/New_York › 上海时间显示、编辑、保存和重载保持同一瞬间
+[14/17] e2e/admin-pages.spec.ts:32:1 › 创建、确认和改密流程显示可恢复状态
+[15/17] e2e/admin-pages.spec.ts:60:1 › 过期会话回到登录页并清理本地令牌
+[16/17] e2e/admin-pages.spec.ts:71:1 › 产品页可创建包含数值和枚举字段的版本并发布分配
+[17/17] e2e/admin-pages.spec.ts:101:1 › 组织成员角色变更、支持期限和停用状态可保存
+  17 passed (33.5s)
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.03kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/alpine:3.20
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:24-alpine
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/golang:1.26-alpine
+#4 DONE 1.7s
+
+#3 [internal] load metadata for docker.io/library/node:24-alpine
+#3 DONE 1.9s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 256B done
+#5 DONE 0.0s
+
+#6 [build 1/9] FROM docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c
+#6 resolve docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c 0.0s done
+#6 DONE 0.0s
+
+#7 [frontend 1/6] FROM docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+#7 resolve docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 0.0s done
+#7 DONE 0.1s
+
+#8 [stage-2 1/5] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#8 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 0.0s done
+#8 DONE 0.1s
+
+#9 [internal] load build context
+#9 transferring context: 2.58MB 2.8s done
+#9 DONE 2.8s
+
+#10 [build 2/9] WORKDIR /src
+#10 CACHED
+
+#11 [build 3/9] COPY go.mod go.sum ./
+#11 CACHED
+
+#12 [frontend 2/6] WORKDIR /web
+#12 CACHED
+
+#13 [frontend 3/6] COPY web/package.json web/package-lock.json ./
+#13 CACHED
+
+#14 [build 4/9] RUN --mount=type=cache,target=/go/pkg/mod go mod download
+#14 CACHED
+
+#15 [frontend 4/6] RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
+#15 CACHED
+
+#16 [frontend 5/6] COPY web/ ./
+#16 DONE 0.1s
+
+#17 [build 5/9] COPY . .
+#17 DONE 1.4s
+
+#18 [frontend 6/6] RUN npm run build
+#18 0.648 
+#18 0.648 > iolink-admin-ui@0.1.0 build
+#18 0.648 > vue-tsc -b && vite build
+#18 0.648 
+#18 3.646 vite v7.3.6 building client environment for production...
+#18 3.697 transforming...
+#18 5.218 node_modules/zod/v4/core/util.js (400:0): A comment
+#18 5.218 
+#18 5.218 "// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+#18 5.218 
+#18 5.218 in "node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+#18 5.221 node_modules/zod/v4/core/regexes.js (74:0): A comment
+#18 5.221 
+#18 5.221 "/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+#18 5.221  * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+#18 5.221  * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+#18 5.221 
+#18 5.221 in "node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+#18 7.035 ✓ 1814 modules transformed.
+#18 7.244 rendering chunks...
+#18 7.493 computing gzip size...
+#18 7.522 dist/index.html                                                             0.47 kB │ gzip:   0.33 kB
+#18 7.522 dist/assets/ProductsView-DY-L-zJk.css                                       0.36 kB │ gzip:   0.23 kB
+#18 7.522 dist/assets/TenantsView-CthDnldy.css                                        0.43 kB │ gzip:   0.25 kB
+#18 7.522 dist/assets/SystemView-0ECwcVMJ.css                                         0.43 kB │ gzip:   0.23 kB
+#18 7.522 dist/assets/index-D6CmpLJq.css                                            369.56 kB │ gzip:  50.66 kB
+#18 7.522 dist/assets/metrics-mFZmf0P5.js                                             0.47 kB │ gzip:   0.33 kB
+#18 7.522 dist/assets/MetricGrid.vue_vue_type_script_setup_true_lang-7QmyTg9G.js      1.01 kB │ gzip:   0.61 kB
+#18 7.522 dist/assets/APIKeyAuditView-BXO4Schx.js                                     1.27 kB │ gzip:   0.81 kB
+#18 7.522 dist/assets/LoginView-Z4VNMPtj.js                                           2.59 kB │ gzip:   1.53 kB
+#18 7.522 dist/assets/AdminLayout-BTR-_X-z.js                                         2.88 kB │ gzip:   1.52 kB
+#18 7.522 dist/assets/DashboardView-lRNGYDsS.js                                       4.23 kB │ gzip:   2.00 kB
+#18 7.522 dist/assets/TenantsView-BY9yaayE.js                                         4.69 kB │ gzip:   2.21 kB
+#18 7.522 dist/assets/AlarmsView-B1Q2ac2T.js                                          4.69 kB │ gzip:   2.15 kB
+#18 7.522 dist/assets/RulesView-BNiHCPJl.js                                           4.94 kB │ gzip:   2.02 kB
+#18 7.522 dist/assets/PondsView-XqRe1-nV.js                                           5.51 kB │ gzip:   2.26 kB
+#18 7.522 dist/assets/DevicesView-BVU7MKJU.js                                         5.85 kB │ gzip:   2.59 kB
+#18 7.522 dist/assets/ProductsView-DK3FN_Yt.js                                        6.50 kB │ gzip:   2.52 kB
+#18 7.523 dist/assets/SystemView-CIqZHhPT.js                                         10.09 kB │ gzip:   4.03 kB
+#18 7.523 dist/assets/index-UBsKE5sn.js                                           1,195.11 kB │ gzip: 391.20 kB
+#18 7.523 
+#18 7.523 (!) Some chunks are larger than 500 kB after minification. Consider:
+#18 7.523 - Using dynamic import() to code-split the application
+#18 7.523 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#18 7.523 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#18 7.523 ✓ built in 3.86s
+#18 7.598 npm notice
+#18 7.598 npm notice New major version of npm available! 11.19.0 -> 12.2.0
+#18 7.598 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#18 7.598 npm notice To update run: npm install -g npm@12.2.0
+#18 7.598 npm notice
+#18 DONE 7.6s
+
+#19 [build 6/9] COPY --from=frontend /web/dist ./web/dist
+#19 DONE 0.1s
+
+#20 [build 7/9] RUN sh scripts/embed-frontend.sh
+#20 DONE 0.2s
+
+#21 [build 8/9] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/iolinkd ./cmd/iolinkd
+#21 DONE 1.5s
+
+#22 [build 9/9] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/mqtt-sim ./cmd/mqtt-sim
+#22 DONE 0.3s
+
+#23 [stage-2 2/5] RUN apk add --no-cache ca-certificates tzdata wget
+#23 CACHED
+
+#24 [stage-2 3/5] WORKDIR /app
+#24 CACHED
+
+#25 [stage-2 4/5] COPY --from=build /out/iolinkd /app/iolinkd
+#25 DONE 0.1s
+
+#26 [stage-2 5/5] COPY --from=build /out/mqtt-sim /app/mqtt-sim
+#26 DONE 0.0s
+
+#27 exporting to image
+#27 exporting layers
+#27 exporting layers 0.6s done
+#27 exporting manifest sha256:680e4a6d3807ac138d7f11fb61cd4ecefdf6f066043c73020c656437604af430 0.0s done
+#27 exporting config sha256:e174fa48c290adb1f64e5b8b029b50fb4332773a6cf23ccae8b6e46817ffcd46 0.0s done
+#27 exporting attestation manifest sha256:bab2f151daf0477647fb2c04a7fc27ea547d4561bb7a9c43d6be6ca6c3e5dd99 0.0s done
+#27 exporting manifest list sha256:fde9782c2ff63ed16012d72e5f9ca26176126710c0f8922e471b3e3f64d8c2c6 0.0s done
+#27 naming to docker.io/library/iolink:m6d-4490d7a done
+#27 unpacking to docker.io/library/iolink:m6d-4490d7a 0.1s done
+#27 DONE 0.8s

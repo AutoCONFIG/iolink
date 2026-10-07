@@ -1,10 +1,10 @@
 # 当前实现状态与证据
 
-## TODO 总览（2026-10-06 核对）
+## TODO 总览（2026-10-07 核对）
 
 当前推进位置：**TODO 10 / M6d（R41–R42）正在进行**。本地 source
-`724f02cf162de496714e4efdc8a72c8cbb6a6486`、web
-`dbce8a5bba548c4762abac8c15a61132da8b8b24` 是初版实现，不是已验收发布。
+`b4b93359976c0529c8f52f50b02a968e3f99750e`、web
+`207dcfa751545e11a63a3a013da7e60552fecd75` 是冻结候选，不是已验收发布。
 最新已发布里程碑仍为 M6c / `v0.0.9`。
 
 本节是对已有证据的状态整理，不是重新运行验收。下方旧表、计划勾选和历史证据
@@ -35,7 +35,7 @@
 | TODO 10a / M6a | 产品/物模型版本、通用遥测、兼容投影 | 已完成已核验 | R34–R35；[R34](evidence/acceptance/R34/README.md)、[R35](evidence/acceptance/R35/README.md)明确最终工作树双审通过 |
 | TODO 10b / M6b | 多租户、成员/RBAC、撤权与当前资源隔离 | 已完成已核验 | R36.a/R37.a；同候选 `0335438` 双审；[最终证据](evidence/acceptance/R37/2026-10-04-version-revocation/README.md)、[gate](evidence/rebuild/gates/M6b.json)；未来资源随其阶段另验 |
 | TODO 10c / M6c | License、配额/功能守卫、离线包与安装恢复 | 已完成已核验 | R38/R39.a/R40 软件范围；`8ad5505` 同快照双审、发布 v0.0.9；[证据](evidence/M6c/2026-10-05/README.md)；实际签发方/客户安装及 R39.b另列 |
-| **TODO 10d / M6d** | **开放 Key、签名、重放、限流与后台** | **正在进行** | R41–R42；本地初版已提交；[初步记录](evidence/M6d/2026-10-05/README.md)不构成完整验收。需补权限/License、资源配置与日志页、完整契约、并发/重启/错误测试、真实 HTTP/浏览器及同快照双审；审阅调用遭遇 API429/中断，无批准 |
+| **TODO 10d / M6d** | **开放 Key、签名、重放、限流与后台** | **正在进行** | R41–R42；实现及已发现缺陷已修；契约、真实 Timescale HTTP、生产浏览器、并发/持久化/拒绝路径已补齐；[最新证据](evidence/M6d/2026-10-07/README.md)。冻结候选重验与同快照双审正在推进，无最终批准 |
 | TODO 11a / M7a | RTSP/GB28181、媒体接入、播放鉴权及双端播放 | 待完成未调研 | R43；已有 [M7需求](EXTENSIONS.md)，未找到专项媒体接入/部署契约与阶段执行证据；需摄像机/GB参数/端口/微信真机 |
 | TODO 11b / M7b | 坐标/腾讯地图、双端定位与只读大屏 | 待完成未调研 | R44–R45；有设计，尚无阶段实施调研证据；需权限过滤、WGS84/GCJ-02对照、断网/无Key状态、20屏刷新性能 |
 | TODO 12a / M8a | 持久命令、回执、TTL、取消、幂等及周期调整 | 待完成未调研 | R46；有状态设计，待冻结命令接口和 worker/固件能力契约；模拟与真实硬件分别验收 |
@@ -109,7 +109,7 @@ M6c License 与离线交付软件验收完成：源码 `8ad550552d56f061222cd1ff
 | R34–R35 | 软件验收通过 | M6a 产品模型、版本发布/分配、通用遥测、兼容投影、fixture 回填 | 外部不适用；证据见 docs/evidence/acceptance/R34/ 与 R35/ |
 | R36–R37 | R36.a/R37.a 软件验收完成 | 租户上下文、成员/RBAC、Casbin策略、资源隔离、权限撤销及组织后台；事务写入校验实时权限，遥测/报警校验权限版本，不完整报警上下文拒绝；source `ef6510ffa5e43fd9796352ae324e09dfc3820c68` 的完整检查、真实 Timescale HTTP 正反向回归与生产授权器 fake executor 验证通过；D12/D13/D15/D16/D17 已整合；最终候选 `03354381b5954087d82d0d3f807cad9993b94b8d` 已获两位独立审阅者明确批准 | R36.b/R37.b 后续资源按对应阶段验收；外部输入仍按 `external_blocked` 记录；证据见 [R36](evidence/acceptance/R36/) 与 [最终验证](evidence/acceptance/R37/2026-10-04-version-revocation/) |
 | R38–R40 | R38/R39.a/R40 软件验收完成 | signed-only License、离线签发工具、管理 API、011 迁移、License-first 配额事务与安全错误、共享 feature guard、可恢复离线安装；源码 `8ad5505` 同快照双审通过 | R39.b 实际可选入口、实际签发方、干净客户主机30分钟安装、ARM64仍未验收；保留较早 `333fc42` 离线镜像来源说明；证据见 [M6c](evidence/m6c-license-delivery.md) |
-| R41–R42 | 未实现 | 文档设计 | 开放平台待实施 |
+| R41–R42 | 已实现待验收 | 开放 Key、HMAC、nonce、共享限流、scope/资源守卫及管理 UI；[最新证据](evidence/M6d/2026-10-07/README.md) | 同冻结候选重验及双审未闭环，不能登记完成 |
 | R43–R45 | 未实现 | 文档设计 | 视频/地图/大屏待实施；真实验收所需外部输入未就绪 |
 | R46–R54 | 未实现 | MQTT命令结构预留/调试CLI | 命令生命周期、HTTP/Modbus/网关/转发/调度/联动/Web调试/报表待实施 |
 | R55 | 未实现 | 无全量发布验收包 | 必须逐项通过后再判定 |
