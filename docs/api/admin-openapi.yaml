@@ -1116,6 +1116,7 @@ paths:
     post:
       tags: [auth]
       summary: Issue a scoped API key; secret is returned once
+      description: Resources must exist in the current tenant; device references must be enabled. Invalid shapes return 400; missing or foreign resources return 404 without issuing a key.
       requestBody:
         required: true
         content:
@@ -1126,6 +1127,7 @@ paths:
         '400': {$ref: '#/components/responses/BadRequest'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/NotFound'}
         '500': {$ref: '#/components/responses/InternalError'}
   /api-keys/{key_id}/rotate:
     post:
@@ -1774,7 +1776,7 @@ components:
       additionalProperties: false
     APIKeyResourceScope:
       type: object
-      description: Empty arrays mean unrestricted within the tenant; nonempty dimensions intersect. Device-only scope limits ponds to current enabled-device locations.
+      description: Omitted fields and empty arrays deliberately mean unrestricted within the tenant; explicit null objects or arrays are invalid. Nonempty dimensions intersect. References must belong to the current tenant at issuance and rotation; devices must be enabled. Device-only scope limits ponds to current enabled-device locations.
       properties:
         farm_ids: {type: array, maxItems: 100, items: {type: integer, format: int64, minimum: 1}}
         pond_ids: {type: array, maxItems: 100, items: {type: integer, format: int64, minimum: 1}}

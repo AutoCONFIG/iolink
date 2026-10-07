@@ -35,6 +35,21 @@ type m6dHTTPFixture struct {
 	licenseKey *rsa.PrivateKey
 }
 
+func m6dSignatureForRequest(t *testing.T, secret []byte, req domain.OpenRequest) string {
+	t.Helper()
+	query, err := core.CanonicalOpenQuery(req.Query)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bodyHash := sha256.Sum256(req.Body)
+	canonical := strings.Join([]string{req.Method, req.Path, query, strconv.FormatInt(req.Timestamp, 10), req.Nonce, hex.EncodeToString(bodyHash[:])}, "\n")
+	mac := hmac.New(sha256.New, secret)
+	if _, err := mac.Write([]byte(canonical)); err != nil {
+		t.Fatal(err)
+	}
+	return hex.EncodeToString(mac.Sum(nil))
+}
+
 func newM6dHTTPFixture(t *testing.T) m6dHTTPFixture {
 	t.Helper()
 	p := testdb.New(t)

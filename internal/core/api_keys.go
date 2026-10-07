@@ -38,6 +38,18 @@ func validateAPIKeyInput(name string, scopes []string, resources domain.APIKeyRe
 	if len(resources.FarmIDs) > 100 || len(resources.PondIDs) > 100 || len(resources.DeviceNos) > 100 {
 		return errors.New("api key resource scope too large")
 	}
+	for _, ids := range [2][]int64{resources.FarmIDs, resources.PondIDs} {
+		for _, id := range ids {
+			if id <= 0 {
+				return errors.New("invalid api key resource id")
+			}
+		}
+	}
+	for _, deviceNo := range resources.DeviceNos {
+		if strings.TrimSpace(deviceNo) == "" {
+			return errors.New("invalid api key device resource")
+		}
+	}
 	return nil
 }
 
@@ -56,6 +68,9 @@ func (s *Service) IssueAPIKey(ctx context.Context, tenantID int64, name string, 
 	if err := s.authorizeAPIKeyAdmin(ctx, tx, tenantID, actorID); err != nil {
 		return domain.APIKey{}, "", err
 	}
+	if err := validateAPIKeyResourceOwnership(ctx, tx, tenantID, resources); err != nil {
+		return domain.APIKey{}, "", err
+	}
 	keyID, err := randomKeyID()
 	if err != nil {
 		return domain.APIKey{}, "", fmt.Errorf("generate api key id: %w", err)
@@ -72,7 +87,7 @@ func (s *Service) IssueAPIKey(ctx context.Context, tenantID int64, name string, 
 	if err != nil {
 		return domain.APIKey{}, "", fmt.Errorf("encode api key resources: %w", err)
 	}
-	if _, err := tx.Exec(ctx, `INSERT INTO api_keys(key_id,tenant_id,name,scopes,resources,encrypted_secret,secret_nonce,created_by) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8)`, keyID, tenantID, strings.TrimSpace(name), scopes, resourceJSON, ciphertext, nonce, actorID); err != nil {
+	if _, err := tx.Exec(ctx, `INSERT INTO api_keys(key_id,tenant_id,name,scopes,resources,encrypted_secret,secret_nonce,created_by,rate_tokens) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9)`, keyID, tenantID, strings.TrimSpace(name), scopes, resourceJSON, ciphertext, nonce, actorID, float64(s.openRateBurst)); err != nil {
 		return domain.APIKey{}, "", fmt.Errorf("insert api key: %w", err)
 	}
 	metadata, err := json.Marshal(struct {
@@ -125,7 +140,7 @@ func (s *Service) RevokeAPIKey(ctx context.Context, tenantID, actorID int64, key
 	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
 		return err
 	}
-	return s.updateAPIKeyState(ctx, tenantID, actorID, keyID, false)
+	return s.revokeAPIKey(ctx, tenantID, actorID, keyID)
 }
 
 func (s *Service) RotateAPIKey(ctx context.Context, tenantID, actorID int64, keyID string) (domain.APIKey, string, error) {
@@ -154,6 +169,9 @@ func (s *Service) RotateAPIKey(ctx context.Context, tenantID, actorID int64, key
 	if err := json.Unmarshal(raw, &old.Resources); err != nil {
 		return domain.APIKey{}, "", fmt.Errorf("decode api key rotation: %w", err)
 	}
+	if err := validateAPIKeyResourceOwnership(ctx, tx, tenantID, old.Resources); err != nil {
+		return domain.APIKey{}, "", err
+	}
 	newID, err := randomKeyID()
 	if err != nil {
 		return domain.APIKey{}, "", err
@@ -173,7 +191,7 @@ func (s *Service) RotateAPIKey(ctx context.Context, tenantID, actorID int64, key
 	if _, err := tx.Exec(ctx, `UPDATE api_keys SET revoked_at=now() WHERE key_id=$1`, keyID); err != nil {
 		return domain.APIKey{}, "", fmt.Errorf("revoke old api key: %w", err)
 	}
-	if _, err := tx.Exec(ctx, `INSERT INTO api_keys(key_id,tenant_id,name,scopes,resources,encrypted_secret,secret_nonce,created_by,rotated_from) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9)`, newID, tenantID, old.Name, old.Scopes, resourceJSON, ciphertext, nonce, actorID, keyID); err != nil {
+	if _, err := tx.Exec(ctx, `INSERT INTO api_keys(key_id,tenant_id,name,scopes,resources,encrypted_secret,secret_nonce,created_by,rotated_from,rate_tokens) VALUES($1,$2,$3,$4,$5::jsonb,$6,$7,$8,$9,$10)`, newID, tenantID, old.Name, old.Scopes, resourceJSON, ciphertext, nonce, actorID, keyID, float64(s.openRateBurst)); err != nil {
 		return domain.APIKey{}, "", fmt.Errorf("insert rotated api key: %w", err)
 	}
 	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id,metadata) VALUES($1,$2,'api_key.rotated','api_key',$3,$4::jsonb)`, tenantID, actorID, newID, fmt.Sprintf(`{"rotated_from":%q}`, keyID)); err != nil {
@@ -185,7 +203,7 @@ func (s *Service) RotateAPIKey(ctx context.Context, tenantID, actorID int64, key
 	return domain.APIKey{KeyID: newID, TenantID: tenantID, Name: old.Name, Scopes: old.Scopes, Resources: old.Resources, CreatedAt: time.Now().UTC()}, base64.RawURLEncoding.EncodeToString(secret), nil
 }
 
-func (s *Service) updateAPIKeyState(ctx context.Context, tenantID, actorID int64, keyID string, active bool) error {
+func (s *Service) revokeAPIKey(ctx context.Context, tenantID, actorID int64, keyID string) error {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("begin api key state: %w", err)
@@ -194,20 +212,14 @@ func (s *Service) updateAPIKeyState(ctx context.Context, tenantID, actorID int64
 	if err := s.authorizeAPIKeyAdmin(ctx, tx, tenantID, actorID); err != nil {
 		return err
 	}
-	var query string
-	if active {
-		query = `UPDATE api_keys SET revoked_at=NULL WHERE key_id=$1 AND tenant_id=$2`
-	} else {
-		query = `UPDATE api_keys SET revoked_at=coalesce(revoked_at,now()) WHERE key_id=$1 AND tenant_id=$2`
-	}
-	result, err := tx.Exec(ctx, query, keyID, tenantID)
+	result, err := tx.Exec(ctx, `UPDATE api_keys SET revoked_at=coalesce(revoked_at,now()) WHERE key_id=$1 AND tenant_id=$2`, keyID, tenantID)
 	if err != nil {
 		return fmt.Errorf("update api key state: %w", err)
 	}
 	if result.RowsAffected() != 1 {
 		return domain.ErrNotFound
 	}
-	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id) VALUES($1,$2,$3,'api_key',$4)`, tenantID, actorID, map[bool]string{false: "api_key.revoked", true: "api_key.activated"}[active], keyID); err != nil {
+	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id) VALUES($1,$2,'api_key.revoked','api_key',$3)`, tenantID, actorID, keyID); err != nil {
 		return fmt.Errorf("audit api key state: %w", err)
 	}
 	return tx.Commit(ctx)

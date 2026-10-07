@@ -23,6 +23,8 @@ type Config struct {
 	LicenseKeyID         string
 	ReportInterval       time.Duration
 	OfflineGrace         int
+	OpenAPIRatePerMinute int
+	OpenAPIBurst         int
 
 	WXAppID      string // WeChat mini program; empty = notifier off
 	WXSecret     string

@@ -36,6 +36,12 @@ openssl rand -hex 32
 
 把两次生成的值分别填入 `.env` 的 `IOLINK_PG_PASSWORD` 和 `IOLINK_SECRET_KEY`。PG 口令必须使用 URL 安全字符（上述 hex 符合要求），因为 Compose 将其直接嵌入 PostgreSQL URL。准备受限权限的管理员口令文件 `/run/secrets/iolink-admin-password`，内容12–256字节、不含空白。支持 `IOLINK_REPORT_INTERVAL=60|300`（默认60）和 `IOLINK_OFFLINE_GRACE=1..10`（默认3）；微信功能需要同时配置 `IOLINK_WX_APPID`、`IOLINK_WX_SECRET`、`IOLINK_WX_TEMPLATE_ID`。
 
+开放平台每 Key 的共享数据库令牌桶可通过 `IOLINK_OPENAPI_RATE_PER_MINUTE`（默认60）
+和 `IOLINK_OPENAPI_BURST`（默认10）配置，均须为1–1000000的整数；非法配置在启动监听前失败。
+同一数据库的所有实例必须使用相同设置，配置在启动时读取，修改后重启服务。
+签发和轮换从配置的 burst 初始化令牌，已有 Key 在下次请求时按新 burst 截断并按新速率补充；
+不足一个令牌时返回429，`Retry-After` 是补足一个令牌所需秒数向上取整。
+
 首次启动：
 
 ```bash

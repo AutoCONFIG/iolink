@@ -21,13 +21,15 @@ import (
 // Service is the assembled core. cmd/iolinkd constructs it and hands the
 // same instance to access (as event.Handler) and appapi (as repositories).
 type Service struct {
-	pool            *pgxpool.Pool
-	log             *slog.Logger
-	al              *alarmEngine
-	policy          domain.PermissionPolicy
-	defaultInterval time.Duration
-	license         *LicenseRuntime
-	apiKeyRoot      []byte
+	pool              *pgxpool.Pool
+	log               *slog.Logger
+	al                *alarmEngine
+	policy            domain.PermissionPolicy
+	defaultInterval   time.Duration
+	license           *LicenseRuntime
+	apiKeyRoot        []byte
+	openRatePerMinute int
+	openRateBurst     int
 }
 
 func (s *Service) SetLicenseRuntime(runtime *LicenseRuntime) { s.license = runtime }
@@ -43,7 +45,7 @@ func NewWithPolicy(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger, po
 	if len(interval) > 0 && interval[0] > 0 {
 		d = interval[0]
 	}
-	s := &Service{pool: pool, log: log, al: &alarmEngine{log: log}, policy: policy, defaultInterval: d}
+	s := &Service{pool: pool, log: log, al: &alarmEngine{log: log}, policy: policy, defaultInterval: d, openRatePerMinute: 60, openRateBurst: 10}
 	// MQTT sessions do not survive a process restart. Retain last_seen timestamps.
 	if _, err := pool.Exec(ctx, "UPDATE devices SET status='offline' WHERE status='online'"); err != nil {
 		return nil, err

@@ -19,8 +19,10 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-var ErrOpenUnauthorized = errors.New("open api authentication failed")
-var ErrOpenReplay = errors.New("open api nonce replay")
+var (
+	ErrOpenUnauthorized = errors.New("open api authentication failed")
+	ErrOpenReplay       = errors.New("open api nonce replay")
+)
 
 type OpenRateLimitError struct{ RetryAfter int }
 
@@ -95,7 +97,11 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 	if err != nil {
 		return domain.OpenPrincipal{}, ErrOpenUnauthorized
 	}
-	if now.Unix()-req.Timestamp > 300 || req.Timestamp-now.Unix() > 300 {
+	delta := uint64(req.Timestamp) - uint64(now.Unix())
+	if req.Timestamp < now.Unix() {
+		delta = uint64(now.Unix()) - uint64(req.Timestamp)
+	}
+	if delta > 300 {
 		return domain.OpenPrincipal{}, ErrOpenUnauthorized
 	}
 	sig, err := hex.DecodeString(req.Signature)
@@ -152,7 +158,7 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 	if err := tx.QueryRow(ctx, `SELECT rate_tokens,rate_last_refill FROM api_keys WHERE key_id=$1 FOR UPDATE`, req.KeyID).Scan(&tokens, &last); err != nil {
 		return domain.OpenPrincipal{}, fmt.Errorf("load open rate: %w", err)
 	}
-	remaining, retryAfter := consumeOpenRate(tokens, last, now)
+	remaining, retryAfter := consumeOpenRate(tokens, last, now, s.openRatePerMinute, s.openRateBurst)
 	if retryAfter > 0 {
 		return domain.OpenPrincipal{}, &OpenRateLimitError{RetryAfter: retryAfter}
 	}
@@ -164,24 +170,6 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 		return domain.OpenPrincipal{}, fmt.Errorf("commit open authentication: %w", err)
 	}
 	return domain.OpenPrincipal{KeyID: req.KeyID, TenantID: tenantID, Scopes: scopes, Resources: resources}, nil
-}
-
-func consumeOpenRate(tokens float64, last, now time.Time) (float64, int) {
-	elapsed := now.Sub(last).Seconds()
-	if elapsed > 0 {
-		tokens += elapsed
-		if tokens > 10 {
-			tokens = 10
-		}
-	}
-	if tokens < 1 {
-		wait := int((1 - tokens) + 0.999999)
-		if wait < 1 {
-			wait = 1
-		}
-		return tokens, wait
-	}
-	return tokens - 1, 0
 }
 
 func rfc3986(value string) string {

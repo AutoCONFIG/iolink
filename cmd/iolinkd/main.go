@@ -224,6 +224,9 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 		return err
 	}
 	svc.SetAPIKeyRoot([]byte(cfg.SecretKey))
+	if err := svc.ConfigureOpenRateLimit(cfg.OpenAPIRatePerMinute, cfg.OpenAPIBurst); err != nil {
+		return err
+	}
 	if err := svc.ObserveLicenseClock(ctx); err != nil && !errors.Is(err, license.ErrClockError) {
 		return err
 	}

@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: IOLink Open API
   version: 0.0.10
-  description: Third party API authenticated with per-tenant HMAC API keys.
+  description: Third party API authenticated with per-tenant HMAC API keys. Shared database token buckets default to 60 requests per minute and burst 10 per key. Deployment settings IOLINK_OPENAPI_RATE_PER_MINUTE and IOLINK_OPENAPI_BURST accept integers from 1 to 1000000; all instances sharing the database must use identical settings. Retry-After is the rounded-up seconds until one token is available.
 servers:
   - url: /
 security:

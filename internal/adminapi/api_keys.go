@@ -14,9 +14,9 @@ import (
 )
 
 type apiKeyCreateRequest struct {
-	Name      string                     `json:"name" binding:"required"`
-	Scopes    []string                   `json:"scopes" binding:"required"`
-	Resources domain.APIKeyResourceScope `json:"resources"`
+	Name      string              `json:"name" binding:"required"`
+	Scopes    []string            `json:"scopes" binding:"required"`
+	Resources apiKeyResourceInput `json:"resources"`
 }
 
 func (s *Server) apiKeyStore(c *gin.Context) (APIKeyAdminStore, bool) {
@@ -104,7 +104,8 @@ func (s *Server) createAPIKey(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
 		return
 	}
-	key, secret, err := store.IssueAPIKey(c.Request.Context(), tenantID, strings.TrimSpace(req.Name), req.Scopes, req.Resources, aid(c))
+	resources := domain.APIKeyResourceScope{FarmIDs: req.Resources.FarmIDs, PondIDs: req.Resources.PondIDs, DeviceNos: req.Resources.DeviceNos}
+	key, secret, err := store.IssueAPIKey(c.Request.Context(), tenantID, strings.TrimSpace(req.Name), req.Scopes, resources, aid(c))
 	if err != nil {
 		apiKeyError(c, err)
 		return

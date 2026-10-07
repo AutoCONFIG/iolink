@@ -42,6 +42,19 @@ func LoadConfig(getenv func(string) string, serving bool) (Config, error) {
 		return c, errors.New("IOLINK_OFFLINE_GRACE must be between 1 and 10")
 	}
 	c.OfflineGrace = grace
+	for _, limit := range []struct {
+		name, fallback string
+		target         *int
+	}{
+		{"IOLINK_OPENAPI_RATE_PER_MINUTE", "60", &c.OpenAPIRatePerMinute},
+		{"IOLINK_OPENAPI_BURST", "10", &c.OpenAPIBurst},
+	} {
+		value, err := strconv.Atoi(get(limit.name, limit.fallback))
+		if err != nil || value < 1 || value > 1_000_000 {
+			return c, fmt.Errorf("%s must be between 1 and 1000000", limit.name)
+		}
+		*limit.target = value
+	}
 	if serving && (len(c.SecretKey) < 32 || strings.TrimSpace(c.SecretKey) != c.SecretKey || c.SecretKey == strings.Repeat(string(c.SecretKey[0]), len(c.SecretKey))) {
 		return c, errors.New("IOLINK_SECRET_KEY must be a non-default random string of at least 32 bytes")
 	}

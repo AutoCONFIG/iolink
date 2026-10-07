@@ -72,11 +72,13 @@ func TestM6dIssueAndAuthenticateOpenKey(t *testing.T) {
 	}
 	stale := req
 	stale.Timestamp = now.Add(-301 * time.Second).Unix()
+	stale.Signature = m6dSignatureForRequest(t, secret, stale)
 	if _, err := svc.AuthenticateOpen(ctx, stale, now); !errors.Is(err, core.ErrOpenUnauthorized) {
 		t.Fatalf("stale timestamp error=%v", err)
 	}
 	future := req
 	future.Timestamp = now.Add(301 * time.Second).Unix()
+	future.Signature = m6dSignatureForRequest(t, secret, future)
 	if _, err := svc.AuthenticateOpen(ctx, future, now); !errors.Is(err, core.ErrOpenUnauthorized) {
 		t.Fatalf("future timestamp error=%v", err)
 	}
@@ -109,8 +111,9 @@ func TestM6dIssueAndAuthenticateOpenKey(t *testing.T) {
 	tamperedReq := httptest.NewRequest(http.MethodGet, "/open/v1/ponds", strings.NewReader("tampered"))
 	tamperedReq.Header.Set("X-Key-Id", key.KeyID)
 	tamperedReq.Header.Set("X-Timestamp", strconv.FormatInt(httpNow.Unix(), 10))
-	tamperedReq.Header.Set("X-Nonce", "tampered-0123456789abcdef0123456")
-	tamperedReq.Header.Set("X-Signature", hex.EncodeToString(httpMAC.Sum(nil)))
+	tamperedNonce := "tampered-0123456789abcdef0123456"
+	tamperedReq.Header.Set("X-Nonce", tamperedNonce)
+	tamperedReq.Header.Set("X-Signature", m6dSignatureForRequest(t, secret, domain.OpenRequest{Method: "GET", Path: "/open/v1/ponds", Timestamp: httpNow.Unix(), Nonce: tamperedNonce}))
 	tamperedRec := httptest.NewRecorder()
 	openapi.New(openapi.Deps{Auth: svc, Resources: svc}).Routes().ServeHTTP(tamperedRec, tamperedReq)
 	if tamperedRec.Code != http.StatusUnauthorized {
