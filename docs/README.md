@@ -18,6 +18,7 @@
 | [DEPLOY.md](DEPLOY.md) | 安装、TLS、备份恢复的目标流程及当前限制 |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 契约先行、测试与证据规范 |
 | [FEATURE-MATRIX.md](FEATURE-MATRIX.md)、[FEATURE-CHECKLIST.md](FEATURE-CHECKLIST.md) | 功能到Rxx的速查，不重复维护完成计数 |
+| [research/redis-cache-evaluation.md](research/redis-cache-evaluation.md) | Redis 类缓存的候选用途、故障语义与后续试点边界；仅调研，不代表已引入 |
 | [PLAN-REVIEW-FINAL.md](PLAN-REVIEW-FINAL.md) | 当前修订版双审过程与结论 |
 | [PLAN-REVIEW-2026-09-19.md](PLAN-REVIEW-2026-09-19.md) | 初次双审未通过记录，行号对应原始commit，不随改文档重写历史 |
 
