@@ -1,7 +1,7 @@
 {
   "gate": "M6d",
-  "source": "9f9824a",
-  "web": "caf2281",
+  "source": "51898df",
+  "web": "248f100",
   "requirements": ["R41", "R42"],
   "checks": {
     "real_timescale_m6d": "passed",

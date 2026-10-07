@@ -1,6 +1,6 @@
 # R41 M6d API Key acceptance
 
-Candidate source: `9f9824a` (web submodule `caf2281`).
+Candidate source: `51898df` (web submodule `248f100`).
 
 Environment: Go 1.26, PostgreSQL 16 + TimescaleDB isolated container
 `iolink-todo9-pg` on `127.0.0.1:55439`; each test creates and drops a disposable

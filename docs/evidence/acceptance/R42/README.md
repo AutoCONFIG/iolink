@@ -1,6 +1,6 @@
 # R42 M6d signed request acceptance
 
-Candidate source: `9f9824a` (web submodule `caf2281`).
+Candidate source: `51898df` (web submodule `248f100`).
 
 Executed checks:
 
