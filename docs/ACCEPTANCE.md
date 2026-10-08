@@ -30,7 +30,7 @@
 | R01 AUDIT | M0 可复现构建测试 | 干净检出运行build/vet/tests通过；make verify无已删除目录；CI同命令；无缓存也可重现 | U/O；Makefile、CI |
 | R02 AUDIT | M0/M1/M2 分层契约验证 | M0仅R02.a静态标准/引用/合成fixture；M1完成R02.b真实MQTT字段/ACL回归；M2完成R02.c全部目标handler请求/响应回归；无空响应定义 | U；docs/api、mqtt-spec |
 | R03 AUDIT | M0 空库/迁移安全 | 空库逐版迁移后正常上报；重复执行无副作用；checksum改变/并发迁移/故意失败/中断安装均按设计拒绝或回滚并可安全恢复。旧schema保数据迁移仅用非生产fixture验证迁移行为，不表示支持已部署客户数据升级 | D/O；internal/migrate、隔离fixture |
-| R04 AUDIT | M0 首启和配置 | 缺生产secret/非法配置拒绝；首启无公开默认密码；env中全局默认上报周期/离线阈值生效（逐设备注册由M2验收）；用户输入不入敏感日志 | U/I/O；platform、cmd/iolinkd |
+| R04 AUDIT | M0 首启和配置 | 缺生产secret/非法配置拒绝；默认启动自动事务建表，空库 Web 进入初始化页；安装密钥授权后创建首个管理员，重复/并发只成功一次、失败无部分账户，初始化前业务 API 拒绝；已初始化实例进入登录且重启保留账户；首启无公开默认密码；env中全局默认上报周期/离线阈值生效（逐设备注册由M2验收）；用户输入不入敏感日志 | U/D/W/I/O；platform、setupapi、cmd/iolinkd、web |
 | R05 BASE | M1 设备认证 | 合法凭据连接；错secret、ClientID不匹配、已停用设备拒绝；第二会话按唯一身份规则替换并保持正确状态；注册secret仅一次返回 | U/D/I；access、core/deviceauth |
 | R06 BASE | M1 Topic ACL/伪造 | 自己properties/ack可发、cmd可订；跨设备/通配符/伪造子设备/非法topic拒绝；认证前不产生online | U/I；access/broker/auth |
 | R07 BASE | M1 物模型字段 | 七字段正常/边界；越界丢字段并可观察；坏JSON/类型/64KiB超限拒绝；全无有效字段不写数据；signal -120..0 | U/D/I；wire、access、pipeline |

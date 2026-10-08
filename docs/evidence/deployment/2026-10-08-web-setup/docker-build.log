@@ -1,0 +1,148 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.03kB 0.0s done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/alpine:3.20
+#2 DONE 0.1s
+
+#3 [internal] load metadata for docker.io/library/golang:1.26-alpine
+#3 DONE 1.7s
+
+#4 [internal] load metadata for docker.io/library/node:24-alpine
+#4 DONE 2.0s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 256B done
+#5 DONE 0.0s
+
+#6 [frontend 1/6] FROM docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+#6 resolve docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 0.0s done
+#6 DONE 0.1s
+
+#7 [build 1/9] FROM docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c
+#7 resolve docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c 0.0s done
+#7 DONE 0.1s
+
+#8 [stage-2 1/5] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#8 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 0.0s done
+#8 DONE 0.1s
+
+#9 [internal] load build context
+#9 transferring context: 3.02MB 1.6s done
+#9 DONE 1.6s
+
+#10 [frontend 2/6] WORKDIR /web
+#10 CACHED
+
+#11 [frontend 3/6] COPY web/package.json web/package-lock.json ./
+#11 CACHED
+
+#12 [frontend 4/6] RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
+#12 CACHED
+
+#13 [build 2/9] WORKDIR /src
+#13 CACHED
+
+#14 [build 3/9] COPY go.mod go.sum ./
+#14 CACHED
+
+#15 [build 4/9] RUN --mount=type=cache,target=/go/pkg/mod go mod download
+#15 CACHED
+
+#16 [frontend 5/6] COPY web/ ./
+#16 DONE 0.1s
+
+#17 [build 5/9] COPY . .
+#17 DONE 5.5s
+
+#18 [frontend 6/6] RUN npm run build
+#18 2.321 
+#18 2.321 > iolink-admin-ui@0.1.0 build
+#18 2.321 > vue-tsc -b && vite build
+#18 2.321 
+#18 5.990 vite v7.3.6 building client environment for production...
+#18 6.046 transforming...
+#18 7.421 node_modules/zod/v4/core/regexes.js (74:0): A comment
+#18 7.421 
+#18 7.421 "/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+#18 7.421  * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+#18 7.421  * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+#18 7.421 
+#18 7.421 in "node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+#18 7.423 node_modules/zod/v4/core/util.js (400:0): A comment
+#18 7.423 
+#18 7.423 "// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+#18 7.423 
+#18 7.423 in "node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+#18 9.653 ✓ 1817 modules transformed.
+#18 9.875 rendering chunks...
+#18 10.16 computing gzip size...
+#18 10.19 dist/index.html                                                             0.47 kB │ gzip:   0.33 kB
+#18 10.19 dist/assets/ProductsView-DY-L-zJk.css                                       0.36 kB │ gzip:   0.23 kB
+#18 10.19 dist/assets/TenantsView-CthDnldy.css                                        0.43 kB │ gzip:   0.25 kB
+#18 10.19 dist/assets/SystemView-DXSp833N.css                                         0.43 kB │ gzip:   0.23 kB
+#18 10.19 dist/assets/index-B2cVhgZV.css                                            370.49 kB │ gzip:  50.86 kB
+#18 10.19 dist/assets/metrics-mFZmf0P5.js                                             0.47 kB │ gzip:   0.33 kB
+#18 10.19 dist/assets/MetricGrid.vue_vue_type_script_setup_true_lang-Bvnt0Lew.js      1.01 kB │ gzip:   0.61 kB
+#18 10.19 dist/assets/APIKeyAuditView-BIhDHSz4.js                                     1.26 kB │ gzip:   0.81 kB
+#18 10.19 dist/assets/LoginView-DqyqUdor.js                                           2.59 kB │ gzip:   1.53 kB
+#18 10.19 dist/assets/AdminLayout-DKzftE4v.js                                         2.88 kB │ gzip:   1.53 kB
+#18 10.19 dist/assets/SetupView-DbFUF6IC.js                                           3.46 kB │ gzip:   1.62 kB
+#18 10.19 dist/assets/DashboardView-Cr4KCndp.js                                       4.24 kB │ gzip:   2.01 kB
+#18 10.19 dist/assets/TenantsView-BjGDw3md.js                                         4.69 kB │ gzip:   2.21 kB
+#18 10.19 dist/assets/AlarmsView-C4I-gXBQ.js                                          4.69 kB │ gzip:   2.15 kB
+#18 10.19 dist/assets/RulesView-xl04HMJW.js                                           4.95 kB │ gzip:   2.02 kB
+#18 10.19 dist/assets/PondsView-BBwvJvqV.js                                           5.52 kB │ gzip:   2.26 kB
+#18 10.19 dist/assets/DevicesView-DS2Dmhc7.js                                         5.85 kB │ gzip:   2.59 kB
+#18 10.19 dist/assets/ProductsView-DrZ1DEyv.js                                        6.50 kB │ gzip:   2.53 kB
+#18 10.19 dist/assets/SystemView-BWobOWxK.js                                         10.37 kB │ gzip:   4.08 kB
+#18 10.19 dist/assets/index-CLHeuKeQ.js                                           1,197.24 kB │ gzip: 391.94 kB
+#18 10.19 
+#18 10.19 (!) Some chunks are larger than 500 kB after minification. Consider:
+#18 10.19 - Using dynamic import() to code-split the application
+#18 10.19 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#18 10.19 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#18 10.19 ✓ built in 4.18s
+#18 10.28 npm notice
+#18 10.28 npm notice New major version of npm available! 11.19.0 -> 12.2.0
+#18 10.28 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#18 10.28 npm notice To update run: npm install -g npm@12.2.0
+#18 10.28 npm notice
+#18 DONE 10.3s
+
+#19 [build 6/9] COPY --from=frontend /web/dist ./web/dist
+#19 DONE 0.1s
+
+#20 [build 7/9] RUN sh scripts/embed-frontend.sh
+#20 DONE 0.2s
+
+#21 [build 8/9] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/iolinkd ./cmd/iolinkd
+#21 DONE 1.9s
+
+#22 [build 9/9] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/mqtt-sim ./cmd/mqtt-sim
+#22 DONE 0.3s
+
+#23 [stage-2 2/5] RUN apk add --no-cache ca-certificates tzdata wget
+#23 CACHED
+
+#24 [stage-2 3/5] WORKDIR /app
+#24 CACHED
+
+#25 [stage-2 4/5] COPY --from=build /out/iolinkd /app/iolinkd
+#25 DONE 0.1s
+
+#26 [stage-2 5/5] COPY --from=build /out/mqtt-sim /app/mqtt-sim
+#26 DONE 0.1s
+
+#27 exporting to image
+#27 exporting layers
+#27 exporting layers 0.6s done
+#27 exporting manifest sha256:f1504673ddbcb3686bbf30d4e86b89b9e2f4f819c2528779e801ddc909830642 0.0s done
+#27 exporting config sha256:a726a4b401402f1b12ca5bce813dea8c8973362f61318b86e9cfd0ab03944fb5 0.0s done
+#27 exporting attestation manifest sha256:7e10b267b6a9627a84afec4653f150b1458a3168dc7f4078e3a97a0ced2533bb 0.0s done
+#27 exporting manifest list sha256:a3d8f27ea4ec029d04cb0e752f10b02d5c1c4a6ce384effc6b09842db927c59f 0.0s done
+#27 naming to docker.io/library/iolink-websetup:local done
+#27 unpacking to docker.io/library/iolink-websetup:local 0.1s done
+#27 DONE 0.8s

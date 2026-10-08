@@ -1,0 +1,69 @@
+openapi: 3.0.3
+info:
+  title: IoLink First-run Setup API
+  version: 1.0.0
+  description: R03/R04/R23 首启初始化。空库启动时自动建表；安装密钥验证管理员创建权限。初始化成功即永久关闭创建入口；旧 CLI 恢复入口保留。密钥和密码不得记录或持久化到浏览器。
+servers:
+  - url: http://localhost:8080/setup/v1
+paths:
+  /status:
+    get:
+      summary: 检查是否需要首次初始化
+      security: []
+      responses:
+        '200':
+          description: 实时读取管理员存在状态，Cache-Control no-store
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [required]
+                properties:
+                  required: { type: boolean }
+        '503': { $ref: '#/components/responses/Error' }
+  /initialize:
+    post:
+      summary: 原子创建首个管理员及审计记录
+      description: 仅未初始化时可用。使用 IOLINK_SECRET_KEY 对应的安装凭据；拒绝跨 Origin、非 JSON、未知字段、多段 JSON 和超过4096字节的请求。并发只允许一次成功；结果未知时先查询 status，禁止盲目重试。初始化完成之前业务 API 返回503。
+      security:
+        - InstallationKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [username, password]
+              properties:
+                username: { type: string, minLength: 1, maxLength: 64, description: 字节长度，不允许首尾空白 }
+                password: { type: string, minLength: 12, maxLength: 256, format: password, description: 字节长度，不允许首尾空白 }
+      responses:
+        '204': { description: 初始化完成，无响应 body；后续需正常登录 }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '415': { $ref: '#/components/responses/Error' }
+        '503': { $ref: '#/components/responses/Error' }
+components:
+  schemas:
+    SetupError:
+      type: object
+      additionalProperties: false
+      required: [error]
+      properties:
+        error: { type: string }
+  securitySchemes:
+    InstallationKey:
+      type: apiKey
+      in: header
+      name: X-IoLink-Setup-Key
+  responses:
+    Error:
+      description: 安全错误信息，不包含密码、密钥或数据库错误详情
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SetupError'

@@ -1,0 +1,119 @@
+Environment: dedicated iolink-todo9-pg, PG16/TimescaleDB2.30.0; DSN set in memory, omitted
+Command: IOLINK_TEST_PG_DSN=<isolated> GIN_MODE=release go test -race -shuffle=on -count=1 -v ./internal/setupapi ./internal/platform ./cmd/iolinkd
+-test.shuffle 1791464486448257763
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/missing_key
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/wrong_key
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/cross_origin
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/invalid_json
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/unknown_field
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/trailing_json
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/empty_fields
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/short_password
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/oversize
+--- PASS: TestBootstrapWhenInvalidThenNoAccounts (0.43s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/missing_key (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/wrong_key (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/cross_origin (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/invalid_json (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/unknown_field (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/trailing_json (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/empty_fields (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/short_password (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/oversize (0.00s)
+=== RUN   TestBootstrapWhenFreshThenInitialized
+--- PASS: TestBootstrapWhenFreshThenInitialized (0.56s)
+=== RUN   TestBootstrapWhenDatabaseUnavailableThenFailsClosed
+--- PASS: TestBootstrapWhenDatabaseUnavailableThenFailsClosed (0.63s)
+=== RUN   TestBootstrapWhenConcurrentThenSingleAdministrator
+--- PASS: TestBootstrapWhenConcurrentThenSingleAdministrator (0.68s)
+=== RUN   TestBootstrapWhenAuditFailsThenRollsBack
+--- PASS: TestBootstrapWhenAuditFailsThenRollsBack (0.72s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	4.081s
+-test.shuffle 1791464486446873160
+=== RUN   TestBootstrapAuditUsesSystemTenantScope
+--- PASS: TestBootstrapAuditUsesSystemTenantScope (0.00s)
+=== RUN   TestAdminCommandsDoNotRequireServingKey
+--- PASS: TestAdminCommandsDoNotRequireServingKey (0.00s)
+=== RUN   TestConfigRejectsEnabledWechatWithoutTemplate
+--- PASS: TestConfigRejectsEnabledWechatWithoutTemplate (0.00s)
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_SECRET_KEY
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_SECRET_KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_PG_DSNpostgres://user:very-secret@[bad/test
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_HTTP_ADDR:0
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_REPORT_INTERVAL5
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_OFFLINE_GRACE0
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_WX_APPIDappid
+=== RUN   TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_WX_TEMPLATE_IDtemplate
+--- PASS: TestConfigRejectsInvalidWithoutLeakingValues (0.00s)
+    --- PASS: TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_SECRET_KEY (0.00s)
+    --- PASS: TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_SECRET_KEYxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (0.00s)
+    --- PASS: TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_PG_DSNpostgres://user:very-secret@[bad/test (0.00s)
+    --- PASS: TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_HTTP_ADDR:0 (0.00s)
+    --- PASS: TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_REPORT_INTERVAL5 (0.00s)
+    --- PASS: TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_OFFLINE_GRACE0 (0.00s)
+    --- PASS: TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_WX_APPIDappid (0.00s)
+    --- PASS: TestConfigRejectsInvalidWithoutLeakingValues/IOLINK_WX_TEMPLATE_IDtemplate (0.00s)
+=== RUN   TestPasswordHash
+--- PASS: TestPasswordHash (0.59s)
+=== RUN   TestSetupInputValidatePasswordPolicy
+=== RUN   TestSetupInputValidatePasswordPolicy/letter_and_symbol
+=== RUN   TestSetupInputValidatePasswordPolicy/letter_only
+=== RUN   TestSetupInputValidatePasswordPolicy/non-letter_only
+=== RUN   TestSetupInputValidatePasswordPolicy/too_short
+=== RUN   TestSetupInputValidatePasswordPolicy/surrounding_whitespace
+--- PASS: TestSetupInputValidatePasswordPolicy (0.00s)
+    --- PASS: TestSetupInputValidatePasswordPolicy/letter_and_symbol (0.00s)
+    --- PASS: TestSetupInputValidatePasswordPolicy/letter_only (0.00s)
+    --- PASS: TestSetupInputValidatePasswordPolicy/non-letter_only (0.00s)
+    --- PASS: TestSetupInputValidatePasswordPolicy/too_short (0.00s)
+    --- PASS: TestSetupInputValidatePasswordPolicy/surrounding_whitespace (0.00s)
+=== RUN   TestOpenAPIRateConfig_rejectsInvalid
+--- PASS: TestOpenAPIRateConfig_rejectsInvalid (0.00s)
+=== RUN   TestSetupInputValidateRequiresDistinctPasswords
+--- PASS: TestSetupInputValidateRequiresDistinctPasswords (0.00s)
+=== RUN   TestOpenAPIRateConfig_defaultsAndOverrides
+--- PASS: TestOpenAPIRateConfig_defaultsAndOverrides (0.00s)
+=== RUN   TestConfig
+--- PASS: TestConfig (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	1.646s
+-test.shuffle 1791464487495906576
+=== RUN   TestSetupCLI_auditsMalformedInputWithoutPartialAccounts
+{"time":"2026-10-08T21:01:28.030751453+08:00","level":"ERROR","msg":"iolinkd operation failed","stage":"process","err":"*errors.joinError"}
+--- PASS: TestSetupCLI_auditsMalformedInputWithoutPartialAccounts (0.59s)
+=== RUN   TestProductionMuxMountsBothApplicationAPIVersions
+2026/10/08 21:01:28 WARN http request request_id=ZZYBNUU357RWRP27JTWFV5I4ZY route=/api/v1/ponds method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/08 21:01:28 WARN http request request_id=HKO47AQOZLWGLDQL2PVDFPFD7D route=/api/v2/devices/:device_no/telemetry method=POST status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/08 21:01:28 WARN http request request_id=YFUVEU7S3TSHLZPV6WBNPUGRYZ route=/api/v2/devices/:device_no/model/latest method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/08 21:01:28 WARN http request request_id=SAS4YFM6ZHWVIL7DQJ3OWBHYRO route=/api/v2/devices/:device_no/history method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestProductionMuxMountsBothApplicationAPIVersions (0.00s)
+=== RUN   TestLicenseCLI_rejectionAuditsRawFileWithoutResettingOnlineDevices
+{"time":"2026-10-08T21:01:28.571816865+08:00","level":"ERROR","msg":"iolinkd operation failed","stage":"process","err":"*errors.errorString"}
+{"time":"2026-10-08T21:01:28.593718821+08:00","level":"ERROR","msg":"iolinkd operation failed","stage":"process","err":"*errors.errorString"}
+{"time":"2026-10-08T21:01:28.618851538+08:00","level":"ERROR","msg":"iolinkd operation failed","stage":"process","err":"*errors.errorString"}
+--- PASS: TestLicenseCLI_rejectionAuditsRawFileWithoutResettingOnlineDevices (0.65s)
+=== RUN   TestCLIHelpAndInvalidCommand
+--- PASS: TestCLIHelpAndInvalidCommand (0.00s)
+=== RUN   TestFailureOutputHidesUntrustedErrors
+=== RUN   TestFailureOutputHidesUntrustedErrors/configuration
+=== RUN   TestFailureOutputHidesUntrustedErrors/runtime
+--- PASS: TestFailureOutputHidesUntrustedErrors (0.00s)
+    --- PASS: TestFailureOutputHidesUntrustedErrors/configuration (0.00s)
+    --- PASS: TestFailureOutputHidesUntrustedErrors/runtime (0.00s)
+=== RUN   TestUnknownAPIDoesNotServeSPA
+--- PASS: TestUnknownAPIDoesNotServeSPA (0.00s)
+=== RUN   TestSetupCLI_rollsBackAccountsAndReportsAuditFailure
+=== RUN   TestSetupCLI_rollsBackAccountsAndReportsAuditFailure/setup.initialized
+{"time":"2026-10-08T21:01:29.44255825+08:00","level":"ERROR","msg":"iolinkd operation failed","stage":"process","err":"postgres_P0001"}
+=== RUN   TestSetupCLI_rollsBackAccountsAndReportsAuditFailure/setup.init_rejected
+{"time":"2026-10-08T21:01:29.811698204+08:00","level":"ERROR","msg":"iolinkd operation failed","stage":"process","err":"postgres_P0001"}
+--- PASS: TestSetupCLI_rollsBackAccountsAndReportsAuditFailure (1.11s)
+    --- PASS: TestSetupCLI_rollsBackAccountsAndReportsAuditFailure/setup.initialized (0.75s)
+    --- PASS: TestSetupCLI_rollsBackAccountsAndReportsAuditFailure/setup.init_rejected (0.37s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	3.410s
+
+EXIT 0

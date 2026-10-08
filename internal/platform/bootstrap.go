@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -15,10 +17,10 @@ const auditAdminQuery = `INSERT INTO audit_events(tenant_id,action,resource_type
 // stdin, not command arguments/environment variables, and are never logged.
 func BootstrapAdmin(ctx context.Context, pool *pgxpool.Pool, username, password string, reset bool) error {
 	if len(username) < 1 || len(username) > 64 || strings.TrimSpace(username) != username {
-		return errors.New("username must be 1..64 characters without surrounding whitespace")
+		return domain.ErrBootstrapInput
 	}
 	if len(password) < 12 || len(password) > 256 || strings.TrimSpace(password) != password || password == "admin123" {
-		return errors.New("bootstrap password must be 12..256 bytes without surrounding whitespace")
+		return domain.ErrBootstrapInput
 	}
 	hash := HashPassword(password)
 	tx, err := pool.Begin(ctx)
@@ -47,7 +49,7 @@ func BootstrapAdmin(ctx context.Context, pool *pgxpool.Pool, username, password 
 			return err
 		}
 		if n > 0 {
-			return errors.New("administrator already exists; use admin reset-password for local recovery")
+			return domain.ErrBootstrapInitialized
 		}
 		if _, err = tx.Exec(ctx, `INSERT INTO users(open_id,username,password_hash,authority,nickname) VALUES('internal-admin',$1,$2,'ADMIN','Administrator')`, username, hash); err != nil {
 			return err

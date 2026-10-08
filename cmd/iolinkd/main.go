@@ -31,6 +31,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/operations"
 	"git.hyhy.fun/rsplab/iolink/internal/persistence"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
+	"git.hyhy.fun/rsplab/iolink/internal/setupapi"
 	"git.hyhy.fun/rsplab/iolink/internal/web"
 	"git.hyhy.fun/rsplab/iolink/internal/wechat"
 
@@ -208,12 +209,23 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 		password := strings.TrimSuffix(strings.TrimSuffix(string(raw), "\n"), "\r")
 		return platform.BootstrapAdmin(cmdCtx, pool, args[2], password, args[1] == "reset-password")
 	}
-	if err := migrate.CheckLatest(ctx, pool); err != nil {
+	installCtx, installCancel := context.WithTimeout(ctx, 2*time.Minute)
+	err = migrate.Up(installCtx, pool)
+	installCancel()
+	if err != nil {
+		return fmt.Errorf("prepare database schema: %w", err)
+	}
+	bootstrapStore := platform.WebBootstrap{Pool: pool}
+	required, err := bootstrapStore.Required(ctx)
+	if err != nil {
 		return err
 	}
-	if err := platform.CheckAdminReady(ctx, pool); err != nil {
-		return err
+	if !required {
+		if err := platform.CheckAdminReady(ctx, pool); err != nil {
+			return err
+		}
 	}
+	setup := setupapi.New(bootstrapStore, cfg.SecretKey, log)
 
 	policy, err := authorization.New()
 	if err != nil {
@@ -325,13 +337,14 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	root.Handle("/healthz", health.Healthz())
 	root.Handle("/readyz", health.Readyz())
 	root.Handle("/metrics", promhttp.Handler())
-	root.Handle("/admin/v1/", admin.Routes())
-	root.Handle("/open/v1/", open.Routes())
+	root.Handle("/setup/v1/", setup.Routes())
+	root.Handle("/admin/v1/", setup.Protect(admin.Routes()))
+	root.Handle("/open/v1/", setup.Protect(open.Routes()))
 	adminFS, err := web.Admin()
 	if err != nil {
 		return err
 	}
-	mountApplicationAPI(root, api.Routes())
+	mountApplicationAPI(root, setup.Protect(api.Routes()))
 	root.Handle("/", spaHandler(adminFS))
 
 	srv := &http.Server{Addr: cfg.HTTPAddr, Handler: root, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second}
