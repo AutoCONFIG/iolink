@@ -30,3 +30,7 @@ Candidate scope: platform administration remains on `/admin/v1`; ordinary busine
 - The web client uses `/user/v1` for business data and `/admin/v1` for platform controls; registration uses `/user/v1/register` while login keeps the compatible `/admin/v1/login` entry.
 
 External browser visual acceptance remains with the user. No external WeChat, hardware, or public TLS result is claimed by this software verification.
+
+## Release CI
+
+Tag `v0.0.14` triggered GitHub Actions run [37819933781](https://github.com/AutoCONFIG/iolink/actions/runs/37819933781), which completed successfully. The workflow is tag-only; the corresponding `main` push did not trigger CI. The successful tag run published the GHCR image for this release.
