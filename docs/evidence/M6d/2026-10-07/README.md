@@ -27,7 +27,8 @@
 
 | 验证面 | 命令与证据 | 结果 |
 |---|---|---|
-| 全库构建/vet/竞态/乱序/真实 DB 与 UI | `GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated> IOLINK_M6D_BROWSER=1 make verify`；[日志](logs/final-3-go-verify.log) | running |
+| 全库构建/vet/竞态/乱序/真实 DB | `GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated> make verify`；[日志](logs/final-3-go-verify.log) | passed |
+| 真实管理浏览器 | 独立生产浏览器运行；[日志](logs/865-followup-web.log)及 [截图](browser/) | passed |
 | 契约 | `make verify-contracts`；67 operations / 334 synthetic fixtures | passed |
 | 架构映射 | `python3 scripts/check_architecture_manifests.py --all` | passed |
 | web | `npm test --prefix web -- --run`、`npm run build --prefix web`（含vue-tsc）；46 unit tests；[日志](logs/865-followup-web.log) | passed |
@@ -98,7 +99,8 @@ APPROVE，两者同源865e9b2/web3c1d860；任一拒绝就不能发布。
 
 镜像导出配置 digest：`sha256:cf67dc03509da4590ad189b3cc2714331d8779cc3d4b1c3b34bcce32a929b45f`；
 本地镜像 manifest list ID：`sha256:9964190ed12da00ce932cb65eea9587d253c3e601b7d9688bcd402ba95ba86cb`。
-最终全库执行仍在运行；截图待该轮生成后逐张核验。窄屏表格使用内部横向滚动，
+最终全库 core 竞态测试117.999s；独立真实管理浏览器通过。截图已逐张核验。
+窄屏表格使用内部横向滚动，
 不代表全部列同时显示。
 冻结源码之后仅归档日志和更新 pending 文档；审阅候选中的产品代码必须与上述
 测试源码一致，最终完成登记也只允许修改证据和状态文档。

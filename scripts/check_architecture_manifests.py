@@ -147,7 +147,7 @@ def validate_manifests() -> list[str]:
         expected_level = "L3" if phase in {"M0", "M1", "M2", "M3", "M4", "M5"} else "L4"
         if capability.get("required_level") != expected_level: errors.append(f"{label}: invalid required_level {capability.get('required_level')!r} for {phase}")
         if capability.get("status") not in {"implemented", "partial", "not_implemented", "external_blocked"}: errors.append(f"{label}: invalid status {capability.get('status')!r}")
-        if capability.get("status") == "implemented" and phase not in {"M0", "M1", "M6a", "M6b"}:
+        if capability.get("status") == "implemented" and phase not in {"M0", "M1", "M6a", "M6b", "M6c", "M6d"}:
             errors.append(f"{label}: implemented capability {cid!r} lacks implementation evidence")
         if not isinstance(capability.get("operation"), str) or not capability["operation"].strip(): errors.append(f"{label}: operation must be a non-empty string")
         if not isinstance(capability.get("command"), str) or not capability["command"].strip(): errors.append(f"{label}: command must be a non-empty exact command")

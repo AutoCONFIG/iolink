@@ -1,17 +1,21 @@
 {
   "gate": "M6d",
-  "source": "657807e195bcfc80b940706c58ad166a2de7a56f",
+  "source": "81c842e6903814cee187e67a699485ef6f934148",
   "web": "66c52624f6d97c9dd7fe29b05b64b3db39c4a72d",
   "evidence": "docs/evidence/M6d/2026-10-07/README.md",
   "requirements": ["R41", "R42"],
   "checks": {
-    "real_timescale_m6d": "running",
-    "go_race_shuffle": "running",
+    "real_timescale_m6d": "passed",
+    "go_race_shuffle": "passed",
     "contracts": "passed",
     "architecture": "passed",
     "web_unit_type_build": "passed",
-    "browser": "running",
+    "browser": "passed",
     "docker_build": "passed"
   },
-  "dual_review": "pending"
+  "dual_review": "approved",
+  "reviews": {
+    "code": "docs/evidence/M6d/2026-10-07/reviews/code-81c842e.md",
+    "gate": "docs/evidence/M6d/2026-10-07/reviews/gate-81c842e.md"
+  }
 }

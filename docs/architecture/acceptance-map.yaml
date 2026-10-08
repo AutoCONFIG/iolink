@@ -70,7 +70,7 @@ requirements:
     owner: 1
     provider: software
     required_level: software
-    software_status: not_run
+    software_status: passed
     external_status: not_applicable
     verification: "planned: make verify"
     evidence: docs/evidence/acceptance/R01/
@@ -79,7 +79,7 @@ requirements:
     owner: 1
     provider: software
     required_level: software
-    software_status: not_run
+    software_status: passed
     external_status: not_applicable
     verification: "planned: make verify-contracts"
     evidence: docs/evidence/acceptance/R02/
@@ -430,18 +430,18 @@ requirements:
     owner: 10
     provider: software
     required_level: software
-    software_status: not_run
+    software_status: passed
     external_status: not_applicable
-    verification: "b4b9335/web207dcfa: real Timescale HTTP and production management browser, full race/shuffle verify passed; independent dual review pending, see docs/evidence/M6d/2026-10-07/README.md"
+    verification: "81c842e/66c5262: real Timescale HTTP, independent browser, full race/shuffle, contracts and dual review passed; external integrations not applicable"
     evidence: docs/evidence/acceptance/R41/
   - id: R42
     wave: M6d
     owner: 10
     provider: software
     required_level: software
-    software_status: not_run
+    software_status: passed
     external_status: not_applicable
-    verification: "b4b9335/web207dcfa: production vector, body-only tampering, concurrent nonce, persisted state and HTTP 429 passed; independent dual review pending, see docs/evidence/M6d/2026-10-07/README.md"
+    verification: "81c842e/66c5262: production vector, body tamper, timestamp extremes, nonce replay, configurable rate, UTF-8 and HTTP 429 passed; dual review passed"
     evidence: docs/evidence/acceptance/R42/
   - id: R43
     wave: M7a
