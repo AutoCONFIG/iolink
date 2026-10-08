@@ -31,4 +31,4 @@
 
 代码审阅保留一项 MEDIUM 非阻断限制：新组织创建 handler 尚未严格拒绝额外字段和尾随 JSON；权限仍有效，未发现授权绕过，已登记 `docs/IMPLEMENTED.md` D18。合成契约通过不等于全部实时 handler 严格校验通过。
 
-web `main` 已推送；根发布标签拟为 `v0.0.13`，远端 CI 结果另行取证。GitHub workflow 仅监听 tag push，推送 main 不触发。
+2026-10-09：两个仓库 `main` 已推送，根发布标签 `v0.0.13` 指向收据归档提交 `d6953e40e9d64c007326b63eb61200800965bbda`。该提交相对批准实现 `2c8a6a9` 只更新状态和证据。GitHub workflow 仅监听 tag push，推送 main 不触发。[CI 37805958832](https://github.com/AutoCONFIG/iolink/actions/runs/37805958832) 由 `v0.0.13` 触发并 SUCCESS，`build-image` 成功，包含前端构建及 GHCR 推送步骤。远端 `build`/`integration` 按现有 tag 发布配置为 skipped，不计为测试通过；本次软件测试仍由本地与独立审阅真实数据库证据支持。原始公开 GitHub API 收据见 `ci-run.json` 和 `ci-jobs.json`。发布工作流生成 `ghcr.io/autoconfig/iolink:v0.0.13` 与 `latest` 标签。

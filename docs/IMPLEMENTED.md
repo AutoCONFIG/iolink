@@ -61,7 +61,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | V3 | 实际签发方License导入/续期与客户离线安装 | 已完成待核验 | 已有工具/软件链；真实签发方、干净断网x86_64客户主机30分钟安装及ARM64证据待提供 |
 | V4 | 公网TLS/网络暴露、100GiB恢复、发布中断、长时容量 | 已完成待核验 | 已有脚本/模板/软件烟测；真实主机、证书、恢复介质及24小时500设备/90天fixture演练为 external_blocked |
 | V5 | 现有采集固件的实际值对照与断线恢复 | 已完成待核验 | 已有MQTT/DB软件证据；真实设备验收 external_blocked，后续控制/网关硬件功能还需开发 |
-| V6 | 远端CI运行与当前发布版本产物核对 | 已完成待核验 | CI `56cbd91` 仅由新 tag push 触发镜像发布，main/PR 不触发；当前标签远端结果须另行取证，不能把本地检查当远端CI通过 |
+| V6 | 远端CI运行与当前发布版本产物核对 | 已完成待核验 | `v0.0.13` / `d6953e4` 的远端CI `37805958832` 镜像构建推送SUCCESS，main/PR不触发；[收据](evidence/deployment/2026-10-08-platform-console/README.md)。远端build/integration为skipped，不算测试通过；最终全量发布产物核对仍随R55进行 |
 | X1 | R36.b/R37.b/R39.b 后续资源权限、执行撤权和License复验 | 待完成已调研 | 跨阶段规则已明确；Key/播放/命令/jobs/下载的真实入口按 M6d–M8d分别实现验收 |
 | S3 | Redis 类缓存引入调研 | 待完成已调研 | 仅形成候选用途、窄 port、故障语义和验证门槛；当前未引入 Redis 依赖、容器或生产配置；[调研记录](research/redis-cache-evaluation.md)；不阻塞 M6d |
 | D12/D13/D15/D16/D17 | 平台owner边界、遥测角色、支持到期时区/精度、租户管理员资源范围 | 已完成已核验 | 已纳入 M6b `0335438` 同候选批准；[gate](evidence/rebuild/gates/M6b.json)明确列出 fixed_defects；旧计划未勾需同步 |
