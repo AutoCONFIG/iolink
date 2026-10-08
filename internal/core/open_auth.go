@@ -13,6 +13,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"github.com/jackc/pgx/v5"
@@ -38,13 +39,13 @@ func CanonicalOpenQuery(raw string) (string, error) {
 	for _, item := range strings.Split(raw, "&") {
 		parts := strings.SplitN(item, "=", 2)
 		key, err := url.PathUnescape(parts[0])
-		if err != nil {
+		if err != nil || !utf8.ValidString(key) {
 			return "", errors.New("invalid query encoding")
 		}
 		value := ""
 		if len(parts) == 2 {
 			value, err = url.PathUnescape(parts[1])
-			if err != nil {
+			if err != nil || !utf8.ValidString(value) {
 				return "", errors.New("invalid query encoding")
 			}
 		}
@@ -71,7 +72,7 @@ func CanonicalOpenPath(path string) (string, error) {
 		return "", errors.New("ambiguous path")
 	}
 	decoded, err := url.PathUnescape(path)
-	if err != nil {
+	if err != nil || !utf8.ValidString(decoded) {
 		return "", errors.New("invalid path encoding")
 	}
 	for _, segment := range strings.Split(decoded, "/") {
@@ -160,6 +161,9 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 	}
 	remaining, retryAfter := consumeOpenRate(tokens, last, now, s.openRatePerMinute, s.openRateBurst)
 	if retryAfter > 0 {
+		if err := tx.Commit(ctx); err != nil {
+			return domain.OpenPrincipal{}, fmt.Errorf("commit throttled open nonce: %w", err)
+		}
 		return domain.OpenPrincipal{}, &OpenRateLimitError{RetryAfter: retryAfter}
 	}
 	tokens = remaining

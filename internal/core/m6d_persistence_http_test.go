@@ -66,6 +66,34 @@ func TestM6dRestart_preservesConsumedNonceAndRateState(t *testing.T) {
 	}
 }
 
+func TestM6dThrottle_preservesNonceAndLeavesTokenUnconsumed(t *testing.T) {
+	f := newM6dHTTPFixture(t)
+	key, secret := f.issue(t, []string{"ponds:read"}, domain.APIKeyResourceScope{})
+	if _, err := f.pool.Exec(t.Context(), `UPDATE api_keys SET rate_tokens=0,rate_last_refill=now()+interval '1 hour' WHERE key_id=$1`, key.KeyID); err != nil {
+		t.Fatal(err)
+	}
+	nonce := m6dNonce(t)
+	status, _, _ := m6dSignedHTTP(t, f.server, key, secret, "/open/v1/ponds", nonce)
+	if status != http.StatusTooManyRequests {
+		t.Fatalf("initial throttle status=%d", status)
+	}
+	var tokens float64
+	if err := f.pool.QueryRow(t.Context(), `SELECT rate_tokens FROM api_keys WHERE key_id=$1`, key.KeyID).Scan(&tokens); err != nil || tokens != 0 {
+		t.Fatalf("throttle token state=%v error=%v", tokens, err)
+	}
+	if _, err := f.pool.Exec(t.Context(), `UPDATE api_keys SET rate_tokens=10 WHERE key_id=$1`, key.KeyID); err != nil {
+		t.Fatal(err)
+	}
+	status, _, _ = m6dSignedHTTP(t, f.server, key, secret, "/open/v1/ponds", nonce)
+	if status != http.StatusUnauthorized {
+		t.Fatalf("throttled nonce reusable: status=%d", status)
+	}
+	status, _, _ = m6dSignedHTTP(t, f.server, key, secret, "/open/v1/ponds", m6dNonce(t))
+	if status != http.StatusOK {
+		t.Fatalf("fresh nonce rejected after refill: status=%d", status)
+	}
+}
+
 func TestM6dPublishedVector_authenticatesWithProductionVerifier(t *testing.T) {
 	f := newM6dHTTPFixture(t)
 	key, _ := f.issue(t, []string{"ponds:read"}, domain.APIKeyResourceScope{})

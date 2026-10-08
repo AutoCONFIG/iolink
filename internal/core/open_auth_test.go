@@ -15,6 +15,19 @@ func TestCanonicalOpenQuery(t *testing.T) {
 	}
 }
 
+func TestCanonicalOpen_rejectsInvalidUTF8(t *testing.T) {
+	for _, query := range []string{"x=%FF", "%C0%AF=x", "x=%E4%B8"} {
+		if _, err := CanonicalOpenQuery(query); err == nil {
+			t.Fatal("invalid UTF-8 query accepted")
+		}
+	}
+	for _, path := range []string{"/open/v1/devices/%FF", "/open/v1/devices/%C0%AF"} {
+		if _, err := CanonicalOpenPath(path); err == nil {
+			t.Fatal("invalid UTF-8 path accepted")
+		}
+	}
+}
+
 func TestCanonicalOpenPathRejectsAmbiguity(t *testing.T) {
 	for _, path := range []string{"/open/v1/../ponds", "/open/v1/%2e%2e/ponds", "/open/v1/%2fponds", "/open/v1\\ponds"} {
 		if _, err := CanonicalOpenPath(path); err == nil {

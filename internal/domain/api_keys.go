@@ -2,8 +2,11 @@ package domain
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
 )
+
+var ErrInvalidAPIKey = errors.New("invalid api key input")
 
 type APIKeyResourceScope struct {
 	FarmIDs   []int64  `json:"farm_ids,omitempty"`

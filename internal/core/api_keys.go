@@ -20,34 +20,34 @@ var validOpenScopes = map[string]bool{
 
 func validateAPIKeyInput(name string, scopes []string, resources domain.APIKeyResourceScope) error {
 	if strings.TrimSpace(name) == "" || len([]byte(name)) > 128 {
-		return errors.New("invalid api key name")
+		return domain.ErrInvalidAPIKey
 	}
 	if len(scopes) == 0 || len(scopes) > 16 {
-		return errors.New("invalid api key scopes")
+		return domain.ErrInvalidAPIKey
 	}
 	seen := make(map[string]struct{}, len(scopes))
 	for _, scope := range scopes {
 		if !validOpenScopes[scope] {
-			return fmt.Errorf("unsupported api key scope %q", scope)
+			return domain.ErrInvalidAPIKey
 		}
 		if _, ok := seen[scope]; ok {
-			return errors.New("duplicate api key scope")
+			return domain.ErrInvalidAPIKey
 		}
 		seen[scope] = struct{}{}
 	}
 	if len(resources.FarmIDs) > 100 || len(resources.PondIDs) > 100 || len(resources.DeviceNos) > 100 {
-		return errors.New("api key resource scope too large")
+		return domain.ErrInvalidAPIKey
 	}
 	for _, ids := range [2][]int64{resources.FarmIDs, resources.PondIDs} {
 		for _, id := range ids {
 			if id <= 0 {
-				return errors.New("invalid api key resource id")
+				return domain.ErrInvalidAPIKey
 			}
 		}
 	}
 	for _, deviceNo := range resources.DeviceNos {
 		if strings.TrimSpace(deviceNo) == "" {
-			return errors.New("invalid api key device resource")
+			return domain.ErrInvalidAPIKey
 		}
 	}
 	return nil

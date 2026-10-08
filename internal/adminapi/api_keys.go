@@ -44,8 +44,10 @@ func apiKeyError(c *gin.Context, err error) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 	case errors.Is(err, domain.ErrNotFound):
 		c.JSON(http.StatusNotFound, gin.H{"error": "api key not found"})
-	default:
+	case errors.Is(err, domain.ErrInvalidAPIKey):
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
+	default:
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 	}
 }
 
