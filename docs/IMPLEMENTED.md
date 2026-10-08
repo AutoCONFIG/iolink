@@ -53,7 +53,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | 位置 | 内容 | 状态 | 下一步与依据 |
 |---|---|---|---|
 | S5 | 首启平台管理员、手工组织授权、平台/用户双看板 | 已完成已核验 | 根源码 `2c8a6a9` / web `1327ff1` 同快照两位独立审阅者 APPROVE，无阻断；首启只创建 ADMIN，不创建业务组织/USER/成员；用户注册后由平台管理员手工授权，看板按身份与资源权限分开。真实 Timescale、空成员契约回归、CLI 账号/密码、前端58测试与构建见[证据与双审](evidence/deployment/2026-10-08-platform-console/README.md)；浏览器由用户验收；License仍为实例级；非阻断严格JSON限制登记D18 |
-| S6 | 平台管理与业务用户 HTTP 接口分层 | 已完成待核验 | 根路由新增 `/user/v1`，仅挂载普通登录/注册、当前组织、成员与租户业务资源；平台 License、平台统计、平台用户和组织生命周期仅挂载 `/admin/v1`，旧 `/admin/v1` 业务路径保留兼容。Web 业务请求使用 user client，平台请求使用 admin client；Go 与 Web 回归已通过，待同一最终快照双审及发布 tag 收据 |
+| S6 | 平台管理与业务用户 HTTP 接口分层 | 已完成已核验 | 最终快照 `2e7205d` 后的证据提交包含手工 QA 与独立门审 APPROVE：[`manual-qa.md`](evidence/deployment/2026-10-09-user-api-split/manual-qa.md)、[门审收据](../.omo/evidence/user-api-gate-review-bounded.md)。根路由新增 `/user/v1`，仅挂载普通登录/注册、当前组织、成员与租户业务资源；平台 License、平台统计、平台用户和组织生命周期仅挂载 `/admin/v1`，旧 `/admin/v1` 业务路径保留兼容。Web 业务请求使用 user client，平台请求使用 admin client；隔离 Timescale、Go race、前端 58 测试/类型检查/构建、契约检查均通过。浏览器视觉、微信、硬件、公网 TLS 仍按 external_blocked/用户验收记录 |
 | S1 | 服务器/开发两份 Compose、latest-pg16 | 已完成已核验 | 用户免双审；隔离构建/首启/重启通过；[证据](evidence/deployment/2026-10-03-compose/) |
 | S2 | JSON日志转储、轮转、关联ID、脱敏及健康状态 | 已完成已核验 | 双审都批准 `1bc74b8`，验证 source `e1b78e1`；[证据](evidence/deployment/2026-10-03-logging/README.md)、`code-review.md`及 `.omo/evidence/logging-gate-review.md`；下方旧“待双审”已过时 |
 | S4 | 空库自动建表、Web 首启初始化和业务 API 门禁 | 已完成已核验 | 根源码 `360bc87` / web `b340cae` 同候选两位独立审阅者 APPROVE；真实隔离 Timescale、并发/回滚/非法输入、Go 全库、契约、前端 52 测试/类型检查/构建及 Docker 首启通过，修订后实际 Vite 代理已核验；web 已推送远端；浏览器由用户验收；[证据与双审](evidence/deployment/2026-10-08-web-setup/README.md) |
