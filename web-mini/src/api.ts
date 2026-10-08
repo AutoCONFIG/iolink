@@ -39,6 +39,7 @@ export function createFetchRequest(fetchFn: typeof fetch = fetch, basePath = '/a
   return async <T>(path: string, init: RequestInit = {}): Promise<T> => {
     const headers = new Headers(init.headers)
     headers.set('Accept', 'application/json')
+    if (init.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
     const token = typeof localStorage === 'undefined' ? null : localStorage.getItem('iolink.mini.token')
     if (token) headers.set('Authorization', `Bearer ${token}`)
     let response: Response

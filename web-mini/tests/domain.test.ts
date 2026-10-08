@@ -53,7 +53,9 @@ describe('M4 page boundary', () => {
   })
   it('maps HTTP, malformed JSON, and empty 204 responses at the transport boundary', async () => {
     const response = (status: number, body: string) => new Response(status === 204 ? null : body, { status, headers: { 'content-type': 'application/json' } })
-    await expect(createFetchRequest(async () => response(401, '{"message":"expired"}'))('/alarms')).rejects.toMatchObject({ status: 401, message: 'expired' })
+    let loginHeaders: Headers | undefined
+    await expect(createFetchRequest(async (_input, init) => { loginHeaders = new Headers(init?.headers); return response(401, '{"message":"expired"}') })('/alarms', { method: 'POST', body: JSON.stringify({ code: 'demo' }) })).rejects.toMatchObject({ status: 401, message: 'expired' })
+    expect(loginHeaders?.get('Content-Type')).toBe('application/json')
     await expect(createFetchRequest(async () => response(200, '{'))('/alarms')).rejects.toMatchObject({ message: '服务响应格式错误' })
     await expect(createFetchRequest(async () => response(204, ''))('/alarms/1/confirm', { method: 'POST' })).resolves.toBeUndefined()
   })

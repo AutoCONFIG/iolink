@@ -55,7 +55,7 @@ onMounted(load)
     <header class="alarm-header"><div><h1>报警中心</h1><p>查看未确认报警，并演示通知订阅授权。</p></div><button type="button" :disabled="loading" @click="load">{{ loading ? '加载中…' : '刷新' }}</button></header>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
     <p v-if="loading" class="state" role="status">正在加载报警</p>
-    <p v-else-if="!alarms.length" class="state">当前没有报警</p>
+    <p v-else-if="!error && !alarms.length" class="state">当前没有报警</p>
     <ul v-else class="alarm-list" aria-live="polite">
       <li v-for="alarm in alarms" :key="alarm.id" :class="['alarm-item', `alarm-${alarm.level}`, { confirmed: alarm.confirmed_at }]">
         <div class="alarm-copy"><strong>{{ alarmLevelLabel(alarm.level) }} · {{ alarm.message }}</strong><small>{{ alarm.metric }} · 当前 {{ alarm.current_value }} · 阈值 {{ alarm.threshold }}</small><time :datetime="alarm.created_at">{{ new Date(alarm.created_at).toLocaleString() }}</time></div>

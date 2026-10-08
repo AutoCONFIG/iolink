@@ -15,6 +15,8 @@
 - `web-mini/tests/domain.test.ts`：API 正向/错误边界及报警计数测试。
 - `web-mini/DESIGN.md`：演示页面令牌和状态约定。
 
+审阅修复：候选初审发现登录 JSON 缺少 `Content-Type` 且错误态同时显示空态；已在 `createFetchRequest` 自动补充 JSON 请求头，并让报警空态只在无错误时显示。测试新增请求头断言。
+
 ## 自动检查
 
 环境：Node.js/npm，Linux；依赖来自已提交 `web-mini/package-lock.json`。
