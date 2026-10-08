@@ -1,0 +1,4 @@
+8:31:07 PM [vite] (client) Re-optimizing dependencies because vite config has changed
+Snapshot 2b66812: parsed 31 actual backend success payloads through current Zod response schemas
+Native Node fetch over real HTTP: login JSON header, login credential exclusion, protected Bearer forwarding and empty 204 PASS
+Fixture limitation reproduced: native Response rejects Buffer body at status 204; happy-dom test adapter uses that unsupported construction

@@ -1,2 +1,3 @@
 Software substitute: python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software
 Result: passed. Six page registry, typed API routes, stale-field/history rules and lifecycle tests passed; real WeChat device remains external_blocked.
+2026-10-08 source 2b66812: mounted page/API/alarm/polling tests, real local HTTP fixture, backend PG16/Timescale tests and browser navigation/failure demonstration PASS. Receipt: docs/evidence/M4/2026-10-08/README.md. No real device or browser-to-backend success is claimed.

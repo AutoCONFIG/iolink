@@ -1,0 +1,42 @@
+[
+  {
+    "action": "initial login and six navigation entries",
+    "state": "- main:\n  - heading \"微信登录\" [level=1]\n  - paragraph: 使用微信登录 IoLink。\n- region \"接口演示\":\n  - text: 微信登录 code\n  - textbox \"微信登录 code\"\n  - button \"调用接口\"\n  - paragraph: 需使用有效微信 code；也可在其他页面填入测试用户 Token 验证资源接口。\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\"\n  - button \"实时水质\"\n  - button \"历史曲线\"\n  - button \"报警中心\""
+  },
+  {
+    "action": "submit empty login code",
+    "state": "- main:\n  - heading \"微信登录\" [level=1]\n  - paragraph: 使用微信登录 IoLink。\n- region \"接口演示\":\n  - text: 微信登录 code\n  - textbox \"微信登录 code\"\n  - button \"调用接口\" [active]\n  - paragraph: 需使用有效微信 code；也可在其他页面填入测试用户 Token 验证资源接口。\n  - alert: 微信登录凭据不能为空\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\"\n  - button \"实时水质\"\n  - button \"历史曲线\"\n  - button \"报警中心\""
+  },
+  {
+    "action": "navigate 首页",
+    "state": "- main:\n  - heading \"首页\" [level=1]\n  - paragraph: 查看池塘概览和未确认报警。\n- region \"接口演示\":\n  - text: 测试用户 Bearer Token\n  - textbox \"测试用户 Bearer Token\"\n  - button \"调用接口\"\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\" [active]\n  - button \"池塘\"\n  - button \"实时水质\"\n  - button \"历史曲线\"\n  - button \"报警中心\""
+  },
+  {
+    "action": "navigate 池塘",
+    "state": "- main:\n  - heading \"池塘\" [level=1]\n  - paragraph: 查看已分配池塘。\n- region \"接口演示\":\n  - text: 测试用户 Bearer Token\n  - textbox \"测试用户 Bearer Token\"\n  - button \"调用接口\"\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\" [active]\n  - button \"实时水质\"\n  - button \"历史曲线\"\n  - button \"报警中心\""
+  },
+  {
+    "action": "navigate 实时水质",
+    "state": "- main:\n  - heading \"设备实时详情\" [level=1]\n  - paragraph: 按已发布物模型展示可读字段，枚举和布尔值保留原始语义。\n  - text: 设备编号\n  - textbox \"设备编号\":\n    - /placeholder: 例如 pond-01\n  - button \"读取详情\"\n- region \"接口演示\":\n  - text: 测试用户 Bearer Token\n  - textbox \"测试用户 Bearer Token\"\n  - text: 设备编号\n  - textbox \"设备编号\"\n  - checkbox \"每 30 秒刷新（后台暂停）\"\n  - text: 每 30 秒刷新（后台暂停）\n  - button \"调用接口\"\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\"\n  - button \"实时水质\" [active]\n  - button \"历史曲线\"\n  - button \"报警中心\""
+  },
+  {
+    "action": "navigate 历史曲线",
+    "state": "- main:\n  - heading \"历史曲线\" [level=1]\n  - paragraph: 按 today、7d 或 30d 查看曲线。\n- region \"接口演示\":\n  - text: 测试用户 Bearer Token\n  - textbox \"测试用户 Bearer Token\"\n  - text: 设备编号\n  - textbox \"设备编号\"\n  - text: 指标\n  - combobox \"指标\":\n    - option \"温度\"\n    - option \"溶氧\"\n    - option \"pH\" [selected]\n    - option \"浊度\"\n    - option \"盐度\"\n  - text: 范围\n  - combobox \"范围\":\n    - option \"今日\" [selected]\n    - option \"7 天\"\n    - option \"30 天\"\n  - button \"调用接口\"\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\"\n  - button \"实时水质\"\n  - button \"历史曲线\" [active]\n  - button \"报警中心\""
+  },
+  {
+    "action": "navigate 报警中心",
+    "state": "- main:\n  - heading \"报警中心\" [level=1]\n  - paragraph: 查看未确认报警，并演示通知订阅授权。\n  - button \"刷新\"\n  - alert: 请求失败\n  - list\n  - region \"报警通知订阅\":\n    - heading \"报警通知订阅\" [level=2]\n    - paragraph: 尚未请求订阅。拒绝或取消不会影响报警中心。\n    - button \"请求微信订阅\"\n    - button \"模拟同意\"\n    - button \"模拟拒绝\"\n    - button \"模拟取消\"\n    - generic: 当前为浏览器演示，真实微信弹窗需在小程序运行时接入。\n  - paragraph: 未确认 0 条 / 共 0 条\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\"\n  - button \"实时水质\"\n  - button \"历史曲线\"\n  - button \"报警中心\" [active]"
+  },
+  {
+    "action": "模拟同意",
+    "state": "- main:\n  - heading \"报警中心\" [level=1]\n  - paragraph: 查看未确认报警，并演示通知订阅授权。\n  - button \"刷新\"\n  - alert: 请求失败\n  - list\n  - region \"报警通知订阅\":\n    - heading \"报警通知订阅\" [level=2]\n    - paragraph: 已同意订阅。拒绝或取消不会影响报警中心。\n    - button \"请求微信订阅\"\n    - button \"模拟同意\" [active]\n    - button \"模拟拒绝\"\n    - button \"模拟取消\"\n    - generic: 当前为浏览器演示，真实微信弹窗需在小程序运行时接入。\n  - paragraph: 未确认 0 条 / 共 0 条\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\"\n  - button \"实时水质\"\n  - button \"历史曲线\"\n  - button \"报警中心\""
+  },
+  {
+    "action": "模拟拒绝",
+    "state": "- main:\n  - heading \"报警中心\" [level=1]\n  - paragraph: 查看未确认报警，并演示通知订阅授权。\n  - button \"刷新\"\n  - alert: 请求失败\n  - list\n  - region \"报警通知订阅\":\n    - heading \"报警通知订阅\" [level=2]\n    - paragraph: 已拒绝订阅。拒绝或取消不会影响报警中心。\n    - button \"请求微信订阅\"\n    - button \"模拟同意\"\n    - button \"模拟拒绝\" [active]\n    - button \"模拟取消\"\n    - generic: 当前为浏览器演示，真实微信弹窗需在小程序运行时接入。\n  - paragraph: 未确认 0 条 / 共 0 条\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\"\n  - button \"实时水质\"\n  - button \"历史曲线\"\n  - button \"报警中心\""
+  },
+  {
+    "action": "模拟取消",
+    "state": "- main:\n  - heading \"报警中心\" [level=1]\n  - paragraph: 查看未确认报警，并演示通知订阅授权。\n  - button \"刷新\"\n  - alert: 请求失败\n  - list\n  - region \"报警通知订阅\":\n    - heading \"报警通知订阅\" [level=2]\n    - paragraph: 已取消订阅。拒绝或取消不会影响报警中心。\n    - button \"请求微信订阅\"\n    - button \"模拟同意\"\n    - button \"模拟拒绝\"\n    - button \"模拟取消\" [active]\n    - generic: 当前为浏览器演示，真实微信弹窗需在小程序运行时接入。\n  - paragraph: 未确认 0 条 / 共 0 条\n- navigation \"小程序页面导航\":\n  - button \"微信登录\"\n  - button \"首页\"\n  - button \"池塘\"\n  - button \"实时水质\"\n  - button \"历史曲线\"\n  - button \"报警中心\""
+  }
+]

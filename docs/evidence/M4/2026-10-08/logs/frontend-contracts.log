@@ -1,0 +1,65 @@
+Snapshot 2b66812fd0d6e64609c1bc3fccbccccf71a4f99d
+
+COMMAND: npm test --prefix web-mini
+
+> iolink-mini-program-boundary@0.1.0 test
+> vitest run tests
+
+
+ RUN  v5.0.2 /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/web-mini
+
+
+ Test Files  3 passed (3)
+      Tests  39 passed (39)
+   Start at  20:26:57
+   Duration  661ms (environment 39%, transform 38%, import 13%, tests 9%, worker 1%)
+
+EXIT: 0
+
+COMMAND: npm run typecheck --prefix web-mini
+
+> iolink-mini-program-boundary@0.1.0 typecheck
+> vue-tsc --noEmit
+
+EXIT: 0
+
+COMMAND: npm run build --prefix web-mini
+
+> iolink-mini-program-boundary@0.1.0 build
+> vue-tsc --noEmit && vite build
+
+vite v8.3.1 building client environment for production...
+transforming...
+✓ 104 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.36 kB │ gzip:  0.28 kB
+dist/assets/index-Uit-Fdm0.css    2.94 kB │ gzip:  0.95 kB
+dist/assets/index-BVkCSKA8.js   133.78 kB │ gzip: 45.78 kB
+
+✓ built in 365ms
+EXIT: 0
+
+COMMAND: npm audit --prefix web-mini --omit=optional
+found 0 vulnerabilities
+EXIT: 0
+
+COMMAND: python3 scripts/run_external_case.py --case R25-R27 --provider wechat --mode software
+{"case": "R25-R27", "provider": "wechat", "software": "passed", "integration": "not_required", "external": "external_blocked", "exit_code": 0}
+EXIT: 0
+
+COMMAND: python3 scripts/check_architecture_manifests.py --all
+architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+EXIT: 0
+
+COMMAND: make verify-contracts
+.venv/contracts/bin/python scripts/check_contracts.py
+docs/api/admin-openapi.yaml: standard schema and 44 operation fixtures PASS
+docs/api/license-openapi.yaml: standard schema and 3 operation fixtures PASS
+docs/api/open-openapi.yaml: standard schema and 5 operation fixtures PASS
+docs/api/openapi.yaml: standard schema and 15 operation fixtures PASS
+67 target operations, 334 synthetic request/response fixtures PASS; live handler verification is R02.c
+EXIT: 0
+
+COMMAND: git diff --check
+EXIT: 0

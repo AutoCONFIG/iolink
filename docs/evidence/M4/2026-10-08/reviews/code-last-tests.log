@@ -1,0 +1,13 @@
+
+> iolink-mini-program-boundary@0.1.0 test
+> vitest run tests
+
+
+ RUN  v5.0.2 /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/web-mini
+
+
+ Test Files  3 passed (3)
+      Tests  39 passed (39)
+   Start at  20:26:00
+   Duration  827ms (environment 54%, transform 25%, import 12%, tests 8%, worker 1%)
+

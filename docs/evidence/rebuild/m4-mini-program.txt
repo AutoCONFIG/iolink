@@ -1,5 +1,5 @@
 Todo 8 / M4 mini-program boundary evidence
-Date: 2026-09-27 Asia/Shanghai
+Date: 2026-09-27 Asia/Shanghai (historical record below; current evidence appended)
 
 Software boundary
 - `web-mini/src/pages.ts` declares P01 login, P02 home, P03 ponds, P04 realtime, P05 history, P06 alarms.
@@ -25,3 +25,15 @@ External status
 
 Gate status
 - Todo 8 remains pending after independent review. The Vue runtime/build and mounted page smoke now pass; two fresh independent reviewers must still approve this final tree before completion.
+
+2026-10-08 update: minimum API demonstration
+- User scope: show whether the APIs work; production mini-program UX is owned by a separate developer.
+- Reviewed source: 2b66812fd0d6e64609c1bc3fccbccccf71a4f99d, tree 1bd83aabd5ea4ef617cbf5975dea270de67d92ca.
+- Six page navigation, /api/v1 and /api/v2 forms, safe JSON/status/schema handling, login token masking, 30-second polling lifecycle, alarm load/confirm/failure and simulated subscription outcomes implemented.
+- npm test --prefix web-mini: PASS, 3 files / 39 tests; typecheck/build/audit PASS, 0 vulnerabilities.
+- Architecture manifest checks: PASS, 55 requirements. Contract checks: PASS, 67 operations / 334 fixtures.
+- Real isolated PG16/TimescaleDB 2.30.0 ownership/transfer/filter/confirmation/revocation tests: PASS, exit 0, no SKIP. Exact command and output: docs/evidence/M4/2026-10-08/logs/live-backend.log.
+- Real local HTTP fixture and mounted component tests cover successful calls; browser QA covers navigation, empty input, request failure and simulated agree/deny/cancel. No browser-to-WeChat success is claimed.
+- Current evidence: docs/evidence/M4/2026-10-08/README.md, logs/frontend-contracts.log, browser/actions.json, browser/login.jpg, browser/alarms.jpg.
+- Independent review receipts on the same source: docs/evidence/M4/2026-10-08/reviews/code-last.md and gate-last.md. The historical pending/rejection statement above applies to the 2026-09-27 candidate only.
+- R25-R27 real WeChat login/subscription/device acceptance remains external_blocked. Software demonstration closure never marks that external scope passed.

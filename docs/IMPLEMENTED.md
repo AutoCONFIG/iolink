@@ -1,10 +1,11 @@
 # 当前实现状态与证据
 
-## TODO 总览（2026-10-07 核对）
+## TODO 总览（2026-10-08 核对）
 
-当前推进位置：**TODO 10 / M6d（R41–R42）已完成软件验收**。本地 source
-`81c842e6903814cee187e67a699485ef6f934148`、web
-`66c52624f6d97c9dd7fe29b05b64b3db39c4a72d` 已通过同一快照双审并登记；发布标签待本次提交后创建。
+当前推进位置：**TODO 8 / M4 接口演示已完成软件核验**。按用户范围，小程序只展示接口调用及返回结果，正式小程序由专人开发。
+源码 `2b66812fd0d6e64609c1bc3fccbccccf71a4f99d` 已获两位独立审阅者同快照 APPROVE；[证据](evidence/M4/2026-10-08/README.md)覆盖 39 项测试、真实数据库后端和浏览器演示。发布标签拟为 `v0.0.11`，远端发布结果另行取证。
+**主清单 20 项：13 项已完成已核验，剩 7 项（M7a、M7b、M8a–M8d、R55）**；补充对账与外部验收另列。
+M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、web `66c52624f6d97c9dd7fe29b05b64b3db39c4a72d` 的阶段证据保留。
 外部微信、硬件、生产 License 和客户安装仍按 `external_blocked` 记录。
 
 本节是对已有证据的状态整理，不是重新运行验收。下方旧表、计划勾选和历史证据
@@ -30,7 +31,7 @@
 | TODO 5 / M2 | 登录、归属转移、资源 API 与授权 | 已完成已核验 | [证据](evidence/rebuild/ownership-api.txt)，双审 `.omo/evidence/todo5-independent-{code,gate}-review.md`，同 manifest `c4a1c98e…`；微信真实用户流程另验 |
 | TODO 6 | 通知事务意图、持久 outbox、重试/租约与微信适配器 | 已完成已核验 | 软件范围；[证据](evidence/rebuild/notifications.txt)，双审 `.omo/evidence/todo6-independent-{code,gate}-review.md`，同 manifest `ef5bf5cf…`；微信实发另验 |
 | TODO 7 / M3 | 管理后台、生产构建与集成前端 | 已完成已核验 | 被审版本浏览器范围；[证据](evidence/rebuild/admin-frontend.txt)，双审 `.omo/evidence/todo7-independent-{code,gate}-review.md`，同 manifest `ed8887f0…`；后续新增页各阶段另验 |
-| TODO 8 / M4 | 小程序六页、登录、订阅及 API 集成 | 待完成已调研 | 适配器/测试/构建已有；`.omo/evidence/todo8-independent-gate-review.md` 最后追加的 final-tree re-review 仍 REJECT；`web-mini/src/pages/AlarmsPage.vue` 仍为静态页面，订阅授权未接入；[证据](evidence/rebuild/m4-mini-program.txt)及旧勾选需重新闭环，不能仅列作外部阻塞 |
+| **TODO 8 / M4** | **小程序六页最小接口演示** | **已完成已核验** | 用户收窄为接口演示；源码 `2b66812`，39 测试/类型检查/构建、真实 PG16/Timescale 后端测试和浏览器导航/失败/订阅演示通过；[代码审阅](evidence/M4/2026-10-08/reviews/code-last.md)与[门审](evidence/M4/2026-10-08/reviews/gate-last.md)同快照 APPROVE；[证据](evidence/M4/2026-10-08/README.md)；真实微信及真机仍 `external_blocked`，不代表生产小程序完整交付 |
 | TODO 9 / M5 | 健康、指标、停机、备份恢复、TLS/容量/CI 基础 | 已完成已核验 | 软件范围；[证据](evidence/rebuild/m5-operations.txt)、[gate](evidence/rebuild/gates/M5.json)，批准 `.omo/evidence/todo9-independent-code-review.md`、`todo9-final-gate-review.md`；公网 TLS、大规模演练及远端 CI另列 |
 | TODO 10a / M6a | 产品/物模型版本、通用遥测、兼容投影 | 已完成已核验 | R34–R35；[R34](evidence/acceptance/R34/README.md)、[R35](evidence/acceptance/R35/README.md)明确最终工作树双审通过 |
 | TODO 10b / M6b | 多租户、成员/RBAC、撤权与当前资源隔离 | 已完成已核验 | R36.a/R37.a；同候选 `0335438` 双审；[最终证据](evidence/acceptance/R37/2026-10-04-version-revocation/README.md)、[gate](evidence/rebuild/gates/M6b.json)；未来资源随其阶段另验 |
@@ -53,12 +54,12 @@
 |---|---|---|---|
 | S1 | 服务器/开发两份 Compose、latest-pg16 | 已完成已核验 | 用户免双审；隔离构建/首启/重启通过；[证据](evidence/deployment/2026-10-03-compose/) |
 | S2 | JSON日志转储、轮转、关联ID、脱敏及健康状态 | 已完成已核验 | 双审都批准 `1bc74b8`，验证 source `e1b78e1`；[证据](evidence/deployment/2026-10-03-logging/README.md)、`code-review.md`及 `.omo/evidence/logging-gate-review.md`；下方旧“待双审”已过时 |
-| V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 已完成待核验 | 实现/历史批准已存在，文档同步尚未完整核对：TODO 3未勾、TODO 8有拒绝、R36/R37 manifest仍not_run、旧 Dxx仍待审；不得直接批量改 passed |
-| V2 | 微信真实登录、订阅、通知及用户归属流程 | 已完成待核验 | 仅指已有服务端/适配器软件；真实凭据、资质、用户/真机为 external_blocked；小程序页面缺口另属 TODO 8 |
+| V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 已完成待核验 | 实现/历史批准已存在，文档同步尚未完整核对：TODO 3旧计划未勾、R36/R37及旧 Dxx逐项核对；TODO 8历史拒绝已由 `2b66812` 新同快照双审闭环；不得直接批量改 passed |
+| V2 | 微信真实登录、订阅、通知及用户归属流程 | 已完成待核验 | 仅指已有服务端/适配器及接口演示软件；真实凭据、资质、用户/真机为 external_blocked；TODO 8软件演示完成不代替真实微信验收 |
 | V3 | 实际签发方License导入/续期与客户离线安装 | 已完成待核验 | 已有工具/软件链；真实签发方、干净断网x86_64客户主机30分钟安装及ARM64证据待提供 |
 | V4 | 公网TLS/网络暴露、100GiB恢复、发布中断、长时容量 | 已完成待核验 | 已有脚本/模板/软件烟测；真实主机、证书、恢复介质及24小时500设备/90天fixture演练为 external_blocked |
 | V5 | 现有采集固件的实际值对照与断线恢复 | 已完成待核验 | 已有MQTT/DB软件证据；真实设备验收 external_blocked，后续控制/网关硬件功能还需开发 |
-| V6 | 远端CI运行与当前发布版本产物核对 | 已完成待核验 | CI配置存在，不能把本地命令当远端CI通过；保留用户未提交 `.github/workflows/ci.yml` 改动 |
+| V6 | 远端CI运行与当前发布版本产物核对 | 已完成待核验 | CI `56cbd91` 仅由新 tag push 触发镜像发布，main/PR 不触发；当前标签远端结果须另行取证，不能把本地检查当远端CI通过 |
 | X1 | R36.b/R37.b/R39.b 后续资源权限、执行撤权和License复验 | 待完成已调研 | 跨阶段规则已明确；Key/播放/命令/jobs/下载的真实入口按 M6d–M8d分别实现验收 |
 | S3 | Redis 类缓存引入调研 | 待完成已调研 | 仅形成候选用途、窄 port、故障语义和验证门槛；当前未引入 Redis 依赖、容器或生产配置；[调研记录](research/redis-cache-evaluation.md)；不阻塞 M6d |
 | D12/D13/D15/D16/D17 | 平台owner边界、遥测角色、支持到期时区/精度、租户管理员资源范围 | 已完成已核验 | 已纳入 M6b `0335438` 同候选批准；[gate](evidence/rebuild/gates/M6b.json)明确列出 fixed_defects；旧计划未勾需同步 |
@@ -69,8 +70,7 @@
 | F3 | 最终完整软件/真实链路/前端及适用外部QA | 待完成未调研 | TODO 13，必须重新绑定最终版本，不能拼接不同版本的passed |
 | F4 | 最终范围、发布产物、手册与恢复流程一致性审计 | 待完成未调研 | TODO 13，和F1–F3汇总至R55；适用外部未通过不能称全部完成 |
 
-推荐下一步：关闭 TODO 8 的已知软件缺口并完成 V1 对账，再进入 M7/M8。M6d
-软件阶段已完成；微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
+推荐下一步：完成 V1 历史证据对账，再进入 M7a。M4 接口演示与 M6d 软件阶段已完成；微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
 
 附加部署里程碑：统一服务器 `deploy/docker-compose.yaml` 与源码构建覆盖
 `deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，并发布至 v0.0.6；用户明确免除该配置变更的双审。
@@ -103,7 +103,7 @@ M6c License 与离线交付软件验收完成：源码 `8ad550552d56f061222cd1ff
 | R21–R22 | 部分实现 | 报警/统计/状态墙代码 | 筛选、去重统计、全量报警等级有差异；管理Telemetry依赖已补并通过单条MQTT实测，完整聚合契约仍待验 |
 | R23 | 已实现（Todo 7 双审待登记） | web/dist 已构建并嵌入 internal/web/dist | 浏览器覆盖登录、总览、农场/池塘、设备、规则、报警、设置及错误/空/过期状态；证据见 docs/evidence/rebuild/admin-frontend.txt |
 | R24 | 已实现（Todo 7 双审待登记） | 真实 Vite dist 已 embed，SPA fallback 与 API JSON 404 代码及浏览器构建验收 | Playwright、Go compile/vet、契约和 manifest 检查通过；admin/app handler IPv6 httptest 受沙箱阻断 |
-| R25–R27 | 外部阻塞 | code2session客户端代码；小程序未实现 | 软件子项部分实现/未实现；需微信资质/真机，fake不是实发证据 |
+| R25–R27 | 软件接口演示通过；外部阻塞 | `2b66812` 六页接口演示、响应校验、报警确认和订阅模拟，同快照双审通过 | 用户范围仅接口演示；真实登录/订阅/六页真机链路需微信资质与设备，模拟不是实发证据 |
 | R28 | 软件通过，外部阻塞 | durable outbox/worker、WeChat HTTP adapter、重试/lease/归属重验及失败状态 | 真微信凭据、授权和设备回执缺失，外部实发为 `external_blocked` |
 | R29–R33 | 软件通过，适用外部阻塞 | health/readiness、metrics、10秒有界排空、固定监听/TLS反代模板、整库custom备份恢复、容量烟测与CI | 真实TLS主机、100GiB恢复、发布中断和24小时500设备/90天容量演练为 `external_blocked` |
 | R34–R35 | 软件验收通过 | M6a 产品模型、版本发布/分配、通用遥测、兼容投影、fixture 回填 | 外部不适用；证据见 docs/evidence/acceptance/R34/ 与 R35/ |

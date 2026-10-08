@@ -1,0 +1,11 @@
+Date: 2026-10-08 Asia/Shanghai
+Environment: Linux, repository root; docs-only M4 archive over source 2b66812; CI-only commit 56cbd91.
+Command: python3 scripts/check_architecture_manifests.py --all
+Result: exit 0; 55 requirements, owners, providers, references, and AGENTS.md scope PASS.
+Command: make verify-contracts
+Result: exit 0; admin 44, license 3, open 5, app 15 operations; 67 target operations / 334 synthetic request/response fixtures PASS. Live handler verification remains R02.c.
+Command: git diff --check
+Result: exit 0 for current archive changes. This is not a whitespace pass for historical generated JS in source 2b66812.
+Command: git diff 2b66812 -- web-mini ':!web-mini/README.md'
+Result: empty; business source, tests and generated dist unchanged from reviewed source.
+CI trigger verification: YAML BaseLoader parsed on == {push: {tags: ["*"]}}; PASS. No branch, PR, schedule or manual trigger.
