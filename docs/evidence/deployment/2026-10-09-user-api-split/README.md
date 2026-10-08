@@ -4,7 +4,7 @@ Candidate scope: platform administration remains on `/admin/v1`; ordinary busine
 
 ## Snapshot
 
-- Root worktree: recorded in the enclosing release commit.
+- Root implementation commits: `c38f881` and `1606bb9`.
 - Web submodule: `953335e` (`feat: route business console through user api`), pushed to `github.com:AutoCONFIG/iolink-webui` `main`.
 - The `.tmp/` directory is pre-existing and is not part of this evidence.
 
