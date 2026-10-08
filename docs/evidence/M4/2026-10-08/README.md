@@ -8,6 +8,8 @@
 
 审阅源码：`2b66812fd0d6e64609c1bc3fccbccccf71a4f99d`，tree `1bd83aabd5ea4ef617cbf5975dea270de67d92ca`。之后的归档提交只更新使用说明、证据、状态和 CI 的 tag 触发配置。
 
+发布 `v0.0.11` 已推送，tag CI 镜像构建发布成功；最终快照双审与远端结果见 [发布收据](release.md)。
+
 ## 源码范围
 
 - `web-mini/src/api.ts`：`WaterLatest` 类型、HTTP JSON/错误边界、401/403/404 映射、204 空响应。
