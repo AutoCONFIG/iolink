@@ -34,7 +34,7 @@ func TestFailureOutputHidesUntrustedErrors(t *testing.T) {
 
 func TestUnknownAPIDoesNotServeSPA(t *testing.T) {
 	h := spaHandler(fstest.MapFS{"index.html": {Data: []byte("app")}})
-	for _, path := range []string{"/api/v9/missing", "/admin/v1missing"} {
+	for _, path := range []string{"/api/v9/missing", "/admin/v1missing", "/user/v1missing"} {
 		w := httptest.NewRecorder()
 		h.ServeHTTP(w, httptest.NewRequest("GET", path, nil))
 		if w.Code != 404 || !strings.Contains(w.Header().Get("Content-Type"), "json") {

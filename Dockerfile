@@ -1,4 +1,6 @@
 FROM node:24-alpine AS frontend
+ARG IOLINK_VERSION=dev
+ENV VITE_APP_VERSION=${IOLINK_VERSION}
 WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund

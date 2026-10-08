@@ -229,6 +229,23 @@ func newTestServerWithRole(t *testing.T, authority, tenantRole string) *httptest
 	return httptest.NewServer(s.Routes())
 }
 
+func newUserTestServerWithRole(t *testing.T, authority, tenantRole string) *httptest.Server {
+	t.Helper()
+	hash := platform.HashPassword("admin123")
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: &fakeStore{
+		admin:      &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: authority},
+		tenantRole: tenantRole,
+		devices:    map[string]domain.Device{},
+		rules:      map[int64]domain.AlarmRule{},
+		stats:      domain.Stats{DevicesTotal: 3, Online: 2, Offline: 1, OpenAlarms: 4},
+	}, Policy: policy})
+	return httptest.NewServer(s.UserRoutes())
+}
+
 func strptr(s string) *string { return &s }
 
 func adminLogin(t *testing.T, ts *httptest.Server) string {
@@ -244,6 +261,23 @@ func adminLogin(t *testing.T, ts *httptest.Server) string {
 	_ = json.NewDecoder(resp.Body).Decode(&out)
 	if out.Token == "" {
 		t.Fatal("no admin token")
+	}
+	return out.Token
+}
+
+func userLogin(t *testing.T, ts *httptest.Server) string {
+	resp, err := http.Post(ts.URL+"/user/v1/login", "application/json",
+		strings.NewReader(`{"username":"admin","password":"admin123"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	var out struct {
+		Token string `json:"token"`
+	}
+	_ = json.NewDecoder(resp.Body).Decode(&out)
+	if resp.StatusCode != http.StatusOK || out.Token == "" {
+		t.Fatalf("user login status=%d token=%q", resp.StatusCode, out.Token)
 	}
 	return out.Token
 }
@@ -275,6 +309,56 @@ func TestAdminLoginAndAuth(t *testing.T) {
 	_ = json.NewDecoder(resp.Body).Decode(&st)
 	if st.DevicesTotal != 3 || st.OpenAlarms != 4 {
 		t.Fatalf("bad stats: %+v", st)
+	}
+}
+
+func TestUserRoutesSeparatePlatformEndpoints(t *testing.T) {
+	ts := newUserTestServerWithRole(t, "USER", "owner")
+	defer ts.Close()
+	token := userLogin(t, ts)
+	for _, path := range []string{"/user/v1/farms", "/user/v1/tenants"} {
+		resp := authGet(t, ts, token, path)
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("%s status=%d, want 200", path, resp.StatusCode)
+		}
+	}
+	for _, path := range []string{"/user/v1/license", "/user/v1/platform/stats", "/user/v1/platform/users", "/user/v1/tenants/7/status"} {
+		resp := authGet(t, ts, token, path)
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusNotFound {
+			t.Fatalf("%s status=%d, want 404", path, resp.StatusCode)
+		}
+	}
+}
+
+func TestPlatformAdminCannotUseUserBusinessRoutes(t *testing.T) {
+	ts := newUserTestServerWithRole(t, "ADMIN", "")
+	defer ts.Close()
+	token := userLogin(t, ts)
+	for _, path := range []string{"/user/v1/tenants", "/user/v1/stats"} {
+		resp := authGet(t, ts, token, path)
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusForbidden {
+			t.Fatalf("%s status=%d, want 403", path, resp.StatusCode)
+		}
+	}
+}
+
+func TestUserRoutesRequireTenantContext(t *testing.T) {
+	hash := platform.HashPassword("admin123")
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := &fakeStore{admin: &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "USER"}, defaultTenantErr: domain.ErrNotFound, devices: map[string]domain.Device{}, rules: map[int64]domain.AlarmRule{}}
+	ts := httptest.NewServer(New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: store, Policy: policy}).UserRoutes())
+	defer ts.Close()
+	token := userLogin(t, ts)
+	resp := authGet(t, ts, token, "/user/v1/stats")
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("stats status=%d, want 403", resp.StatusCode)
 	}
 }
 

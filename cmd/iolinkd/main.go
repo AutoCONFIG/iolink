@@ -339,6 +339,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	root.Handle("/metrics", promhttp.Handler())
 	root.Handle("/setup/v1/", setup.Routes())
 	root.Handle("/admin/v1/", setup.Protect(admin.Routes()))
+	root.Handle("/user/v1/", setup.Protect(admin.UserRoutes()))
 	root.Handle("/open/v1/", setup.Protect(open.Routes()))
 	adminFS, err := web.Admin()
 	if err != nil {
@@ -397,7 +398,7 @@ func envOr(k, def string) string {
 func spaHandler(fsys fs.FS) http.Handler {
 	fileServer := http.FileServer(http.FS(fsys))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, "/api/") || strings.HasPrefix(r.URL.Path, "/admin/v1") {
+		if strings.HasPrefix(r.URL.Path, "/api/") || strings.HasPrefix(r.URL.Path, "/admin/v1") || strings.HasPrefix(r.URL.Path, "/user/v1") {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = io.WriteString(w, `{"error":"not found"}`)

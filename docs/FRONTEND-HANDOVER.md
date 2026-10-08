@@ -8,7 +8,7 @@
 
 | 页面ID | 页面/建议路由 | 接口与验收要点 |
 |---|---|---|
-| A01 | 登录 /login | POST /admin/v1/login；401回登录，首启/强制改密另有引导 |
+| A01 | 登录 /login | POST /admin/v1/login（兼容入口）；401回登录，首启/强制改密另有引导 |
 | A02 | 总览 /dashboard | GET /stats + /ponds；critical/warning/normal及latest；无数据和过期属性明确显示 |
 | A03 | 农场和用户分配 /farms | farms CRUD、users检索、PUT farms/{id}/owner；未分配提示；转交/解除二次确认并说明历史权限变化 |
 | A04 | 池塘 /ponds | ponds CRUD；有任何设备（含停用）/历史/规则/报警引用409时显示具体原因，不提示直接删历史 |
@@ -21,12 +21,12 @@ A03与A04是独立业务页面；后续M6增加产品/模型、组织/成员/角
 
 ## 接口与状态
 
-- 管理前缀/admin/v1，小程序/api/v1；成功JSON不包code/data，失败{error}，空列表[]，时间UTC RFC3339，UI按Asia/Shanghai显示。
+- 平台管理前缀/admin/v1，业务用户前缀/user/v1，小程序/api/v1；平台管理接口保留既有业务路径兼容，前端业务数据请求使用/user/v1。成功JSON不包code/data，失败{error}，空列表[]，时间UTC RFC3339，UI按Asia/Shanghai显示。
 - 管理集合limit/offset，稳定排序，过滤再分页；无效参数400。认证无效401，资源不存在/跨范围404；M6已认证动作不足403。无数据latest为null，不能当成0。
 - latest按属性合并，timestamps给逐字段时间，report_interval给设备周期；超过3倍周期标过期，即使包ts较新也不能把旧字段显示为新值。
 - 表单按目标OpenAPI校验；响应契约检查失败视为联调缺陷，不在前端静默改名猜字段。
 - 管理鉴权token仅保存在运行时内存，页面刷新重新登录；不在日志/URL保存token。小程序使用平台安全存储并在登出/过期清除。
-- Vue开发用Vite代理/admin和/api到本机后端；生产同源，管理路由避免与/admin/v1冲突；不为开发直接放开生产CORS。
+- Vue开发用Vite代理/admin、/user/v1和/api到本机后端；生产同源，管理路由避免与/admin/v1、/user/v1冲突；不为开发直接放开生产CORS。
 
 ## 小程序
 

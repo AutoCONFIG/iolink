@@ -139,30 +139,59 @@ func New(cfg Config, deps Deps) *Server {
 	return &Server{cfg: cfg, deps: deps}
 }
 
-// Routes builds the gin engine with all /admin/v1 routes.
 func (s *Server) Routes() http.Handler {
 	r := gin.New()
 	r.Use(operations.RequestLogging(s.deps.Logger))
 
 	v1 := r.Group("/admin/v1")
+	s.mountAuthRoutes(v1, true)
+	s.mountTenantRoutes(v1, false)
+	return r
+}
+
+func (s *Server) UserRoutes() http.Handler {
+	r := gin.New()
+	r.Use(operations.RequestLogging(s.deps.Logger))
+
+	v1 := r.Group("/user/v1")
+	s.mountAuthRoutes(v1, false)
+	s.mountTenantRoutes(v1, true)
+	return r
+}
+
+func (s *Server) mountAuthRoutes(v1 *gin.RouterGroup, platform bool) {
 	v1.POST("/login", s.login)
 	v1.POST("/register", s.register)
 
 	auth := v1.Group("", s.authRequired)
 	{
 		auth.GET("/session", s.session)
-		auth.GET("/license", s.getLicense)
-		auth.POST("/license", s.importLicense)
-		auth.GET("/tenants", s.listTenants)
-		auth.POST("/tenants", s.createTenant)
-		auth.GET("/platform/stats", s.platformStats)
-		auth.GET("/platform/users", s.platformUsers)
-		auth.PUT("/tenants/:id/status", s.setTenantStatus)
-		auth.GET("/tenants/:id/members", s.listTenantMembers)
-		auth.PUT("/tenants/:id/members/:user_id", s.setTenantMember)
 		auth.POST("/password", s.changePassword)
+		organizations := auth
+		if !platform {
+			organizations = auth.Group("", s.userAccountRequired)
+		}
+		organizations.GET("/tenants", s.listTenants)
+		organizations.GET("/tenants/:id/members", s.listTenantMembers)
+		organizations.PUT("/tenants/:id/members/:user_id", s.setTenantMember)
+		if platform {
+			auth.GET("/license", s.getLicense)
+			auth.POST("/license", s.importLicense)
+			auth.POST("/tenants", s.createTenant)
+			auth.GET("/platform/stats", s.platformStats)
+			auth.GET("/platform/users", s.platformUsers)
+			auth.PUT("/tenants/:id/status", s.setTenantStatus)
+		}
 	}
-	tenantAuth := v1.Group("", s.authRequired, s.tenantRequired)
+}
+
+func (s *Server) mountTenantRoutes(v1 *gin.RouterGroup, userOnly bool) {
+	middleware := []gin.HandlerFunc{s.authRequired}
+	if userOnly {
+		middleware = append(middleware, s.userAccountRequired)
+	}
+	middleware = append(middleware, s.tenantRequired)
+	tenantAuth := v1.Group("", middleware...)
 	{
 		tenantAuth.GET("/farms", s.listFarms)
 		tenantAuth.POST("/farms", s.createFarm)
@@ -208,5 +237,4 @@ func (s *Server) Routes() http.Handler {
 		tenantAuth.GET("/devices/:device_no/product", s.getDeviceProduct)
 		tenantAuth.PUT("/devices/:device_no/product", s.assignDeviceProduct)
 	}
-	return r
 }

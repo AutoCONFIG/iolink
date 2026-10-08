@@ -11,7 +11,7 @@
 | [IMPLEMENTED.md](IMPLEMENTED.md) | 当前状态、已执行检查、已知差异；不继承旧勾选 |
 | [PLAN-DETAILS.md](PLAN-DETAILS.md) | M0–M5身份、数据、报警、接口和迁移目标 |
 | [EXTENSIONS.md](EXTENSIONS.md) | M6–M8产品模型/权限/授权/视频/协议/任务，外部输入清单 |
-| [api/admin-openapi.yaml](api/admin-openapi.yaml)、[api/openapi.yaml](api/openapi.yaml) | M0–M5目标契约，已标待实现；扩展契约在各阶段入口补齐后复核 |
+| [api/admin-openapi.yaml](api/admin-openapi.yaml)、[api/openapi.yaml](api/openapi.yaml) | M0–M5目标契约，已标待实现；管理控制台使用 `/admin/v1`，业务用户复用同一资源形状并通过 `/user/v1` 暴露，扩展契约在各阶段入口补齐后复核 |
 | [mqtt-spec.md](mqtt-spec.md) | 基础MQTT及命令、网关阶段目标 |
 | [schema.sql](schema.sql) | 遗留初始化脚本，有已登记缺陷；不是新目标DDL或升级入口 |
 | [FRONTEND-HANDOVER.md](FRONTEND-HANDOVER.md) | 页面ID、交互与联调关卡 |

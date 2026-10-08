@@ -186,6 +186,7 @@ func (s *Server) tenantRequired(c *gin.Context) {
 
 func tenantPermission(path, method string) (string, string) {
 	relative := strings.TrimPrefix(path, "/admin/v1/")
+	relative = strings.TrimPrefix(relative, "/user/v1/")
 	resource, _, _ := strings.Cut(relative, "/")
 	if resource == "farms" && strings.Contains(relative, "/members") {
 		resource = "farm_members"
