@@ -25,7 +25,7 @@ paths:
   /initialize:
     post:
       summary: 原子创建首个管理员及审计记录
-      description: 仅未初始化时可用。使用 IOLINK_SECRET_KEY 对应的安装凭据；拒绝跨 Origin、非 JSON、未知字段、多段 JSON 和超过4096字节的请求。并发只允许一次成功；结果未知时先查询 status，禁止盲目重试。初始化完成之前业务 API 返回503。
+      description: 仅未初始化时可用。使用 IOLINK_SECRET_KEY 对应的安装凭据；Origin 必须是与请求 Host（含端口）相同的 http/https 主机且不含 userinfo、路径、query 或 fragment，兼容 HTTPS 反代到 HTTP，不依赖 cookie 认证且不开放 CORS。拒绝非 JSON、未知字段、多段 JSON 和超过4096字节的请求。并发只允许一次成功；结果未知时先查询 status，禁止盲目重试。初始化完成之前业务 API 返回503。
       security:
         - InstallationKey: []
       requestBody:

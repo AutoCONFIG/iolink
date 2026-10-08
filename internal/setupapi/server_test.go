@@ -82,12 +82,17 @@ func TestBootstrapWhenInvalidThenNoAccounts(t *testing.T) {
 		{"missing_key", credentials, "", "", 401},
 		{"wrong_key", credentials, "wrong-key", "", 401},
 		{"cross_origin", credentials, testKey, "https://attacker.example", 403},
+		{"origin_port", credentials, testKey, "http://example.com:1234", 403},
+		{"origin_userinfo", credentials, testKey, "http://user@example.com", 403},
+		{"origin_path", credentials, testKey, "http://example.com/path", 403},
+		{"origin_query", credentials, testKey, "http://example.com?query=1", 403},
+		{"origin_fragment", credentials, testKey, "http://example.com#fragment", 403},
 		{"invalid_json", "{", testKey, "", 400},
 		{"unknown_field", `{"username":"operator","password":"Operator-test-1234","extra":1}`, testKey, "", 400},
 		{"trailing_json", credentials + `{}`, testKey, "", 400},
 		{"empty_fields", `{}`, testKey, "", 400},
 		{"short_password", `{"username":"operator","password":"short"}`, testKey, "", 400},
-		{"oversize", strings.Repeat("x", 4097), testKey, "", 400},
+		{"oversize", strings.Repeat(" ", 4097) + credentials, testKey, "", 400},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			w := request(s.Routes(), "POST", "/setup/v1/initialize", tc.body, tc.key, tc.origin)
@@ -99,6 +104,14 @@ func TestBootstrapWhenInvalidThenNoAccounts(t *testing.T) {
 				t.Fatal(count, err)
 			}
 		})
+	}
+}
+
+func TestBootstrapWhenHTTPSProxyOriginThenInitialized(t *testing.T) {
+	_, s := fixture(t)
+	w := request(s.Routes(), "POST", "/setup/v1/initialize", credentials, testKey, "https://example.com")
+	if w.Code != 204 {
+		t.Fatal(w.Code, w.Body)
 	}
 }
 
