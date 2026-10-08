@@ -1,0 +1,7 @@
+-test.shuffle 1791474972446160649
+=== RUN   TestPlatformConsoleOnboardingAndIsolation
+--- PASS: TestPlatformConsoleOnboardingAndIsolation (1.67s)
+=== RUN   TestCLISetupCreatesOnlyPlatformAdmin
+--- PASS: TestCLISetupCreatesOnlyPlatformAdmin (0.65s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	3.385s

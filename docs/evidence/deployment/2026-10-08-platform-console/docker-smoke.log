@@ -1,0 +1,2 @@
+PASS Docker: automatic schema + administrator-only setup + registration + manual organization + both sessions/dashboards + denied access + integrated web assets + restart persistence
+Database: dedicated PG16/Timescale container; temporary database removed at end

@@ -1,0 +1,215 @@
+go build ./...
+go vet ./...
+go test -race -shuffle=on ./... -count=1
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	4.607s
+ok  	git.hyhy.fun/rsplab/iolink/cmd/license-sign	1.252s
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-once	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-sim	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/offline-sbom	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/tp-spike-pub	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.024s
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	10.336s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.056s
+ok  	git.hyhy.fun/rsplab/iolink/internal/authorization	1.014s
+-test.shuffle 1791472155700392013
+2026/10/08 23:09:16 INFO http request request_id=PANYNO2FJKGHJOFGA362R23LSK route=/open/v1/devices method=GET status=200 duration_ms=8 tenant_id=0 actor_id=0
+2026/10/08 23:09:16 INFO http request request_id=DNNFQSPA4AEYCOZH5LAH3WFFXM route=/open/v1/alarms method=GET status=200 duration_ms=8 tenant_id=0 actor_id=0
+--- FAIL: TestM2OwnershipLifecycleAndTokenRevocation (0.44s)
+    m2_integration_test.go:88: missing app token
+2026/10/08 23:09:38 INFO http request request_id=VYRB7OY4ARZKTWCIX72BUKF4ZW route=/admin/v1/login method=POST status=200 duration_ms=172 tenant_id=0 actor_id=0
+2026/10/08 23:09:38 WARN http request request_id=GH7PEY64MW636BJWYLJD6EWLOB route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:39 INFO http request request_id=QRT7BOQ64QU6447LXRJCRFXZ2A route=/admin/v1/login method=POST status=200 duration_ms=147 tenant_id=0 actor_id=0
+2026/10/08 23:09:39 WARN http request request_id=7KKO6NZ5U2SYZ4THEGDE335GI6 route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:40 INFO http request request_id=ERTJ346UGMCGNGWBUYFNN54MWE route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/08 23:09:40 WARN http request request_id=K6M4RJDMCY635ZYWBT4TQCNB7L route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:40 INFO http request request_id=XKBRZZZYNX77NGU73TAEMQ7FWA route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/08 23:09:40 WARN http request request_id=SCAF3FQ7JGTGJBUZ3SCLFGD44J route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:41 INFO http request request_id=77BSV3CZLQHIPPKFEOB7D4CNPV route=/admin/v1/login method=POST status=200 duration_ms=138 tenant_id=0 actor_id=0
+2026/10/08 23:09:41 WARN http request request_id=VU3TW7XKZWGBY5AAI34J7FW6Q5 route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:42 INFO http request request_id=CMYMXQITUKIRYOGOWGZOBY5SZ4 route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/08 23:09:42 WARN http request request_id=ELCQ3B26P7Q5WOLQHEHU54GCYI route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:42 INFO http request request_id=XMCZ6ZIJVLR7ZYJ62FXRAYEPXG route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/08 23:09:42 WARN http request request_id=76D3ATTWQ4R7TMDEZOO4LX4IXJ route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:43 INFO http request request_id=P5LKTMDDAMEALOI3I6E5TYKM6U route=/admin/v1/login method=POST status=200 duration_ms=138 tenant_id=0 actor_id=0
+2026/10/08 23:09:43 WARN http request request_id=D522QB26UQXEZOTS3UDEWIAMQH route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:44 INFO http request request_id=BUP65ZTU75JLAJFSNK776CYJCB route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/08 23:09:44 WARN http request request_id=JBEML3IBGIFINLG4TJICAD3ZP2 route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:44 INFO http request request_id=JTOSJX5AEG3AVBK72D6YUGJXHW route=/admin/v1/login method=POST status=200 duration_ms=142 tenant_id=0 actor_id=0
+2026/10/08 23:09:44 WARN http request request_id=I6IOGSEQKHTPZWXS7AVXCMDRFZ route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:51 WARN http request request_id=C6ZVXSWJJBTYJFPU4MOPEM4NYO route=/admin/v1/farms method=GET status=401 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/08 23:09:51 INFO http request request_id=OM6PU7UDRWVRAAXUWAB7UUYWGP route=/admin/v1/login method=POST status=200 duration_ms=161 tenant_id=0 actor_id=0
+2026/10/08 23:09:51 WARN http request request_id=ZUD6MLV375ODBFYQ3CCNC5WFUM route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/08 23:09:51 WARN http request request_id=SULMZIGAIYVWMHENRTU66EDJ6I route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/08 23:09:51 INFO http request request_id=LCKRVJVRLUBA3XPVSCU6J4OOSX route=/admin/v1/login method=POST status=200 duration_ms=156 tenant_id=0 actor_id=0
+2026/10/08 23:09:51 WARN http request request_id=37RZVFW54BKLBWBXRKBDP5QUM5 route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/08 23:09:51 WARN http request request_id=MVQTMHVY3TQTKAVQQYVFRNNAF4 route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/08 23:09:52 INFO http request request_id=7QOF3LWTOUCTGRX5FSI6OA5ZRH route=/admin/v1/login method=POST status=200 duration_ms=141 tenant_id=0 actor_id=0
+2026/10/08 23:09:52 WARN http request request_id=NABLKQVBO6YDCZT66BUIXN7PUK route=/admin/v1/farms method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/08 23:09:52 WARN http request request_id=SEKNZJNXHGQTPE6S5JYLCPVPAK route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/08 23:09:52 INFO http request request_id=KWSPYHHTQBB6T62MWVJRWJAFGX route=/admin/v1/login method=POST status=200 duration_ms=139 tenant_id=0 actor_id=0
+2026/10/08 23:09:52 WARN http request request_id=IDZHW4CAVP6TSBCWSD4DLNP5CD route=/admin/v1/farms method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/08 23:09:56 INFO http request request_id=RBONDYP5IOXFJUXN4YHL4WQHZA route=/admin/v1/login method=POST status=200 duration_ms=135 tenant_id=0 actor_id=0
+2026/10/08 23:09:56 WARN http request request_id=JOAZ3HPMGDSCNAHPJEWLZU5663 route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:56 INFO http request request_id=MHNH3YXRWBNKSPBZE7F5LWM7RM route=/admin/v1/login method=POST status=200 duration_ms=144 tenant_id=0 actor_id=0
+2026/10/08 23:09:56 WARN http request request_id=WIGVUAAWMD5TFOVFXJHIZ3SZH2 route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:57 INFO http request request_id=F5OZDLH3CVBGPDBDMZXYQETJD3 route=/admin/v1/login method=POST status=200 duration_ms=144 tenant_id=0 actor_id=0
+2026/10/08 23:09:57 WARN http request request_id=ZTR2MV35O6JT2CS66SGM7OVDIH route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:58 INFO http request request_id=MQPRJFHT2AE37XZIS7AV7PHQEN route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/08 23:09:58 WARN http request request_id=MRWGDTLZU6HSCZZAUY75UD3UKX route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:09:59 WARN http request request_id=VQ77NW47EZD2R3PFYGW5Q3EUHX route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+2026/10/08 23:09:59 INFO http request request_id=YLFRDZLIZO5JIG3ALWCDPTDHJW route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+2026/10/08 23:10:05 INFO http request request_id=X33TQ7P665AU7AWPDONIFRERG3 route=/admin/v1/login method=POST status=200 duration_ms=138 tenant_id=0 actor_id=0
+2026/10/08 23:10:05 INFO http request request_id=PA2G7TNE5GCT5PNAMLX4QM52MA route=/admin/v1/farms method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/08 23:10:05 INFO http request request_id=I2UIE47BKKXN3SWHRAW7FINXKW route=/admin/v1/ponds method=GET status=200 duration_ms=6 tenant_id=801 actor_id=802
+2026/10/08 23:10:05 INFO http request request_id=KPCFZLJRKWB2DAOAZY73ZK2PPQ route=/admin/v1/devices method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:05 INFO http request request_id=PYHI6GOUO2YFJWBRZVW6H64DPQ route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:05 INFO http request request_id=ZAWQ5YFBNKXYBZT4NTGDVIZTPF route=/admin/v1/stats method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/08 23:10:05 WARN http request request_id=F4AAXTX42OYVB6ILMJQEE5AXQL route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:05 WARN http request request_id=RP6BYNFR4TRBWENH4HVJUJFN3M route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:05 WARN http request request_id=MFQA33GTFV4OZTV4WEK67YKO2U route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=CEJZWNRWYQVX25SATDE3DMJ2HV route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=WX2OHEHRJ55NOPG2ZLA2D4A7LZ route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=YS6VTBODYIWFVYTAJUIBG7RNDX route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=3 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=XFPTJLJBJO64LY6BNRJGNDOTUL route=/admin/v1/login method=POST status=200 duration_ms=139 tenant_id=0 actor_id=0
+2026/10/08 23:10:06 INFO http request request_id=PBD7KAEDFV6C62UMUSGGYHUM7F route=/admin/v1/farms method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=P7L47MTEVP6AK32AGOJZJQ23ZF route=/admin/v1/ponds method=GET status=200 duration_ms=8 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=VDZFTTSS5MUYW7GVZ2QW5RUGAT route=/admin/v1/devices method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=RWDX3JT5UTDNWGNJB62AVSKZYR route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=FKLTTR6BV3ZAG2LL6CRW6763CZ route=/admin/v1/stats method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=M4RVDWFQFAEV4BCGJMH3RMHIKH route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=D5N53HRQSILJVUJBPH23DCLYK7 route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=CLV7BQ2VPONIITIDAGC53L4Q6F route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=Q33TWCEJKDJW7XZN3UMDHZPKSR route=/admin/v1/alarms/batch-confirm method=POST status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=WGUYDK6XIAVM65N2S6MH4NXXUT route=/admin/v1/login method=POST status=200 duration_ms=140 tenant_id=0 actor_id=0
+2026/10/08 23:10:06 INFO http request request_id=JLOODF4EY6YZABTFD3FNWG6R3S route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=Z7Z5Z2XE34UJ6LV2KIO5DC7F2O route=/admin/v1/ponds method=GET status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=K2IMUOXUDXJXPQTECEHRPN3YBI route=/admin/v1/devices method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=J6Q5IHLCQYH3XRCTK4CMIYPRIP route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=Q7VJRVU7K35HPN64BIRIPB6TZD route=/admin/v1/stats method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=VHC6BUGTZ6GEEE5UFLKN7LXGZX route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=SJ3NJWGZLRPUW7H3KBFDLGZNT4 route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=YM3FALU5TQ3FXPSLICI2QCH6TM route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 WARN http request request_id=344UR5P5KOUONQCVLBG7IQKQ6I route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=XE3SRFBUGOY7PHASPWJEHC2U6E route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=3QQHWPCFEJCNGVTDK7E6NE7OVN route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=3 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=TYDT4V7TBBAQISJBUL37X5WH4M route=/admin/v1/login method=POST status=200 duration_ms=147 tenant_id=0 actor_id=0
+2026/10/08 23:10:06 INFO http request request_id=ZUCYUOOPQ4MCODDS67DFIM4O3E route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/08 23:10:06 INFO http request request_id=BWWBY2B74NJCZR57VN754NBAAS route=/admin/v1/login method=POST status=200 duration_ms=142 tenant_id=0 actor_id=0
+2026/10/08 23:10:06 INFO http request request_id=LR6U577CCEXOEVLDZQTKXQ6ACN route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/08 23:10:08 WARN http request request_id=3WKCKELFVLNEXRRPUP4J3VAW3W route=/open/v1/ponds method=GET status=429 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=YMMO4XH5GGHTS2XE2WZ72OKJXU route=/open/v1/ponds method=GET status=429 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=VGJ47ZDZUEQYA7MEKOZEDE6BRN route=/open/v1/ponds method=GET status=401 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=D6IKY5PNX34HXKIUICZDMTKG67 route=/open/v1/ponds method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=2LPGQJQ5XHKLXFDWXCODS3JSK5 route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=4FMFYXYY6QGKY6CGMXIB2T6L2P route=/open/v1/devices method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=TKWDY7M4Y3JULDBOU5ODKQBRCR route=/open/v1/alarms method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=7FFHSTQBEL5SPK6H3QL2XKP3K7 route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=PGZQ3GLOURHWWYQZXF4I4RWJFA route=/open/v1/ponds/:id method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=BROO2HR4T27WWJZXUTW7KA7KP5 route=/open/v1/devices/:device_no method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=EY6MXMYW6I3JYYETIDR7A6NOWY route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=FERZP47XSR45Q6SQ3KPMXFR4OV route=/open/v1/ponds method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=CPYNPERPFHZWJ6M2DHL45KGVG2 route=/open/v1/devices method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=WX6BSJA26W32GTITD7VDCKCOJN route=/open/v1/alarms method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=7Y4X6VG37V7QIFQ5EMTLNXNDUA route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=KY53UIEHENLVNGSAIIFICZCKCJ route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=4BM7HKSOPNCHQ4UTLJRHBPJRMW route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=64HIVNQDHJSWS5JSB3SRBO6RIF route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=F64ZXFZUSF4K3JDJVO2VN26YMS route=/open/v1/ponds method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=25VXQ2PLLBSFCWIJ5376XSVVJR route=/open/v1/devices method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 INFO http request request_id=PGTWUQN43REW77545OQHACKTO5 route=/open/v1/alarms method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=37SDN6E2SJEOVS6EVZWL2VCLEU route=/open/v1/ponds/:id method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=SH5WCIDAY4XATSL2L57DNOMPQF route=/open/v1/ponds/:id method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=HQSWU6Z6VRGBMGTTO4ZNRN5SML route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:12 WARN http request request_id=QPD2TITIKH7SP7VHFJ45UYDPHN route=/open/v1/devices/:device_no method=GET status=404 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:17 INFO http request request_id=JJUDTEYVUVSSXVVMV6BB2TGOZA route=/open/v1/ponds method=GET status=200 duration_ms=6 tenant_id=0 actor_id=0
+2026/10/08 23:10:17 WARN http request request_id=EKFNW44NLTG4BCURBEYMZBEO6I route=/open/v1/ponds method=GET status=401 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:17 WARN http request request_id=ASCTLW2IF6B3DRTZURR7WQYFHI route=/open/v1/ponds method=GET status=429 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:18 INFO http request request_id=6BJ53SOL6GANOPVRPAPERLHTJI route=/open/v1/ponds method=GET status=200 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/08 23:10:18 WARN http request request_id=2CGSFHUHS34BLA7ZOZIHIFEBEX route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+2026/10/08 23:10:19 WARN http request request_id=XMADVFENQCNE3LAEDGJDHL4GU3 route=/open/v1/ponds method=GET status=403 duration_ms=5 tenant_id=0 actor_id=0
+2026/10/08 23:10:20 WARN http request request_id=KZM6WE2EBTFM7G3HNW5YAPQQQV route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+2026/10/08 23:10:20 WARN http request request_id=XQHOEDLQSLBFRERMERKMUQXRBZ route=/open/v1/ponds method=GET status=403 duration_ms=2 tenant_id=0 actor_id=0
+2026/10/08 23:10:21 INFO http request request_id=4HT5QZOL2GFWLHDMXKW76UOYTL route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=0 actor_id=0
+2026/10/08 23:10:21 WARN http request request_id=B4XBETLPGPUY4KPQIKKRTCRNOB route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+2026/10/08 23:10:21 WARN http request request_id=LIOVDIZF34DI57J7GHNI4QNX2J route=/open/v1/ponds method=GET status=429 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/08 23:10:23 INFO http request request_id=LQSAH6YUDJIYOXX55NDN274H5J route=/admin/v1/login method=POST status=200 duration_ms=158 tenant_id=0 actor_id=0
+2026/10/08 23:10:23 WARN http request request_id=P247AQPH4IIHI7D6BYKTBXDDTY route=/admin/v1/farms/:id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:24 INFO http request request_id=4VRV6YQKK3WHFRB4JHC6ZJU5WA route=/admin/v1/login method=POST status=200 duration_ms=161 tenant_id=0 actor_id=0
+2026/10/08 23:10:24 WARN http request request_id=S3RHZ33ZRVYFHDI7RMF6WS5JK5 route=/admin/v1/farms/:id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:24 INFO http request request_id=3HDFRBR4XT5Q5CIJ5XA2X53FFL route=/admin/v1/login method=POST status=200 duration_ms=140 tenant_id=0 actor_id=0
+2026/10/08 23:10:24 WARN http request request_id=3T2NDDGUPNAFPGUHWU44MEQR5I route=/admin/v1/farms/:id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:25 INFO http request request_id=5WPCZGLBJGKYZ4VRZOQOSIJPNT route=/admin/v1/login method=POST status=200 duration_ms=138 tenant_id=0 actor_id=0
+2026/10/08 23:10:25 WARN http request request_id=673AVVH2UQVXQIVSV3LRG7O2VR route=/admin/v1/farms/:id method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:26 INFO http request request_id=2FTGXVF3BYQ6EB7HKV7KLXFWHB route=/admin/v1/login method=POST status=200 duration_ms=139 tenant_id=0 actor_id=0
+2026/10/08 23:10:26 WARN http request request_id=YR27AI5KE7MCI7IKKXFRPPR3ZT route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:26 INFO http request request_id=KTCF7F2O7SER3QZCMPYQ3J7ZNK route=/admin/v1/login method=POST status=200 duration_ms=141 tenant_id=0 actor_id=0
+2026/10/08 23:10:26 WARN http request request_id=72IIGMARJYD2GFFTYB6XPMMV2K route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:27 INFO http request request_id=O4JC4NOUUWYU5XKACBRUNHF3GX route=/admin/v1/login method=POST status=200 duration_ms=139 tenant_id=0 actor_id=0
+2026/10/08 23:10:27 WARN http request request_id=GMWFWNNBYZO744BXZB6JJ4K3KT route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:28 INFO http request request_id=PC5MA65IH5CRCQBYB77FPM6YXS route=/admin/v1/login method=POST status=200 duration_ms=144 tenant_id=0 actor_id=0
+2026/10/08 23:10:28 WARN http request request_id=C7AS3HHABIWUDADMS6PPC5EIOX route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:28 INFO http request request_id=C6RH7M5IC5NIIIDBT6I5LMNIET route=/admin/v1/login method=POST status=200 duration_ms=145 tenant_id=0 actor_id=0
+2026/10/08 23:10:28 WARN http request request_id=HFTMWK6USZMU4MYSAHH6I7GQRG route=/admin/v1/products method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:29 INFO http request request_id=XPOP6T34LGTEIMOWZ2FYOR7CKO route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/08 23:10:29 WARN http request request_id=EVB45FANENYUL575PH6NUKESXS route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:30 INFO http request request_id=PLEUTAH3CMIKYIN2APZCNGFWN5 route=/admin/v1/login method=POST status=200 duration_ms=134 tenant_id=0 actor_id=0
+2026/10/08 23:10:30 WARN http request request_id=JAOLJRFGH7X3FYWQTN2HK4V2HR route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:30 INFO http request request_id=XOUKKNB7DM4WB3AAVWEW6XSCL6 route=/admin/v1/login method=POST status=200 duration_ms=144 tenant_id=0 actor_id=0
+2026/10/08 23:10:30 WARN http request request_id=UEDIT5Z533Y4JKNBONKLE6FKET route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=2 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:31 INFO http request request_id=KJYUHRLUX6R4VM2S774I3TMSRS route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/08 23:10:31 WARN http request request_id=3ESALOD6MD3R2VRFYVR5PIGDFB route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:32 INFO http request request_id=EWQC46Z2PPWQYUTW3NMPYT3OBC route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/08 23:10:32 WARN http request request_id=HNZRSO75JXXA4T4X7RKWTBXRIP route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:32 INFO http request request_id=PXGSWI54T3VFM4OTDW2WNI6TH2 route=/admin/v1/login method=POST status=200 duration_ms=143 tenant_id=0 actor_id=0
+2026/10/08 23:10:32 WARN http request request_id=Z2N2OIH54NLLBXIVPQLVCO6R7D route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:33 INFO http request request_id=TVU6M5FLW27343IIOSRBNY6JJD route=/admin/v1/login method=POST status=200 duration_ms=140 tenant_id=0 actor_id=0
+2026/10/08 23:10:33 WARN http request request_id=2MNJZSQEI2SNH5EEMMFXNJFLFL route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:34 INFO http request request_id=DMJO4Z7CTKIDBLHSI3WO7YSFR7 route=/admin/v1/login method=POST status=200 duration_ms=142 tenant_id=0 actor_id=0
+2026/10/08 23:10:34 WARN http request request_id=GN7GDKPWAON7PQAZKIUJ6NOF5E route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=2 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:34 INFO http request request_id=RANFECB52YCF5PVFM5KR6F236J route=/admin/v1/login method=POST status=200 duration_ms=139 tenant_id=0 actor_id=0
+2026/10/08 23:10:34 WARN http request request_id=25RELIRXRGKR2GNZKLNLZQCRFV route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:35 INFO http request request_id=CS7NZINBLFQJVSPMIDK5BIGBYE route=/admin/v1/login method=POST status=200 duration_ms=140 tenant_id=0 actor_id=0
+2026/10/08 23:10:35 WARN http request request_id=TF2EINUKCHJXTXTV4QWXE5IARO route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:36 INFO http request request_id=KRNFGW5SAIQULJUY35FYL6TLMH route=/admin/v1/login method=POST status=200 duration_ms=140 tenant_id=0 actor_id=0
+2026/10/08 23:10:36 WARN http request request_id=YTJL3ERNMXGKFOFTHKGTWCAERE route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:36 INFO http request request_id=FGCZXLWRHV6R3ZNIBIGVYDOICX route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/08 23:10:36 WARN http request request_id=XJ5NUNIVD3CUJZAE2J77C5LEQS route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:37 INFO http request request_id=HE6QPEGLWNFIMS4V5JUS24NMFR route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+2026/10/08 23:10:37 WARN http request request_id=HTJW72GESROC6A74KHVLFTJ7DT route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:38 INFO http request request_id=HXPPFAREVSXQJDEQNRDQT4Q27B route=/admin/v1/login method=POST status=200 duration_ms=138 tenant_id=0 actor_id=0
+2026/10/08 23:10:38 WARN http request request_id=RYYSMO64KYIXD23BM3RVWVDEXV route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+2026/10/08 23:10:38 INFO http request request_id=4LTD2J2ZINEQLSBXG3QTDPIF4H route=/admin/v1/login method=POST status=200 duration_ms=139 tenant_id=0 actor_id=0
+2026/10/08 23:10:38 WARN http request request_id=7466WR2CUNDL3O6XRLTPWOT6J6 route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=3 tenant_id=9401 actor_id=9402
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	83.227s
+ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.025s
+?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/ingestion	2.704s
+ok  	git.hyhy.fun/rsplab/iolink/internal/license	25.086s
+-test.shuffle 1791472155700443931
+2026/10/08 23:09:21 INFO http request request_id=RDB3TERUI63KETYGPXL6STRJNQ route=/admin/v1/login method=POST status=200 duration_ms=154 tenant_id=0 actor_id=0
+2026/10/08 23:09:21 WARN http request request_id=RWL6DQXOOF33OJEHPNAJEUWFWV route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/08 23:09:22 INFO http request request_id=WXNPG2ZKHFH75LKA5HIYF3XJHR route=/admin/v1/login method=POST status=200 duration_ms=157 tenant_id=0 actor_id=0
+2026/10/08 23:09:22 INFO http request request_id=XZ5JA73DKQK3OMWVAIWMTOUFC4 route=/admin/v1/farms method=GET status=200 duration_ms=2 tenant_id=1 actor_id=9202
+--- FAIL: TestM6bLegacyPlatformOwnerBusinessBoundary (1.33s)
+    platform_owner_test.go:57: POST /admin/v1/login status=200 expected=200
+    platform_owner_test.go:58: GET /admin/v1/farms status=403 expected=403
+    platform_owner_test.go:66: migration platform memberships=0 reconciliation=1 legacy farm/owner preserved=1
+    platform_owner_test.go:67: POST /admin/v1/login status=200 expected=200
+    platform_owner_test.go:69: GET /admin/v1/farms status=200 expected=200
+    platform_owner_test.go:86: not found
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/migrate	8.494s
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	7.837s
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	1.559s
+ok  	git.hyhy.fun/rsplab/iolink/internal/openapi	1.178s
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.037s
+ok  	git.hyhy.fun/rsplab/iolink/internal/persistence	2.598s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	1.710s
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	5.504s
+?   	git.hyhy.fun/rsplab/iolink/internal/testdb	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/internal/web	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.021s
+?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]
+FAIL
+make: *** [Makefile:25: verify] Error 1

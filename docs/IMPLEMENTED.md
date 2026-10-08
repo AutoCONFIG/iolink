@@ -2,7 +2,7 @@
 
 ## TODO 总览（2026-10-08 核对）
 
-当前推进位置：**TODO 8 / M4 接口演示已完成软件核验**。按用户范围，小程序只展示接口调用及返回结果，正式小程序由专人开发。
+当前推进位置：**S5 首启平台/用户边界与双看板软件范围已闭环；主清单下一阶段为 TODO 11a / M7a 视频接入**。TODO 8 / M4 接口演示已经闭环；按用户范围，正式小程序由专人开发。
 源码 `2b66812fd0d6e64609c1bc3fccbccccf71a4f99d` 已获两位独立审阅者同快照 APPROVE；[证据](evidence/M4/2026-10-08/README.md)覆盖 39 项测试、真实数据库后端和浏览器演示。发布快照 `036523d` 亦获同两位审阅者批准，已推送 `main` 与 `v0.0.11`，tag CI 镜像构建发布成功；[发布收据](evidence/M4/2026-10-08/release.md)。
 **主清单 20 项：13 项已完成已核验，剩 7 项（M7a、M7b、M8a–M8d、R55）**；补充对账与外部验收另列。
 M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、web `66c52624f6d97c9dd7fe29b05b64b3db39c4a72d` 的阶段证据保留。
@@ -52,6 +52,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 
 | 位置 | 内容 | 状态 | 下一步与依据 |
 |---|---|---|---|
+| S5 | 首启平台管理员、手工组织授权、平台/用户双看板 | 已完成已核验 | 根源码 `2c8a6a9` / web `1327ff1` 同快照两位独立审阅者 APPROVE，无阻断；首启只创建 ADMIN，不创建业务组织/USER/成员；用户注册后由平台管理员手工授权，看板按身份与资源权限分开。真实 Timescale、空成员契约回归、CLI 账号/密码、前端58测试与构建见[证据与双审](evidence/deployment/2026-10-08-platform-console/README.md)；浏览器由用户验收；License仍为实例级；非阻断严格JSON限制登记D18 |
 | S1 | 服务器/开发两份 Compose、latest-pg16 | 已完成已核验 | 用户免双审；隔离构建/首启/重启通过；[证据](evidence/deployment/2026-10-03-compose/) |
 | S2 | JSON日志转储、轮转、关联ID、脱敏及健康状态 | 已完成已核验 | 双审都批准 `1bc74b8`，验证 source `e1b78e1`；[证据](evidence/deployment/2026-10-03-logging/README.md)、`code-review.md`及 `.omo/evidence/logging-gate-review.md`；下方旧“待双审”已过时 |
 | S4 | 空库自动建表、Web 首启初始化和业务 API 门禁 | 已完成已核验 | 根源码 `360bc87` / web `b340cae` 同候选两位独立审阅者 APPROVE；真实隔离 Timescale、并发/回滚/非法输入、Go 全库、契约、前端 52 测试/类型检查/构建及 Docker 首启通过，修订后实际 Vite 代理已核验；web 已推送远端；浏览器由用户验收；[证据与双审](evidence/deployment/2026-10-08-web-setup/README.md) |
@@ -65,6 +66,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | S3 | Redis 类缓存引入调研 | 待完成已调研 | 仅形成候选用途、窄 port、故障语义和验证门槛；当前未引入 Redis 依赖、容器或生产配置；[调研记录](research/redis-cache-evaluation.md)；不阻塞 M6d |
 | D12/D13/D15/D16/D17 | 平台owner边界、遥测角色、支持到期时区/精度、租户管理员资源范围 | 已完成已核验 | 已纳入 M6b `0335438` 同候选批准；[gate](evidence/rebuild/gates/M6b.json)明确列出 fixed_defects；旧计划未勾需同步 |
 | D14 | M6b证据归档与同快照批准绑定 | 已完成待核验 | gate和批准文件已存在，但manifest及旧表仍不同步；纳入 V1，完成对账后关闭 |
+| D18 | 新组织创建接口严格JSON单对象校验 | 待完成已调研 | 本次代码审阅MEDIUM、非阻断：POST /tenants 尚未严格拒绝额外字段和尾随JSON；权限校验有效，无授权绕过；[审阅](evidence/deployment/2026-10-08-platform-console/code-review.md)，不宣称全部实时handler契约通过 |
 | D01–D11 | 历史构建/迁移/API/报警/通知/运维缺陷登记 | 已完成待核验 | 多项已有阶段修复与批准；逐项核对最终关闭证据，适用外部部分保留阻塞；不沿用旧表来推断当前代码缺陷 |
 | F1 | 全量范围、Rxx归属、provider与证据追溯审计 | 待完成未调研 | TODO 13最终发布快照审计，现有manifest检查不代替该轮核验 |
 | F2 | 最终架构/代码质量、安全与依赖边界审计 | 待完成未调研 | TODO 13，待全部功能完成后冻结候选执行 |

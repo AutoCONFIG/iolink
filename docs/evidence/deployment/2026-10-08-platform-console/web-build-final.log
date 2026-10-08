@@ -1,0 +1,49 @@
+
+> iolink-admin-ui@0.1.0 build
+> vue-tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 1822 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                             0.47 kB │ gzip:   0.33 kB
+dist/assets/ProductsView-DY-L-zJk.css                                       0.36 kB │ gzip:   0.23 kB
+dist/assets/TenantsView-DLkd_96A.css                                        0.43 kB │ gzip:   0.25 kB
+dist/assets/SystemView-KY5Gry-X.css                                         0.43 kB │ gzip:   0.22 kB
+dist/assets/index-Hx3hHIF5.css                                            370.48 kB │ gzip:  50.86 kB
+dist/assets/metrics-mFZmf0P5.js                                             0.47 kB │ gzip:   0.33 kB
+dist/assets/PendingView-CcuWk3p9.js                                         0.69 kB │ gzip:   0.54 kB
+dist/assets/MetricGrid.vue_vue_type_script_setup_true_lang-CGr8LFli.js      1.01 kB │ gzip:   0.61 kB
+dist/assets/APIKeyAuditView-BYjDiiH_.js                                     1.26 kB │ gzip:   0.81 kB
+dist/assets/RegisterView-BFq7lrTO.js                                        2.17 kB │ gzip:   1.12 kB
+dist/assets/LoginView-BCuybI6_.js                                           2.71 kB │ gzip:   1.59 kB
+dist/assets/AdminLayout-IcG8FZRy.js                                         3.30 kB │ gzip:   1.64 kB
+dist/assets/SetupView-BzVj8gpB.js                                           3.46 kB │ gzip:   1.62 kB
+dist/assets/AlarmsView-DnmGHrlC.js                                          4.69 kB │ gzip:   2.15 kB
+dist/assets/RulesView-DxOwVXM3.js                                           4.95 kB │ gzip:   2.02 kB
+dist/assets/PondsView-DtSAPxJK.js                                           5.52 kB │ gzip:   2.26 kB
+dist/assets/DevicesView-DWpYCQqj.js                                         5.85 kB │ gzip:   2.59 kB
+dist/assets/ProductsView-CyqZ74uz.js                                        6.50 kB │ gzip:   2.53 kB
+dist/assets/DashboardView-C1LlLlHK.js                                       6.57 kB │ gzip:   2.65 kB
+dist/assets/TenantsView-9xw-A2kp.js                                         7.85 kB │ gzip:   3.13 kB
+dist/assets/SystemView-fJcuJyDe.js                                         10.62 kB │ gzip:   4.20 kB
+dist/assets/index-tRlzbQ_P.js                                           1,199.84 kB │ gzip: 392.54 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.25s
