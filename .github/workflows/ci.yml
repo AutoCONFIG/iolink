@@ -1,12 +1,10 @@
-# 远端 CI 只做编译和打包：push/PR 上跑 go build，打 tag 直接构建镜像推 GHCR。
+# 远端 CI 仅由新 tag 的 push 触发，构建镜像并推送 GHCR。
 # 测试在本地开发阶段执行（make verify / make integration，见 Makefile）。
 name: CI
 
 on:
   push:
-    branches: [main]
     tags: ["*"]
-  pull_request:
 
 concurrency:
   group: ci-${{ github.ref }}
