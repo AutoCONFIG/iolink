@@ -3,8 +3,7 @@ info:
   title: IoLink Admin API — TARGET
   version: 1.0.0-planned
   description: TARGET / 待实现、待验收：本文件保留 M0–M5 管理 v1 契约，并包含 M6a products/models/assignment 增量；并非现有实现已通过验收的声明。原有 v1 操作路径保持不变；新增目标操作见各 summary。所有 JSON 字段 snake_case；集合始终返回数组，无结果为 []，不得返回 null。时间统一返回 UTC RFC3339
-    字符串。所有参数越界/非法值返回 400，不静默回退。所有受保护操作必须逐请求校验身份及资源归属。管理员使用aid claim和管理签名密钥，小程序使用uid claim和用户签名密钥；均由IOLINK_SECRET_KEY以不同标签派生（逻辑密钥，不是新增环境变量），不得互验。管理权限覆盖本实例全部业务资源，管理员不会自动成为
-    farm.owner_id。管理集合均支持 limit/offset，默认按 id 升序稳定排序；报警按 created_at DESC,id DESC。新增资源 POST 非幂等，网络结果未知时须查询核实，不能盲目重试；PUT 为完整字段替换且重复执行结果相同；确认操作及 DELETE 幂等，重复成功不产生新副作用。
+    字符串。所有参数越界/非法值返回 400，不静默回退。所有受保护操作必须逐请求校验身份及资源归属。管理端使用aid claim和管理签名密钥，小程序使用uid claim和用户签名密钥；均由IOLINK_SECRET_KEY以不同标签派生，不得互验。平台管理员管理组织与身份授权，仅查看平台汇总；业务用户按本租户及农场权限访问资源。首次初始化不创建业务租户或用户。集合默认按 id 升序稳定排序；报警按 created_at DESC,id DESC。新增资源 POST 非幂等，网络结果未知时须查询核实，不能盲目重试；PUT 为完整字段替换且重复执行结果相同；确认操作及 DELETE 幂等，重复成功不产生新副作用。
 servers:
 - url: http://localhost:8080/admin/v1
 tags:
@@ -36,6 +35,7 @@ paths:
                 required:
                 - token
                 - expires_in
+                - platform_admin
                 properties:
                   token:
                     type: string
@@ -43,6 +43,8 @@ paths:
                     type: integer
                     minimum: 1
                     description: 秒
+                  platform_admin:
+                    type: boolean
                 additionalProperties: false
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -69,6 +71,74 @@ paths:
                   format: password
               additionalProperties: false
       security: []
+  /session:
+    get:
+      tags: [auth]
+      summary: 获取当前登录账号角色与租户上下文
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [platform_admin, tenant_id, tenant_role]
+                properties:
+                  platform_admin: { type: boolean }
+                  tenant_id: { type: integer, format: int64, minimum: 0 }
+                  tenant_role: { type: string }
+                additionalProperties: false
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /register:
+    post:
+      tags: [auth]
+      summary: 业务用户自行注册账号，等待平台管理员分配组织
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string, minLength: 1, maxLength: 64 }
+                password: { type: string, format: password, minLength: 12, maxLength: 256 }
+              additionalProperties: false
+      responses:
+        '201': { description: 账号已注册，不创建组织或成员授权 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /platform/users:
+    get:
+      tags: [users]
+      summary: 平台管理员搜索已注册业务用户
+      description: 按用户 ID 升序返回最多 200 条；query 匹配账号、昵称或完整编号。不返回 open_id、口令或摘要。
+      parameters:
+      - { name: query, in: query, schema: { type: string, maxLength: 128 } }
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [id, username, name]
+                  properties:
+                    id: { type: integer, format: int64, minimum: 1 }
+                    username: { type: string }
+                    name: { type: string }
+                  additionalProperties: false
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /tenants:
     get:
       tags: [tenants]
@@ -83,6 +153,40 @@ paths:
                 items: { $ref: '#/components/schemas/Tenant' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '500': { $ref: '#/components/responses/InternalError' }
+    post:
+      tags: [tenants]
+      summary: 创建业务租户（平台管理员）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties: { name: { type: string, minLength: 1, maxLength: 128 } }
+              additionalProperties: false
+      responses:
+        '201':
+          description: 已创建
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Tenant' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /platform/stats:
+    get:
+      tags: [stats]
+      summary: 平台管理员查看平台汇总状态
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlatformStats' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
   /tenants/{id}/status:
     put:
       tags: [tenants]
@@ -108,6 +212,7 @@ paths:
     get:
       tags: [tenants]
       summary: 租户成员列表
+      description: 平台管理员可查看授权配置；业务用户仅本租户 owner/admin 可查看。此入口不授予业务数据读取权限。
       parameters:
       - { name: id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
       responses:
@@ -124,6 +229,7 @@ paths:
     put:
       tags: [tenants]
       summary: 更新租户成员角色或状态
+      description: 平台管理员可为已注册 USER 设置普通组织角色；不得授予自己或其他 ADMIN 普通成员身份，也不得自行授予 support。业务 owner/admin 按本租户维护成员和有时限的支持授权。
       parameters:
       - { name: id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
       - { name: user_id, in: path, required: true, schema: { type: integer, format: int64, minimum: 1 } }
@@ -137,7 +243,6 @@ paths:
               properties:
                 role: { type: string, enum: [owner, admin, member, viewer, support] }
                 active: { type: boolean }
-                expires_at: { type: string, format: date-time, nullable: true }
                 expires_at: { type: string, format: date-time, nullable: true }
               additionalProperties: false
       responses:
@@ -1179,6 +1284,11 @@ components:
       scheme: bearer
       bearerFormat: JWT
   responses:
+    ServiceUnavailable:
+      description: 所需能力暂不可用
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
     BadRequest:
       description: 参数、JSON 或业务校验失败；error=invalid_request
       content:
@@ -1773,6 +1883,16 @@ components:
         role: { type: string, enum: [owner, admin, member, viewer, support] }
         active: { type: boolean }
         expires_at: { type: string, format: date-time, nullable: true }
+      additionalProperties: false
+    PlatformStats:
+      type: object
+      required: [tenants, users, active_users, devices, online_devices]
+      properties:
+        tenants: { type: integer, format: int64, minimum: 0 }
+        users: { type: integer, format: int64, minimum: 0 }
+        active_users: { type: integer, format: int64, minimum: 0 }
+        devices: { type: integer, format: int64, minimum: 0 }
+        online_devices: { type: integer, format: int64, minimum: 0 }
       additionalProperties: false
     APIKeyResourceScope:
       type: object

@@ -36,7 +36,6 @@ if ! printf '%s' "$setup_status" | grep -q '"platform_ready":true'; then
   setup_status=$(docker compose --env-file .env -f deploy/docker-compose.yaml run --rm --pull never --no-deps iolinkd setup status)
 fi
 printf '%s\n' "$setup_status"
-printf '%s' "$setup_status" | grep -q '"tenant_ready":true' || { echo 'tenant setup incomplete; recover locally before serving' >&2; exit 2; }
 if test -z "${IOLINK_LICENSE_INPUT:-}" || test ! -f "$IOLINK_LICENSE_INPUT"; then
   echo 'set IOLINK_LICENSE_INPUT to a protected License envelope; installation stops before serving' >&2
   exit 3

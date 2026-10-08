@@ -374,7 +374,7 @@ func TestLicenseImportMapsClockErrorAndRejectsDuplicateJSON(t *testing.T) {
 	}
 }
 
-func TestPlatformAdminCannotGrantTenantMembership(t *testing.T) {
+func TestPlatformAdminCanGrantTenantMembership(t *testing.T) {
 	ts := newTestServer(t)
 	defer ts.Close()
 	token := adminLogin(t, ts)
@@ -386,8 +386,8 @@ func TestPlatformAdminCannotGrantTenantMembership(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusForbidden {
-		t.Fatalf("platform membership mutation status=%d, want 403", resp.StatusCode)
+	if resp.StatusCode != http.StatusNoContent {
+		t.Fatalf("platform membership mutation status=%d, want 204", resp.StatusCode)
 	}
 }
 

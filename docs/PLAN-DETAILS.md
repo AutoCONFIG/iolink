@@ -21,7 +21,7 @@
 
 ## 2. 数据与迁移
 
-目标表：users、farms、ponds、devices、device_shadows、alarm_rules、alarms、sensor_data、schema_migrations、audit_events。现有 docs/schema.sql 只是遗留初始化文件（目前缺 signal 等），不可作为生产升级程序；M0 以版本迁移替换入口。2026-10-08 用户首启范围补充：默认启动自动执行事务建表，空库进入 Web 初始化页设置首个管理员；安装密钥授权、一次性关闭、并发互斥、失败不留部分账户，业务 API 在初始化之前拒绝访问，CLI 只保留恢复能力。
+目标表：users、farms、ponds、devices、device_shadows、alarm_rules、alarms、sensor_data、schema_migrations、audit_events。现有 docs/schema.sql 只是遗留初始化文件（目前缺 signal 等），不可作为生产升级程序；M0 以版本迁移替换入口。2026-10-08 用户首启范围补充：默认启动自动执行事务建表，空库进入 Web 初始化页仅设置平台管理员，不创建业务租户或普通用户；管理员手工设置组织，用户自行注册并进入自己的业务看板；安装密钥授权、一次性关闭、并发互斥、失败不留部分账户，业务 API 在初始化之前拒绝访问，CLI 只保留恢复能力。
 
 - farms.owner_id 允许 NULL；device 当前 pond_id 必填，device_no 不可复用；增加 name、disabled_at，不做无归属设备库存。
 - 遥测新增 signal INT 和 pond_id 快照；报警已经有 pond_id，影子也增加 pond_id。历史归属按采集时 pond_id 保留，农场 owner 变化对该农场历史一起生效。

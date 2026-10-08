@@ -43,6 +43,9 @@ func TestM2OwnershipLifecycleAndTokenRevocation(t *testing.T) {
 		SELECT tenant.id,10,'member' FROM tenant`); err != nil {
 		t.Fatal(err)
 	}
+	if _, err = p.Exec(ctx, `WITH tenant AS (INSERT INTO tenants(name) VALUES ('m2-other-tenant') RETURNING id) INSERT INTO tenant_memberships(tenant_id,user_id,role) SELECT tenant.id,11,'member' FROM tenant`); err != nil {
+		t.Fatal(err)
+	}
 	a := int64(10)
 	f, err := s.CreateFarm(ctx, &a, "shared", "lake")
 	if err != nil {

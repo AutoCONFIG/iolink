@@ -52,6 +52,8 @@ curl -f http://127.0.0.1:8080/readyz
 
 浏览器打开服务器地址，空库自动进入 `/setup` 初始化配置页。输入 `.env` 中的 `IOLINK_SECRET_KEY` 作为安装权限凭据，并设置管理员账号、密码和确认密码。保存成功进入登录页。密钥和密码不记录到浏览器存储或诊断日志；系统初始化后创建入口关闭。正式公网部署使用 HTTPS；默认 loopback 绑定适合本地访问或 SSH 隧道。已执行 CLI 管理员初始化的实例直接进入登录页。
 
+首启仅创建平台管理员，不创建业务组织或用户。平台管理员登录后查看平台总览并管理组织和授权配置；业务用户从登录页自行注册，未分配组织时显示待授权页。管理员在“组织与成员”手工创建组织，搜索已注册用户并分配角色；用户重新登录进入自己的业务看板。平台管理员没有普通租户成员身份，不进入租户设备、遥测和告警详情。
+
 仓库服务名为 `iolinkd`；旧服务器文件若使用 `iolink`，手工恢复命令以 `docker compose config --services` 的实际名称为准。正常首启不需要运行恢复 CLI。
 
 `IOLINKD_IMAGE` 默认 `ghcr.io/autoconfig/iolink:latest`，`pull_policy: always` 在执行 `up` 时检查拉取镜像，不会在后台定时升级。需要更新时先备份数据库，显式停应用并迁移，再启动：
@@ -91,7 +93,7 @@ IOLINK_DB_IMAGE=timescale/timescaledb:latest-pg16 \
 把整个 `dist/iolink-offline` 目录复制到目标机。安装前准备仅本地可读的 setup JSON，例如：
 
 ```json
-{"platform_username":"platform","platform_password":"Platform-pass1!","tenant_username":"tenant","tenant_password":"Tenant-pass2@","tenant_name":"Default tenant"}
+{"platform_username":"platform","platform_password":"Platform-pass1!"}
 ```
 
 然后执行：

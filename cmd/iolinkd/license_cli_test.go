@@ -98,7 +98,7 @@ func TestSetupCLI_rollsBackAccountsAndReportsAuditFailure(t *testing.T) {
 			if _, err := p.Exec(ctx, fmt.Sprintf(`CREATE FUNCTION fail_setup_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='%s' THEN RAISE EXCEPTION 'audit unavailable'; END IF; RETURN NEW; END $$; CREATE TRIGGER fail_setup BEFORE INSERT ON audit_events FOR EACH ROW EXECUTE FUNCTION fail_setup_audit()`, action)); err != nil {
 				t.Fatal(err)
 			}
-			input := `{"platform_username":"platform","platform_password":"Platform-test-123","tenant_username":"owner","tenant_password":"Owner-test-456","tenant_name":"test-tenant"}`
+			input := `{"platform_username":"platform","platform_password":"Platform-test-123"}`
 			if action == "setup.init_rejected" {
 				input = `{}`
 			}

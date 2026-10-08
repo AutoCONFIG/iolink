@@ -14,9 +14,6 @@ import (
 type SetupInput struct {
 	PlatformUsername string `json:"platform_username"`
 	PlatformPassword string `json:"platform_password"`
-	TenantUsername   string `json:"tenant_username"`
-	TenantPassword   string `json:"tenant_password"`
-	TenantName       string `json:"tenant_name"`
 }
 
 type SetupStatus struct {
@@ -27,21 +24,14 @@ type SetupStatus struct {
 }
 
 func (s SetupInput) validate() error {
-	for name, value := range map[string]string{
-		"platform_username": s.PlatformUsername,
-		"tenant_username":   s.TenantUsername,
-		"tenant_name":       s.TenantName,
-	} {
+	for name, value := range map[string]string{"platform_username": s.PlatformUsername} {
 		if len(value) < 1 || len(value) > 64 || strings.TrimSpace(value) != value {
 			return fmt.Errorf("%s must be 1..64 characters without surrounding whitespace", name)
 		}
 	}
-	for name, value := range map[string]string{"platform_password": s.PlatformPassword, "tenant_password": s.TenantPassword} {
+	for name, value := range map[string]string{"platform_password": s.PlatformPassword} {
 		if err := validateSetupPassword(name, value); err != nil {
 			return err
-		}
-		if value == s.PlatformPassword && value == s.TenantPassword {
-			return errors.New("platform and tenant passwords must differ")
 		}
 	}
 	return nil
@@ -112,21 +102,11 @@ func SetupInit(ctx context.Context, pool *pgxpool.Pool, input SetupInput) (setup
 		return errors.New("system tenant unavailable; run migrations first")
 	}
 	adminHash := HashPassword(input.PlatformPassword)
-	tenantHash := HashPassword(input.TenantPassword)
-	var adminID, tenantUserID, tenantID int64
+	var adminID int64
 	if err := tx.QueryRow(ctx, `INSERT INTO users(open_id,username,password_hash,authority,nickname) VALUES('internal-setup-admin',$1,$2,'ADMIN','Platform administrator') RETURNING id`, input.PlatformUsername, adminHash).Scan(&adminID); err != nil {
 		return err
 	}
-	if err := tx.QueryRow(ctx, `INSERT INTO users(open_id,username,password_hash,authority,nickname) VALUES('internal-tenant-owner',$1,$2,'USER','Tenant owner') RETURNING id`, input.TenantUsername, tenantHash).Scan(&tenantUserID); err != nil {
-		return err
-	}
-	if err := tx.QueryRow(ctx, `INSERT INTO tenants(name) VALUES($1) RETURNING id`, input.TenantName).Scan(&tenantID); err != nil {
-		return err
-	}
-	if _, err := tx.Exec(ctx, `INSERT INTO tenant_memberships(tenant_id,user_id,role) VALUES($1,$2,'owner')`, tenantID, tenantUserID); err != nil {
-		return err
-	}
-	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id) VALUES($1,$2,'setup.initialized','user',$3),($1,$4,'setup.tenant_created','tenant',$5)`, systemTenantID, adminID, fmt.Sprint(adminID), tenantUserID, fmt.Sprint(tenantID)); err != nil {
+	if _, err := tx.Exec(ctx, `INSERT INTO audit_events(tenant_id,actor_id,action,resource_type,resource_id) VALUES($1,$2,'setup.initialized','user',$3)`, systemTenantID, adminID, fmt.Sprint(adminID)); err != nil {
 		return err
 	}
 	return tx.Commit(ctx)

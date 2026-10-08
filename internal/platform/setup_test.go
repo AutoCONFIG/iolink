@@ -19,9 +19,6 @@ func TestSetupInputValidatePasswordPolicy(t *testing.T) {
 			input := SetupInput{
 				PlatformUsername: "platform",
 				PlatformPassword: tt.password,
-				TenantUsername:   "tenant",
-				TenantPassword:   "Tenant-pass2@",
-				TenantName:       "Default tenant",
 			}
 			if gotErr := input.validate(); (gotErr != nil) != tt.wantErr {
 				t.Fatalf("validate() error = %v, wantErr %v", gotErr, tt.wantErr)
@@ -30,15 +27,11 @@ func TestSetupInputValidatePasswordPolicy(t *testing.T) {
 	}
 }
 
-func TestSetupInputValidateRequiresDistinctPasswords(t *testing.T) {
+func TestSetupInputRequiresPlatformUsername(t *testing.T) {
 	input := SetupInput{
-		PlatformUsername: "platform",
 		PlatformPassword: "same-password1!",
-		TenantUsername:   "tenant",
-		TenantPassword:   "same-password1!",
-		TenantName:       "Default tenant",
 	}
 	if err := input.validate(); err == nil {
-		t.Fatal("validate() accepted identical platform and tenant passwords")
+		t.Fatal("validate() accepted missing platform username")
 	}
 }
