@@ -9,7 +9,33 @@ export interface HistoryQuery { deviceNo: string; metric: string; range: History
 export interface LoginExchange { token: string; expires_in: number; user: MiniUser }
 export interface SubscriptionResult { decision: SubscriptionDecision; accepted: boolean }
 export interface PondSummary { id: number; name: string; farm_name?: string; latest?: Record<string, number | string | null> | null }
-export interface AlarmSummary { id: number; level: 'warning' | 'critical'; message: string; confirmed_at?: string | null }
+export type AlarmLevel = 'warning' | 'critical'
+export type WaterMetric = 'temperature' | 'dissolved_oxygen' | 'ph' | 'turbidity' | 'salinity'
+export interface WaterLatest {
+  device_no: string
+  pond_id: number
+  ts: string
+  temperature: number | null
+  dissolved_oxygen: number | null
+  ph: number | null
+  turbidity: number | null
+  salinity: number | null
+  signal: number | null
+  timestamps: Record<WaterMetric | 'signal', string | null>
+  report_interval: 60 | 300
+}
+export interface AlarmSummary {
+  id: number
+  device_no: string
+  pond_id: number
+  metric: WaterMetric
+  current_value: number
+  threshold: number
+  level: AlarmLevel
+  message: string
+  confirmed_at: string | null
+  created_at: string
+}
 export interface HistoryResponse { metric: string; unit?: string; points: Array<{ ts: string; value: number | null }> }
 export type ModelFieldType = 'number' | 'integer' | 'boolean' | 'string'
 export interface DeviceModelField { identifier: string; type: ModelFieldType; unit: string; minimum?: number | null; maximum?: number | null; enum_values?: string[] | null; readable: boolean; writable: boolean; nullable: boolean }
