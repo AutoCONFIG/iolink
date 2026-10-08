@@ -1,0 +1,7 @@
+=== RUN   TestReviewCanonicalOpenQueryRejectsInvalidUTF8
+    open_auth_test.go:70: invalid UTF-8 accepted as "x=%FF"
+--- FAIL: TestReviewCanonicalOpenQueryRejectsInvalidUTF8 (0.00s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	0.008s
+FAIL
+exit=1

@@ -1,0 +1,165 @@
+.venv/contracts/bin/python scripts/check_contracts.py
+docs/api/admin-openapi.yaml: standard schema and 44 operation fixtures PASS
+docs/api/license-openapi.yaml: standard schema and 3 operation fixtures PASS
+docs/api/open-openapi.yaml: standard schema and 5 operation fixtures PASS
+docs/api/openapi.yaml: standard schema and 15 operation fixtures PASS
+67 target operations, 334 synthetic request/response fixtures PASS; live handler verification is R02.c
+architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.03kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/alpine:3.20
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:24-alpine
+#3 ...
+
+#4 [internal] load metadata for docker.io/library/golang:1.26-alpine
+#4 DONE 1.6s
+
+#3 [internal] load metadata for docker.io/library/node:24-alpine
+#3 DONE 1.6s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 256B done
+#5 DONE 0.0s
+
+#6 [frontend 1/6] FROM docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
+#6 resolve docker.io/library/node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 0.1s done
+#6 DONE 0.1s
+
+#7 [stage-2 1/5] FROM docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc
+#7 resolve docker.io/library/alpine:3.20@sha256:d9e853e87e55526f6b2917df91a2115c36dd7c696a35be12163d44e6e2a4b6bc 0.1s done
+#7 DONE 0.1s
+
+#8 [internal] load build context
+#8 ...
+
+#9 [build 1/9] FROM docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c
+#9 resolve docker.io/library/golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c 0.1s done
+#9 DONE 0.1s
+
+#8 [internal] load build context
+#8 transferring context: 2.64MB 1.6s done
+#8 DONE 1.7s
+
+#10 [frontend 2/6] WORKDIR /web
+#10 CACHED
+
+#11 [frontend 3/6] COPY web/package.json web/package-lock.json ./
+#11 CACHED
+
+#12 [frontend 4/6] RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
+#12 CACHED
+
+#13 [build 2/9] WORKDIR /src
+#13 CACHED
+
+#14 [build 3/9] COPY go.mod go.sum ./
+#14 CACHED
+
+#15 [build 4/9] RUN --mount=type=cache,target=/go/pkg/mod go mod download
+#15 CACHED
+
+#16 [frontend 5/6] COPY web/ ./
+#16 DONE 0.2s
+
+#17 [frontend 6/6] RUN npm run build
+#17 2.446 
+#17 2.446 > iolink-admin-ui@0.1.0 build
+#17 2.446 > vue-tsc -b && vite build
+#17 2.446 
+#17 9.221 vite v7.3.6 building client environment for production...
+#17 9.297 transforming...
+#17 ...
+
+#18 [build 5/9] COPY . .
+#18 DONE 10.8s
+
+#17 [frontend 6/6] RUN npm run build
+#17 11.64 node_modules/zod/v4/core/util.js (400:0): A comment
+#17 11.64 
+#17 11.64 "// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+#17 11.64 
+#17 11.64 in "node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+#17 11.64 node_modules/zod/v4/core/regexes.js (74:0): A comment
+#17 11.64 
+#17 11.64 "/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+#17 11.64  * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+#17 11.64  * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+#17 11.64 
+#17 11.64 in "node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+#17 14.01 ✓ 1814 modules transformed.
+#17 14.28 rendering chunks...
+#17 14.62 computing gzip size...
+#17 14.65 dist/index.html                                                             0.47 kB │ gzip:   0.33 kB
+#17 14.65 dist/assets/ProductsView-DY-L-zJk.css                                       0.36 kB │ gzip:   0.23 kB
+#17 14.65 dist/assets/TenantsView-CthDnldy.css                                        0.43 kB │ gzip:   0.25 kB
+#17 14.65 dist/assets/SystemView-DXSp833N.css                                         0.43 kB │ gzip:   0.23 kB
+#17 14.65 dist/assets/index-D6CmpLJq.css                                            369.56 kB │ gzip:  50.66 kB
+#17 14.65 dist/assets/metrics-mFZmf0P5.js                                             0.47 kB │ gzip:   0.33 kB
+#17 14.65 dist/assets/MetricGrid.vue_vue_type_script_setup_true_lang-DO5ZOQlr.js      1.01 kB │ gzip:   0.61 kB
+#17 14.65 dist/assets/APIKeyAuditView-C9CzUfXM.js                                     1.27 kB │ gzip:   0.81 kB
+#17 14.65 dist/assets/LoginView-C_fLwHyP.js                                           2.59 kB │ gzip:   1.53 kB
+#17 14.65 dist/assets/AdminLayout-BWt9TD4M.js                                         2.88 kB │ gzip:   1.53 kB
+#17 14.65 dist/assets/DashboardView-CWJpuQ7P.js                                       4.23 kB │ gzip:   2.01 kB
+#17 14.65 dist/assets/TenantsView-7fPlWCrG.js                                         4.69 kB │ gzip:   2.21 kB
+#17 14.65 dist/assets/AlarmsView-XOY05W_s.js                                          4.69 kB │ gzip:   2.15 kB
+#17 14.65 dist/assets/RulesView-BtW6wJ5b.js                                           4.94 kB │ gzip:   2.02 kB
+#17 14.65 dist/assets/PondsView-D_-OmE7q.js                                           5.51 kB │ gzip:   2.26 kB
+#17 14.65 dist/assets/DevicesView-DqWxBQqt.js                                         5.85 kB │ gzip:   2.59 kB
+#17 14.65 dist/assets/ProductsView-C3Jlvr9s.js                                        6.50 kB │ gzip:   2.52 kB
+#17 14.65 dist/assets/SystemView-QNROLT06.js                                         10.37 kB │ gzip:   4.08 kB
+#17 14.65 dist/assets/index-DLLMvoUl.js                                           1,195.46 kB │ gzip: 391.27 kB
+#17 14.65 
+#17 14.65 (!) Some chunks are larger than 500 kB after minification. Consider:
+#17 14.65 - Using dynamic import() to code-split the application
+#17 14.65 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#17 14.65 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#17 14.65 ✓ built in 5.40s
+#17 14.76 npm notice
+#17 14.76 npm notice New major version of npm available! 11.19.0 -> 12.2.0
+#17 14.76 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#17 14.76 npm notice To update run: npm install -g npm@12.2.0
+#17 14.76 npm notice
+#17 DONE 14.8s
+
+#19 [build 6/9] COPY --from=frontend /web/dist ./web/dist
+#19 DONE 0.1s
+
+#20 [build 7/9] RUN sh scripts/embed-frontend.sh
+#20 DONE 0.2s
+
+#21 [build 8/9] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/iolinkd ./cmd/iolinkd
+#21 DONE 2.4s
+
+#22 [build 9/9] RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags="-s -w" -o /out/mqtt-sim ./cmd/mqtt-sim
+#22 DONE 0.4s
+
+#23 [stage-2 2/5] RUN apk add --no-cache ca-certificates tzdata wget
+#23 CACHED
+
+#24 [stage-2 3/5] WORKDIR /app
+#24 CACHED
+
+#25 [stage-2 4/5] COPY --from=build /out/iolinkd /app/iolinkd
+#25 DONE 0.1s
+
+#26 [stage-2 5/5] COPY --from=build /out/mqtt-sim /app/mqtt-sim
+#26 DONE 0.1s
+
+#27 exporting to image
+#27 exporting layers
+#27 exporting layers 0.7s done
+#27 exporting manifest sha256:aeb51406df83a9d4e20f8b488e4ed934e2200200ddc6d69e216ab36a8c4ecc93 0.0s done
+#27 exporting config sha256:cf67dc03509da4590ad189b3cc2714331d8779cc3d4b1c3b34bcce32a929b45f 0.0s done
+#27 exporting attestation manifest sha256:feb9f331ae3613e8b254ef73bb811085f4c08c67ca8c70f7547675735ec3caf3 0.0s done
+#27 exporting manifest list sha256:9964190ed12da00ce932cb65eea9587d253c3e601b7d9688bcd402ba95ba86cb 0.0s done
+#27 naming to docker.io/library/iolink:m6d-final3
+#27 naming to docker.io/library/iolink:m6d-final3 done
+#27 unpacking to docker.io/library/iolink:m6d-final3
+#27 unpacking to docker.io/library/iolink:m6d-final3 0.2s done
+#27 DONE 1.0s

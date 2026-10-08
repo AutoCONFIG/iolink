@@ -1,0 +1,103 @@
+
+> iolink-admin-ui@0.1.0 test
+> vitest run tests --run
+
+
+ RUN  v5.0.1 /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/web
+
+
+ Test Files  5 passed (5)
+      Tests  46 passed (46)
+   Start at  11:35:20
+   Duration  904ms (import 56%, transform 32%, worker 10%, tests 2%)
+
+
+> iolink-admin-ui@0.1.0 build
+> vue-tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+node_modules/zod/v4/core/util.js (400:0): A comment
+
+"// Wrapped in a `@__PURE__` IIFE: esbuild never tree-shakes a top-level initializer that contains a member access on `Number`, so the bare object literal survived into every bundle."
+
+in "node_modules/zod/v4/core/util.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+node_modules/zod/v4/core/regexes.js (74:0): A comment
+
+"/** Anchors a pattern source. The interpolation lives here rather than at the call site because
+ * esbuild will not drop a `@__PURE__` call whose own argument interpolates a variable, but it
+ * will drop `anchor(dateSource)`. Keeping it inline pinned `date` into every bundle. */"
+
+in "node_modules/zod/v4/core/regexes.js" contains an annotation that Rollup cannot interpret due to the position of the comment. The comment will be removed to avoid issues.
+✓ 1814 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                             0.47 kB │ gzip:   0.33 kB
+dist/assets/ProductsView-DY-L-zJk.css                                       0.36 kB │ gzip:   0.23 kB
+dist/assets/TenantsView-CthDnldy.css                                        0.43 kB │ gzip:   0.25 kB
+dist/assets/SystemView-DXSp833N.css                                         0.43 kB │ gzip:   0.23 kB
+dist/assets/index-D6CmpLJq.css                                            369.56 kB │ gzip:  50.66 kB
+dist/assets/metrics-mFZmf0P5.js                                             0.47 kB │ gzip:   0.33 kB
+dist/assets/MetricGrid.vue_vue_type_script_setup_true_lang-DO5ZOQlr.js      1.01 kB │ gzip:   0.61 kB
+dist/assets/APIKeyAuditView-C9CzUfXM.js                                     1.27 kB │ gzip:   0.81 kB
+dist/assets/LoginView-C_fLwHyP.js                                           2.59 kB │ gzip:   1.53 kB
+dist/assets/AdminLayout-BWt9TD4M.js                                         2.88 kB │ gzip:   1.53 kB
+dist/assets/DashboardView-CWJpuQ7P.js                                       4.23 kB │ gzip:   2.01 kB
+dist/assets/TenantsView-7fPlWCrG.js                                         4.69 kB │ gzip:   2.21 kB
+dist/assets/AlarmsView-XOY05W_s.js                                          4.69 kB │ gzip:   2.15 kB
+dist/assets/RulesView-BtW6wJ5b.js                                           4.94 kB │ gzip:   2.02 kB
+dist/assets/PondsView-D_-OmE7q.js                                           5.51 kB │ gzip:   2.26 kB
+dist/assets/DevicesView-DqWxBQqt.js                                         5.85 kB │ gzip:   2.59 kB
+dist/assets/ProductsView-C3Jlvr9s.js                                        6.50 kB │ gzip:   2.52 kB
+dist/assets/SystemView-QNROLT06.js                                         10.37 kB │ gzip:   4.08 kB
+dist/assets/index-DLLMvoUl.js                                           1,195.46 kB │ gzip: 391.27 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.43s
+
+> iolink-admin-ui@0.1.0 e2e
+> playwright test --reporter=line
+
+[WebServer] (node:2311492) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 17 tests using 4 workers
+
+(node:2311553) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:2311545) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:2311547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:2311546) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/17] e2e/admin-pages.spec.ts:9:1 › 所有管理页面在桌面和窄屏保持可用
+[2/17] e2e/m6d.spec.ts:10:1 › demo API Key form and audit navigation smoke
+[3/17] e2e/smoke.spec.ts:3:1 › 管理员可从登录进入运营总览
+[4/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：Asia/Shanghai › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37Z
+[5/17] e2e/smoke.spec.ts:15:1 › 主导航可进入设备管理
+[6/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：Asia/Shanghai › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z
+[7/17] e2e/support-expiry.spec.ts:43:5 › 支持到期：Asia/Shanghai › 上海时间显示、编辑、保存和重载保持同一瞬间
+[8/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37Z
+[9/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：UTC › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z
+[10/17] e2e/support-expiry.spec.ts:43:5 › 支持到期：UTC › 上海时间显示、编辑、保存和重载保持同一瞬间
+[11/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：America/New_York › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37Z
+[12/17] e2e/support-expiry.spec.ts:8:5 › 支持到期：America/New_York › 未编辑到期时间的重复保存保留 UTC 精度：2099-10-02T05:00:37.123Z
+[13/17] e2e/support-expiry.spec.ts:43:5 › 支持到期：America/New_York › 上海时间显示、编辑、保存和重载保持同一瞬间
+[14/17] e2e/admin-pages.spec.ts:32:1 › 创建、确认和改密流程显示可恢复状态
+[15/17] e2e/admin-pages.spec.ts:60:1 › 过期会话回到登录页并清理本地令牌
+[16/17] e2e/admin-pages.spec.ts:71:1 › 产品页可创建包含数值和枚举字段的版本并发布分配
+[17/17] e2e/admin-pages.spec.ts:101:1 › 组织成员角色变更、支持期限和停用状态可保存
+  17 passed (34.4s)

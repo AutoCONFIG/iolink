@@ -1,12 +1,12 @@
 # M6d / R41–R42 候选验收证据
 
-日期：2026-10-07（Asia/Shanghai）。本目录是最新记录；2026-10-05 及旧拒绝报告
+日期：2026-10-07，修订及复验2026-10-08（Asia/Shanghai）。本目录是最新记录；2026-10-05 及旧拒绝报告
 属于历史快照。双审 **pending**，尚不登记阶段完成。
 
 ## 冻结候选与环境
 
-- 测试源码：`21c3704197f89a91387084ed092af8e79c757eb2`。
-- web：`3c1d860e2cca0b6ed8207142f5506784f5fef452`。
+- 测试源码：`657807e195bcfc80b940706c58ad166a2de7a56f`。
+- web：`66c52624f6d97c9dd7fe29b05b64b3db39c4a72d`。
 - 基线：source `v0.0.9` / `9f46b6e549d36a6eac8c197acfbe64d2a91585a4`；
   web `0aa7771acf0ef6322c9ac1e4c9839616646bb675`。
 - Go 1.26.8、Node 24.21.0、Chrome Playwright、Linux amd64。
@@ -19,23 +19,23 @@
 
 ## 执行命令
 
-`final-2-go-verify.log` 对应上述候选；`final-06d2486-*` 的全库运行因新增浏览器
-重复提示定位失败，修正只涉及 live 测试等待，产品代码完全相同。
-同次契约、45个web单元测试、typecheck/build、17个默认浏览器回归、镜像构建通过；
-这些检查及镜像不依赖新增的 live 提示等待，继续适用。
+`final-3-*` 与 `865-followup-web.log` 对应上述候选。
+`final-2-go-verify.log` 对应旧21c3704；`final-06d2486-*` 的全库运行因浏览器
+重复提示定位失败。两者保留为旧快照历史，不认证新候选。
 `frozen-*` 对应旧 b4b9335/web207dcfa，
 该快照在 d82aa82 审阅中被拒绝，不能用于批准新候选。其他 logs 为调查历史。
 
 | 验证面 | 命令与证据 | 结果 |
 |---|---|---|
-| 全库构建/vet/竞态/乱序/真实 DB 与 UI | `GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated> IOLINK_M6D_BROWSER=1 make verify`；[日志](logs/final-2-go-verify.log) | passed |
+| 全库构建/vet/竞态/乱序/真实 DB 与 UI | `GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated> IOLINK_M6D_BROWSER=1 make verify`；[日志](logs/final-3-go-verify.log) | running |
 | 契约 | `make verify-contracts`；67 operations / 334 synthetic fixtures | passed |
 | 架构映射 | `python3 scripts/check_architecture_manifests.py --all` | passed |
-| web | `npm test --prefix web -- --run`、`npm run typecheck --prefix web`、`npm run build --prefix web`；45 unit tests；[日志](logs/review-fixes-final-web.log) | passed |
+| web | `npm test --prefix web -- --run`、`npm run build --prefix web`（含vue-tsc）；46 unit tests；[日志](logs/865-followup-web.log) | passed |
 | 既有管理浏览器回归 | `npm run e2e --prefix web -- --reporter=line`；17 scenarios，与真实管理单列 | passed |
-| 集成镜像 | `docker build -t iolink:m6d-06d2486 .` | passed |
+| 集成镜像 | `docker build -t iolink:m6d-final3 .` | passed |
 
-契约、架构、浏览器回归、容器连续输出见 [日志](logs/final-06d2486-contracts-web-docker.log)。
+契约、架构、容器输出见 [日志](logs/final-3-contracts-docker.log)。
+17个浏览器回归输出见 [日志](logs/865-followup-web.log)。
 `make docs-tools` 同日已执行，见 [日志](logs/candidate-contracts-web-docker.log)。
 合成契约不替代 handler 测试。保留既有 Rollup 注释/bundle 大小提示；
 不声称 Lighthouse 或远端 CI 已通过。
@@ -53,6 +53,8 @@
 | R42 body 上限 | 4 MiB 可认证，多 1 byte 在认证前 413，不接受未签名尾部 | `TestRoutesRejectOversizedBody` |
 | R42 replay/rate | 并发 nonce 仅一个成功；burst10 和 60/min refill；真实 429+正数 Retry-After | `TestM6dConcurrentNonceAndRateLimit`、`TestConsumeOpenRate*`、真实 signed HTTP |
 | R42 时间窗/配置 | 正确重签的 ±300/±301、零/负数/int64 极值/溢出差值；部署 30/min burst2 的初始化、轮换、补充和 HTTP Retry-After2；非法配置拒绝 | `TestM6dTimestampWindow*`、`TestConfiguredOpenRate*`、`TestM6dConfiguredRate*`、`TestOpenAPIRateConfig*` |
+| R42 限流重放/编码 | 429保留认证nonce且不消耗token，补充token后相同nonce401、新nonce200；UTF-8非法路径/查询拒绝 | `TestM6dThrottle_preservesNonceAndLeavesTokenUnconsumed`、`TestCanonicalOpen_rejectsInvalidUTF8` |
+| R41 错误/演示边界 | 内部错误500且无错误原文，输入错误400；演示存储Zod解析；刷新隐藏密钥、撤销及日志导航 | `TestAPIKeyError*`、真实管理浏览器、web unit/demo e2e |
 | R42 持久状态 | 新 Service 拒绝已用 nonce，读取共享 DB rate state | `TestM6dRestart_preservesConsumedNonceAndRateState`；不是进程崩溃恢复演练 |
 
 真实浏览器覆盖签发、刷新后 Secret 消失、轮换、撤销、日志导航；375/768/1440
@@ -85,11 +87,18 @@ gate 通道因平台内容审核中断，无最终结论，记录为 INCONCLUSIV
 浏览器回归新增逗号-only、混合空设备项、null/错误资源和外租户请求，截图重新生成；
 旧截图可在 d82aa82 的 Git 快照查看。
 
-镜像导出配置 digest：`sha256:04c78e0f12910b5297950b34f4986233a1a172a7a257bd420ed09da876d884ff`；
-本地镜像 manifest list ID：`sha256:c8890869080e5eb0b30ae6f3f85549aa291e573672b85d2d521e68dfeb8d2a87`。
-最终全库 core 竞态测试94.435s，真实管理浏览器在该次运行开启并通过。
-执行者已逐张打开本轮375/768/1440签发图和审计图，
-确认遮罩整个Secret提示及三条审计动作。窄屏表格使用内部横向滚动，
+## 865e9b2 审阅修复
+
+[代码报告](reviews/code-865e9b2.md)REQUEST_CHANGES，[gate报告](reviews/gate-865e9b2.md)
+APPROVE，两者同源865e9b2/web3c1d860；任一拒绝就不能发布。
+新修复保留429的nonce记录，同时纠正内部错误500、UTF-8校验、演示存储解析和
+演示行为测试；M5参数对象为非阻断建议，本轮保持接口。
+[red](logs/865-followup-red.log)实际复现三个失败，[green](logs/865-followup-green.log)
+覆盖真实HTTP429/重放及相关DB测试。独立批准记录按快照保存在[ledger](reviews/ledger.md)。
+
+镜像导出配置 digest：`sha256:cf67dc03509da4590ad189b3cc2714331d8779cc3d4b1c3b34bcce32a929b45f`；
+本地镜像 manifest list ID：`sha256:9964190ed12da00ce932cb65eea9587d253c3e601b7d9688bcd402ba95ba86cb`。
+最终全库执行仍在运行；截图待该轮生成后逐张核验。窄屏表格使用内部横向滚动，
 不代表全部列同时显示。
 冻结源码之后仅归档日志和更新 pending 文档；审阅候选中的产品代码必须与上述
 测试源码一致，最终完成登记也只允许修改证据和状态文档。

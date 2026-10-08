@@ -1,7 +1,7 @@
 # R41 M6d API Key acceptance
 
-Tested source: `21c3704197f89a91387084ed092af8e79c757eb2`.
-Web: `3c1d860e2cca0b6ed8207142f5506784f5fef452`.
+Tested source: `657807e195bcfc80b940706c58ad166a2de7a56f`.
+Web: `66c52624f6d97c9dd7fe29b05b64b3db39c4a72d`.
 
 Commands, environment, behavior matrix, red/green history, and screenshots:
 [M6d 2026-10-07](../../M6d/2026-10-07/README.md).

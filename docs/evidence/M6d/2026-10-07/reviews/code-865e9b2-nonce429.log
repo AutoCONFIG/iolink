@@ -1,0 +1,19 @@
+-test.shuffle 1791365183859062728
+=== RUN   TestReviewRateLimitedRequestDoesNotConsumeNonce
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /open/v1/ponds            --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /open/v1/ponds/:id        --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices          --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /open/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /open/v1/alarms           --> git.hyhy.fun/rsplab/iolink/internal/openapi.(*Server).listAlarms-fm (3 handlers)
+2026/10/07 17:26:24 WARN http request request_id=PZHNDBXIBBWXB6YTH6FFOQ5BCQ route=/open/v1/ponds method=GET status=429 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/07 17:26:24 INFO http request request_id=DY3HDQWQOS23EHRFECHDXQBZL3 route=/open/v1/ponds method=GET status=200 duration_ms=4 tenant_id=0 actor_id=0
+    m6d_persistence_http_test.go:112: rate-limited nonce was reusable, status=200
+--- FAIL: TestReviewRateLimitedRequestDoesNotConsumeNonce (0.43s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	0.464s
+FAIL
+exit=1
