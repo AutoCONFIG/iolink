@@ -35,3 +35,7 @@
 - 实际启动 Vite 与临时 HTTP backend（仅 `/setup/v1/status` fixture），经开发服务器 GET 返回 HTTP 200 `application/json` 和 `required=true`：PASS；用于确认代理不再返回 SPA HTML，不属于浏览器验收。
 - `make verify-contracts`：PASS，69 operations / 343 fixtures；`python3 scripts/check_architecture_manifests.py --all`：PASS，55 requirements。
 - 原始 Docker 日志保留尾部空白，提交空白检查为 NOTE；不宣称归档原始日志通过 `git show --check`。
+
+## 同候选双审
+
+根源码 `360bc8742ce9392c9cfdcd25f295050540f5fee7`，web `b340caedd038d1c80504aeffec8de7927b2871ba`。两位未参与实现的独立审阅者对同一候选明确 APPROVE，均无阻断项：[代码审阅](code-review.md)、[门审](gate-review.md)。各自独立复跑真实 DB、web、契约及实际 Vite 代理检查；初始拒绝不作为完成依据。归档收据和更新 IMPLEMENTED 不修改业务源码、测试、API 契约或 web gitlink。浏览器验收仍由用户进行。
