@@ -154,23 +154,26 @@ func (s *Server) UserRoutes() http.Handler {
 	r.Use(operations.RequestLogging(s.deps.Logger))
 
 	v1 := r.Group("/user/v1")
+	v1.POST("/login", s.userLogin)
 	s.mountAuthRoutes(v1, false)
 	s.mountTenantRoutes(v1, true)
 	return r
 }
 
 func (s *Server) mountAuthRoutes(v1 *gin.RouterGroup, platform bool) {
-	v1.POST("/login", s.login)
+	if platform {
+		v1.POST("/login", s.login)
+	}
 	v1.POST("/register", s.register)
 
 	auth := v1.Group("", s.authRequired)
 	{
-		auth.GET("/session", s.session)
-		auth.POST("/password", s.changePassword)
 		organizations := auth
 		if !platform {
 			organizations = auth.Group("", s.userAccountRequired)
 		}
+		organizations.GET("/session", s.session)
+		organizations.POST("/password", s.changePassword)
 		organizations.GET("/tenants", s.listTenants)
 		organizations.GET("/tenants/:id/members", s.listTenantMembers)
 		organizations.PUT("/tenants/:id/members/:user_id", s.setTenantMember)

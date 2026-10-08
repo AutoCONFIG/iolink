@@ -27,6 +27,10 @@ func (s *Server) login(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
+	if c.GetBool("user_login") && u.Authority == "ADMIN" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "business user required"})
+		return
+	}
 	if platform.IsLegacyPassword(*u.PasswordHash) {
 		_ = s.deps.Store.UpgradeAdminPassword(c.Request.Context(), u.ID, platform.HashPassword(req.Password))
 	}
@@ -69,6 +73,11 @@ func (s *Server) login(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"token": token, "expires_in": int(s.cfg.JWT.Seconds()), "platform_admin": u.Authority == "ADMIN"})
+}
+
+func (s *Server) userLogin(c *gin.Context) {
+	c.Set("user_login", true)
+	s.login(c)
 }
 
 func (s *Server) authRequired(c *gin.Context) {

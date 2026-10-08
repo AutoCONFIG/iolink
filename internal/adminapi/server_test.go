@@ -335,13 +335,13 @@ func TestUserRoutesSeparatePlatformEndpoints(t *testing.T) {
 func TestPlatformAdminCannotUseUserBusinessRoutes(t *testing.T) {
 	ts := newUserTestServerWithRole(t, "ADMIN", "")
 	defer ts.Close()
-	token := userLogin(t, ts)
-	for _, path := range []string{"/user/v1/tenants", "/user/v1/stats"} {
-		resp := authGet(t, ts, token, path)
-		resp.Body.Close()
-		if resp.StatusCode != http.StatusForbidden {
-			t.Fatalf("%s status=%d, want 403", path, resp.StatusCode)
-		}
+	resp, err := http.Post(ts.URL+"/user/v1/login", "application/json", strings.NewReader(`{"username":"admin","password":"admin123"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("user login status=%d, want 403", resp.StatusCode)
 	}
 }
 
