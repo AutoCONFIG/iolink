@@ -39,22 +39,27 @@ describe('M4 page boundary', () => {
   })
   it('uses typed API paths and rejects invalid login before transport', async () => {
     const paths: string[] = []
-    const api = new ApiClient(async <T>(path: string): Promise<T> => { paths.push(path); return { token: 't', expires_in: 60, user: { uid: 'u', assigned: false } } as T })
+    const api = new ApiClient(async (path: string): Promise<unknown> => {
+      paths.push(path)
+      if (path === '/v1/auth/login') return { token: 't', expires_in: 60, user: { id: 1, nickname: 'u' } }
+      if (path.startsWith('/v1/water/history')) return { metric: 'ph', unit: '', points: [] }
+      return undefined
+    })
     await expect(api.login('')).rejects.toThrow('不能为空')
     await api.login('wx-code')
     await api.history({ deviceNo: 'dev-1', metric: 'ph', range: '7d', maxPoints: 20 })
     await api.confirmAlarm(7)
-    expect(paths).toEqual(['/auth/login', '/water/history?device_no=dev-1&metric=ph&range=7d&max_points=20', '/alarms/7/confirm'])
+    expect(paths).toEqual(['/v1/auth/login', '/v1/water/history?device_no=dev-1&metric=ph&range=7d&max_points=20', '/v1/alarms/7/confirm'])
   })
   it('types latest responses and rejects blank device numbers before transport', async () => {
-    const api = new ApiClient(async <T>(): Promise<T> => ({ device_no: 'dev-1', pond_id: 2, ts: new Date(0).toISOString(), temperature: null, dissolved_oxygen: null, ph: 7, turbidity: null, salinity: null, signal: -60, timestamps: { temperature: null, dissolved_oxygen: null, ph: new Date(0).toISOString(), turbidity: null, salinity: null, signal: null }, report_interval: 60 } as T))
+    const api = new ApiClient(async () => ({ device_no: 'dev-1', pond_id: 2, ts: new Date(0).toISOString(), temperature: null, dissolved_oxygen: null, ph: 7, turbidity: null, salinity: null, signal: -60, timestamps: { temperature: null, dissolved_oxygen: null, ph: new Date(0).toISOString(), turbidity: null, salinity: null, signal: null }, report_interval: 60 }))
     await expect(api.latest('dev-1')).resolves.toMatchObject({ device_no: 'dev-1', ph: 7 })
     await expect(api.latest(' ')).rejects.toThrow('设备编号不能为空')
   })
   it('maps HTTP, malformed JSON, and empty 204 responses at the transport boundary', async () => {
     const response = (status: number, body: string) => new Response(status === 204 ? null : body, { status, headers: { 'content-type': 'application/json' } })
     let loginHeaders: Headers | undefined
-    await expect(createFetchRequest(async (_input, init) => { loginHeaders = new Headers(init?.headers); return response(401, '{"message":"expired"}') })('/alarms', { method: 'POST', body: JSON.stringify({ code: 'demo' }) })).rejects.toMatchObject({ status: 401, message: 'expired' })
+    await expect(createFetchRequest(async (_input, init) => { loginHeaders = new Headers(init?.headers); return response(401, '{"message":"expired"}') })('/v1/auth/login', { method: 'POST', body: JSON.stringify({ code: 'demo' }) })).rejects.toMatchObject({ status: 401, message: '登录已过期，请重新登录' })
     expect(loginHeaders?.get('Content-Type')).toBe('application/json')
     await expect(createFetchRequest(async () => response(200, '{'))('/alarms')).rejects.toMatchObject({ message: '服务响应格式错误' })
     await expect(createFetchRequest(async () => response(204, ''))('/alarms/1/confirm', { method: 'POST' })).resolves.toBeUndefined()

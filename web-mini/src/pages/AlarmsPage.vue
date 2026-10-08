@@ -25,6 +25,7 @@ async function load() {
 }
 
 async function confirmAlarm(alarm: AlarmSummary) {
+  if (confirming.value !== null) return
   confirming.value = alarm.id
   error.value = ''
   try {
@@ -39,7 +40,8 @@ async function requestSubscription() {
   error.value = ''
   try {
     if (!props.subscription) { subscriptionDecision.value = 'cancelled'; return }
-    const result = await props.subscription.request([props.templateId ?? 'alarm-template-demo'])
+    if (!props.templateId?.trim()) throw new Error('尚未配置微信订阅模板')
+    const result = await props.subscription.request([props.templateId])
     subscriptionDecision.value = result.decision
   } catch (cause) { error.value = cause instanceof Error ? cause.message : '订阅授权失败' }
   finally { subscriptionBusy.value = false }
@@ -59,7 +61,7 @@ onMounted(load)
     <ul v-else class="alarm-list" aria-live="polite">
       <li v-for="alarm in alarms" :key="alarm.id" :class="['alarm-item', `alarm-${alarm.level}`, { confirmed: alarm.confirmed_at }]">
         <div class="alarm-copy"><strong>{{ alarmLevelLabel(alarm.level) }} · {{ alarm.message }}</strong><small>{{ alarm.metric }} · 当前 {{ alarm.current_value }} · 阈值 {{ alarm.threshold }}</small><time :datetime="alarm.created_at">{{ new Date(alarm.created_at).toLocaleString() }}</time></div>
-        <button v-if="!alarm.confirmed_at" type="button" :disabled="confirming === alarm.id" @click="confirmAlarm(alarm)">{{ confirming === alarm.id ? '确认中…' : '确认报警' }}</button>
+        <button v-if="!alarm.confirmed_at" type="button" :disabled="confirming !== null" @click="confirmAlarm(alarm)">{{ confirming === alarm.id ? '确认中…' : '确认报警' }}</button>
         <span v-else class="confirmed-label">已确认</span>
       </li>
     </ul>
@@ -84,7 +86,7 @@ button { background: var(--mini-accent); border: 0; border-radius: 8px; color: #
 .error { color: var(--mini-danger); } .state { border: 1px dashed var(--mini-line); padding: 20px; text-align: center; }
 .alarm-list { display: grid; gap: 8px; list-style: none; margin: 0; padding: 0; }
 .alarm-item { align-items: center; border: 1px solid var(--mini-line); border-radius: 10px; display: flex; gap: 12px; justify-content: space-between; padding: 12px; }
-.alarm-item.alarm-critical { border-color: color-mix(in srgb, var(--mini-danger) 45%, var(--mini-line)); } .alarm-item.alarm-warning { border-color: color-mix(in srgb, var(--mini-warning) 45%, var(--mini-line)); }
+.alarm-item.alarm-critical { background: color-mix(in srgb, var(--mini-danger) 7%, white); } .alarm-item.alarm-warning { background: color-mix(in srgb, var(--mini-warning) 7%, white); }
 .alarm-item.confirmed { opacity: .7; } .alarm-copy { display: grid; gap: 4px; } .alarm-copy strong { color: var(--mini-ink); } .confirmed-label { color: var(--mini-muted); }
 .subscription { border-top: 1px solid var(--mini-line); display: grid; gap: 10px; padding-top: 16px; } .subscription-actions { display: flex; flex-wrap: wrap; gap: 8px; } .demo-note, .summary { font-size: .875rem; }
 @media (max-width: 560px) { .alarm-page { padding: 16px; } .alarm-header, .alarm-item { align-items: stretch; flex-direction: column; } .alarm-item button { align-self: flex-start; } }

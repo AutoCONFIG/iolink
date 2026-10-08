@@ -6,9 +6,9 @@ export type HistoryRange = 'today' | '7d' | '30d'
 export interface MiniUser { uid: string; nickname?: string; assigned: boolean }
 export interface MiniSession { token: string; expiresAt: number; user: MiniUser }
 export interface HistoryQuery { deviceNo: string; metric: string; range: HistoryRange; maxPoints: number }
-export interface LoginExchange { token: string; expires_in: number; user: MiniUser }
+export interface LoginExchange { token: string; expires_in: number; user: { id: number; nickname: string } }
 export interface SubscriptionResult { decision: SubscriptionDecision; accepted: boolean }
-export interface PondSummary { id: number; name: string; farm_name?: string; latest?: Record<string, number | string | null> | null }
+export interface PondSummary { pond_id: number; pond_name: string; status: 'normal' | 'warning' | 'critical'; device_count: number; latest: WaterLatest | null }
 export type AlarmLevel = 'warning' | 'critical'
 export type WaterMetric = 'temperature' | 'dissolved_oxygen' | 'ph' | 'turbidity' | 'salinity'
 export interface WaterLatest {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { ApiClient, createFetchRequest } from '../api'
 import type { DeviceModelLatest } from '../types'
 
 const deviceNo = ref('')
@@ -16,9 +17,7 @@ const load = async () => {
   try {
     const token = localStorage.getItem('iolink.mini.token')
     if (!token) throw new Error('请先登录')
-    const response = await fetch(`/api/v2/devices/${encodeURIComponent(deviceNo.value.trim())}/model/latest`, { headers: { Accept: 'application/json', Authorization: `Bearer ${token}` } })
-    if (!response.ok) throw new Error(response.status === 404 ? '设备不存在或无权访问' : '实时数据加载失败')
-    latest.value = await response.json() as DeviceModelLatest
+    latest.value = await new ApiClient(createFetchRequest()).modelLatest(deviceNo.value.trim())
   } catch (cause) { error.value = cause instanceof Error ? cause.message : '实时数据加载失败' }
   finally { loading.value = false }
 }
