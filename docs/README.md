@@ -19,6 +19,7 @@
 | [CONTRIBUTING.md](CONTRIBUTING.md) | 契约先行、测试与证据规范 |
 | [FEATURE-MATRIX.md](FEATURE-MATRIX.md)、[FEATURE-CHECKLIST.md](FEATURE-CHECKLIST.md) | 功能到Rxx的速查，不重复维护完成计数 |
 | [research/redis-cache-evaluation.md](research/redis-cache-evaluation.md) | Redis 类缓存的候选用途、故障语义与后续试点边界；仅调研，不代表已引入 |
+| [design/M7a-video.md](design/M7a-video.md)、[api/video-openapi.yaml](api/video-openapi.yaml)、[deploy/M7a-video.md](deploy/M7a-video.md) | 视频阶段实施前设计、接口、DDL与网络鉴权边界；状态仅见IMPLEMENTED，不代表视频已经实现 |
 | [PLAN-REVIEW-FINAL.md](PLAN-REVIEW-FINAL.md) | 当前修订版双审过程与结论 |
 | [PLAN-REVIEW-2026-09-19.md](PLAN-REVIEW-2026-09-19.md) | 初次双审未通过记录，行号对应原始commit，不随改文档重写历史 |
 

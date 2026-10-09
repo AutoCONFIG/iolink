@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 import yaml
 from openapi_spec_validator import validate
-from openapi_schema_validator import OAS30Validator
+from openapi_schema_validator import OAS30Validator, OAS30WriteValidator, OAS30ReadValidator
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,6 +25,10 @@ def resolve(value, doc):
 
 def fixture(schema):
     s = deepcopy(schema)
+    if 'example' in s:
+        return deepcopy(s['example'])
+    if 'oneOf' in s:
+        return fixture(s['oneOf'][0])
     if 'anyOf' in s:
         branch = s['anyOf'][0]
         s.setdefault('properties', {}).update(branch.get('properties', {}))
@@ -76,12 +80,12 @@ def main():
                         assert 'schema' in response.get('content', {}).get('application/json', {}), (route, method, status, 'missing error schema')
                 parameters = operation.get('parameters', [])
                 assert set(re.findall(r'{([^}]+)}', route)) == {p['name'] for p in parameters if p['in'] == 'path'}
-                containers = [operation['requestBody']] if 'requestBody' in operation else []
-                containers += list(operation['responses'].values())
-                for container in containers:
+                containers = [(operation['requestBody'], OAS30WriteValidator)] if 'requestBody' in operation else []
+                containers += [(response, OAS30ReadValidator) for response in operation['responses'].values()]
+                for container, validator in containers:
                     for media in container.get('content', {}).values():
                         schema = media['schema']
-                        OAS30Validator(schema, format_checker=OAS30Validator.FORMAT_CHECKER).validate(fixture(schema))
+                        validator(schema, format_checker=OAS30Validator.FORMAT_CHECKER).validate(fixture(schema))
                         samples += 1
         if 'RuleReq' in full['components']['schemas']:
             checker = OAS30Validator(full['components']['schemas']['RuleReq'])
@@ -106,7 +110,7 @@ def main():
             samples += 5
         counts.append(count)
         print(f'{path.relative_to(ROOT)}: standard schema and {count} operation fixtures PASS')
-    assert sorted(counts) == [2, 3, 5, 15, 49], counts
+    assert sorted(counts) == [2, 3, 5, 15, 22, 49], counts
     print(f'{sum(counts)} target operations, {samples} synthetic request/response fixtures PASS; live handler verification is R02.c')
 
 if __name__ == '__main__':

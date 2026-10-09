@@ -2,7 +2,7 @@
 
 ## TODO 总览（2026-10-08 核对）
 
-当前推进位置：**S5 首启平台/用户边界与双看板软件范围已闭环；主清单下一阶段为 TODO 11a / M7a 视频接入**。TODO 8 / M4 接口演示已经闭环；按用户范围，正式小程序由专人开发。
+当前推进位置：**S5/S6 平台与用户边界及接口分层已闭环，已发布 v0.0.14；正在推进 TODO 11a / M7a 视频接入契约设计**。TODO 8 / M4 接口演示已经闭环；按用户范围，正式小程序由专人开发。
 源码 `2b66812fd0d6e64609c1bc3fccbccccf71a4f99d` 已获两位独立审阅者同快照 APPROVE；[证据](evidence/M4/2026-10-08/README.md)覆盖 39 项测试、真实数据库后端和浏览器演示。发布快照 `036523d` 亦获同两位审阅者批准，已推送 `main` 与 `v0.0.11`，tag CI 镜像构建发布成功；[发布收据](evidence/M4/2026-10-08/release.md)。
 **主清单 20 项：13 项已完成已核验，剩 7 项（M7a、M7b、M8a–M8d、R55）**；补充对账与外部验收另列。
 M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、web `66c52624f6d97c9dd7fe29b05b64b3db39c4a72d` 的阶段证据保留。
@@ -37,7 +37,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | TODO 10b / M6b | 多租户、成员/RBAC、撤权与当前资源隔离 | 已完成已核验 | R36.a/R37.a；同候选 `0335438` 双审；[最终证据](evidence/acceptance/R37/2026-10-04-version-revocation/README.md)、[gate](evidence/rebuild/gates/M6b.json)；未来资源随其阶段另验 |
 | TODO 10c / M6c | License、配额/功能守卫、离线包与安装恢复 | 已完成已核验 | R38/R39.a/R40 软件范围；`8ad5505` 同快照双审、发布 v0.0.9；[证据](evidence/M6c/2026-10-05/README.md)；实际签发方/客户安装及 R39.b另列 |
 | **TODO 10d / M6d** | **开放 Key、签名、重放、限流与后台** | **已完成已核验** | R41–R42；源码 `81c842e`、web `66c5262`；真实 Timescale、竞态/乱序、契约、前端、浏览器、Docker 及 429/UTF-8/500 回归通过；代码与 gate 双审 APPROVE；[最新证据](evidence/M6d/2026-10-07/README.md) |
-| TODO 11a / M7a | RTSP/GB28181、媒体接入、播放鉴权及双端播放 | 待完成未调研 | R43；已有 [M7需求](EXTENSIONS.md)，未找到专项媒体接入/部署契约与阶段执行证据；需摄像机/GB参数/端口/微信真机 |
+| TODO 11a / M7a | RTSP/GB28181、媒体接入、播放鉴权及双端播放 | 正在进行 | R43；[专项设计](design/M7a-video.md)、[22操作契约](api/video-openapi.yaml)、[DDL提案](design/video-proposal.sql)、[部署附件](deploy/M7a-video.md)与[设计验证](evidence/M7a/2026-10-09/README.md)已形成；等待同快照独立双审，未开始视频生产实现；真实摄像机/GB网络/微信真机为external_blocked |
 | TODO 11b / M7b | 坐标/腾讯地图、双端定位与只读大屏 | 待完成未调研 | R44–R45；有设计，尚无阶段实施调研证据；需权限过滤、WGS84/GCJ-02对照、断网/无Key状态、20屏刷新性能 |
 | TODO 12a / M8a | 持久命令、回执、TTL、取消、幂等及周期调整 | 待完成未调研 | R46；有状态设计，待冻结命令接口和 worker/固件能力契约；模拟与真实硬件分别验收 |
 | TODO 12b / M8b | HTTP签名上报、TCP网关桥接、Modbus TCP/RTU、子设备 | 待完成未调研 | R47–R49；有范围设计，待设备/寄存器/桥接专项调查与协议契约；写操作依赖 M8a |
@@ -53,7 +53,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | 位置 | 内容 | 状态 | 下一步与依据 |
 |---|---|---|---|
 | S5 | 首启平台管理员、手工组织授权、平台/用户双看板 | 已完成已核验 | 根源码 `2c8a6a9` / web `1327ff1` 同快照两位独立审阅者 APPROVE，无阻断；首启只创建 ADMIN，不创建业务组织/USER/成员；用户注册后由平台管理员手工授权，看板按身份与资源权限分开。真实 Timescale、空成员契约回归、CLI 账号/密码、前端58测试与构建见[证据与双审](evidence/deployment/2026-10-08-platform-console/README.md)；浏览器由用户验收；License仍为实例级；非阻断严格JSON限制登记D18 |
-| S6 | 平台管理与业务用户 HTTP 接口分层 | 已完成已核验 | 最终快照 `2e7205d` 后的证据提交包含手工 QA 与独立门审 APPROVE：[`manual-qa.md`](evidence/deployment/2026-10-09-user-api-split/manual-qa.md)、[门审收据](../.omo/evidence/user-api-gate-review-bounded.md)。根路由新增 `/user/v1`，仅挂载普通登录/注册、当前组织、成员与租户业务资源；平台 License、平台统计、平台用户和组织生命周期仅挂载 `/admin/v1`，旧 `/admin/v1` 业务路径保留兼容。Web 业务请求使用 user client，平台请求使用 admin client；隔离 Timescale、Go race、前端 58 测试/类型检查/构建、契约检查均通过。浏览器视觉、微信、硬件、公网 TLS 仍按 external_blocked/用户验收记录 |
+| S6 | 平台管理与业务用户 HTTP 接口分层 | 已完成已核验 | 根快照 `2e7205d` / web `953335e` 获两位未参与编辑的独立审阅者 APPROVE：[代码审阅](evidence/deployment/2026-10-09-user-api-split/code-review.md)、[门审收据](evidence/deployment/2026-10-09-user-api-split/gate-review.md)，手工 QA 是额外证据。已发布 v0.0.14。根路由新增 `/user/v1`，仅挂载普通登录/注册、当前组织、成员与租户业务资源；平台 License、平台统计、平台用户和组织生命周期仅挂载 `/admin/v1`，旧 `/admin/v1` 业务路径保留兼容。Web 业务请求使用 user client，平台请求使用 admin client；隔离 Timescale、Go race、前端 58 测试/类型检查/构建、契约检查均通过。代码审阅的前端 session 测试置信度 MEDIUM 留待回归补强；浏览器视觉、微信、硬件、公网 TLS 仍按 external_blocked/用户验收记录 |
 | S1 | 服务器/开发两份 Compose、latest-pg16 | 已完成已核验 | 用户免双审；隔离构建/首启/重启通过；[证据](evidence/deployment/2026-10-03-compose/) |
 | S2 | JSON日志转储、轮转、关联ID、脱敏及健康状态 | 已完成已核验 | 双审都批准 `1bc74b8`，验证 source `e1b78e1`；[证据](evidence/deployment/2026-10-03-logging/README.md)、`code-review.md`及 `.omo/evidence/logging-gate-review.md`；下方旧“待双审”已过时 |
 | S4 | 空库自动建表、Web 首启初始化和业务 API 门禁 | 已完成已核验 | 根源码 `360bc87` / web `b340cae` 同候选两位独立审阅者 APPROVE；真实隔离 Timescale、并发/回滚/非法输入、Go 全库、契约、前端 52 测试/类型检查/构建及 Docker 首启通过，修订后实际 Vite 代理已核验；web 已推送远端；浏览器由用户验收；[证据与双审](evidence/deployment/2026-10-08-web-setup/README.md) |
@@ -74,7 +74,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | F3 | 最终完整软件/真实链路/前端及适用外部QA | 待完成未调研 | TODO 13，必须重新绑定最终版本，不能拼接不同版本的passed |
 | F4 | 最终范围、发布产物、手册与恢复流程一致性审计 | 待完成未调研 | TODO 13，和F1–F3汇总至R55；适用外部未通过不能称全部完成 |
 
-推荐下一步：完成 V1 历史证据对账，再进入 M7a。M4 接口演示与 M6d 软件阶段已完成；微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
+推荐下一步：通过 M7a 契约/DDL/部署设计双审，再实施视频领域/存储/API、媒体与GB链路；V1历史证据对账仍待闭环。微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
 
 附加部署里程碑：统一服务器 `deploy/docker-compose.yaml` 与源码构建覆盖
 `deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，并发布至 v0.0.6；用户明确免除该配置变更的双审。

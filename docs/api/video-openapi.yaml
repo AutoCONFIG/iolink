@@ -1,0 +1,744 @@
+openapi: 3.0.3
+info:
+  title: IoLink Video API
+  version: 1.0.0
+  description: |
+    M7a/R43 实施前契约，尚未实现。完整路径区分 user、mini 和 media。
+    user 使用业务 USER JWT，mini 使用现有 uid JWT；每次校验活跃租户和当前农场权限。
+    仅 owner/admin 可配置，其他合法业务成员可读/播放获授权农场；平台 ADMIN 无业务权限。
+    列表默认 limit=50，最大100；after_id 默认无。不存在/跨租户/无农场权限统一404。
+    License video 守卫用于配置、目录刷新、播放申请与worker启动，停止/读取可用。
+    详细状态、SSRF、撤权、事务、部署与外部验收见 docs/design/M7a-video.md。
+servers:
+  - url: https://localhost
+security:
+  - UserBearer: []
+paths:
+  /user/v1/cameras:
+    get:
+      operationId: listCameras
+      summary: 列当前授权农场摄像机
+      security: [{ UserBearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+        - { name: after_id, in: query, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CameraList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    post:
+      operationId: createCamera
+      summary: 配置摄像机（owner/admin）
+      security: [{ UserBearer: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CameraRequest' }
+      responses:
+        '201':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Camera' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /user/v1/cameras/{camera_id}:
+    get:
+      operationId: getCamera
+      summary: 摄像机脱敏详情
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: camera_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Camera' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    put:
+      operationId: replaceCamera
+      summary: 完整替换配置并撤销旧会话
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: camera_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CameraRequest' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Camera' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    delete:
+      operationId: disableCamera
+      summary: 停用摄像机并停止播放
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: camera_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      responses:
+        '204':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /user/v1/cameras/{camera_id}/playback-sessions:
+    post:
+      operationId: createPlayback
+      summary: 申请300秒播放会话
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: camera_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      responses:
+        '201':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlaybackGrant' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /user/v1/playback-sessions/{session_id}:
+    get:
+      operationId: getPlayback
+      summary: 查询自己的播放状态
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlaybackSession' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    delete:
+      operationId: stopPlayback
+      summary: 停止自己的会话，重复幂等
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '204':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /user/v1/gb-devices:
+    get:
+      operationId: listGBDevices
+      summary: 列本租户GB设备（owner/admin）
+      security: [{ UserBearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+        - { name: after_id, in: query, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GBDeviceList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    post:
+      operationId: createGBDevice
+      summary: 人工登记GB设备，不自动创建组织
+      security: [{ UserBearer: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GBDeviceRequest' }
+      responses:
+        '201':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GBDevice' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /user/v1/gb-devices/{device_id}:
+    get:
+      operationId: getGBDevice
+      summary: 设备脱敏注册状态（owner/admin）
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GBDevice' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    put:
+      operationId: replaceGBDevice
+      summary: 更换GB凭据并撤销注册/会话
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GBDeviceRequest' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GBDevice' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    delete:
+      operationId: disableGBDevice
+      summary: 停用设备，有启用camera绑定则409
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      responses:
+        '204':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /user/v1/gb-devices/{device_id}/catalog:
+    post:
+      operationId: refreshGBCatalog
+      summary: 持久刷新目录，复用未完成任务
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      responses:
+        '202':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CatalogJob' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /user/v1/gb-devices/{device_id}/channels:
+    get:
+      operationId: listGBChannels
+      summary: 列目录通道（owner/admin），不自动绑定
+      security: [{ UserBearer: [] }]
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+        - { name: after_channel_id, in: query, schema: { $ref: '#/components/schemas/GBID' } }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GBChannelList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/v1/cameras:
+    get:
+      operationId: miniListCameras
+      summary: mini列授权摄像机
+      security: [{ MiniBearer: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+        - { name: after_id, in: query, schema: { type: integer, format: int64, minimum: 1 } }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CameraList' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/v1/cameras/{camera_id}:
+    get:
+      operationId: miniGetCamera
+      summary: mini摄像机详情
+      security: [{ MiniBearer: [] }]
+      parameters:
+        - name: camera_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Camera' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/v1/cameras/{camera_id}/playback-sessions:
+    post:
+      operationId: miniCreatePlayback
+      summary: mini申请播放（真机能力另验）
+      security: [{ MiniBearer: [] }]
+      parameters:
+        - name: camera_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/ID' }
+      responses:
+        '201':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlaybackGrant' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/v1/playback-sessions/{session_id}:
+    get:
+      operationId: miniGetPlayback
+      summary: mini查询自己的会话
+      security: [{ MiniBearer: [] }]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PlaybackSession' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    delete:
+      operationId: miniStopPlayback
+      summary: mini停止自己的会话
+      security: [{ MiniBearer: [] }]
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '204':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /media/v1/{token}/{session_id}/index.m3u8:
+    get:
+      operationId: mediaManifest
+      summary: 逐请求鉴权并重写HLS，pending返回425
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/PlaybackToken' }
+        - name: session_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          headers:
+            Cache-Control: { schema: { type: string, enum: [no-store] } }
+            Referrer-Policy: { schema: { type: string, enum: [no-referrer] } }
+          content:
+            application/vnd.apple.mpegurl:
+              schema: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '425': { $ref: '#/components/responses/Pending' }
+        '502': { $ref: '#/components/responses/BadMedia' }
+  /media/v1/{token}/{session_id}/segments/{segment_id}:
+    get:
+      operationId: mediaSegment
+      summary: 限定session的H264/AAC TS段
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/PlaybackToken' }
+        - name: session_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+        - name: segment_id
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/UUID' }
+      responses:
+        '200':
+          description: 成功（创建会话仅表示已受理，不保证媒体ready）
+          headers:
+            Cache-Control: { schema: { type: string, enum: [no-store] } }
+            Referrer-Policy: { schema: { type: string, enum: [no-referrer] } }
+          content:
+            video/mp2t:
+              schema: { type: string, format: binary }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '429': { $ref: '#/components/responses/Limited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+        '425': { $ref: '#/components/responses/Pending' }
+        '502': { $ref: '#/components/responses/BadMedia' }
+components:
+  securitySchemes:
+    UserBearer: { type: http, scheme: bearer, bearerFormat: Business USER JWT }
+    MiniBearer: { type: http, scheme: bearer, bearerFormat: Mini uid JWT }
+  responses:
+    BadRequest:
+      description: 请求参数非法或非单JSON对象
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: 认证失败或播放token非法/过期
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: 动作权限/租户上下文/License不足，或会话已撤销
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: 不存在或跨租户/用户/农场无权
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: 标识冲突或资源仍被camera使用
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Limited:
+      description: session并发或速率上限，Retry-After秒数
+      headers:
+        Retry-After: { schema: { type: integer, minimum: 1 }, description: 重试等待秒数 }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    InternalError:
+      description: 内部错误，不泄露provider信息
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unavailable:
+      description: 数据库或必需provider/key/配置不可用
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Pending:
+      description: 媒体尚未就绪，Retry-After秒数
+      headers:
+        Retry-After: { schema: { type: integer, minimum: 1 }, description: 重试等待秒数 }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    BadMedia:
+      description: 来源失败或不安全/不支持的HLS
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    ID: { type: integer, format: int64, minimum: 1 }
+    UUID: { type: string, format: uuid, example: '8e64b082-fb25-4f17-9f01-ae29b98033e1' }
+    GBID: { type: string, pattern: '^[0-9]{20}$', example: '34020000001320000001' }
+    PlaybackToken: { type: string, minLength: 16, maxLength: 2048, pattern: '^[A-Za-z0-9_.-]+$', description: 仅播放grant签发的签名token，禁止记录 }
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code: { type: string, enum: [invalid_request, unauthorized, forbidden, not_found, conflict, rate_limited, internal_error, unavailable, media_pending, bad_media] }
+        message: { type: string, minLength: 1, maxLength: 128 }
+    CameraRequest:
+      type: object
+      additionalProperties: false
+      required: [name, pond_id, source]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 128 }
+        pond_id: { $ref: '#/components/schemas/ID' }
+        source:
+          oneOf:
+            - { $ref: '#/components/schemas/RTSPSource' }
+            - { $ref: '#/components/schemas/GBSource' }
+    RTSPSource:
+      type: object
+      additionalProperties: false
+      required: [kind, uri]
+      properties:
+        kind: { type: string, enum: [rtsp] }
+        uri: { type: string, minLength: 8, maxLength: 2048, pattern: '^rtsp://[^@?#]+$', example: 'rtsp://192.168.10.20:554/live', writeOnly: true, description: 还须运行时解析与SSRF允许列表检查 }
+        credentials:
+          type: object
+          additionalProperties: false
+          required: [username, password]
+          properties:
+            username: { type: string, minLength: 1, maxLength: 128, writeOnly: true }
+            password: { type: string, minLength: 1, maxLength: 128, writeOnly: true }
+    GBSource:
+      type: object
+      additionalProperties: false
+      required: [kind, device_id, channel_id]
+      properties:
+        kind: { type: string, enum: [gb28181] }
+        device_id: { $ref: '#/components/schemas/ID' }
+        channel_id: { $ref: '#/components/schemas/GBID' }
+    Camera:
+      type: object
+      additionalProperties: false
+      required: [id, pond_id, name, source_kind, source_version, status]
+      properties:
+        id: { $ref: '#/components/schemas/ID' }
+        pond_id: { $ref: '#/components/schemas/ID' }
+        name: { type: string, minLength: 1, maxLength: 128 }
+        source_kind: { type: string, enum: [rtsp, gb28181] }
+        source_version: { type: integer, minimum: 1 }
+        gb_device_id: { $ref: '#/components/schemas/ID' }
+        gb_channel_id: { $ref: '#/components/schemas/GBID' }
+        status: { type: string, enum: [offline, connecting, ready, failed] }
+        error_code: { $ref: '#/components/schemas/SourceError' }
+    SourceError:
+      type: string
+      enum: [source_unreachable, unsupported_codec, provider_unavailable, registration_expired, catalog_stale]
+    CameraList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items: { type: array, maxItems: 100, items: { $ref: '#/components/schemas/Camera' } }
+        next_after_id: { $ref: '#/components/schemas/ID' }
+    GBDeviceRequest:
+      type: object
+      additionalProperties: false
+      required: [name, device_id, password]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 128 }
+        device_id: { $ref: '#/components/schemas/GBID' }
+        password: { type: string, minLength: 16, maxLength: 128, writeOnly: true }
+    GBDevice:
+      type: object
+      additionalProperties: false
+      required: [id, device_id, name, registration_state, catalog_state]
+      properties:
+        id: { $ref: '#/components/schemas/ID' }
+        device_id: { $ref: '#/components/schemas/GBID' }
+        name: { type: string, minLength: 1, maxLength: 128 }
+        registration_state: { type: string, enum: [offline, registered] }
+        catalog_state: { type: string, enum: [empty, refreshing, ready, stale, failed] }
+    GBDeviceList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items: { type: array, maxItems: 100, items: { $ref: '#/components/schemas/GBDevice' } }
+        next_after_id: { $ref: '#/components/schemas/ID' }
+    GBChannel:
+      type: object
+      additionalProperties: false
+      required: [channel_id, name, online, present]
+      properties:
+        channel_id: { $ref: '#/components/schemas/GBID' }
+        name: { type: string, minLength: 1, maxLength: 128 }
+        online: { type: boolean }
+        present: { type: boolean }
+    GBChannelList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items: { type: array, maxItems: 100, items: { $ref: '#/components/schemas/GBChannel' } }
+        next_after_channel_id: { $ref: '#/components/schemas/GBID' }
+    CatalogJob:
+      type: object
+      additionalProperties: false
+      required: [job_id]
+      properties:
+        job_id: { $ref: '#/components/schemas/ID' }
+    PlaybackSession:
+      type: object
+      additionalProperties: false
+      required: [id, camera_id, state, expires_at]
+      properties:
+        id: { $ref: '#/components/schemas/UUID' }
+        camera_id: { $ref: '#/components/schemas/ID' }
+        state: { type: string, enum: [pending, ready, failed, revoked, expired] }
+        expires_at: { type: string, format: date-time }
+        error_code: { $ref: '#/components/schemas/SourceError' }
+    PlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [session, manifest_url]
+      properties:
+        session: { $ref: '#/components/schemas/PlaybackSession' }
+        manifest_url: { type: string, format: uri, pattern: '^https://', example: 'https://example.test/media/v1/token/session/index.m3u8', description: 含敏感token，仅组件内存保存 }
