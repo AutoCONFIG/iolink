@@ -37,10 +37,6 @@ func (s *Server) productCatalog(c *gin.Context) (ProductCatalog, int64, bool) {
 }
 
 func (s *Server) listProducts(c *gin.Context) {
-	if role := domain.TenantRole(c.Request.Context()); role != "owner" && role != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "tenant admin required"})
-		return
-	}
 	catalog, tenant, ok := s.productCatalog(c)
 	if !ok {
 		return
@@ -98,10 +94,6 @@ func parseProductIDs(c *gin.Context) (int64, int, bool) {
 }
 
 func (s *Server) listProductModels(c *gin.Context) {
-	if role := domain.TenantRole(c.Request.Context()); role != "owner" && role != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "tenant admin required"})
-		return
-	}
 	catalog, tenant, ok := s.productCatalog(c)
 	if !ok {
 		return

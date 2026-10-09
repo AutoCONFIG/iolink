@@ -36,6 +36,35 @@ type fakeStore struct {
 	restoreErr       error
 }
 
+type fakeProductCatalog struct{}
+
+func (fakeProductCatalog) DefaultTenantID(context.Context) (int64, error) { return 7, nil }
+func (fakeProductCatalog) CreateProduct(context.Context, int64, string) (domain.Product, error) {
+	return domain.Product{ID: 1, TenantID: 7, Name: "water-quality"}, nil
+}
+func (fakeProductCatalog) ListProducts(context.Context, int64) ([]domain.Product, error) {
+	return []domain.Product{{ID: 1, TenantID: 7, Name: "water-quality"}}, nil
+}
+func (fakeProductCatalog) CreateProductModel(context.Context, int64, int64, int, []domain.ModelField) (domain.ProductModel, error) {
+	return domain.ProductModel{ID: 1, ProductID: 1, Version: 1}, nil
+}
+func (fakeProductCatalog) ListProductModels(context.Context, int64, int64) ([]domain.ProductModel, error) {
+	return []domain.ProductModel{{ID: 1, ProductID: 1, Version: 1}}, nil
+}
+func (fakeProductCatalog) PublishProductModel(context.Context, int64, int64, int) error { return nil }
+func (fakeProductCatalog) GetProductModel(context.Context, int64, int64, int) (domain.ProductModel, error) {
+	return domain.ProductModel{ID: 1, ProductID: 1, Version: 1}, nil
+}
+func (fakeProductCatalog) AssignDeviceProduct(context.Context, int64, string, int64, int) error {
+	return nil
+}
+func (fakeProductCatalog) AssignDeviceProductByActor(context.Context, int64, string, int64, int, int64) error {
+	return nil
+}
+func (fakeProductCatalog) DeviceAssignment(context.Context, int64, string) (domain.ProductModel, error) {
+	return domain.ProductModel{ID: 1, ProductID: 1, Version: 1}, nil
+}
+
 func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.User, error) {
 	if f.admin != nil && *f.admin.Username == login {
 		return f.admin, nil
@@ -242,7 +271,7 @@ func newUserTestServerWithRole(t *testing.T, authority, tenantRole string) *http
 		devices:    map[string]domain.Device{},
 		rules:      map[int64]domain.AlarmRule{},
 		stats:      domain.Stats{DevicesTotal: 3, Online: 2, Offline: 1, OpenAlarms: 4},
-	}, Policy: policy})
+	}, Catalog: fakeProductCatalog{}, Policy: policy})
 	return httptest.NewServer(s.UserRoutes())
 }
 
@@ -329,6 +358,33 @@ func TestUserRoutesSeparatePlatformEndpoints(t *testing.T) {
 		if resp.StatusCode != http.StatusNotFound {
 			t.Fatalf("%s status=%d, want 404", path, resp.StatusCode)
 		}
+	}
+}
+
+func TestMemberCanReadProductsButCannotWrite(t *testing.T) {
+	ts := newUserTestServerWithRole(t, "USER", "member")
+	defer ts.Close()
+	token := userLogin(t, ts)
+	for _, path := range []string{"/user/v1/products", "/user/v1/products/1/models"} {
+		resp := authGet(t, ts, token, path)
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("%s status=%d, want 200", path, resp.StatusCode)
+		}
+	}
+	req, err := http.NewRequest(http.MethodPost, ts.URL+"/user/v1/products", strings.NewReader(`{"name":"new-product"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusForbidden {
+		t.Fatalf("product write status=%d, want 403", resp.StatusCode)
 	}
 }
 
