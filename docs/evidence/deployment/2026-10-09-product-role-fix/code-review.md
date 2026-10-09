@@ -75,4 +75,3 @@ git -C web diff --check 953335e..03b4286                  PASS
 ```
 
 No implementation files were edited during this review.
-
