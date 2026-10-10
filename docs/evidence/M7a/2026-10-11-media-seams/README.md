@@ -8,7 +8,7 @@ This increment adds provider-neutral application seams while the video capabilit
 - `internal/playback/service.go` implements `RequestPlayback`, `ReadPlayback`, `StopPlayback`, `AuthorizeMedia`, and `ProcessMediaJob` orchestration.
 - `internal/playback/service_test.go` exercises the required lifecycle and failure contracts with fakes only.
 
-The service rejects requests when `Enabled` is false, when provider/license capability is absent, or when actor context is missing. `CreatePlayback` is required to perform the atomic session plus start-job write and to recheck source version. `FinishJob` is required to CAS lease token, source version, and session validity. The store owns live membership and owner checks; media authorization receives only a SHA-256 token hash and claims.
+The service rejects playback-management requests when `Enabled` is false, when provider/license capability is absent, or when actor context is missing. The media manifest/segment authorization seam intentionally accepts only the dedicated token context because its contract has `security: []`; it still verifies audience, claims, session live state, and the SHA-256 token hash. `CreatePlayback` is required to perform the atomic session plus start-job write and to recheck source version. `FinishJob` is required to CAS lease token, source version, and session validity. The store owns live membership and owner checks.
 
 ## Evidence
 
@@ -21,13 +21,15 @@ The service rejects requests when `Enabled` is false, when provider/license capa
 | Missing token issuer fail-closed | `go test -race -shuffle=on -count=1 ./internal/media ./internal/playback && go vet ./internal/media ./internal/playback` | `TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing` returns `ErrUnavailable` and confirms no session insertion; commit `4bf9a27` | [token-issuer-guard.log](token-issuer-guard.log) |
 | Token gateway authorization | same command | audience validation, token hash handoff, and pending state are exercised; pending returns `ErrPending` | [targeted-race.log](targeted-race.log) |
 | Job lease/CAS/unknown semantics | same command | provider unknown is persisted as `unknown` with the lease token; CAS lease loss returns `ErrLeaseLost` without replay | [targeted-race.log](targeted-race.log) |
+| Media gateway without business actor | `go test -race -shuffle=on -count=1 ./internal/playback ./internal/media` | `AuthorizeMedia` accepts `context.Background()` for the token-only `security: []` media path while invalid token and revoked-session cases remain rejected | [media-gateway-zlm-review.log](media-gateway-zlm-review.log) |
+| ZLMediaKit patch application gate | `sh deploy/zlm-secure-build/build-probe.sh` | required patch is applied and reverse-checked; unapplied, dirty, and unapproved inputs are rejected before fetch/build | [media-gateway-zlm-review.log](media-gateway-zlm-review.log) |
 | Static checks | `go vet ./internal/media ./internal/playback` | exit status 0 | [targeted-race.log](targeted-race.log) |
 | Full Go package regression | `go test ./...` | exit status 0; all packages pass, including `internal/media/zlm` and `internal/playback` | [full-test.log](full-test.log) |
 | Repository verification | `make verify` | exit status 0; build, vet, race/shuffle package checks pass | [full-verify.log](full-verify.log) |
 
 ## Final candidate
 
-The current implementation candidate is commit `4bf9a278e081f567e805b83028c0f0bb1720b695` (`fix: fail closed when media token issuer is unavailable`). The nil token issuer guard and regression test were verified by the targeted race/vet command and by `make verify`; the full receipts are in [token-issuer-guard.log](token-issuer-guard.log). This README is a documentation draft for the root agent's later docs commit.
+The current implementation candidate is commit `078009a88aa7d6d6e5621bae72ab3ff179baabcc` (`fix: align media gateway and zlm patch checks`). It includes the nil token issuer guard, token-only media gateway boundary, and fail-closed ZLM patch application gate. The targeted and full receipts are in [token-issuer-guard.log](token-issuer-guard.log) and [media-gateway-zlm-review.log](media-gateway-zlm-review.log). Independent code and gate approval is still required for this exact snapshot.
 
 ## Limits
 

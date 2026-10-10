@@ -1,0 +1,19 @@
+M7a media gateway and ZLMediaKit patch gate verification (2026-10-11).
+
+Command: go test -race -shuffle=on -count=1 ./internal/playback ./internal/media
+Output:
+ok   git.hyhy.fun/rsplab/iolink/internal/playback 1.011s
+?    git.hyhy.fun/rsplab/iolink/internal/media [no test files]
+
+Command: go vet ./internal/playback ./internal/media
+Output: exit 0 (no diagnostics)
+
+Command: sh deploy/zlm-secure-build/build-probe.sh
+Output:
+zlm build probe: approved patch applied and reverse-checked; unapplied, dirty, and unapproved inputs rejected before build/fetch.
+
+Command: make verify
+Exit: 0
+Observed output included go build ./..., go vet ./..., go test -race -shuffle=on ./... -count=1, and passing internal/playback, internal/media/zlm, internal/license, and internal/wechat packages.
+
+Judgment: AuthorizeMedia accepts context.Background for the security: [] media gateway and still fails closed on token verification, audience/claims, disabled capability, and revoked session state. build.sh rejects dirty source trees, validates every required patch with git apply --check, applies it, reverse-checks the applied patch, then continues to build; the probe exercises approved success plus unapplied, dirty, and unapproved failures before fetch/build.
