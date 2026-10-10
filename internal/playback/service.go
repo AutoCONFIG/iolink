@@ -245,7 +245,7 @@ func (s *Service) ReadManifest(ctx context.Context, rawToken, sessionID string) 
 	if len(manifest) == 0 || len(manifest) > media.MaxManifestBytes {
 		return nil, ErrBadMedia
 	}
-	return s.rewriteManifest(ctx, access, rawToken, manifest)
+	return s.rewriteManifest(fetchCtx, access, rawToken, manifest)
 }
 
 func (s *Service) ReadSegment(ctx context.Context, rawToken, sessionID, segmentID string) ([]byte, error) {
@@ -259,19 +259,19 @@ func (s *Service) ReadSegment(ctx context.Context, rawToken, sessionID, segmentI
 	if s.cfg.Segments == nil || s.cfg.Mappings == nil || segmentID == "" {
 		return nil, ErrUnavailable
 	}
-	mapping, err := s.cfg.Mappings.ResolveSegmentMapping(ctx, sessionID, segmentID)
-	if err != nil {
-		return nil, normalizeMediaStoreError(err)
-	}
-	if mapping.ID != segmentID || mapping.SessionID != sessionID || mapping.StreamID != access.StreamID || mapping.SourceVersion != access.SourceVersion || !validSegmentPath(mapping.Path) {
-		return nil, ErrNotFound
-	}
 	timeout := s.cfg.SegmentTimeout
 	if timeout <= 0 {
 		timeout = 10 * time.Second
 	}
 	fetchCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
+	mapping, err := s.cfg.Mappings.ResolveSegmentMapping(fetchCtx, sessionID, segmentID)
+	if err != nil {
+		return nil, normalizeMediaStoreError(err)
+	}
+	if mapping.ID != segmentID || mapping.SessionID != sessionID || mapping.StreamID != access.StreamID || mapping.SourceVersion != access.SourceVersion || !validSegmentPath(mapping.Path) {
+		return nil, ErrNotFound
+	}
 	segment, err := s.cfg.Segments.FetchSegment(fetchCtx, access, mapping.Path)
 	if err != nil {
 		return nil, normalizeMediaSourceError(err)
