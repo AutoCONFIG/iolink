@@ -13,6 +13,7 @@ var (
 	ErrUnknownDevice        = errors.New("unknown GB device")
 	ErrPeerNotAllowed       = errors.New("GB peer not allowed")
 	ErrPeerConflict         = errors.New("GB peer already registered")
+	ErrPeerNotFound         = errors.New("GB peer registration not found")
 	ErrDigestRequired       = errors.New("GB digest required")
 	ErrDigestInvalid        = errors.New("invalid GB digest")
 	ErrNonceInvalid         = errors.New("invalid GB nonce")
@@ -139,12 +140,13 @@ type RegisterResult struct {
 }
 
 type Service struct {
-	Devices       DeviceStore
-	Nonces        NonceStore
-	Clock         Clock
-	Transport     Transport
-	transactionMu sync.Mutex
-	transactions  map[string]transactionResult
+	Devices        DeviceStore
+	Nonces         NonceStore
+	Clock          Clock
+	Transport      Transport
+	transactionMu  sync.Mutex
+	registrationMu sync.Mutex
+	transactions   map[string]transactionResult
 }
 
 type transactionResult struct {
@@ -176,8 +178,12 @@ func (s *Service) HandleMessage(ctx context.Context, source netip.AddrPort, raw 
 	if err != nil || registration.DeviceID != message.DeviceID {
 		return MessageResult{}, ErrUnknownDevice
 	}
+	now := s.Clock.Now()
+	if registration.StatusAt(now) != RegistrationOnline {
+		return MessageResult{}, ErrUnknownDevice
+	}
 	if message.CmdType == "Keepalive" {
-		if err := s.Devices.MarkKeepalive(ctx, message.DeviceID, source, s.Clock.Now(), message.Status); err != nil {
+		if err := s.Devices.MarkKeepalive(ctx, message.DeviceID, source, now, message.Status); err != nil {
 			return MessageResult{}, ErrUnknownDevice
 		}
 		status := RegistrationOffline
@@ -186,12 +192,15 @@ func (s *Service) HandleMessage(ctx context.Context, source netip.AddrPort, raw 
 		}
 		return MessageResult{Message: message, Status: status}, nil
 	}
-	return MessageResult{Message: message, Status: registration.StatusAt(s.Clock.Now())}, nil
+	return MessageResult{Message: message, Status: registration.StatusAt(now)}, nil
 }
 
 func (s *Service) HandleSIPMessage(ctx context.Context, method string, source netip.AddrPort, raw []byte) (MessageResult, error) {
 	if method != "MESSAGE" {
 		return MessageResult{}, ErrInvalidRequest
+	}
+	if len(raw) > MaxSIPMessageSize {
+		return MessageResult{}, ErrXMLTooLarge
 	}
 	return s.HandleMessage(ctx, source, raw)
 }

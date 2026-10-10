@@ -103,13 +103,9 @@ func (s *Service) HandleRegister(ctx context.Context, req RegisterRequest) (Regi
 		return RegisterResult{}, err
 	}
 	if req.Expires != 0 {
-		peerReg, lookupErr := s.Devices.LookupPeer(ctx, req.Source)
-		if lookupErr == nil && peerReg.DeviceID != "" && peerReg.DeviceID != req.DeviceID {
-			return RegisterResult{}, ErrRegistrationConflict
-		}
 		now := s.Clock.Now()
 		reg := Registration{DeviceID: req.DeviceID, Peer: req.Source, RegisteredAt: now, LastSeenAt: now, ExpiresAt: now.Add(ttl), Status: RegistrationOnline}
-		if err := s.Devices.ApplyRegistration(ctx, reg); err != nil {
+		if err := s.applyRegistration(ctx, req.Source, req.DeviceID, reg); err != nil {
 			return RegisterResult{}, ErrRegistrationConflict
 		}
 		result := RegisterResult{StatusCode: 200, Registration: reg}
@@ -118,12 +114,28 @@ func (s *Service) HandleRegister(ctx context.Context, req RegisterRequest) (Regi
 	}
 	now := s.Clock.Now()
 	reg := Registration{DeviceID: req.DeviceID, Peer: req.Source, RegisteredAt: now, LastSeenAt: now, Status: RegistrationOffline}
-	if err := s.Devices.ApplyRegistration(ctx, reg); err != nil {
+	if err := s.applyRegistration(ctx, req.Source, req.DeviceID, reg); err != nil {
 		return RegisterResult{}, ErrRegistrationConflict
 	}
 	result := RegisterResult{StatusCode: 200, Registration: reg}
 	s.rememberTransaction(req.TransactionID, req.Source, req.DeviceID, result)
 	return result, nil
+}
+
+func (s *Service) applyRegistration(ctx context.Context, source netip.AddrPort, deviceID string, registration Registration) error {
+	s.registrationMu.Lock()
+	defer s.registrationMu.Unlock()
+	peerReg, lookupErr := s.Devices.LookupPeer(ctx, source)
+	if lookupErr != nil && !errors.Is(lookupErr, ErrPeerNotFound) && !errors.Is(lookupErr, ErrUnknownDevice) {
+		return ErrRegistrationConflict
+	}
+	if lookupErr == nil && peerReg.DeviceID != "" && peerReg.DeviceID != deviceID {
+		return ErrRegistrationConflict
+	}
+	if err := s.Devices.ApplyRegistration(ctx, registration); err != nil {
+		return ErrRegistrationConflict
+	}
+	return nil
 }
 
 func (s *Service) transaction(id string, source netip.AddrPort, deviceID string) (RegisterResult, bool) {

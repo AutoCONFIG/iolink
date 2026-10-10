@@ -47,6 +47,7 @@ func (n *testNonceStore) Consume(_ context.Context, value string, now time.Time)
 type testDeviceStore struct {
 	device     RegisteredDevice
 	peer       *Registration
+	peerErr    error
 	applied    []Registration
 	markStatus string
 }
@@ -58,10 +59,13 @@ func (d *testDeviceStore) LookupDevice(_ context.Context, id string) (Registered
 	return d.device, nil
 }
 func (d *testDeviceStore) LookupPeer(_ context.Context, p netip.AddrPort) (Registration, error) {
+	if d.peerErr != nil {
+		return Registration{}, d.peerErr
+	}
 	if d.peer != nil && d.peer.Peer == p {
 		return *d.peer, nil
 	}
-	return Registration{}, ErrUnknownDevice
+	return Registration{}, ErrPeerNotFound
 }
 func (d *testDeviceStore) ApplyRegistration(_ context.Context, r Registration) error {
 	d.applied = append(d.applied, r)
@@ -206,6 +210,26 @@ func TestRegisterExpiresBoundariesAndConflict(t *testing.T) {
 	if _, err := s.HandleRegister(context.Background(), req); !errors.Is(err, ErrRegistrationConflict) {
 		t.Fatalf("conflict=%v", err)
 	}
+	req.Expires = 0
+	if _, err := s.Challenge(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+	req.Authorization = ptrDigest(digestFor(req, "nonce-4", "secret", false))
+	if _, err := s.HandleRegister(context.Background(), req); !errors.Is(err, ErrRegistrationConflict) {
+		t.Fatalf("unregister conflict=%v", err)
+	}
+}
+
+func TestRegisterFailsClosedOnPeerLookupError(t *testing.T) {
+	s, store, _, _, req := testService()
+	store.peerErr = errors.New("store unavailable")
+	if _, err := s.Challenge(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+	req.Authorization = ptrDigest(digestFor(req, "nonce-1", "secret", false))
+	if _, err := s.HandleRegister(context.Background(), req); !errors.Is(err, ErrRegistrationConflict) {
+		t.Fatalf("lookup error=%v", err)
+	}
 }
 
 func TestRegistrationStatusExpiresAndKeepaliveThreshold(t *testing.T) {
@@ -246,6 +270,28 @@ func TestHandleKeepaliveRequiresRegisteredPeer(t *testing.T) {
 	bad = netip.AddrPortFrom(netip.MustParseAddr("192.0.2.11"), bad.Port())
 	if _, err := s.HandleMessage(context.Background(), bad, raw); !errors.Is(err, ErrUnknownDevice) {
 		t.Fatalf("unregistered peer=%v", err)
+	}
+	if _, err := s.HandleSIPMessage(context.Background(), "MESSAGE", req.Source, make([]byte, MaxSIPMessageSize+1)); !errors.Is(err, ErrXMLTooLarge) {
+		t.Fatalf("SIP size=%v", err)
+	}
+}
+
+func TestHandleKeepaliveRejectsExpiredRegistration(t *testing.T) {
+	s, store, _, clock, req := testService()
+	if _, err := s.Challenge(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+	req.Authorization = ptrDigest(digestFor(req, "nonce-1", "secret", false))
+	if _, err := s.HandleRegister(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+	clock.now = clock.now.Add(5 * time.Minute)
+	raw := []byte(`<Notify><CmdType>Keepalive</CmdType><SN>12</SN><DeviceID>` + req.DeviceID + `</DeviceID><Status>OK</Status></Notify>`)
+	if _, err := s.HandleMessage(context.Background(), req.Source, raw); !errors.Is(err, ErrUnknownDevice) {
+		t.Fatalf("expired keepalive=%v", err)
+	}
+	if store.markStatus != "" {
+		t.Fatalf("expired keepalive changed store: %s", store.markStatus)
 	}
 }
 
