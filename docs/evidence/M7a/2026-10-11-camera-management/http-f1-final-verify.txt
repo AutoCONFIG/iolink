@@ -1,0 +1,26 @@
+F1 final verification receipt
+Source: team-75bb9f76/worktrees/A
+Database: isolated PostgreSQL at 127.0.0.1:32904 (credentials omitted)
+COMMAND: cd worktree && real PostgreSQL ADMIN mini camera regression
+=== RUN   TestCameraHTTPRealPGPlatformAdminMiniCameraForbidden
+    camera_http_auth_test.go:60: method=GET path=/api/v1/cameras status=403 redacted_response={"code":"forbidden","message":"forbidden"}
+    camera_http_auth_test.go:60: method=GET path=/api/v1/cameras/1701 status=403 redacted_response={"code":"forbidden","message":"forbidden"}
+--- PASS: TestCameraHTTPRealPGPlatformAdminMiniCameraForbidden (0.60s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	0.617s
+COMMAND: cd worktree && race/shuffle package regression
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	11.662s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.048s
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	1.045s
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	1.039s
+COMMAND: cd worktree && go vet
+COMMAND: cd worktree && gofmt -l owned files
+COMMAND: cd worktree && absolute contract checker
+docs/api/admin-openapi.yaml: standard schema and 49 operation fixtures PASS
+docs/api/license-openapi.yaml: standard schema and 3 operation fixtures PASS
+docs/api/open-openapi.yaml: standard schema and 5 operation fixtures PASS
+docs/api/openapi.yaml: standard schema and 15 operation fixtures PASS
+docs/api/setup-openapi.yaml: standard schema and 2 operation fixtures PASS
+docs/api/video-openapi.yaml: standard schema and 22 operation fixtures PASS
+96 target operations, 568 synthetic request/response fixtures PASS; live handler verification is R02.c
+JUDGMENT: PASS. The real HTTP regression observed 403 for list and detail and unchanged camera storage; all subsequent commands exited 0.
