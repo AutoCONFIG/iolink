@@ -195,3 +195,47 @@ func TestExpiredSiblingDoesNotBlockLastSessionStop(t *testing.T) {
 		t.Fatalf("stopJobs=%d pendingStreams=%d", stopJobs, streamState)
 	}
 }
+
+func TestStopJobSkipsWhenNewSessionArrivesBeforeClaim(t *testing.T) {
+	p, store, ctx := fixture(t)
+	target, err := store.PreparePlayback(ctx, 40)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := store.CreatePlayback(ctx, createInput(t, target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	lease, ok, err := store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-stop-race-start")
+	if err != nil || !ok {
+		t.Fatalf("lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobReady, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	if err = store.StopOwnedPlayback(ctx, first.ID, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	second, err := store.CreatePlayback(ctx, createInputToken(t, target, "media-token-new-session"))
+	if err != nil || second.State != media.SessionReady {
+		t.Fatalf("second=%+v err=%v", second, err)
+	}
+	lease, ok, err = store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-stop-race-stop")
+	if err != nil || !ok || lease.Kind != media.JobStop {
+		t.Fatalf("stop lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	auth, err := store.RevalidateJob(ctx, lease)
+	if err != nil || auth.Active {
+		t.Fatalf("stop auth=%+v err=%v", auth, err)
+	}
+	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobSkipped, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	var firstState, secondState, streamState string
+	if err = p.QueryRow(t.Context(), `SELECT (SELECT state FROM video_sessions WHERE id=$1),(SELECT state FROM video_sessions WHERE id=$2),(SELECT state FROM video_streams WHERE id=$3)`, first.ID, second.ID, first.StreamID).Scan(&firstState, &secondState, &streamState); err != nil {
+		t.Fatal(err)
+	}
+	if firstState != "revoked" || secondState != "ready" || streamState != "ready" {
+		t.Fatalf("first=%s second=%s stream=%s", firstState, secondState, streamState)
+	}
+}

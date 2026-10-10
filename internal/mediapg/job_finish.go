@@ -124,7 +124,11 @@ func finishStreamAndSessions(ctx context.Context, tx pgx.Tx, job media.Job, resu
 	case media.JobRetryable:
 		streamState = "starting"
 	case media.JobSkipped, media.JobDisabled, media.JobFailed, media.JobUnknown:
-		streamState, sessionState = "failed", "failed"
+		if job.Kind == media.JobStop && result.Status == media.JobSkipped {
+			streamState = "ready"
+		} else {
+			streamState, sessionState = "failed", "failed"
+		}
 	default:
 		return media.ErrInvalid
 	}
@@ -133,6 +137,13 @@ func finishStreamAndSessions(ctx context.Context, tx pgx.Tx, job media.Job, resu
 	}
 	if sessionState != "" {
 		_, err := tx.Exec(ctx, `UPDATE video_sessions SET state=$2,error_code=NULLIF($3,'') WHERE stream_id=$1 AND state='pending'`, job.StreamID, sessionState, sessionErrorCode(result.ErrorCode))
+		return err
+	}
+	if job.Kind == media.JobStop && result.Status == media.JobSkipped {
+		if active > 0 {
+			return nil
+		}
+		_, err := tx.Exec(ctx, `UPDATE video_streams SET state='stopped',updated_at=clock_timestamp() WHERE id=$1`, job.StreamID)
 		return err
 	}
 	if result.Status == media.JobStopped {

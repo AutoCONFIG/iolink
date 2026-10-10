@@ -428,6 +428,10 @@ func (s *Service) ProcessMediaJob(ctx context.Context, workerID string) (bool, e
 			providerErr = normalizeLicenseError(providerErr)
 		}
 	case media.JobStop:
+		if !auth.Active || !auth.SourceCurrent {
+			skipped = true
+			break
+		}
 		providerErr = s.cfg.Provider.Stop(ctx, media.StopRequest{CameraID: lease.CameraID, SourceVersion: lease.SourceVersion, StreamID: lease.StreamID})
 	default:
 		providerErr = ErrInvalid
