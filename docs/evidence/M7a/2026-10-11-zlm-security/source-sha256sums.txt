@@ -1,5 +1,5 @@
 c04792763bc19e739dca0c93913c8be36c042def6ddf421de08a93bb16c67f58  internal/media/zlm/gate.go
 d72ad8c24e6c379331b3bd154f8913e5ad556762b02d5614df756e81f2f13f8d  internal/media/zlm/gate_test.go
 6be54c887bb6eb1d9b41b2925cb51a0bdb21bbd341e53e3a566f1a85afa6bf40  deploy/zlm-secure-build/build-manifest.json
-cd20145dcf67232b0fc771e822d7925cef3983e0853b987cbcb42f48b8b04e51  deploy/zlm-secure-build/build.sh
+95460eed3c2773468764fa5babbf29e02791d2bad663f9b3909a6d307e966b59  deploy/zlm-secure-build/build.sh
 27ac116f48a2b6c1fc55be41191c7adc5f866c4ca5493c409c9d609fd2238320  deploy/zlm-secure-build/patches/README.md
