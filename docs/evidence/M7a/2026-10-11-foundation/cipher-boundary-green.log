@@ -1,0 +1,4 @@
+=== RUN   TestVideoCredentialRejectsOversizedEnvelope
+--- PASS: TestVideoCredentialRejectsOversizedEnvelope (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	1.011s

@@ -3,6 +3,8 @@ package videocredential_test
 import (
 	"bytes"
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
 	"errors"
 	"strconv"
 	"strings"
@@ -72,11 +74,37 @@ func TestVideoCredentialRejectsZeroInstancesAndBinding(t *testing.T) {
 }
 
 func TestVideoCredentialRejectsOversizedEnvelope(t *testing.T) {
-	c := newCipher(t, 0x51)
+	// Given: the independently authenticated envelope has valid key, nonce and AAD,
+	// but its 4097-byte plaintext exceeds the credential limit by one byte.
+	key := independentCameraKey(bytes.Repeat([]byte{0x51}, 32))
+	defer clear(key)
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nonce := bytes.Repeat([]byte{0x27}, gcm.NonceSize())
 	b := binding(t, domain.CameraCredential, 1, 2, 3)
-	got, err := c.Open(t.Context(), b, make([]byte, 4125))
+	plaintext := bytes.Repeat([]byte{0xa5}, 4097)
+	envelope := gcm.Seal(bytes.Clone(nonce), nonce, plaintext, b.AssociatedData())
+	if len(envelope) != 4125 {
+		t.Fatal("unexpected envelope size")
+	}
+	decoded, err := gcm.Open(nil, envelope[:12], envelope[12:], b.AssociatedData())
+	if err != nil || !bytes.Equal(decoded, plaintext) {
+		t.Fatal("independent envelope is unauthenticated")
+	}
+	c := newCipher(t, 0x51)
+
+	// When
+	got, err := c.Open(t.Context(), b, envelope)
+
+	// Then
 	if !errors.Is(err, domain.ErrVideoCredentialUnavailable) || got != nil {
-		t.Fatal("oversized ciphertext accepted")
+		t.Fatal("oversized authenticated ciphertext accepted")
 	}
 }
 

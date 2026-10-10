@@ -1,0 +1,6 @@
+=== RUN   TestVideoCredentialRejectsOversizedEnvelope
+    cipher_boundary_test.go:107: oversized authenticated ciphertext accepted
+--- FAIL: TestVideoCredentialRejectsOversizedEnvelope (0.00s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/videocredential	0.002s
+FAIL
