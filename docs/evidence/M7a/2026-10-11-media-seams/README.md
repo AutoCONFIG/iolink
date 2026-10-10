@@ -15,6 +15,7 @@ The service rejects requests when `Enabled` is false, when provider/license capa
 | Scenario | Invocation | Observable result | Artifact |
 |---|---|---|---|
 | Playback TTL and source-version job identity | `go test -race -shuffle=on -count=1 -v ./internal/media ./internal/playback` | `TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey` passes; grant is exactly 300 seconds and start key is `start:9:7` | [targeted-race.log](targeted-race.log) |
+| Source-version CAS conflict | same command | `TestRequestPlaybackReturnsSourceVersionConflictWithoutGrant` passes; a stale source cannot return a grant | [targeted-race.log](targeted-race.log) |
 | Owner-only read/stop and exact expiry boundary | same command | cross-user read/stop return not-found and `now == expires_at` becomes expired | [targeted-race.log](targeted-race.log) |
 | License/provider fail-closed | same command | disabled runtime, missing license, and rejected license produce errors before session insertion | [targeted-race.log](targeted-race.log) |
 | Token gateway authorization | same command | audience validation, token hash handoff, and pending state are exercised; pending returns `ErrPending` | [targeted-race.log](targeted-race.log) |
