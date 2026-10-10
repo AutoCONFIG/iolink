@@ -52,6 +52,9 @@ func (a *Allocator) Allocate(ctx context.Context) (PortPair, error) {
 	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return PortPair{}, err
+	}
 	for index := range a.allocated {
 		if a.allocated[index] {
 			continue
@@ -77,6 +80,9 @@ func (a *Allocator) Release(ctx context.Context, pair PortPair) error {
 	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	index := (pair.RTP - MinRTPPort) / 2
 	if !a.allocated[index] {
 		return ErrNotAllocated
