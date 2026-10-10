@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
-	"strconv"
 	"strings"
 )
 
@@ -28,7 +27,7 @@ type wireMessage struct {
 	Status     string `xml:"Status"`
 	SumNum     string `xml:"SumNum"`
 	DeviceList struct {
-		Num   int        `xml:"Num,attr"`
+		Num   string     `xml:"Num,attr"`
 		Items []wireItem `xml:"Item"`
 	} `xml:"DeviceList"`
 }
@@ -66,7 +65,7 @@ func ParseMessageXML(raw []byte, expectedDevice string) (XMLMessage, error) {
 	if wire.CmdType != "Keepalive" && wire.CmdType != "Catalog" {
 		return XMLMessage{}, ErrXMLInvalid
 	}
-	if !validText(wire.CmdType, 32) || !validText(wire.SN, 64) || !validDeviceID(wire.DeviceID) || (expectedDevice != "" && wire.DeviceID != expectedDevice) {
+	if !validText(wire.CmdType, 32) || !validDecimal(wire.SN, 64) || !validDeviceID(wire.DeviceID) || (expectedDevice != "" && wire.DeviceID != expectedDevice) {
 		return XMLMessage{}, ErrXMLInvalid
 	}
 	msg := XMLMessage{CmdType: wire.CmdType, SN: wire.SN, DeviceID: wire.DeviceID, Status: wire.Status}
@@ -79,8 +78,9 @@ func ParseMessageXML(raw []byte, expectedDevice string) (XMLMessage, error) {
 	if wire.SumNum == "" || len(wire.DeviceList.Items) > MaxCatalogItems {
 		return XMLMessage{}, ErrXMLInvalid
 	}
-	sum, err := strconv.Atoi(wire.SumNum)
-	if err != nil || sum < 0 || sum > MaxCatalogItems || sum != len(wire.DeviceList.Items) || wire.DeviceList.Num != sum {
+	sum, ok := parseDecimal(wire.SumNum)
+	deviceListNum, listOK := parseDecimal(wire.DeviceList.Num)
+	if !ok || !listOK || sum > MaxCatalogItems || sum != len(wire.DeviceList.Items) || deviceListNum != sum {
 		return XMLMessage{}, ErrXMLInvalid
 	}
 	msg.SumNum = sum
@@ -92,6 +92,33 @@ func ParseMessageXML(raw []byte, expectedDevice string) (XMLMessage, error) {
 		msg.Items = append(msg.Items, CatalogItem{DeviceID: item.DeviceID, Name: item.Name, Status: item.Status, Manufacturer: item.Manufacturer, Model: item.Model, Owner: item.Owner, CivilCode: item.CivilCode, Address: item.Address})
 	}
 	return msg, nil
+}
+
+func validDecimal(s string, max int) bool {
+	if s == "" || len(s) > max {
+		return false
+	}
+	for i := range s {
+		if s[i] < '0' || s[i] > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+func parseDecimal(s string) (int, bool) {
+	if !validDecimal(s, 10) {
+		return 0, false
+	}
+	value := 0
+	for i := range s {
+		digit := int(s[i] - '0')
+		if value > (MaxCatalogItems-digit)/10 {
+			return 0, false
+		}
+		value = value*10 + digit
+	}
+	return value, true
 }
 
 func xmlBounds(raw []byte) error {
