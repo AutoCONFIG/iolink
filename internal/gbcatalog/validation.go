@@ -34,7 +34,10 @@ func validPage(page Page) bool {
 		}
 		seen[item.ChannelID] = item
 	}
-	return page.SumNum != 0 || len(page.Items) == 0
+	if page.SumNum == 0 {
+		return len(page.Items) == 0
+	}
+	return len(page.Items) > 0
 }
 
 func validDeviceID(value string) bool {

@@ -271,6 +271,7 @@ func TestInvalidPagesAndDeadlineAreRejected(t *testing.T) {
 		{DeviceID: "34020000002000000001", SN: 0, SumNum: 0},
 		{DeviceID: "34020000002000000001", SN: 1, SumNum: 1, Items: []Item{{ChannelID: "3402", Name: "bad"}}},
 		{DeviceID: "34020000002000000001", SN: 2, SumNum: 1, Items: []Item{{ChannelID: "34020000001310000101", Name: "", Online: true}}},
+		{DeviceID: "34020000002000000001", SN: 3, SumNum: 1},
 	}
 	for _, page := range bad {
 		if _, err := c.AcceptPage(context.Background(), page); !errors.Is(err, ErrInvalid) {
