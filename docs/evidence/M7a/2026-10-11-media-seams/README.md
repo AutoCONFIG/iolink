@@ -18,11 +18,16 @@ The service rejects requests when `Enabled` is false, when provider/license capa
 | Source-version CAS conflict | same command | `TestRequestPlaybackReturnsSourceVersionConflictWithoutGrant` passes; a stale source cannot return a grant | [targeted-race.log](targeted-race.log) |
 | Owner-only read/stop and exact expiry boundary | same command | cross-user read/stop return not-found and `now == expires_at` becomes expired | [targeted-race.log](targeted-race.log) |
 | License/provider fail-closed | same command | disabled runtime, missing license, and rejected license produce errors before session insertion | [targeted-race.log](targeted-race.log) |
+| Missing token issuer fail-closed | `go test -race -shuffle=on -count=1 ./internal/media ./internal/playback && go vet ./internal/media ./internal/playback` | `TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing` returns `ErrUnavailable` and confirms no session insertion; commit `4bf9a27` | [token-issuer-guard.log](token-issuer-guard.log) |
 | Token gateway authorization | same command | audience validation, token hash handoff, and pending state are exercised; pending returns `ErrPending` | [targeted-race.log](targeted-race.log) |
 | Job lease/CAS/unknown semantics | same command | provider unknown is persisted as `unknown` with the lease token; CAS lease loss returns `ErrLeaseLost` without replay | [targeted-race.log](targeted-race.log) |
 | Static checks | `go vet ./internal/media ./internal/playback` | exit status 0 | [targeted-race.log](targeted-race.log) |
 | Full Go package regression | `go test ./...` | exit status 0; all packages pass, including `internal/media/zlm` and `internal/playback` | [full-test.log](full-test.log) |
 | Repository verification | `make verify` | exit status 0; build, vet, race/shuffle package checks pass | [full-verify.log](full-verify.log) |
+
+## Final candidate
+
+The current implementation candidate is commit `4bf9a278e081f567e805b83028c0f0bb1720b695` (`fix: fail closed when media token issuer is unavailable`). The nil token issuer guard and regression test were verified by the targeted race/vet command and by `make verify`; the full receipts are in [token-issuer-guard.log](token-issuer-guard.log). This README is a documentation draft for the root agent's later docs commit.
 
 ## Limits
 
