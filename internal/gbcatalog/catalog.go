@@ -59,6 +59,10 @@ func (c *Coordinator) start(ctx context.Context, refresh Refresh) (Refresh, erro
 		return Refresh{}, ErrDeadline
 	}
 	if got, ok := c.completed[k]; ok {
+		if got.ExpectedCount != refresh.ExpectedCount {
+			c.mu.Unlock()
+			return Refresh{}, ErrInvalid
+		}
 		c.mu.Unlock()
 		return got, nil
 	}
@@ -220,6 +224,7 @@ func (c *Coordinator) markStale(ctx context.Context, refresh Refresh, now time.T
 		ctx = context.Background()
 	}
 	if err := ctx.Err(); err != nil {
+		c.resetStaling(refresh)
 		return err
 	}
 	callCtx, cancel := context.WithTimeout(ctx, time.Second)
@@ -239,4 +244,12 @@ func (c *Coordinator) markStale(ctx context.Context, refresh Refresh, now time.T
 	c.stale[k] = refresh
 	c.mu.Unlock()
 	return nil
+}
+
+func (c *Coordinator) resetStaling(refresh Refresh) {
+	c.mu.Lock()
+	if p := c.pending[key{device: refresh.DeviceID, sn: refresh.SN}]; p != nil {
+		p.staling = false
+	}
+	c.mu.Unlock()
 }

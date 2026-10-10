@@ -155,6 +155,26 @@ func TestCompletedRefreshIgnoresLateDuplicateAndDoesNotCreateNewSnapshot(t *test
 	}
 }
 
+func TestCompletedRefreshRejectsDifferentSumNum(t *testing.T) {
+	c, store, _ := testCoordinator(t)
+	device := "34020000002000000001"
+	page := Page{DeviceID: device, SN: 15, SumNum: 1, Items: []Item{item("34020000001310000101", "a", true)}}
+	if _, err := c.AcceptPage(context.Background(), page); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := c.Start(context.Background(), device, 15, 2); !errors.Is(err, ErrInvalid) {
+		t.Fatalf("start with changed expected count=%v", err)
+	}
+	if _, err := c.AcceptPage(context.Background(), Page{DeviceID: device, SN: 15, SumNum: 2, Items: []Item{page.Items[0]}}); !errors.Is(err, ErrInvalid) {
+		t.Fatalf("page with changed SumNum=%v", err)
+	}
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	if len(store.replacements) != 1 || store.starts != 1 {
+		t.Fatalf("store=%#v starts=%d", store.replacements, store.starts)
+	}
+}
+
 func TestExpireMarksStaleWithoutReplacingOldDirectory(t *testing.T) {
 	c, store, clock := testCoordinator(t)
 	device := "34020000002000000001"
@@ -175,6 +195,28 @@ func TestExpireMarksStaleWithoutReplacingOldDirectory(t *testing.T) {
 	}
 	if _, err := c.AcceptPage(context.Background(), Page{DeviceID: device, SN: 11, SumNum: 2, Items: []Item{item("34020000001310000102", "late", true)}}); !errors.Is(err, ErrDeadline) {
 		t.Fatalf("late page=%v", err)
+	}
+}
+
+func TestCanceledStaleMarkDoesNotPoisonPendingRefresh(t *testing.T) {
+	c, store, clock := testCoordinator(t)
+	device := "34020000002000000001"
+	if _, err := c.AcceptPage(context.Background(), Page{DeviceID: device, SN: 16, SumNum: 2, Items: []Item{item("34020000001310000101", "a", true)}}); err != nil {
+		t.Fatal(err)
+	}
+	clock.Advance(RefreshTimeout)
+	canceled, cancel := context.WithCancel(context.Background())
+	cancel()
+	if _, err := c.AcceptPage(canceled, Page{DeviceID: device, SN: 16, SumNum: 2, Items: []Item{item("34020000001310000102", "b", true)}}); !errors.Is(err, context.Canceled) {
+		t.Fatalf("canceled stale mark=%v", err)
+	}
+	if err := c.Expire(context.Background(), device, 16, clock.Now()); err != nil {
+		t.Fatalf("retry stale mark=%v", err)
+	}
+	store.mu.Lock()
+	defer store.mu.Unlock()
+	if len(store.stales) != 1 || len(store.replacements) != 0 {
+		t.Fatalf("stales=%#v replacements=%#v", store.stales, store.replacements)
 	}
 }
 
