@@ -2,8 +2,6 @@ package gb
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"errors"
 	"net/netip"
 	"strconv"
@@ -202,6 +200,11 @@ func TestRegisterRejectsUnknownPeerDeviceAndDigestFields(t *testing.T) {
 	bad.Source = netip.MustParseAddrPort("198.51.100.5:5060")
 	if _, err := s.Challenge(context.Background(), bad); !errors.Is(err, ErrPeerNotAllowed) {
 		t.Fatalf("peer=%v", err)
+	}
+	wrongRealm := req
+	wrongRealm.Realm = "evil-realm"
+	if _, err := s.Challenge(context.Background(), wrongRealm); !errors.Is(err, ErrPeerNotAllowed) {
+		t.Fatalf("realm challenge=%v", err)
 	}
 	unknown := req
 	unknown.DeviceID = "34020000002000000002"
@@ -423,10 +426,6 @@ func TestDigestVectorAndValidation(t *testing.T) {
 	}
 	if _, err := digestResponse(DigestAuthorization{Username: "u", Realm: "r", Nonce: "n", URI: "/", Response: "x", Algorithm: "SHA-256"}, "GET", "p"); !errors.Is(err, ErrDigestInvalid) {
 		t.Fatal("algorithm accepted")
-	}
-	sum := md5.Sum([]byte("x"))
-	if hex.EncodeToString(sum[:]) == "" {
-		t.Fatal("unreachable")
 	}
 }
 

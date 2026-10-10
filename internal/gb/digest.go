@@ -47,7 +47,7 @@ func (s *Service) Challenge(ctx context.Context, req RegisterRequest) (RegisterR
 	if err != nil {
 		return RegisterResult{}, ErrUnknownDevice
 	}
-	if device.DeviceID != req.DeviceID || !device.AllowsPeer(req.Source.Addr()) {
+	if device.DeviceID != req.DeviceID || req.Realm != device.Realm || !device.AllowsPeer(req.Source.Addr()) {
 		return RegisterResult{}, ErrPeerNotAllowed
 	}
 	if !validText(device.Realm, 128) || !validText(req.URI, 2048) {
@@ -74,7 +74,7 @@ func (s *Service) HandleRegister(ctx context.Context, req RegisterRequest) (Regi
 	if err != nil {
 		return RegisterResult{}, ErrUnknownDevice
 	}
-	if device.DeviceID != req.DeviceID || !device.AllowsPeer(req.Source.Addr()) {
+	if device.DeviceID != req.DeviceID || req.Realm != device.Realm || !device.AllowsPeer(req.Source.Addr()) {
 		return RegisterResult{}, ErrPeerNotAllowed
 	}
 	if req.Authorization == nil {
