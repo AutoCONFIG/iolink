@@ -271,6 +271,22 @@ func TestMemoryNonceStoreExpiresAndRejectsReplay(t *testing.T) {
 	}
 }
 
+func TestMemoryNonceStoreIsBounded(t *testing.T) {
+	nonces := NewMemoryNonceStore()
+	expires := time.Now().Add(time.Hour)
+	for i := 0; i < MaxMemoryNonces+1; i++ {
+		if _, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", ExpiresAt: expires}); err != nil {
+			t.Fatalf("issue %d: %v", i, err)
+		}
+	}
+	nonces.mu.Lock()
+	got := len(nonces.entries)
+	nonces.mu.Unlock()
+	if got > MaxMemoryNonces {
+		t.Fatalf("nonce store grew to %d", got)
+	}
+}
+
 func TestDigestVectorAndValidation(t *testing.T) {
 	a := DigestAuthorization{Username: "Mufasa", Realm: "testrealm@host.com", Nonce: "dcd98b7102dd2f0e8b11d0f600bfb0c093", URI: "/dir/index.html", Response: "6629fae49393a05397450978507c4ef1", QOP: "auth", NC: "00000001", CNonce: "0a4f113b"}
 	got, err := digestResponse(a, "GET", "Circle Of Life")
@@ -314,6 +330,12 @@ func TestMessageXMLKeepaliveCatalogAndBounds(t *testing.T) {
 	}
 	if _, err := ParseMessageXML([]byte(keepalive), "34020000002000000002"); !errors.Is(err, ErrXMLInvalid) {
 		t.Fatalf("device mismatch=%v", err)
+	}
+	if _, err := ParseMessageXML(append([]byte(keepalive), []byte(`<Notify/>`)...), device); !errors.Is(err, ErrXMLInvalid) {
+		t.Fatalf("trailing root=%v", err)
+	}
+	if _, err := ParseMessageXML(append([]byte(keepalive), []byte(" trailing")...), device); !errors.Is(err, ErrXMLInvalid) {
+		t.Fatalf("trailing text=%v", err)
 	}
 }
 

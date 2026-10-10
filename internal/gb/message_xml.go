@@ -130,7 +130,7 @@ func xmlBounds(raw []byte) error {
 	}
 	dec := xml.NewDecoder(bytes.NewReader(raw))
 	dec.Strict = true
-	depth, textBytes := 0, 0
+	depth, textBytes, roots := 0, 0, 0
 	for {
 		tok, err := dec.Token()
 		if err != nil {
@@ -141,6 +141,12 @@ func xmlBounds(raw []byte) error {
 		}
 		switch t := tok.(type) {
 		case xml.StartElement:
+			if depth == 0 {
+				roots++
+				if roots > 1 {
+					return ErrXMLInvalid
+				}
+			}
 			depth++
 			if depth > MaxXMLDepth {
 				return ErrXMLDepth
@@ -155,11 +161,14 @@ func xmlBounds(raw []byte) error {
 			if textBytes > MaxXMLSize {
 				return ErrXMLTooLarge
 			}
+			if depth == 0 && len(bytes.TrimSpace(t)) != 0 {
+				return ErrXMLInvalid
+			}
 		case xml.Directive:
 			return ErrXMLInvalid
 		}
 	}
-	if depth != 0 {
+	if depth != 0 || roots != 1 {
 		return ErrXMLInvalid
 	}
 	return nil

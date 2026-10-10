@@ -14,6 +14,8 @@ type MemoryNonceStore struct {
 	used    map[string]struct{}
 }
 
+const MaxMemoryNonces = 4096
+
 func NewMemoryNonceStore() *MemoryNonceStore {
 	return &MemoryNonceStore{entries: make(map[string]NonceRecord), used: make(map[string]struct{})}
 }
@@ -35,6 +37,17 @@ func (s *MemoryNonceStore) Issue(_ context.Context, record NonceRecord) (string,
 	if s.used == nil {
 		s.used = make(map[string]struct{})
 	}
+	if len(s.entries) >= MaxMemoryNonces {
+		var oldest string
+		var oldestExpiry time.Time
+		for value, item := range s.entries {
+			if oldest == "" || item.ExpiresAt.Before(oldestExpiry) {
+				oldest, oldestExpiry = value, item.ExpiresAt
+			}
+		}
+		delete(s.entries, oldest)
+		delete(s.used, oldest)
+	}
 	s.entries[nonce] = record
 	return nonce, nil
 }
@@ -45,6 +58,12 @@ func (s *MemoryNonceStore) Consume(_ context.Context, nonce string, now time.Tim
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	for value, record := range s.entries {
+		if !now.Before(record.ExpiresAt) {
+			delete(s.entries, value)
+			delete(s.used, value)
+		}
+	}
 	if _, ok := s.used[nonce]; ok {
 		return NonceRecord{}, ErrNonceReplay
 	}
