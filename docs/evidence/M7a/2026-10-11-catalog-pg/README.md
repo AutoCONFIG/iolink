@@ -12,4 +12,4 @@ This increment adds the provider-neutral GB catalog refresh coordinator and Post
 
 ## Review
 
-The fixed implementation snapshot is `6bee0aea1c485611cfeaef3050f237820f58bc89`. Independent code and gate reviews are archived as [final-code-review.md](final-code-review.md) and [final-gate-review.md](final-gate-review.md); both are APPROVE with no blockers. Real GB/SIP devices, UDP/RTP runtime, ZLM, browser playback, and WeChat playback remain `external_blocked` or later increments.
+The fixed implementation snapshot is `b3c98c4d0127530a6fd8f9f9935f51fe7c1889d8`. Independent code and gate reviews are archived as [final-code-review.md](final-code-review.md) and [final-gate-review.md](final-gate-review.md); both are APPROVE with no blockers. Real GB/SIP devices, UDP/RTP runtime, ZLM, browser playback, and WeChat playback remain `external_blocked` or later increments.

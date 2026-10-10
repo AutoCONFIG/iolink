@@ -2,7 +2,7 @@
 
 - `codeQualityStatus`: WATCH
 - `recommendation`: APPROVE
-- `snapshotSHA`: `6bee0aea1c485611cfeaef3050f237820f58bc89`
+- `snapshotSHA`: `b3c98c4d0127530a6fd8f9f9935f51fe7c1889d8`
 - `reviewScope`: `internal/gbcatalog`, `internal/gbcatalogpg`, `internal/migrate/sql/014_video_catalog.sql`, and their tests/evidence; unrelated HTTP, SIP, and media changes were excluded
 - `blockers`: `[]`
 - `external_blocked`: real PostgreSQL/Timescale integration was unavailable because `IOLINK_TEST_PG_DSN` was not set; those tests were reported as skipped, not passed
@@ -18,15 +18,15 @@ The exact snapshot and cumulative scoped diff were inspected with:
 
 ```text
 git rev-parse HEAD
-git diff 28f2f3e..6bee0ae -- internal/gbcatalog internal/gbcatalogpg internal/migrate/sql/014_video_catalog.sql
-git diff --check 28f2f3e..6bee0ae -- internal/gbcatalog internal/gbcatalogpg internal/migrate/sql/014_video_catalog.sql
+git diff 28f2f3e..b3c98c4 -- internal/gbcatalog internal/gbcatalogpg internal/migrate/sql/014_video_catalog.sql
+git diff --check 28f2f3e..b3c98c4 -- internal/gbcatalog internal/gbcatalogpg internal/migrate/sql/014_video_catalog.sql
 ```
 
-The final commit is `6bee0ae` (`fix: harden GB catalog persistence deadlines`), based on `28f2f3e` and `33facea`. The final fix adds the active-refresh expected-count comparison, atomically sets `video_gb_devices.catalog_state='stale'` when an expired collecting row is discovered, and compares the persisted deadline with `clock_timestamp()` before a replacement. I read `docs/README.md`, `docs/CONTRIBUTING.md`, `docs/design/M7a-video.md`, `docs/ACCEPTANCE.md`, and the checked-in catalog receipts under `docs/evidence/M7a/2026-10-11-catalog-pg/` as untrusted source material.
+The final commit is `b3c98c4` (`fix: reject empty nonzero GB catalog pages`), based on `28f2f3e`, `33facea`, and `6bee0ae`. The cumulative fixes add the active-refresh expected-count comparison, atomically set `video_gb_devices.catalog_state='stale'` when an expired collecting row is discovered, compare the persisted deadline with `clock_timestamp()` before a replacement, and reject a nonzero `SumNum` with an empty page. I read `docs/README.md`, `docs/CONTRIBUTING.md`, `docs/design/M7a-video.md`, `docs/ACCEPTANCE.md`, and the checked-in catalog receipts under `docs/evidence/M7a/2026-10-11-catalog-pg/` as untrusted source material.
 
 ## Skill perspective check
 
-This check ran before judging maintainability and test relevance. I explicitly loaded and consulted `omo:remove-ai-slops` and `omo:programming` (Go guidance). The overfit/slop pass found no deletion-only tests, tests that merely prove a requested removal, tautological assertions, untyped escape hatches, provider-SDK leakage, broad catch-all handling, or needless production parsing/normalization beyond the catalog boundary. The medium findings below are the remaining oversized test module, unbounded process-local result maps, and one page-validation coverage gap.
+This check ran before judging maintainability and test relevance. I explicitly loaded and consulted `omo:remove-ai-slops` and `omo:programming` (Go guidance). The overfit/slop pass found no deletion-only tests, tests that merely prove a requested removal, tautological assertions, untyped escape hatches, provider-SDK leakage, broad catch-all handling, or needless production parsing/normalization beyond the catalog boundary. The medium findings below are the remaining oversized test module and unbounded process-local result maps.
 
 ## Findings by severity
 
@@ -40,11 +40,9 @@ None. The final snapshot closes the previously identified PG boundary issues: ac
 
 ### MEDIUM
 
-1. **The coordinator accepts a non-empty `SumNum` with an empty page.** `internal/gbcatalog/validation.go:23-37` returns true for `SumNum > 0` and `len(Items) == 0`. The GB XML boundary rejects that combination, and the design says a nonzero total cannot carry an empty page. A direct caller can nevertheless create a pending refresh that cannot complete until expiry. Add the same guard and a focused regression before wiring additional untrusted page callers. This is a bounded correctness/coverage gap, not a current directory-corruption path.
+1. **Completed and stale refresh maps never evict entries.** `internal/gbcatalog/catalog.go:20-24,187-189,241-245` retains one value for every device/SN forever. SN values can increase over a long-lived process, so a registered peer can cause unbounded heap growth even though each pending page is capped at 1000 items. Add TTL/size eviction or move terminal-state lookup to durable state before production-scale wiring. This is a resource/maintenance risk for this provider-neutral increment.
 
-2. **Completed and stale refresh maps never evict entries.** `internal/gbcatalog/catalog.go:20-24,187-189,241-245` retains one value for every device/SN forever. SN values can increase over a long-lived process, so a registered peer can cause unbounded heap growth even though each pending page is capped at 1000 items. Add TTL/size eviction or move terminal-state lookup to durable state before production-scale wiring. This is a resource/maintenance risk for this provider-neutral increment.
-
-3. **The catalog unit-test module exceeds the remove-ai-slops 250 pure-LOC ceiling.** `internal/gbcatalog/catalog_test.go` measures 296 pure non-comment lines and combines aggregation, duplicate/conflict, deadline, concurrency, and store-failure seams. Split by behavior before the next substantial increment to keep review and failure isolation manageable. `internal/gbcatalog/catalog.go` is 242 pure lines (warning band); avoid adding another responsibility there.
+2. **The catalog unit-test module exceeds the remove-ai-slops 250 pure-LOC ceiling.** `internal/gbcatalog/catalog_test.go` measures 297 pure non-comment lines and combines aggregation, duplicate/conflict, deadline, concurrency, and store-failure seams. Split by behavior before the next substantial increment to keep review and failure isolation manageable. `internal/gbcatalog/catalog.go` is 242 pure lines (warning band); avoid adding another responsibility there.
 
 ### LOW
 
@@ -55,7 +53,7 @@ None. The final snapshot closes the previously identified PG boundary issues: ac
 ## Criterion review
 
 - **Same-SN idempotency and conflict:** The coordinator serializes pending/completed keys and rejects changed expected counts. The PG store locks the device and catalog row, reuses an active row only when the count matches, and refuses completed/failed rows. Concurrent same-SN starts therefore produce one catalog row.
-- **Aggregation and SumNum:** Pages are deduplicated by channel ID, conflicting duplicates fail, aggregate count cannot exceed the expected count, and replacement runs only at exact completion. The `SumNum > 0`/empty-page validation gap is recorded above.
+- **Aggregation and SumNum:** Pages are deduplicated by channel ID, conflicting duplicates fail, aggregate count cannot exceed the expected count, and replacement runs only at exact completion. The coordinator now rejects a nonzero total with an empty page (`internal/gbcatalog/validation.go:37-40`) and the regression is in `internal/gbcatalog/catalog_test.go:267-285`.
 - **Atomicity:** `StartRefresh`, expired-row stale transition, `ReplaceCatalog`, and `MarkStale` each use one transaction with rollback on every error. Replacement deletes/rebuilds catalog items, updates channel presence, completes the catalog, and marks the device ready before commit. No old-directory mutation occurs on validation or deadline failure.
 - **Tenant/device scope:** `video_gb_devices.device_id` is globally unique; catalog and channel rows carry tenant IDs and the `(device_id,tenant_id)` foreign key. The store resolves the tenant from the locked device and never trusts a caller-supplied tenant. Replacement joins the requested device ID to its catalog row and uses that locked row's tenant/device keys for all writes.
 - **Deadline/stale:** Coordinator calls are bounded by the refresh deadline; expired in-memory refreshes mark stale without replacing the old directory. The PG adapter rejects an expired row at start, atomically fails it and marks the device stale, and uses the database clock to reject late replacements even when a caller supplies an old observation timestamp.
@@ -65,20 +63,20 @@ None. The final snapshot closes the previously identified PG boundary issues: ac
 
 ## Fresh verification at the exact SHA
 
-- `git rev-parse HEAD`: **PASS**, `6bee0aea1c485611cfeaef3050f237820f58bc89`.
+- `git rev-parse HEAD`: **PASS**, `b3c98c4d0127530a6fd8f9f9935f51fe7c1889d8`.
 - `go test -race -shuffle=on -count=1 -v ./internal/gbcatalog ./internal/gbcatalogpg ./internal/migrate`: **PASS** for all unit/static tests. All PG-backed catalog and migration tests explicitly **SKIP** with `integration: set IOLINK_TEST_PG_DSN to a disposable Timescale instance`.
 - `go test -race -shuffle=on -count=1 ./...`: **PASS** for the full Go suite; PG-backed tests remain skipped for the same missing DSN.
 - `go vet ./...`: **PASS**.
 - `test -z "$(gofmt -d internal/gbcatalog/*.go internal/gbcatalogpg/*.go)"`: **PASS**.
-- `git diff --check 28f2f3e..6bee0ae -- internal/gbcatalog internal/gbcatalogpg internal/migrate/sql/014_video_catalog.sql`: **PASS**.
+- `git diff --check 28f2f3e..b3c98c4 -- internal/gbcatalog internal/gbcatalogpg internal/migrate/sql/014_video_catalog.sql`: **PASS**.
 - `python3 scripts/check_architecture_manifests.py`: **PASS** (`55 requirements, owners, providers, references, and AGENTS.md scope`).
 - `make verify-contracts`: **PASS** (`96 target operations, 568 synthetic request/response fixtures`).
 - `make docs-tools`: **PASS** (dependencies already satisfied; no documentation-tool errors).
 
 ## External and deferred evidence
 
-The real PostgreSQL/Timescale path, rollback behavior under injected SQL failures, concurrent database transactions, migration idempotence against a disposable database, and the actual GB device/catalog UDP chain could not be exercised here because `IOLINK_TEST_PG_DSN` and external devices/services were unavailable. These remain `external_blocked`; no skipped test is counted as a pass. The fresh unit/full/race/vet/static results establish the coordinator and compile-time/provider-boundary behavior only.
+This rerun process did not have `IOLINK_TEST_PG_DSN`, so its PG/migration tests were explicitly skipped and are `external_blocked` for this local run. I also inspected the independent gate receipt `docs/evidence/M7a/2026-10-11-catalog-pg/final-gate-review.md` and its `/tmp/m7a-catalog-6bee0ae-real-pg.log`: the cumulative persistence snapshot `6bee0ae` passed all catalog PG and migration integration cases against an isolated loopback PostgreSQL/Timescale instance. `b3c98c4` changes only the domain page validator and its regression test, so that database evidence remains applicable to the unchanged PG adapter. Real GB devices, SIP/UDP runtime, cameras, and playback remain external/later scope.
 
 ## Final recommendation
 
-**APPROVE** the GB catalog persistence snapshot at `6bee0aea1c485611cfeaef3050f237820f58bc89`, with `blockers=[]`. Carry the three medium follow-ups and the explicit real-Postgres `external_blocked` status into the next increment.
+**APPROVE** the GB catalog persistence snapshot at `b3c98c4d0127530a6fd8f9f9935f51fe7c1889d8`, with `blockers=[]`. Carry the two medium follow-ups and the explicit real-Postgres `external_blocked` status into the next increment.
