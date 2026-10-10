@@ -14,6 +14,6 @@ This scoped increment adds the provider-neutral `internal/gb` signaling core. It
 
 The scoped test covers successful no-qop and qop Digest flows, RFC Digest interoperability, unknown devices, peer ACLs, invalid fields, nonce expiry/replay, Expires bounds, peer conflicts, transaction retransmission, registration status transitions, registered-peer Keepalive handling, XML positive parsing, device mismatch, DTD/entity/oversize/depth/catalog-count rejection, race testing, and vet.
 
-The scoped test and vet receipts are stored beside this README. The real GB UDP device, NAT, SIP transport, catalog pagination, RTP/PS, INVITE/BYE, and restart acceptance remain external or later increments.
+The scoped test and vet receipts are stored beside this README. The implementation snapshot is `e691d944666ef6913a42b6c5ba4388fd69a3128f`; its independent code and gate reviews are archived as [final-code-review.md](final-code-review.md) and [final-gate-review.md](final-gate-review.md), both APPROVE with no blockers. The real GB UDP device, NAT, SIP transport, catalog pagination, RTP/PS, INVITE/BYE, and restart acceptance remain external or later increments.
 
-Status: implementation complete; independent code and gate review required before release.
+Status: scoped implementation and independent review complete; release packaging is tracked by the parent M7a milestone.
