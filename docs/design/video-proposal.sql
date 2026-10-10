@@ -88,7 +88,7 @@ CREATE TABLE video_streams (
     tenant_id BIGINT NOT NULL,
     source_version BIGINT NOT NULL CHECK (source_version > 0),
     state TEXT NOT NULL DEFAULT 'pending' CHECK (state IN ('pending','starting','ready','stopping','stopped','failed','unknown')),
-    rtp_port INTEGER CHECK (rtp_port BETWEEN 30000 AND 30019),
+    rtp_port INTEGER CHECK (rtp_port BETWEEN 30000 AND 30038 AND rtp_port % 2 = 0),
     ssrc TEXT CHECK (ssrc ~ '^[0-9]{10}$'),
     call_id UUID,
     cseq BIGINT CHECK (cseq > 0),

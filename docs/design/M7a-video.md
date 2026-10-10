@@ -164,6 +164,9 @@ sipgo 仅提供 SIP transport/parse，不把它的单注册 demo 当 GB 实现�
    去重/汇总 SumNum 完整才事务替换目录。超时不覆盖旧目录，标 stale，
    新目录缺失通道使对应 camera offline 并撤销 session，不静默继续旧点播。
 4. 点播：openRtpServer 先分配独占 UDP 端口与SSRC，再 INVITE SDP，
+   RTP 只分配30000..30038的20个偶数端口，并原子保留相邻 RTCP port+1；
+   固定 ZLM 会同时绑定这两个端口，不能把30000..30019当20路容量。
+   DDL限制偶数RTP并唯一占用，防火墙/NAT覆盖30000..30039；关闭源后确认释放端口对才可复用。
    只支持 UDP RTP/AVP PS；offer 含 recvonly、PS/90000、y=SSRC、
    正确公网/局域网 receiver 地址。200 校验 SDP/SSRC/peer 后 ACK，
    只有 ZLM 已提供兼容 tracks 和可取 HLS 后 ready。4xx/超时/BYE/失保活→offline/failed、
@@ -218,5 +221,7 @@ sipgo固定至 `03cdf8e07c69e96719816d70f13a44a105e52d5a`。后续运行镜像�
   addStreamProxy/delStreamProxy/getMediaList/openRtpServer/closeRtpServer。
 - [ZLM hook](https://github.com/ZLMediaKit/ZLMediaKit/blob/46220e6a866592c140d719ca2981bd2276344f5e/server/WebHook.cpp)：
   on_http_access 带目录/秒数缓存，不能单独保障实时撤权。
+- [ZLM RTP端口对](https://github.com/ZLMediaKit/ZLMediaKit/blob/46220e6a866592c140d719ca2981bd2276344f5e/src/Rtp/RtpServer.cpp#L137)：
+  显式 RTP 端口同时绑定相邻 RTCP 端口；每路占用一个偶数/奇数端口对。
 - [sipgo注册demo](https://github.com/emiago/sipgo/blob/03cdf8e07c69e96719816d70f13a44a105e52d5a/example/register/server/main.go)：
   仅单注册示范，不能复用共享nonce/用户名日志。

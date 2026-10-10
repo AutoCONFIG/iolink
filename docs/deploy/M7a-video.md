@@ -8,12 +8,14 @@
 |---|---|---|
 | 浏览器→HTTPS反代→iolinkd | 443/TCP→8080 | Web/API及 /media/v1；TLS必需，同源 |
 | camera→iolinkd SIP | 5060/UDP、5060/TCP | 仅授权camera网段/来源IP，禁互联网任意注册 |
-| GB camera→ZLM RTP | 30000–30019/UDP | 最多20路同时接收；每路独占，防火墙允许登记peer |
+| GB camera→ZLM RTP/RTCP | 30000–30039/UDP | 最多20路端口对；RTP偶数、RTCP为RTP+1，防火墙允许登记peer |
 | iolinkd→ZLM API/HLS | 80/TCP | 私有media网络，无宿主机映射，只允许iolinkd |
 | ZLM→RTSP camera | 运维授权端口，默认554/TCP | numeric IP + egress允许网段/端口，禁任意出站 |
 | RTSP/RTMP/WebRTC/SRT公开入口 | 无 | 关闭未用协议；不得发布554/1935/8000/9000/10000等默认端口 |
 
-GB声明receiver IP由运维明确设置，与上述UDP端口一一NAT映射；不能根据不可信Host/SDP推导。
+GB声明receiver IP由运维明确设置，与上述40个UDP端口一一NAT映射；不能根据不可信Host/SDP推导。
+allocator只分配30000..30038偶数RTP端口，同时保留相邻RTCP端口；
+数据库唯一占用与偶数约束防止两路重叠，provider确认关闭前不能归还端口对。
 无合法receiver IP或端口不可用时503/启动失败，不发送不可接收的INVITE。
 TCP SIP保留作注册/目录传输，媒体仅UDP PS；SIP默认5060而非HTTPS反代。
 Linux主机限制media网络egress，Docker网络本身不是SSRF防火墙。
@@ -24,7 +26,7 @@ Linux主机限制media网络egress，Docker网络本身不是SSRF防火墙。
 - 视频显式enabled开关、ZLM专用安全构建的固定镜像digest、私有API地址、非默认随机API secret文件、
   camera允许CIDR/host/RTSP端口、GB server ID/realm/receiver IP/peer CIDR、SIP监听地址。
 - ZLM `protocol.enable_hls=1`，H264/AAC TS，不开启fMP4/录制/转码；
-  `rtp_proxy.port_range=30000-30019`，每路显式 openRtpServer指定端口。
+  `rtp_proxy.port_range=30000-30039`，每路显式 openRtpServer指定偶数端口。
   关闭固定10000 listener及未用RTSP/RTMP/WebRTC/SRT，具体字段需用选定镜像实测。
 - 不使用固定源码的原版镜像直接拉RTSP。安全构建须包含
   [来源边界补丁要求](../design/M7a-video.md#来源凭据与-ssrf)，记录上游SHA、补丁SHA256、
