@@ -23,13 +23,14 @@ The service rejects playback-management requests when `Enabled` is false, when p
 | Job lease/CAS/unknown semantics | same command | provider unknown is persisted as `unknown` with the lease token; CAS lease loss returns `ErrLeaseLost` without replay | [targeted-race.log](targeted-race.log) |
 | Media gateway without business actor | `go test -race -shuffle=on -count=1 ./internal/playback ./internal/media` | `AuthorizeMedia` accepts `context.Background()` for the token-only `security: []` media path while invalid token and revoked-session cases remain rejected | [media-gateway-zlm-review.log](media-gateway-zlm-review.log) |
 | ZLMediaKit patch application gate | `sh deploy/zlm-secure-build/build-probe.sh` | required patch is applied and reverse-checked; unapplied, dirty, and unapproved inputs are rejected before fetch/build | [media-gateway-zlm-review.log](media-gateway-zlm-review.log) |
+| Revoked job and manifest URL boundaries | `go test -race -shuffle=on -count=1 ./internal/playback ./internal/media` | inactive/source-stale start jobs remain `skipped` without provider calls; enabled playback rejects non-HTTPS manifest bases before persistence | [playback-job-url-guards.log](playback-job-url-guards.log) |
 | Static checks | `go vet ./internal/media ./internal/playback` | exit status 0 | [targeted-race.log](targeted-race.log) |
 | Full Go package regression | `go test ./...` | exit status 0; all packages pass, including `internal/media/zlm` and `internal/playback` | [full-test.log](full-test.log) |
 | Repository verification | `make verify` | exit status 0; build, vet, race/shuffle package checks pass | [full-verify.log](full-verify.log) |
 
 ## Final candidate
 
-The current implementation candidate is commit `078009a88aa7d6d6e5621bae72ab3ff179baabcc` (`fix: align media gateway and zlm patch checks`). It includes the nil token issuer guard, token-only media gateway boundary, and fail-closed ZLM patch application gate. The targeted and full receipts are in [token-issuer-guard.log](token-issuer-guard.log) and [media-gateway-zlm-review.log](media-gateway-zlm-review.log). Independent code and gate approval is still required for this exact snapshot.
+The current implementation candidate is commit `8f011599e94f886077f7947bbbe5150774b97ff` (`fix: skip revoked jobs and require https manifests`). It includes the nil token issuer guard, token-only media gateway boundary, fail-closed ZLM patch application gate, revoked-job skip behavior, and HTTPS manifest validation. The targeted and full receipts are in [token-issuer-guard.log](token-issuer-guard.log), [media-gateway-zlm-review.log](media-gateway-zlm-review.log), and [playback-job-url-guards.log](playback-job-url-guards.log). Independent code and gate approval is still required for this exact snapshot.
 
 ## Limits
 
