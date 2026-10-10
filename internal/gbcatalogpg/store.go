@@ -42,6 +42,9 @@ func (s *Store) StartRefresh(ctx context.Context, refresh gbcatalog.Refresh) (gb
 	var expiresAt time.Time
 	err = tx.QueryRow(ctx, `SELECT expected_count,expires_at,state FROM video_gb_catalogs WHERE device_id=$1 AND sn=$2 FOR UPDATE`, devicePK, refresh.SN).Scan(&existing.ExpectedCount, &expiresAt, &state)
 	if err == nil && state == "collecting" && expiresAt.After(time.Now()) {
+		if existing.ExpectedCount != refresh.ExpectedCount {
+			return gbcatalog.Refresh{}, gbcatalog.ErrInvalid
+		}
 		existing.DeviceID = refresh.DeviceID
 		existing.SN = refresh.SN
 		existing.Deadline = expiresAt
@@ -56,6 +59,9 @@ func (s *Store) StartRefresh(ctx context.Context, refresh gbcatalog.Refresh) (gb
 	if err == nil {
 		if state == "collecting" {
 			if _, err = tx.Exec(ctx, `UPDATE video_gb_catalogs SET state='failed',failed_at=clock_timestamp() WHERE device_id=$1 AND sn=$2 AND state='collecting'`, devicePK, refresh.SN); err != nil {
+				return gbcatalog.Refresh{}, gbcatalog.ErrStore
+			}
+			if _, err = tx.Exec(ctx, `UPDATE video_gb_devices SET catalog_state='stale' WHERE id=$1`, devicePK); err != nil {
 				return gbcatalog.Refresh{}, gbcatalog.ErrStore
 			}
 			if err = tx.Commit(ctx); err != nil {
@@ -89,8 +95,8 @@ func (s *Store) ReplaceCatalog(ctx context.Context, snapshot gbcatalog.Snapshot)
 	var catalogID uuid.UUID
 	var devicePK, tenantID int64
 	var expected int
-	var deadline time.Time
-	if err = tx.QueryRow(ctx, `SELECT c.id,c.device_id,c.tenant_id,c.expected_count,c.expires_at FROM video_gb_catalogs c JOIN video_gb_devices d ON d.id=c.device_id WHERE d.device_id=$1 AND c.sn=$2 AND c.state='collecting' FOR UPDATE OF c,d`, snapshot.DeviceID, snapshot.SN).Scan(&catalogID, &devicePK, &tenantID, &expected, &deadline); err != nil {
+	var deadline, databaseNow time.Time
+	if err = tx.QueryRow(ctx, `SELECT c.id,c.device_id,c.tenant_id,c.expected_count,c.expires_at,clock_timestamp() FROM video_gb_catalogs c JOIN video_gb_devices d ON d.id=c.device_id WHERE d.device_id=$1 AND c.sn=$2 AND c.state='collecting' FOR UPDATE OF c,d`, snapshot.DeviceID, snapshot.SN).Scan(&catalogID, &devicePK, &tenantID, &expected, &deadline, &databaseNow); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return gbcatalog.ErrInvalid
 		}
@@ -99,7 +105,7 @@ func (s *Store) ReplaceCatalog(ctx context.Context, snapshot gbcatalog.Snapshot)
 	if expected != len(snapshot.Items) {
 		return gbcatalog.ErrInvalid
 	}
-	if !snapshot.ObservedAt.Before(deadline) {
+	if !snapshot.ObservedAt.Before(deadline) || !databaseNow.Before(deadline) {
 		return gbcatalog.ErrDeadline
 	}
 	if _, err = tx.Exec(ctx, `DELETE FROM video_gb_catalog_items WHERE catalog_id=$1`, catalogID); err != nil {

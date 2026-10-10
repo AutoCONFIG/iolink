@@ -81,6 +81,9 @@ func TestStartRefreshIsIdempotentAndSerializesSamePeer(t *testing.T) {
 	if count != 1 {
 		t.Fatalf("catalog rows=%d", count)
 	}
+	if _, err := store.StartRefresh(t.Context(), refreshSN(1, deadline, 2)); !errors.Is(err, gbcatalog.ErrInvalid) {
+		t.Fatalf("different expected count reused active refresh: %v", err)
+	}
 }
 
 func TestReplaceCatalogAtomicallyReplacesDirectory(t *testing.T) {
@@ -154,6 +157,46 @@ func TestExpiredRefreshMarksStaleAndPreservesChannels(t *testing.T) {
 	}
 	if state != "stale" || !present {
 		t.Fatalf("state=%q present=%t", state, present)
+	}
+}
+
+func TestExpiredStartMarksDeviceStaleAtomically(t *testing.T) {
+	p, store := fixture(t)
+	deadline := time.Now().Add(-time.Second).Truncate(time.Microsecond)
+	if _, err := p.Exec(t.Context(), `INSERT INTO video_gb_catalogs(id,device_id,tenant_id,sn,expected_count,expires_at,state) VALUES(gen_random_uuid(),1401,1401,1,1,$1,'collecting')`, deadline); err != nil {
+		t.Fatal(err)
+	}
+	_, err := store.StartRefresh(t.Context(), refreshSN(1, time.Now().Add(10*time.Second).Truncate(time.Microsecond), 1))
+	if !errors.Is(err, gbcatalog.ErrDeadline) {
+		t.Fatalf("expired refresh err=%v", err)
+	}
+	var state, catalogState string
+	if err := p.QueryRow(t.Context(), `SELECT c.state,d.catalog_state FROM video_gb_catalogs c JOIN video_gb_devices d ON d.id=c.device_id WHERE c.device_id=1401 AND c.sn=1`).Scan(&state, &catalogState); err != nil {
+		t.Fatal(err)
+	}
+	if state != "failed" || catalogState != "stale" {
+		t.Fatalf("expired states catalog=%q device=%q", state, catalogState)
+	}
+}
+
+func TestReplaceCatalogRejectsLateDatabaseDeadlineWithOldObservedAt(t *testing.T) {
+	p, store := fixture(t)
+	deadline := time.Now().Add(250 * time.Millisecond).Truncate(time.Microsecond)
+	if _, err := store.StartRefresh(t.Context(), refreshSN(1, deadline, 1)); err != nil {
+		t.Fatal(err)
+	}
+	observed := deadline.Add(-100 * time.Millisecond)
+	time.Sleep(time.Until(deadline) + 50*time.Millisecond)
+	err := store.ReplaceCatalog(t.Context(), gbcatalog.Snapshot{DeviceID: testDevice, SN: 1, ObservedAt: observed, Items: []gbcatalog.Item{item("34020000001310001401", "late", true)}})
+	if !errors.Is(err, gbcatalog.ErrDeadline) {
+		t.Fatalf("late replacement err=%v", err)
+	}
+	var state string
+	if err := p.QueryRow(t.Context(), `SELECT state FROM video_gb_catalogs WHERE device_id=1401 AND sn=1`).Scan(&state); err != nil {
+		t.Fatal(err)
+	}
+	if state != "collecting" {
+		t.Fatalf("late replacement changed state=%q", state)
 	}
 }
 
