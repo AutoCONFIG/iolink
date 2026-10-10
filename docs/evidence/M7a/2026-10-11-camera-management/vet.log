@@ -1,0 +1,2 @@
+COMMAND: go vet ./internal/camera ./internal/camerapg ./internal/adminapi ./internal/appapi ./cmd/iolinkd
+RESULT: PASS
