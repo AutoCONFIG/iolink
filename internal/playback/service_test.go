@@ -131,6 +131,14 @@ func TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey(t *t
 	}
 }
 
+func TestRequestPlaybackReturnsSourceVersionConflictWithoutGrant(t *testing.T) {
+	store := &fakeStore{target: target(), createErr: domain.ErrConflict}
+	s := service(t, store, true, fakeProvider{}, fakeLicense{}, fakeTokens{raw: "token"})
+	if _, err := s.RequestPlayback(actor(), 9); !errors.Is(err, playback.ErrConflict) {
+		t.Fatalf("source version conflict err=%v", err)
+	}
+}
+
 func TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing(t *testing.T) {
 	store := &fakeStore{target: target()}
 	s := service(t, store, false, nil, nil, nil)

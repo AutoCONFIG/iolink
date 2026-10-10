@@ -21,6 +21,7 @@ The service rejects requests when `Enabled` is false, when provider/license capa
 | Job lease/CAS/unknown semantics | same command | provider unknown is persisted as `unknown` with the lease token; CAS lease loss returns `ErrLeaseLost` without replay | [targeted-race.log](targeted-race.log) |
 | Static checks | `go vet ./internal/media ./internal/playback` | exit status 0 | [targeted-race.log](targeted-race.log) |
 | Full Go package regression | `go test ./...` | exit status 0; all packages pass, including `internal/media/zlm` and `internal/playback` | [full-test.log](full-test.log) |
+| Repository verification | `make verify` | exit status 0; build, vet, race/shuffle package checks pass | [full-verify.log](full-verify.log) |
 
 ## Limits
 

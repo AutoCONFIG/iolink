@@ -1,0 +1,13 @@
+command: git rev-parse HEAD
+c71f6dff74eb402e72aa114b1420ccdae7df0e91
+command: git status --short -- internal/media/zlm deploy/zlm-secure-build
+command: go test -race -count=1 ./internal/media/zlm
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/zlm	1.011s
+command: go vet ./internal/media/zlm
+command: gofmt -l internal/media/zlm/*.go
+formatter_output=empty
+command: sh -n deploy/zlm-secure-build/build.sh
+command: guarded recipe
+ZLMediaKit security manifest is not approved
+guarded_recipe_exit=1
+judgment: gate tests/vet/format/syntax passed; guarded recipe failed closed as expected while manifest status is external_blocked
