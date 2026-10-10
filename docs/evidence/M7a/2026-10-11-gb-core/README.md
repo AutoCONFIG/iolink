@@ -7,7 +7,7 @@ This scoped increment adds the provider-neutral `internal/gb` signaling core. It
 - REGISTER challenge and MD5 Digest verification, with optional `qop=auth`, exact method/URI/realm binding, constant-time response comparison, nonce expiry and one-time use.
 - Registered-device lookup and configured peer-prefix enforcement. A peer already bound to another device is rejected. Transaction IDs replay the same successful response for a bounded period without applying registration twice.
 - Expires `0` unregisters; valid registration TTL is 60 through 3600 seconds. Registration status is online only while the expiry and three-keepalive window are both valid.
-- MESSAGE XML for Keepalive and Catalog uses a 64 KiB input bound, 16-level token depth bound, a 1000-item catalog bound, exact `SumNum`/`DeviceList Num` consistency, expected device binding, and DTD/entity/CDATA rejection.
+- MESSAGE XML for Keepalive and Catalog uses a 64 KiB input bound, 16-level token depth bound, a 1000-item catalog bound, page `DeviceList Num` consistency with the bounded `SumNum` total, expected device binding, and DTD/entity/CDATA rejection.
 - Ports are limited to `DeviceStore`, `NonceStore`, `Clock`, and `Transport`; no provider SDK or network runtime is included.
 
 ## Verification

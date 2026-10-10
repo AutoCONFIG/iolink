@@ -320,6 +320,11 @@ func TestMessageXMLKeepaliveCatalogAndBounds(t *testing.T) {
 	if err != nil || msg.SumNum != 1 || len(msg.Items) != 1 {
 		t.Fatalf("catalog=%#v %v", msg, err)
 	}
+	page := strings.Replace(catalog, "<SumNum>1</SumNum>", "<SumNum>2</SumNum>", 1)
+	msg, err = ParseMessageXML([]byte(page), device)
+	if err != nil || msg.SumNum != 2 || len(msg.Items) != 1 {
+		t.Fatalf("catalog page=%#v %v", msg, err)
+	}
 	for name, raw := range map[string]string{"dtd": `<!DOCTYPE Notify [<!ENTITY x "y">]><Notify/>`, "entity": `<Notify><CmdType>Keepalive</CmdType><SN>1</SN><DeviceID>` + device + `</DeviceID><Status>&x;</Status></Notify>`, "sum": `<Response><CmdType>Catalog</CmdType><SN>1</SN><DeviceID>` + device + `</DeviceID><SumNum>1</SumNum><DeviceList Num="0"/></Response>`} {
 		if _, err := ParseMessageXML([]byte(raw), device); !errors.Is(err, ErrXMLInvalid) {
 			t.Fatalf("%s err=%v", name, err)

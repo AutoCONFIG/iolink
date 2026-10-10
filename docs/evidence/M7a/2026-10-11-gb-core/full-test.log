@@ -13,7 +13,10 @@ ok  	git.hyhy.fun/rsplab/iolink/internal/camerapg	(cached)
 ok  	git.hyhy.fun/rsplab/iolink/internal/core	(cached)
 ok  	git.hyhy.fun/rsplab/iolink/internal/domain	(cached)
 ?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
-ok  	git.hyhy.fun/rsplab/iolink/internal/gb	0.004s
+--- FAIL: TestMessageXMLKeepaliveCatalogAndBounds (0.00s)
+    gb_test.go:330: sum err=<nil>
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/gb	0.004s
 ok  	git.hyhy.fun/rsplab/iolink/internal/ingestion	(cached)
 ok  	git.hyhy.fun/rsplab/iolink/internal/license	(cached)
 ?   	git.hyhy.fun/rsplab/iolink/internal/media	[no test files]
@@ -33,3 +36,4 @@ ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	(cached)
 ?   	git.hyhy.fun/rsplab/iolink/internal/web	[no test files]
 ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	(cached)
 ?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]
+FAIL
