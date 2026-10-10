@@ -207,7 +207,7 @@ func (s *Service) AuthorizeMedia(ctx context.Context, rawToken, sessionID string
 	}
 	access, err := s.cfg.Store.AuthorizeMedia(ctx, claims, sha256.Sum256([]byte(rawToken)), now)
 	if err != nil {
-		return MediaAccess{}, normalizeStoreError(err)
+		return MediaAccess{}, normalizeMediaStoreError(err)
 	}
 	if access.SessionID != sessionID || access.TenantID != claims.TenantID || access.CameraID != claims.CameraID || access.SourceVersion != claims.SourceVersion {
 		return MediaAccess{}, ErrUnauthorized

@@ -31,6 +31,7 @@ type store struct {
 	partialErr         bool
 	resolveErr         error
 	resolveSawDeadline bool
+	authorizeErr       error
 }
 
 func (s *store) PreparePlayback(context.Context, int64) (media.PlaybackTarget, error) {
@@ -62,6 +63,9 @@ func (s *store) FinishJob(context.Context, media.Lease, media.JobResult, time.Ti
 }
 
 func (s *store) AuthorizeMedia(context.Context, media.MediaClaims, [32]byte, time.Time) (media.MediaAccess, error) {
+	if s.authorizeErr != nil {
+		return media.MediaAccess{}, s.authorizeErr
+	}
 	return s.access, nil
 }
 
@@ -143,6 +147,15 @@ func TestManifestPendingReturns425AndRetryAfter(t *testing.T) {
 	recorder := request(mediahttp.New(s), "/media/v1/"+mediaToken+"/"+mediaUUID+"/index.m3u8")
 	if recorder.Code != http.StatusTooEarly || recorder.Header().Get("Retry-After") != "1" {
 		t.Fatalf("status=%d headers=%v", recorder.Code, recorder.Header())
+	}
+}
+
+func TestGenericAuthorizationStoreFailureReturns503(t *testing.T) {
+	s, store := service(t, media.SessionReady, []byte("#EXTM3U\n"), nil)
+	store.authorizeErr = errors.New("database unavailable")
+	recorder := request(mediahttp.New(s), "/media/v1/"+mediaToken+"/"+mediaUUID+"/index.m3u8")
+	if recorder.Code != http.StatusServiceUnavailable {
+		t.Fatalf("generic authorization error status=%d body=%s", recorder.Code, recorder.Body.String())
 	}
 }
 
