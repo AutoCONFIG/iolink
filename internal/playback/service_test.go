@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -89,10 +90,19 @@ func (f fakeTokens) Verify(context.Context, string) (media.MediaClaims, error) {
 	return f.claims, f.verifyErr
 }
 
-type fakeProvider struct{ startErr, stopErr error }
+type fakeProvider struct {
+	startErr, stopErr     error
+	startCalls, stopCalls int
+}
 
-func (f fakeProvider) Start(context.Context, media.StartRequest) error { return f.startErr }
-func (f fakeProvider) Stop(context.Context, media.StopRequest) error   { return f.stopErr }
+func (f *fakeProvider) Start(context.Context, media.StartRequest) error {
+	f.startCalls++
+	return f.startErr
+}
+func (f *fakeProvider) Stop(context.Context, media.StopRequest) error {
+	f.stopCalls++
+	return f.stopErr
+}
 
 func actor() context.Context {
 	ctx := domain.WithTenantID(context.Background(), 21)
@@ -109,7 +119,7 @@ func target() media.PlaybackTarget {
 
 func service(t *testing.T, store *fakeStore, enabled bool, provider media.Provider, license media.LicenseGuard, tokens media.TokenIssuer) *playback.Service {
 	t.Helper()
-	s, err := playback.New(playback.Config{Store: store, Enabled: enabled, Provider: provider, License: license, Tokens: tokens, Now: func() time.Time { return time.Date(2026, 10, 11, 1, 0, 0, 0, time.UTC) }})
+	s, err := playback.New(playback.Config{Store: store, Enabled: enabled, Provider: provider, License: license, Tokens: tokens, ManifestBaseURL: "https://media.example.test/media/v1", Now: func() time.Time { return time.Date(2026, 10, 11, 1, 0, 0, 0, time.UTC) }})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +128,7 @@ func service(t *testing.T, store *fakeStore, enabled bool, provider media.Provid
 
 func TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey(t *testing.T) {
 	store := &fakeStore{target: target()}
-	s := service(t, store, true, fakeProvider{}, fakeLicense{}, fakeTokens{raw: "token"})
+	s := service(t, store, true, &fakeProvider{}, fakeLicense{}, fakeTokens{raw: "token"})
 	grant, err := s.RequestPlayback(actor(), 9)
 	if err != nil {
 		t.Fatal(err)
@@ -129,14 +139,14 @@ func TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey(t *t
 	if store.create.Target.SourceVersion != 7 || store.create.StartJobKey != "start:9:7" {
 		t.Fatalf("create input lost source version/idempotency key: %+v", store.create)
 	}
-	if grant.ManifestURL == "" || store.create.TokenHash != sha256.Sum256([]byte("token")) {
+	if !strings.HasPrefix(grant.ManifestURL, "https://") || store.create.TokenHash != sha256.Sum256([]byte("token")) {
 		t.Fatalf("grant or token hash missing: %+v", grant)
 	}
 }
 
 func TestRequestPlaybackReturnsSourceVersionConflictWithoutGrant(t *testing.T) {
 	store := &fakeStore{target: target(), createErr: domain.ErrConflict}
-	s := service(t, store, true, fakeProvider{}, fakeLicense{}, fakeTokens{raw: "token"})
+	s := service(t, store, true, &fakeProvider{}, fakeLicense{}, fakeTokens{raw: "token"})
 	if _, err := s.RequestPlayback(actor(), 9); !errors.Is(err, playback.ErrConflict) {
 		t.Fatalf("source version conflict err=%v", err)
 	}
@@ -148,7 +158,7 @@ func TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing(t *testing.T
 	if _, err := s.RequestPlayback(actor(), 9); !errors.Is(err, playback.ErrUnavailable) {
 		t.Fatalf("disabled playback err=%v", err)
 	}
-	s = service(t, store, true, fakeProvider{}, nil, fakeTokens{raw: "token"})
+	s = service(t, store, true, &fakeProvider{}, nil, fakeTokens{raw: "token"})
 	if _, err := s.RequestPlayback(actor(), 9); !errors.Is(err, playback.ErrUnavailable) {
 		t.Fatalf("missing license err=%v", err)
 	}
@@ -156,7 +166,7 @@ func TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing(t *testing.T
 		t.Fatal("fail-closed request inserted a session")
 	}
 	store = &fakeStore{target: target()}
-	s = service(t, store, true, fakeProvider{}, fakeLicense{err: media.ErrLicenseRequired}, fakeTokens{raw: "token"})
+	s = service(t, store, true, &fakeProvider{}, fakeLicense{err: media.ErrLicenseRequired}, fakeTokens{raw: "token"})
 	if _, err := s.RequestPlayback(actor(), 9); !errors.Is(err, playback.ErrLicenseRequired) {
 		t.Fatalf("license rejection err=%v", err)
 	}
@@ -164,12 +174,34 @@ func TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing(t *testing.T
 
 func TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing(t *testing.T) {
 	store := &fakeStore{target: target()}
-	s := service(t, store, true, fakeProvider{}, fakeLicense{}, nil)
+	s := service(t, store, true, &fakeProvider{}, fakeLicense{}, nil)
 	if _, err := s.RequestPlayback(actor(), 9); !errors.Is(err, playback.ErrUnavailable) {
 		t.Fatalf("missing token issuer err=%v", err)
 	}
 	if store.created {
 		t.Fatal("missing token issuer inserted a session")
+	}
+}
+
+func TestRequestPlaybackRequiresAbsoluteHTTPSManifestURLWhenEnabled(t *testing.T) {
+	for _, base := range []string{"", "/media/v1", "http://media.example.test/media/v1", "https://"} {
+		store := &fakeStore{target: target()}
+		s, err := playback.New(playback.Config{
+			Store: store, Enabled: true, Provider: &fakeProvider{}, License: fakeLicense{}, Tokens: fakeTokens{raw: "token"},
+			ManifestBaseURL: base, Now: func() time.Time { return time.Date(2026, 10, 11, 1, 0, 0, 0, time.UTC) },
+		})
+		if err != nil {
+			t.Fatalf("base %q New err=%v", base, err)
+		}
+		if _, err := s.RequestPlayback(actor(), 9); !errors.Is(err, playback.ErrUnavailable) {
+			t.Fatalf("base %q err=%v", base, err)
+		}
+		if store.created {
+			t.Fatalf("base %q persisted a session", base)
+		}
+	}
+	if _, err := playback.New(playback.Config{Store: &fakeStore{}}); err != nil {
+		t.Fatalf("disabled service construction err=%v", err)
 	}
 }
 
@@ -204,7 +236,7 @@ func TestProcessMediaJobUsesLeaseAndRecordsUnknownWithoutReplay(t *testing.T) {
 		claimOK:    true,
 		revalidate: media.JobAuthorization{Target: target(), Active: true, SourceCurrent: true},
 	}
-	s := service(t, store, true, fakeProvider{startErr: media.ErrUnknown}, fakeLicense{}, fakeTokens{raw: "token"})
+	s := service(t, store, true, &fakeProvider{startErr: media.ErrUnknown}, fakeLicense{}, fakeTokens{raw: "token"})
 	ok, err := s.ProcessMediaJob(actor(), "worker-1")
 	if !ok || !errors.Is(err, media.ErrUnknown) {
 		t.Fatalf("unknown process ok=%v err=%v", ok, err)
@@ -221,10 +253,40 @@ func TestProcessMediaJobLeaseCASFailureIsUnknownToCaller(t *testing.T) {
 		revalidate: media.JobAuthorization{Target: target(), Active: true, SourceCurrent: true},
 		finishErr:  media.ErrLeaseLost,
 	}
-	s := service(t, store, true, fakeProvider{}, fakeLicense{}, fakeTokens{raw: "token"})
+	s := service(t, store, true, &fakeProvider{}, fakeLicense{}, fakeTokens{raw: "token"})
 	ok, err := s.ProcessMediaJob(actor(), "worker-1")
 	if !ok || !errors.Is(err, media.ErrLeaseLost) {
 		t.Fatalf("lease loss ok=%v err=%v", ok, err)
+	}
+}
+
+func TestProcessMediaJobSkipsInactiveOrStaleStartWithoutProvider(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		auth media.JobAuthorization
+	}{
+		{name: "inactive", auth: media.JobAuthorization{Target: target(), Active: false, SourceCurrent: true}},
+		{name: "stale-source", auth: media.JobAuthorization{Target: target(), Active: true, SourceCurrent: false}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			store := &fakeStore{
+				claim:      media.Lease{Job: media.Job{ID: "j", Kind: media.JobStart, CameraID: 9, SourceVersion: 7, StreamID: "stream-7", Attempts: 1}, LeaseToken: "lease"},
+				claimOK:    true,
+				revalidate: tc.auth,
+			}
+			provider := &fakeProvider{}
+			s := service(t, store, true, provider, fakeLicense{}, fakeTokens{raw: "token"})
+			ok, err := s.ProcessMediaJob(actor(), "worker-1")
+			if !ok || err != nil {
+				t.Fatalf("skip ok=%v err=%v", ok, err)
+			}
+			if store.finish.Status != media.JobSkipped {
+				t.Fatalf("finish status=%s, want skipped", store.finish.Status)
+			}
+			if provider.startCalls != 0 {
+				t.Fatalf("provider start calls=%d, want 0", provider.startCalls)
+			}
+		})
 	}
 }
 

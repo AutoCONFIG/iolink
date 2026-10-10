@@ -1,0 +1,22 @@
+M7a playback review fixes verification (2026-10-11)
+
+Command: go test -race -shuffle=on -count=1 ./internal/playback ./internal/media
+Output:
+ok   git.hyhy.fun/rsplab/iolink/internal/playback 1.012s
+?    git.hyhy.fun/rsplab/iolink/internal/media [no test files]
+
+Command: go vet ./internal/playback ./internal/media
+Output: exit 0 with no diagnostics.
+
+Command: sh deploy/zlm-secure-build/build-probe.sh
+Output:
+zlm build probe: approved patch applied and reverse-checked; unapplied, dirty, and unapproved inputs rejected before build/fetch.
+
+Command: make verify >/dev/null && printf 'make verify exit=0'
+Output:
+make verify exit=0
+
+Command: git diff --check
+Output: exit 0 with no whitespace errors.
+
+Judgment: ProcessMediaJob now keeps inactive or stale JobStart leases at JobSkipped and does not call the provider; regression subtests cover both predicates. Enabled playback rejects relative, HTTP, empty, and hostless manifest bases with ErrUnavailable before Prepare/Create, while disabled service construction remains valid. A valid HTTPS base produces an HTTPS manifest URL. No provider runtime was enabled.

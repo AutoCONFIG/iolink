@@ -83,6 +83,9 @@ func (s *Service) RequestPlayback(ctx context.Context, cameraID int64) (Grant, e
 	if !s.cfg.Enabled || s.cfg.License == nil || s.cfg.Provider == nil || s.cfg.Tokens == nil {
 		return Grant{}, ErrUnavailable
 	}
+	if !validManifestBaseURL(s.cfg.ManifestBaseURL) {
+		return Grant{}, ErrUnavailable
+	}
 	if cameraID <= 0 {
 		return Grant{}, ErrInvalid
 	}
@@ -225,10 +228,12 @@ func (s *Service) ProcessMediaJob(ctx context.Context, workerID string) (bool, e
 		return true, normalizeStoreError(err)
 	}
 	result := media.JobResult{Status: media.JobSkipped, NextAt: now}
+	skipped := false
 	var providerErr error
 	switch lease.Kind {
 	case media.JobStart:
 		if !auth.Active || !auth.SourceCurrent {
+			skipped = true
 			break
 		}
 		if s.cfg.License == nil {
@@ -245,7 +250,10 @@ func (s *Service) ProcessMediaJob(ctx context.Context, workerID string) (bool, e
 	default:
 		providerErr = ErrInvalid
 	}
-	result, returnedErr := jobResult(providerErr, lease.Attempts, now, lease.Kind)
+	var returnedErr error
+	if !skipped {
+		result, returnedErr = jobResult(providerErr, lease.Attempts, now, lease.Kind)
+	}
 	if err = s.cfg.Store.FinishJob(context.WithoutCancel(ctx), lease, result, now); err != nil {
 		if errors.Is(err, media.ErrLeaseLost) {
 			return true, ErrLeaseLost
@@ -306,6 +314,11 @@ func validateClaims(got, want media.MediaClaims, now time.Time) error {
 func manifestURL(base, token, sessionID string) string {
 	base = strings.TrimRight(base, "/")
 	return base + "/" + url.PathEscape(token) + "/" + url.PathEscape(sessionID) + "/index.m3u8"
+}
+
+func validManifestBaseURL(raw string) bool {
+	u, err := url.Parse(raw)
+	return err == nil && u.IsAbs() && strings.EqualFold(u.Scheme, "https") && u.Host != ""
 }
 
 func jobResult(providerErr error, attempts int, now time.Time, kind media.JobKind) (media.JobResult, error) {
