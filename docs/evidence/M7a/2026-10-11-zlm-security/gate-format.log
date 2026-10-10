@@ -1,0 +1,3 @@
+command=gofmt -l internal/media/zlm/*.go
+formatter_output=empty
+exit=0
