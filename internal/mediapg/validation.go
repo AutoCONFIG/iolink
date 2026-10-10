@@ -18,7 +18,10 @@ func validCreate(in media.CreateSession) bool {
 }
 
 func validLease(l media.Lease) bool {
-	return l.ID != "" && l.Kind != "" && validUUID(l.StreamID) && l.CameraID > 0 && l.SourceVersion > 0 && l.LeaseToken != "" && !l.LeasedUntil.IsZero()
+	if l.ID == "" || !validUUID(l.SessionID) || !validUUID(l.StreamID) || l.CameraID <= 0 || l.SourceVersion <= 0 || l.LeaseToken == "" || l.LeasedUntil.IsZero() {
+		return false
+	}
+	return l.Kind == media.JobStart || l.Kind == media.JobStop
 }
 
 func validWorkerID(workerID string) bool {
@@ -123,11 +126,4 @@ func sessionErrorCode(code string) string {
 	default:
 		return "provider_unavailable"
 	}
-}
-
-func kindFromLease(l media.Lease) string {
-	if l.Kind == media.JobStop {
-		return jobStop
-	}
-	return jobStart
 }

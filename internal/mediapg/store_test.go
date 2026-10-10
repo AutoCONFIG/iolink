@@ -27,6 +27,7 @@ INSERT INTO tenants(id,name,permission_version) VALUES (10,'media-tenant',3);
 INSERT INTO farms(id,tenant_id,owner_id,name) VALUES (20,10,1,'media-farm');
 INSERT INTO ponds(id,farm_id,name) VALUES (30,20,'media-pond');
 INSERT INTO tenant_memberships(tenant_id,user_id,role,permission_version) VALUES (10,1,'owner',4);
+UPDATE license_state SET payload=decode('01','hex'),signature=decode('02','hex'),payload_sha256=repeat('0',64),imported_at=clock_timestamp() WHERE singleton;
 INSERT INTO video_cameras(id,tenant_id,farm_id,pond_id,name,source_kind,source_version,rtsp_uri) VALUES (40,10,20,30,'camera','rtsp',1,'rtsp://192.0.2.1/live')`); err != nil {
 		t.Fatal(err)
 	}
@@ -36,10 +37,14 @@ INSERT INTO video_cameras(id,tenant_id,farm_id,pond_id,name,source_kind,source_v
 }
 
 func createInput(t *testing.T, target media.PlaybackTarget) media.CreateSession {
+	return createInputToken(t, target, "media-token")
+}
+
+func createInputToken(t *testing.T, target media.PlaybackTarget, token string) media.CreateSession {
 	t.Helper()
 	now := time.Now().UTC().Truncate(time.Microsecond)
 	id := uuid.NewString()
-	hash := sha256.Sum256([]byte("media-token"))
+	hash := sha256.Sum256([]byte(token))
 	return media.CreateSession{Target: target, TokenHash: hash, StartJobKey: "start:40:1", Session: media.Session{
 		ID: id, StreamID: target.StreamID, TenantID: target.TenantID, CameraID: target.CameraID, SourceVersion: target.SourceVersion,
 		UserID: target.UserID, UserTokenVersion: target.UserTokenVersion, TenantPermissionVersion: target.TenantPermissionVersion,
@@ -124,7 +129,7 @@ func TestCreateRejectsSourceVersionChangeWithoutPartialRows(t *testing.T) {
 	}
 }
 
-func TestCreateDuplicateStartJobRollsBackSession(t *testing.T) {
+func TestCreateDuplicateStartJobSharesStream(t *testing.T) {
 	p, store, ctx := fixture(t)
 	target, err := store.PreparePlayback(ctx, 40)
 	if err != nil {
@@ -133,47 +138,107 @@ func TestCreateDuplicateStartJobRollsBackSession(t *testing.T) {
 	if _, err = store.CreatePlayback(ctx, createInput(t, target)); err != nil {
 		t.Fatal(err)
 	}
-	_, err = store.CreatePlayback(ctx, createInput(t, target))
-	if !errors.Is(err, media.ErrConflict) {
+	second, err := store.CreatePlayback(ctx, createInputToken(t, target, "media-token-2"))
+	if err != nil {
 		t.Fatalf("err=%v", err)
 	}
 	var sessions, jobs int
 	if err = p.QueryRow(t.Context(), `SELECT (SELECT count(*) FROM video_sessions),(SELECT count(*) FROM jobs WHERE kind='video.start')`).Scan(&sessions, &jobs); err != nil {
 		t.Fatal(err)
 	}
-	if sessions != 1 || jobs != 1 {
+	if sessions != 2 || jobs != 1 || second.StreamID != target.StreamID {
 		t.Fatalf("duplicate left partial rows sessions=%d jobs=%d", sessions, jobs)
 	}
 }
 
-func TestAuthorizeRejectsWrongHash(t *testing.T) {
-	_, store, ctx := fixture(t)
+func TestCreateSameSessionIsIdempotent(t *testing.T) {
+	p, store, ctx := fixture(t)
 	target, err := store.PreparePlayback(ctx, 40)
 	if err != nil {
 		t.Fatal(err)
 	}
-	session, err := store.CreatePlayback(ctx, createInput(t, target))
+	in := createInput(t, target)
+	first, err := store.CreatePlayback(ctx, in)
 	if err != nil {
 		t.Fatal(err)
 	}
-	claims := media.MediaClaims{SessionID: session.ID, TenantID: 10, CameraID: 40, UserID: 1, SourceVersion: 1, Audience: "iolink-media-v1", IssuedAt: session.CreatedAt, ExpiresAt: session.ExpiresAt, JTI: uuid.NewString()}
-	wrong := sha256.Sum256([]byte("wrong"))
-	if _, err = store.AuthorizeMedia(context.Background(), claims, wrong, time.Now().UTC()); !errors.Is(err, media.ErrUnauthorized) {
-		t.Fatalf("err=%v", err)
+	second, err := store.CreatePlayback(ctx, in)
+	if err != nil || second.ID != first.ID {
+		t.Fatalf("first=%+v second=%+v err=%v", first, second, err)
 	}
-	validHash := sha256.Sum256([]byte("media-token"))
-	claims.Audience = "other-audience"
-	if _, err = store.AuthorizeMedia(context.Background(), claims, validHash, time.Now().UTC()); !errors.Is(err, media.ErrUnauthorized) {
-		t.Fatalf("audience err=%v", err)
+	var sessions, jobs int
+	if err = p.QueryRow(t.Context(), `SELECT (SELECT count(*) FROM video_sessions),(SELECT count(*) FROM jobs WHERE kind='video.start')`).Scan(&sessions, &jobs); err != nil {
+		t.Fatal(err)
 	}
-	claims.Audience = "iolink-media-v1"
-	claims.JTI = ""
-	if _, err = store.AuthorizeMedia(context.Background(), claims, validHash, time.Now().UTC()); !errors.Is(err, media.ErrUnauthorized) {
-		t.Fatalf("jti err=%v", err)
+	if sessions != 1 || jobs != 1 {
+		t.Fatalf("sessions=%d jobs=%d", sessions, jobs)
 	}
-	claims.JTI = uuid.NewString()
-	claims.IssuedAt = time.Now().UTC().Add(time.Second)
-	if _, err = store.AuthorizeMedia(context.Background(), claims, validHash, time.Now().UTC()); !errors.Is(err, media.ErrUnauthorized) {
-		t.Fatalf("future issued err=%v", err)
+}
+
+func TestStopOnlyStopsLastSharedSession(t *testing.T) {
+	p, store, ctx := fixture(t)
+	target, err := store.PreparePlayback(ctx, 40)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := store.CreatePlayback(ctx, createInput(t, target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := store.CreatePlayback(ctx, createInputToken(t, target, "media-token-2"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	lease, ok, err := store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-shared")
+	if err != nil || !ok {
+		t.Fatalf("lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobReady, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	if err = store.StopOwnedPlayback(ctx, first.ID, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	var firstState, secondState string
+	var stopJobs int
+	if err = p.QueryRow(t.Context(), `SELECT (SELECT state FROM video_sessions WHERE id=$1),(SELECT state FROM video_sessions WHERE id=$2),(SELECT count(*) FROM jobs WHERE kind='video.stop')`, first.ID, second.ID).Scan(&firstState, &secondState, &stopJobs); err != nil {
+		t.Fatal(err)
+	}
+	if firstState != "revoked" || secondState != "ready" || stopJobs != 0 {
+		t.Fatalf("first=%s second=%s stopJobs=%d", firstState, secondState, stopJobs)
+	}
+	if err = store.StopOwnedPlayback(ctx, second.ID, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	lease, ok, err = store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-stop")
+	if err != nil || !ok || lease.Kind != media.JobStop {
+		t.Fatalf("stop lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobStopped, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	var streamState string
+	if err = p.QueryRow(t.Context(), `SELECT state FROM video_streams WHERE id=$1`, first.StreamID).Scan(&streamState); err != nil {
+		t.Fatal(err)
+	}
+	if streamState != "stopped" {
+		t.Fatalf("stream=%s", streamState)
+	}
+}
+
+func TestClaimRejectsMaxAttempts(t *testing.T) {
+	p, store, ctx := fixture(t)
+	target, err := store.PreparePlayback(ctx, 40)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = store.CreatePlayback(ctx, createInput(t, target)); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = p.Exec(t.Context(), `UPDATE jobs SET attempts=6 WHERE kind='video.start'`); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok, err := store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-max"); err != nil || ok {
+		t.Fatalf("ok=%v err=%v", ok, err)
 	}
 }

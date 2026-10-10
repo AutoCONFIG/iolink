@@ -2,7 +2,6 @@ package mediapg
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"strconv"
 	"time"
@@ -24,7 +23,7 @@ func (s *Store) ClaimJob(ctx context.Context, now time.Time, lease time.Duration
 	var kind, payloadRaw string
 	var attempts int
 	err = tx.QueryRow(ctx, `SELECT id,tenant_id,kind,payload::text,attempts FROM jobs
-	 WHERE kind IN ('video.start','video.stop') AND ((status='scheduled' AND available_at<=clock_timestamp()) OR (status='running' AND leased_until IS NOT NULL AND leased_until<=clock_timestamp()))
+	 WHERE kind IN ('video.start','video.stop') AND attempts < 6 AND ((status='scheduled' AND available_at<=clock_timestamp()) OR (status='running' AND leased_until IS NOT NULL AND leased_until<=clock_timestamp()))
 	 ORDER BY available_at,id FOR UPDATE SKIP LOCKED LIMIT 1`).Scan(&id, &tenantID, &kind, &payloadRaw, &attempts)
 	if errors.Is(err, pgx.ErrNoRows) {
 		if err = tx.Commit(ctx); err != nil {
@@ -70,14 +69,21 @@ func (s *Store) RevalidateJob(ctx context.Context, lease media.Lease) (media.Job
 		return media.JobAuthorization{}, media.ErrUnavailable
 	}
 	defer tx.Rollback(context.Background())
-	var status string
+	var kind string
 	var tenantID int64
-	err = tx.QueryRow(ctx, `SELECT status,tenant_id FROM jobs WHERE id=$1 AND status='running' AND lease_owner=$2 AND leased_until>clock_timestamp() FOR SHARE`, id, lease.LeaseToken).Scan(&status, &tenantID)
+	err = tx.QueryRow(ctx, `SELECT kind,tenant_id FROM jobs WHERE id=$1 AND status='running' AND lease_owner=$2 AND leased_until>clock_timestamp() FOR SHARE`, id, lease.LeaseToken).Scan(&kind, &tenantID)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return media.JobAuthorization{}, media.ErrLeaseLost
 	}
 	if err != nil {
 		return media.JobAuthorization{}, media.ErrUnavailable
+	}
+	wantKind := jobStart
+	if lease.Kind == media.JobStop {
+		wantKind = jobStop
+	}
+	if kind != wantKind {
+		return media.JobAuthorization{}, media.ErrLeaseLost
 	}
 	target := media.PlaybackTarget{TenantID: tenantID, CameraID: lease.CameraID, SourceVersion: lease.SourceVersion, StreamID: lease.StreamID}
 	var enabled bool
@@ -92,94 +98,45 @@ func (s *Store) RevalidateJob(ctx context.Context, lease media.Lease) (media.Job
 	if err != nil {
 		return media.JobAuthorization{}, media.ErrUnavailable
 	}
-	if err = loadLicense(ctx, tx, &target.License); err != nil {
+	var userID, userTokenVersion, tenantPermissionVersion, memberPermissionVersion int64
+	var currentUserTokenVersion, currentTenantPermissionVersion, currentMemberPermissionVersion int64
+	var sessionState string
+	err = tx.QueryRow(ctx, `SELECT s.user_id,s.user_token_version,s.tenant_permission_version,s.member_permission_version,
+	 u.token_version,t.permission_version,tm.permission_version,s.state
+ FROM video_sessions s
+ JOIN video_cameras c ON c.id=s.camera_id AND c.tenant_id=s.tenant_id
+ JOIN farms f ON f.id=c.farm_id AND f.tenant_id=c.tenant_id
+ JOIN tenants t ON t.id=s.tenant_id AND t.active
+ JOIN users u ON u.id=s.user_id AND u.authority='USER'
+ JOIN tenant_memberships tm ON tm.tenant_id=s.tenant_id AND tm.user_id=s.user_id AND tm.active AND (tm.expires_at IS NULL OR tm.expires_at>clock_timestamp())
+	 WHERE s.id=$5 AND s.stream_id=$1 AND s.camera_id=$2 AND s.tenant_id=$3 AND s.source_version=$4
+ AND s.user_token_version=u.token_version AND s.tenant_permission_version=t.permission_version AND s.member_permission_version=tm.permission_version
+	 AND ($6 <> 'video.start' OR (s.state IN ('pending','ready') AND s.expires_at>clock_timestamp()))
+ AND (tm.role IN ('owner','admin') OR f.owner_id=s.user_id OR EXISTS (SELECT 1 FROM farm_memberships fm WHERE fm.farm_id=f.id AND fm.tenant_id=f.tenant_id AND fm.user_id=s.user_id AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>clock_timestamp())))
+		 ORDER BY s.created_at DESC LIMIT 1`, lease.StreamID, lease.CameraID, tenantID, lease.SourceVersion, lease.SessionID, kind).Scan(&userID, &userTokenVersion, &tenantPermissionVersion, &memberPermissionVersion, &currentUserTokenVersion, &currentTenantPermissionVersion, &currentMemberPermissionVersion, &sessionState)
+	if errors.Is(err, pgx.ErrNoRows) {
+		if err = tx.Commit(ctx); err != nil {
+			return media.JobAuthorization{}, media.ErrUnavailable
+		}
+		return media.JobAuthorization{Target: target, Active: false, SourceCurrent: sourceVersion == lease.SourceVersion}, nil
+	}
+	if err != nil {
 		return media.JobAuthorization{}, media.ErrUnavailable
+	}
+	if currentUserTokenVersion != userTokenVersion || currentTenantPermissionVersion != tenantPermissionVersion || currentMemberPermissionVersion != memberPermissionVersion {
+		return media.JobAuthorization{}, media.ErrLeaseLost
+	}
+	target.UserID = userID
+	target.UserTokenVersion = userTokenVersion
+	target.TenantPermissionVersion = tenantPermissionVersion
+	target.MemberPermissionVersion = memberPermissionVersion
+	if lease.Kind == media.JobStart && enabled && sourceVersion == lease.SourceVersion {
+		if err = loadLicense(ctx, tx, &target.License); err != nil {
+			return media.JobAuthorization{}, media.ErrLicenseUnavailable
+		}
 	}
 	if err = tx.Commit(ctx); err != nil {
 		return media.JobAuthorization{}, media.ErrUnavailable
 	}
 	return media.JobAuthorization{Target: target, Active: enabled, SourceCurrent: sourceVersion == lease.SourceVersion}, nil
-}
-
-func (s *Store) FinishJob(ctx context.Context, lease media.Lease, result media.JobResult, now time.Time) error {
-	if s == nil || s.pool == nil || !validLease(lease) || now.IsZero() || !validJobResult(result) {
-		return media.ErrInvalid
-	}
-	id, _ := strconv.ParseInt(lease.ID, 10, 64)
-	status := jobStatus(result.Status)
-	next := result.NextAt.UTC()
-	if next.IsZero() {
-		next = now.UTC()
-	}
-	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.ReadCommitted})
-	if err != nil {
-		return media.ErrPersistenceUnknown
-	}
-	defer tx.Rollback(context.Background())
-	var payload string
-	err = tx.QueryRow(ctx, `UPDATE jobs SET status=$2,available_at=$3,leased_until=NULL,lease_owner=NULL,
- payload=CASE WHEN $4='' THEN payload ELSE jsonb_set(payload,'{error_code}',to_jsonb($4::text),true) END
- WHERE id=$1 AND status='running' AND lease_owner=$5 AND leased_until>clock_timestamp() RETURNING payload::text`, id, status, next, result.ErrorCode, lease.LeaseToken).Scan(&payload)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return media.ErrLeaseLost
-	}
-	if err != nil {
-		return media.ErrPersistenceUnknown
-	}
-	job, err := decodeJob(id, kindFromLease(lease), payload, lease.Attempts)
-	if err != nil {
-		return media.ErrPersistenceUnknown
-	}
-	if err = finishStreamAndSessions(ctx, tx, job, result); err != nil {
-		return media.ErrPersistenceUnknown
-	}
-	if err = tx.Commit(ctx); err != nil {
-		return media.ErrPersistenceUnknown
-	}
-	return nil
-}
-
-func finishStreamAndSessions(ctx context.Context, tx pgx.Tx, job media.Job, result media.JobResult) error {
-	streamState := ""
-	sessionState := ""
-	switch result.Status {
-	case media.JobReady:
-		streamState, sessionState = "ready", "ready"
-	case media.JobStopped:
-		streamState = "stopped"
-	case media.JobRetryable:
-		streamState = "starting"
-	case media.JobSkipped, media.JobDisabled, media.JobFailed, media.JobUnknown:
-		streamState, sessionState = "failed", "failed"
-	default:
-		return media.ErrInvalid
-	}
-	if _, err := tx.Exec(ctx, `UPDATE video_streams SET state=$2,updated_at=clock_timestamp() WHERE id=$1`, job.StreamID, streamState); err != nil {
-		return err
-	}
-	if sessionState != "" {
-		_, err := tx.Exec(ctx, `UPDATE video_sessions SET state=$2,error_code=NULLIF($3,'') WHERE stream_id=$1 AND state='pending'`, job.StreamID, sessionState, sessionErrorCode(result.ErrorCode))
-		return err
-	}
-	if result.Status == media.JobStopped {
-		_, err := tx.Exec(ctx, `UPDATE video_sessions SET state='revoked',revoked_at=COALESCE(revoked_at,clock_timestamp()) WHERE stream_id=$1 AND state IN ('pending','ready')`, job.StreamID)
-		return err
-	}
-	return nil
-}
-
-func decodeJob(id int64, kind, raw string, attempts int) (media.Job, error) {
-	var payload struct {
-		CameraID      int64  `json:"camera_id"`
-		SourceVersion int64  `json:"source_version"`
-		StreamID      string `json:"stream_id"`
-	}
-	if kind != jobStart && kind != jobStop || json.Unmarshal([]byte(raw), &payload) != nil || payload.CameraID <= 0 || payload.SourceVersion <= 0 || !validUUID(payload.StreamID) {
-		return media.Job{}, media.ErrInvalid
-	}
-	jobKind := media.JobStart
-	if kind == jobStop {
-		jobKind = media.JobStop
-	}
-	return media.Job{ID: strconv.FormatInt(id, 10), Kind: jobKind, CameraID: payload.CameraID, SourceVersion: payload.SourceVersion, StreamID: payload.StreamID, Attempts: attempts}, nil
 }

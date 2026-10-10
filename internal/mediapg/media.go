@@ -12,17 +12,21 @@ import (
 )
 
 func (s *Store) AuthorizeMedia(ctx context.Context, claims media.MediaClaims, tokenHash [32]byte, now time.Time) (media.MediaAccess, error) {
-	if s == nil || s.pool == nil || !validClaims(claims) || now.IsZero() || zeroHash(tokenHash) || claims.IssuedAt.After(now) || claims.ExpiresAt.Sub(claims.IssuedAt) > domain.MaxVideoPlaybackTTL {
+	if s == nil || s.pool == nil || !validClaims(claims) || now.IsZero() || zeroHash(tokenHash) || claims.ExpiresAt.Sub(claims.IssuedAt) > domain.MaxVideoPlaybackTTL {
 		return media.MediaAccess{}, media.ErrUnauthorized
 	}
 	var out media.MediaAccess
 	var state string
 	var storedHash []byte
 	var userID, cameraVersion int64
+	var userTokenVersion, tenantPermissionVersion, memberPermissionVersion int64
 	var cameraEnabled bool
+	var dbNow time.Time
 	err := s.pool.QueryRow(ctx, `SELECT vs.id::text,vs.stream_id::text,vs.tenant_id,vs.camera_id,vs.source_version,vs.state,vs.expires_at,vs.token_hash,vs.user_id,c.enabled,c.source_version
+ ,vs.user_token_version,vs.tenant_permission_version,vs.member_permission_version
+	 ,clock_timestamp()
  FROM video_sessions vs JOIN tenants t ON t.id=vs.tenant_id JOIN video_cameras c ON c.id=vs.camera_id AND c.tenant_id=vs.tenant_id
- WHERE vs.id=$1 AND t.active`, claims.SessionID).Scan(&out.SessionID, &out.StreamID, &out.TenantID, &out.CameraID, &out.SourceVersion, &state, &out.ExpiresAt, &storedHash, &userID, &cameraEnabled, &cameraVersion)
+	 WHERE vs.id=$1`, claims.SessionID).Scan(&out.SessionID, &out.StreamID, &out.TenantID, &out.CameraID, &out.SourceVersion, &state, &out.ExpiresAt, &storedHash, &userID, &cameraEnabled, &cameraVersion, &userTokenVersion, &tenantPermissionVersion, &memberPermissionVersion, &dbNow)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return media.MediaAccess{}, media.ErrNotFound
 	}
@@ -32,8 +36,27 @@ func (s *Store) AuthorizeMedia(ctx context.Context, claims media.MediaClaims, to
 	if out.TenantID != claims.TenantID || out.CameraID != claims.CameraID || out.SourceVersion != claims.SourceVersion || userID != claims.UserID || !cameraEnabled || cameraVersion != claims.SourceVersion || len(storedHash) != sha256.Size || !equalHash(storedHash, tokenHash[:]) {
 		return media.MediaAccess{}, media.ErrUnauthorized
 	}
+	var authorized bool
+	err = s.pool.QueryRow(ctx, `SELECT EXISTS (
+ SELECT 1 FROM tenants t
+ JOIN users u ON u.id=$2 AND u.authority='USER' AND u.token_version=$3
+ JOIN tenant_memberships tm ON tm.tenant_id=t.id AND tm.user_id=$2 AND tm.active AND (tm.expires_at IS NULL OR tm.expires_at>clock_timestamp())
+ JOIN video_cameras c ON c.id=$4 AND c.tenant_id=t.id
+ JOIN farms f ON f.id=c.farm_id AND f.tenant_id=c.tenant_id
+ WHERE t.id=$1 AND t.active AND t.permission_version=$5 AND tm.permission_version=$6
+ AND (tm.role IN ('owner','admin') OR f.owner_id=$2 OR EXISTS (SELECT 1 FROM farm_memberships fm WHERE fm.farm_id=f.id AND fm.tenant_id=f.tenant_id AND fm.user_id=$2 AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>clock_timestamp())))
+ )`, out.TenantID, claims.UserID, userTokenVersion, out.CameraID, tenantPermissionVersion, memberPermissionVersion).Scan(&authorized)
+	if err != nil {
+		return media.MediaAccess{}, media.ErrUnavailable
+	}
+	if !authorized {
+		return media.MediaAccess{}, media.ErrForbidden
+	}
 	out.State = media.SessionState(state)
-	if !now.Before(out.ExpiresAt) || out.State == media.SessionRevoked || out.State == media.SessionExpired || out.State == media.SessionFailed {
+	if claims.IssuedAt.After(dbNow) {
+		return media.MediaAccess{}, media.ErrUnauthorized
+	}
+	if !dbNow.Before(out.ExpiresAt) || out.State == media.SessionRevoked || out.State == media.SessionExpired || out.State == media.SessionFailed {
 		return media.MediaAccess{}, media.ErrForbidden
 	}
 	if out.State != media.SessionPending && out.State != media.SessionReady {
@@ -80,9 +103,15 @@ func (s *Store) ResolveSegmentMapping(ctx context.Context, sessionID, segmentID 
 		return media.SegmentMapping{}, media.ErrInvalid
 	}
 	var out media.SegmentMapping
-	err := s.pool.QueryRow(ctx, `SELECT segment_id::text,session_id::text,vs.stream_id::text,vs.source_version,provider_name
+	err := s.pool.QueryRow(ctx, `SELECT sg.segment_id::text,sg.session_id::text,vs.stream_id::text,vs.source_version,sg.provider_name
  FROM video_segments sg JOIN video_sessions vs ON vs.id=sg.session_id
- WHERE sg.session_id=$1 AND sg.segment_id=$2 AND sg.expires_at>clock_timestamp()`, sessionID, segmentID).Scan(&out.ID, &out.SessionID, &out.StreamID, &out.SourceVersion, &out.Path)
+	 JOIN video_cameras c ON c.id=vs.camera_id AND c.tenant_id=vs.tenant_id
+	 JOIN farms f ON f.id=c.farm_id AND f.tenant_id=c.tenant_id
+	 JOIN tenants t ON t.id=vs.tenant_id AND t.active
+	 JOIN users u ON u.id=vs.user_id AND u.authority='USER' AND u.token_version=vs.user_token_version
+	 JOIN tenant_memberships tm ON tm.tenant_id=vs.tenant_id AND tm.user_id=vs.user_id AND tm.active AND (tm.expires_at IS NULL OR tm.expires_at>clock_timestamp()) AND tm.permission_version=vs.member_permission_version
+	 WHERE sg.session_id=$1 AND sg.segment_id=$2 AND sg.expires_at>clock_timestamp() AND vs.state IN ('pending','ready') AND vs.expires_at>clock_timestamp() AND c.enabled AND c.source_version=vs.source_version AND t.permission_version=vs.tenant_permission_version
+	 AND (tm.role IN ('owner','admin') OR f.owner_id=vs.user_id OR EXISTS (SELECT 1 FROM farm_memberships fm WHERE fm.farm_id=f.id AND fm.tenant_id=f.tenant_id AND fm.user_id=vs.user_id AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>clock_timestamp())))`, sessionID, segmentID).Scan(&out.ID, &out.SessionID, &out.StreamID, &out.SourceVersion, &out.Path)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return media.SegmentMapping{}, media.ErrNotFound
 	}

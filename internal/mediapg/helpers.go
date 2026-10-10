@@ -8,7 +8,14 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-const sessionQuery = `SELECT vs.id::text,vs.stream_id::text,vs.tenant_id,vs.camera_id,vs.source_version,vs.user_id,vs.user_token_version,vs.tenant_permission_version,vs.member_permission_version,vs.state,coalesce(vs.error_code,''),vs.created_at,vs.expires_at FROM video_sessions vs WHERE vs.id=$1`
+const sessionQuery = `SELECT vs.id::text,vs.stream_id::text,vs.tenant_id,vs.camera_id,vs.source_version,vs.user_id,vs.user_token_version,vs.tenant_permission_version,vs.member_permission_version,vs.state,coalesce(vs.error_code,''),vs.created_at,vs.expires_at
+ FROM video_sessions vs
+ JOIN tenants t ON t.id=vs.tenant_id AND t.active AND t.permission_version=vs.tenant_permission_version
+ JOIN users u ON u.id=vs.user_id AND u.authority='USER' AND u.token_version=vs.user_token_version
+ JOIN video_cameras c ON c.id=vs.camera_id AND c.tenant_id=vs.tenant_id AND c.source_version=vs.source_version
+ JOIN farms f ON f.id=c.farm_id AND f.tenant_id=c.tenant_id
+ JOIN tenant_memberships tm ON tm.tenant_id=vs.tenant_id AND tm.user_id=vs.user_id AND tm.active AND (tm.expires_at IS NULL OR tm.expires_at>clock_timestamp()) AND tm.permission_version=vs.member_permission_version
+ WHERE vs.id=$1 AND (tm.role IN ('owner','admin') OR f.owner_id=vs.user_id OR EXISTS (SELECT 1 FROM farm_memberships fm WHERE fm.farm_id=f.id AND fm.tenant_id=f.tenant_id AND fm.user_id=vs.user_id AND fm.active AND (fm.expires_at IS NULL OR fm.expires_at>clock_timestamp())))`
 
 func sessionArgs(s *media.Session) []any {
 	return []any{&s.ID, &s.StreamID, &s.TenantID, &s.CameraID, &s.SourceVersion, &s.UserID, &s.UserTokenVersion, &s.TenantPermissionVersion, &s.MemberPermissionVersion, &s.State, &s.ErrorCode, &s.CreatedAt, &s.ExpiresAt}
@@ -22,13 +29,6 @@ func actorContext(ctx context.Context) (int64, int64, string, bool) {
 	user, userOK := domain.TenantUserID(ctx)
 	role := domain.TenantRole(ctx)
 	return tenant, user, role, tenantOK && userOK && tenant > 0 && user > 0 && role != ""
-}
-
-func claimedPermissionVersion(ctx context.Context) any {
-	if version, ok := domain.TenantPermissionVersion(ctx); ok {
-		return version
-	}
-	return nil
 }
 
 func loadTarget(ctx context.Context, tx pgx.Tx, tenantID, userID int64, role string, cameraID int64) (media.PlaybackTarget, error) {
@@ -63,8 +63,14 @@ func loadTarget(ctx context.Context, tx pgx.Tx, tenantID, userID int64, role str
 }
 
 func loadLicense(ctx context.Context, tx pgx.Tx, out *media.LicenseSnapshot) error {
-	return tx.QueryRow(ctx, `SELECT d.deployment_id,ls.payload,ls.signature,coalesce(ls.payload_sha256,''),coalesce(lc.max_seen_at,'epoch'::timestamptz),lc.clock_error,clock_timestamp()
- FROM deployment_config d CROSS JOIN license_state ls CROSS JOIN license_clock lc WHERE d.singleton AND ls.singleton AND lc.singleton FOR SHARE`).Scan(&out.DeploymentID, &out.Payload, &out.Signature, &out.SHA256, &out.MaxSeenAt, &out.ClockError, &out.Now)
+	if err := tx.QueryRow(ctx, `SELECT d.deployment_id,ls.payload,ls.signature,coalesce(ls.payload_sha256,''),coalesce(lc.max_seen_at,'epoch'::timestamptz),lc.clock_error,clock_timestamp()
+	 FROM deployment_config d CROSS JOIN license_state ls CROSS JOIN license_clock lc WHERE d.singleton AND ls.singleton AND lc.singleton FOR SHARE`).Scan(&out.DeploymentID, &out.Payload, &out.Signature, &out.SHA256, &out.MaxSeenAt, &out.ClockError, &out.Now); err != nil {
+		return err
+	}
+	if out.DeploymentID == "" || len(out.Payload) == 0 || len(out.Signature) == 0 || len(out.SHA256) != 64 || out.ClockError {
+		return media.ErrLicenseUnavailable
+	}
+	return nil
 }
 
 func ensureStream(ctx context.Context, tx pgx.Tx, in media.CreateSession) (string, error) {
