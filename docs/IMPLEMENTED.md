@@ -2,7 +2,7 @@
 
 ## TODO 总览（2026-10-08 核对）
 
-当前推进位置：**S5/S6 平台与用户边界及接口分层已闭环，已发布 v0.0.14；正在推进 TODO 11a / M7a 视频接入契约设计**。TODO 8 / M4 接口演示已经闭环；按用户范围，正式小程序由专人开发。
+当前推进位置：**S7 权限页面已发布 v0.0.18；TODO 11a / M7a 的领域、凭据加密、013 存储与保留历史删除基础已发布 v0.0.19，正在推进摄像机管理接口增量**。TODO 8 / M4 接口演示已经闭环；按用户范围，正式小程序由专人开发。
 源码 `2b66812fd0d6e64609c1bc3fccbccccf71a4f99d` 已获两位独立审阅者同快照 APPROVE；[证据](evidence/M4/2026-10-08/README.md)覆盖 39 项测试、真实数据库后端和浏览器演示。发布快照 `036523d` 亦获同两位审阅者批准，已推送 `main` 与 `v0.0.11`，tag CI 镜像构建发布成功；[发布收据](evidence/M4/2026-10-08/release.md)。
 **主清单 20 项：13 项已完成已核验，剩 7 项（M7a、M7b、M8a–M8d、R55）**；补充对账与外部验收另列。
 M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、web `66c52624f6d97c9dd7fe29b05b64b3db39c4a72d` 的阶段证据保留。
@@ -37,7 +37,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | TODO 10b / M6b | 多租户、成员/RBAC、撤权与当前资源隔离 | 已完成已核验 | R36.a/R37.a；同候选 `0335438` 双审；[最终证据](evidence/acceptance/R37/2026-10-04-version-revocation/README.md)、[gate](evidence/rebuild/gates/M6b.json)；未来资源随其阶段另验 |
 | TODO 10c / M6c | License、配额/功能守卫、离线包与安装恢复 | 已完成已核验 | R38/R39.a/R40 软件范围；`8ad5505` 同快照双审、发布 v0.0.9；[证据](evidence/M6c/2026-10-05/README.md)；实际签发方/客户安装及 R39.b另列 |
 | **TODO 10d / M6d** | **开放 Key、签名、重放、限流与后台** | **已完成已核验** | R41–R42；源码 `81c842e`、web `66c5262`；真实 Timescale、竞态/乱序、契约、前端、浏览器、Docker 及 429/UTF-8/500 回归通过；代码与 gate 双审 APPROVE；[最新证据](evidence/M6d/2026-10-07/README.md) |
-| TODO 11a / M7a | RTSP/GB28181、媒体接入、播放鉴权及双端播放 | 正在进行 | R43；[专项设计](design/M7a-video.md)、[22操作契约](api/video-openapi.yaml)、[DDL提案](design/video-proposal.sql)、[部署附件](deploy/M7a-video.md)与[设计验证](evidence/M7a/2026-10-09/README.md)已形成；等待同快照独立双审，未开始视频生产实现；真实摄像机/GB网络/微信真机为external_blocked |
+| TODO 11a / M7a | RTSP/GB28181、媒体接入、播放鉴权及双端播放 | 正在进行 | R43；[专项设计](design/M7a-video.md)、[22操作契约](api/video-openapi.yaml)、[DDL提案](design/video-proposal.sql)与[部署附件](deploy/M7a-video.md)已完成设计准入双审，均批准 `f796fcc`：[设计证据](evidence/M7a/2026-10-11-design/README.md)。领域值、凭据加密、013存储与保留历史删除基础已在 `v0.0.19` 完成并获同快照独立 code/gate APPROVE：[基础证据](evidence/M7a/2026-10-11-foundation/README.md)；摄像机HTTP、媒体worker/安全ZLM构建、GB、播放页面未完成，视频保持关闭。真实摄像机/GB网络/微信真机为external_blocked |
 | TODO 11b / M7b | 坐标/腾讯地图、双端定位与只读大屏 | 待完成未调研 | R44–R45；有设计，尚无阶段实施调研证据；需权限过滤、WGS84/GCJ-02对照、断网/无Key状态、20屏刷新性能 |
 | TODO 12a / M8a | 持久命令、回执、TTL、取消、幂等及周期调整 | 待完成未调研 | R46；有状态设计，待冻结命令接口和 worker/固件能力契约；模拟与真实硬件分别验收 |
 | TODO 12b / M8b | HTTP签名上报、TCP网关桥接、Modbus TCP/RTU、子设备 | 待完成未调研 | R47–R49；有范围设计，待设备/寄存器/桥接专项调查与协议契约；写操作依赖 M8a |
@@ -75,7 +75,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | F3 | 最终完整软件/真实链路/前端及适用外部QA | 待完成未调研 | TODO 13，必须重新绑定最终版本，不能拼接不同版本的passed |
 | F4 | 最终范围、发布产物、手册与恢复流程一致性审计 | 待完成未调研 | TODO 13，和F1–F3汇总至R55；适用外部未通过不能称全部完成 |
 
-推荐下一步：通过 M7a 契约/DDL/部署设计双审，再实施视频领域/存储/API、媒体与GB链路；V1历史证据对账仍待闭环。微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
+推荐下一步：闭环 M7a 领域/加密/013存储基础，再实施摄像机API、媒体与GB链路；V1历史证据对账仍待闭环。微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
 
 附加部署里程碑：统一服务器 `deploy/docker-compose.yaml` 与源码构建覆盖
 `deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，并发布至 v0.0.6；用户明确免除该配置变更的双审。

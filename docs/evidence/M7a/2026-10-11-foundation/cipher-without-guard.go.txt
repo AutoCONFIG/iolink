@@ -1,0 +1,70 @@
+package videocredential
+
+import (
+	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/hkdf"
+	"crypto/sha256"
+	"fmt"
+
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
+)
+
+type Cipher struct{ aead cipher.AEAD }
+
+// This bounds credential envelopes while allowing two 128-character fields,
+// including UTF-16 surrogate escapes and JSON object overhead.
+const maxCredentialPlaintextBytes = 4096
+
+var _ domain.VideoCredentialCipher = (*Cipher)(nil)
+
+func New(root []byte) (*Cipher, error) {
+	if len(root) < 32 {
+		return nil, domain.ErrVideoCredentialUnavailable
+	}
+	key, err := hkdf.Key(sha256.New, root, nil, "iolink-camera-credential-v1", 32)
+	if err != nil {
+		return nil, fmt.Errorf("derive video key: %w", domain.ErrVideoCredentialUnavailable)
+	}
+	defer clear(key)
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, fmt.Errorf("create video cipher: %w", domain.ErrVideoCredentialUnavailable)
+	}
+	aead, err := cipher.NewGCMWithRandomNonce(block)
+	if err != nil {
+		return nil, fmt.Errorf("create video GCM: %w", domain.ErrVideoCredentialUnavailable)
+	}
+	return &Cipher{aead}, nil
+}
+
+func (c *Cipher) Seal(ctx context.Context, binding domain.VideoCredentialBinding, plaintext []byte) ([]byte, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if c == nil || c.aead == nil {
+		return nil, domain.ErrVideoCredentialUnavailable
+	}
+	if !binding.Valid() || len(plaintext) == 0 || len(plaintext) > maxCredentialPlaintextBytes {
+		return nil, domain.ErrInvalidVideoCredential
+	}
+	return c.aead.Seal(nil, nil, plaintext, binding.AssociatedData()), nil
+}
+
+func (c *Cipher) Open(ctx context.Context, binding domain.VideoCredentialBinding, ciphertext []byte) ([]byte, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if c == nil || c.aead == nil {
+		return nil, domain.ErrVideoCredentialUnavailable
+	}
+	if !binding.Valid() || len(ciphertext) <= c.aead.Overhead() {
+		return nil, domain.ErrVideoCredentialUnavailable
+	}
+	plaintext, err := c.aead.Open(nil, nil, ciphertext, binding.AssociatedData())
+	if err != nil {
+		return nil, domain.ErrVideoCredentialUnavailable
+	}
+	return plaintext, nil
+}

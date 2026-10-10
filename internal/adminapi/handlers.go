@@ -478,7 +478,7 @@ func (s *Server) deletePond(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
-		if errors.Is(err, domain.ErrPondHasDevices) {
+		if errors.Is(err, domain.ErrPondHasDevices) || errors.Is(err, domain.ErrConflict) {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
 		}

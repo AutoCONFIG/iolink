@@ -1,0 +1,60 @@
+-test.shuffle 1791652851354151830
+=== RUN   TestM7aVideoCredentialsPersistAsBoundCiphertext
+=== RUN   TestM7aVideoCredentialsPersistAsBoundCiphertext/GB_device
+=== RUN   TestM7aVideoCredentialsPersistAsBoundCiphertext/RTSP_camera
+--- PASS: TestM7aVideoCredentialsPersistAsBoundCiphertext (0.91s)
+    --- PASS: TestM7aVideoCredentialsPersistAsBoundCiphertext/GB_device (0.00s)
+    --- PASS: TestM7aVideoCredentialsPersistAsBoundCiphertext/RTSP_camera (0.00s)
+=== RUN   TestM7aVideoFoundationMigrationRollsBackAtomically
+--- PASS: TestM7aVideoFoundationMigrationRollsBackAtomically (0.86s)
+=== RUN   TestM7aVideoFoundationMigrationConstraints
+--- PASS: TestM7aVideoFoundationMigrationConstraints (0.87s)
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/global_GB_device_identity
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/unique_camera_source_stream
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/session_source_version_binding
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/stream_tenant_binding
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/camera_credential_envelope
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/device_credential_envelope
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/positive_source_version
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/session_state_enum
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/positive_session_lifetime
+--- PASS: TestM7aVideoFoundationRejectsInvalidStorage (0.86s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/global_GB_device_identity (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/unique_camera_source_stream (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/session_source_version_binding (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/stream_tenant_binding (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/camera_credential_envelope (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/device_credential_envelope (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/positive_source_version (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/session_state_enum (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/positive_session_lifetime (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	4.528s
+-test.shuffle 1791652851354445228
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/active_camera_pond
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/disabled_camera_pond
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/tenant_admin_camera_pond
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/camera_farm
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/unreferenced_pond
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/foreign_pond
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/foreign_farm
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/missing_pond
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/member_role
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/read_role
+=== RUN   TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/unauthenticated
+--- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP (9.93s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/active_camera_pond (0.93s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/disabled_camera_pond (0.86s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/tenant_admin_camera_pond (0.86s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/camera_farm (0.86s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/unreferenced_pond (0.77s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/foreign_pond (1.36s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/foreign_farm (1.24s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/missing_pond (0.75s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/member_role (0.76s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/read_role (0.77s)
+    --- PASS: TestM7aVideoHistoryProtectsResourceDeletionThroughUserHTTP/unauthenticated (0.76s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	10.998s

@@ -1,7 +1,7 @@
 # M7a 视频接入设计
 
-范围：TODO 11a / R43，附带 R36.b/R37.b/R39.b。这是实施前设计，当前没有视频生产实现，
-设计批准不等于播放验收通过。API 见 [video-openapi](../api/video-openapi.yaml)，
+范围：TODO 11a / R43，附带 R36.b/R37.b/R39.b。这是冻结的实施设计，实际进度只由
+[IMPLEMENTED](../IMPLEMENTED.md)记录，设计批准不等于播放验收通过。API 见 [video-openapi](../api/video-openapi.yaml)，
 DDL 提案见 [video-proposal.sql](video-proposal.sql)，部署见 [M7a部署](../deploy/M7a-video.md)。
 
 ## 业务边界与页面
@@ -98,7 +98,12 @@ manifest 由网关获取并重写所有 URI 为同源带 token 的 gateway 路�
 仅支持有限 live HLS manifest（≤256KiB）及 H264/AAC TS 段（≤8MiB），关闭 master、
 外部 URI、KEY、MAP、byterange 和 fMP4；非支持标签/绝对路径/转义遍历/重定向一律502。
 网关分配随机 segment_id，持久映射到固定 stream 下规范段名，绑定 session/source_version，
-禁止把任意客户端 segment_id 当文件路径。段超时10秒，manifest 3秒，
+禁止把任意客户端 segment_id 当文件路径。固定 ZLM 的普通TS相对路径为
+`YYYY-MM-DD/HH/MM-SS_index.ts`，须保留日期/小时目录，不能只存 basename。
+运行时按这一固定布局解析日期、时间和非负数字index，DDL以同布局正则与128字符上限兜底；
+拒绝编码、绝对路径、额外目录、query/fragment、反斜线、点段和外部URI。
+由adapter使用固定stream根目录加已解析相对路径构造私有请求，不接受客户端指定provider路径。
+段超时10秒，manifest 3秒，
 授权失效主动 cancel。每用户≤5 session、每 camera≤20 session，超限429，Retry-After:1。
 映射在源 HLS 窗口结束或 session 到期后清理；负载测试验证并发与上限而非无限缓存。
 
@@ -114,7 +119,26 @@ RTSP URI 仅 rtsp scheme、无 userinfo/query/fragment；允许编码 path，但
 unspecified、multicast、loopback、link-local（即使误列入允许项）。内网可按明确 CIDR 授权。
 连接传 ZLM 已验证且钉住的 numeric IP，每次重连重新检验；不把原 hostname 交由 ZLM 自行解析。
 RTSP 使用 TCP interleaved 传输，禁止来源 redirect 和额外 SDP 外部控制 URL；
-adapter 若无法保证，启动拒绝该来源。ZLM 进程 egress ACL 是第二层强制边界。
+固定的原版 ZLM 不满足这一要求：`RtspPlayer::handleResponse` 会跟随301/302，
+`handleResDESCRIBE` 接受 Content-Base 和绝对 SDP control，不能直接作为生产 provider。
+媒体实施使用同一固定源码的专用安全构建，补丁与构建配方随仓库版本管理：
+
+- `handleResponse` 对所有3xx直接返回安全失败，禁止读取 Location 后再次 `play`。
+- `handleResDESCRIBE` 在保存 Content-Base/session control/track control 前，解析并校验
+  最终 URI；只允许初始已钉住的 numeric IP、端口和 rtsp scheme，无 userinfo/query/fragment，
+  禁控制字符、反斜线与解码后遍历。相对 control 解析后执行相同校验；原 hostname、
+  外部绝对地址和不能解析的 URI 均失败，不能向其发送带认证的 SETUP/PLAY/TEARDOWN。
+  `sendRtspRequest` 作为最后发送边界再次约束目的 URI；拒绝不能触发析构异常或补发请求。
+- 移除 RtspPlayer 的 URI/user/password、PlayerProxy 的源 URL及原始 provider 异常日志，
+  禁止协议报文/SDP/digest dump；只输出常量事件和安全类别。原版仅调高日志等级不算满足。
+- `addStreamProxy` 显式 `retry_count=0`、TCP interleaved；禁 provider 内部自动重连。
+  每次重连由持久 worker 重新解析全部 DNS、验权/License 后提交新的 pinned 地址。
+
+adapter 启动核对批准的安全构建标识和镜像digest，并执行私有能力探测；
+原版、构建不匹配或探测失败时开启视频须启动失败，不把所有正常 RTSP 当不支持。
+视频默认关闭时可先交付领域/加密/数据库基础。安全构建的实际测试是媒体里程碑前置门槛，
+不是本文已经实现的能力。ZLM 进程 egress ACL 是第二层边界，不能代替协议层校验；
+即使重定向目标也在允许网段内，仍必须拒绝。
 GB peer/IP 同样按 allowlist，Contact/SDP 不能指定任意外网/metadata；RTP 仅接受登记 peer，
 每次注册不能通过 Contact 任意变更既有 tenant/device 身份。
 
@@ -145,6 +169,9 @@ sipgo 仅提供 SIP transport/parse，不把它的单注册 demo 当 GB 实现�
    去重/汇总 SumNum 完整才事务替换目录。超时不覆盖旧目录，标 stale，
    新目录缺失通道使对应 camera offline 并撤销 session，不静默继续旧点播。
 4. 点播：openRtpServer 先分配独占 UDP 端口与SSRC，再 INVITE SDP，
+   RTP 只分配30000..30038的20个偶数端口，并原子保留相邻 RTCP port+1；
+   固定 ZLM 会同时绑定这两个端口，不能把30000..30019当20路容量。
+   DDL限制偶数RTP并唯一占用，防火墙/NAT覆盖30000..30039；关闭源后确认释放端口对才可复用。
    只支持 UDP RTP/AVP PS；offer 含 recvonly、PS/90000、y=SSRC、
    正确公网/局域网 receiver 地址。200 校验 SDP/SSRC/peer 后 ACK，
    只有 ZLM 已提供兼容 tracks 和可取 HLS 后 ready。4xx/超时/BYE/失保活→offline/failed、
@@ -180,7 +207,7 @@ ponds 新增 (id,farm_id) 唯一键；camera 同时 FK (farm_id,tenant_id) 和 (
 | DB/worker | 原子job、回滚、并发重复start、租约失效、unknown reconcile、stop/newsession竞态 | PG/I |
 | token | 300秒边界/篡改/audience/claim/hash、撤权/停租户/调塘/密码撤销、DB失效与在途取消 | U/I/media |
 | License | 申请/worker真实video入口拒绝、已有session边界、停止可用、public key缺失503 | I |
-| RTSP/HLS | H264/AAC tracks、合法段重写、非法manifest/路径、源断线重连、ZLM断线/重启 | ZLM/I |
+| RTSP/HLS | 安全构建正常源；301/302/其他3xx到允许及禁止目标均零连接；外部Content-Base/SDP control在认证前拒绝；日志无URI/凭据/SDP；禁内部重连；H264/AAC tracks、合法段重写、非法manifest/路径、源断线重连、ZLM断线/重启 | ZLM/I |
 | SIP/GB | digest/replay/transaction重发、未知ID、越权peer、XML界限、完整目录/超时、INVITE取消/BYE | UDP/I |
 | 外部 | 真RTSP与GB各一路、HTTPS浏览器、微信真机资质与播放、凭据不出前端 | W/X/H |
 
@@ -199,5 +226,9 @@ sipgo固定至 `03cdf8e07c69e96719816d70f13a44a105e52d5a`。后续运行镜像�
   addStreamProxy/delStreamProxy/getMediaList/openRtpServer/closeRtpServer。
 - [ZLM hook](https://github.com/ZLMediaKit/ZLMediaKit/blob/46220e6a866592c140d719ca2981bd2276344f5e/server/WebHook.cpp)：
   on_http_access 带目录/秒数缓存，不能单独保障实时撤权。
+- [ZLM RTP端口对](https://github.com/ZLMediaKit/ZLMediaKit/blob/46220e6a866592c140d719ca2981bd2276344f5e/src/Rtp/RtpServer.cpp#L137)：
+  显式 RTP 端口同时绑定相邻 RTCP 端口；每路占用一个偶数/奇数端口对。
+- [ZLM HLS段路径](https://github.com/ZLMediaKit/ZLMediaKit/blob/46220e6a866592c140d719ca2981bd2276344f5e/src/Record/HlsMakerImp.cpp#L157)：
+  `onOpenSegment` 生成日期/小时目录下的TS；网关和DDL均保留受限相对路径。
 - [sipgo注册demo](https://github.com/emiago/sipgo/blob/03cdf8e07c69e96719816d70f13a44a105e52d5a/example/register/server/main.go)：
   仅单注册示范，不能复用共享nonce/用户名日志。

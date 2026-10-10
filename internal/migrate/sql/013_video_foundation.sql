@@ -1,5 +1,3 @@
--- M7a design proposal only. Not embedded or applied on service startup.
--- Apply after migrations 001..012 in a disposable database.
 ALTER TABLE ponds ADD CONSTRAINT ponds_id_farm_video_unique UNIQUE (id, farm_id);
 
 CREATE TABLE video_gb_devices (

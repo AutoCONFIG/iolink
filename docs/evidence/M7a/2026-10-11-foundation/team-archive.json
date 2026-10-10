@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 3,
+  "transport": "multi_agent_v2",
+  "teamId": "dd9e0a5f-8cbd-40f1-8b0e-7dbf66b1829e",
+  "teamName": "m7a-foundation",
+  "sessionName": "m7a-foundation-20261011",
+  "sessionId": "team-71f9b0bf",
+  "threadTitleConvention": null,
+  "status": "archived",
+  "createdAt": "2026-10-10T17:08:29.188Z",
+  "updatedAt": "2026-10-10T17:24:26.317Z",
+  "archivedAt": "2026-10-10T17:24:26.317Z",
+  "leader": {
+    "kind": "main-session",
+    "sessionId": null,
+    "agentPath": "/root"
+  },
+  "communication": {
+    "memberLanguage": "english",
+    "replyToUserInUserLanguage": true
+  },
+  "worktree": {
+    "enabled": false,
+    "baseBranch": "dev",
+    "root": "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.omo/teams/team-71f9b0bf/worktrees"
+  },
+  "paths": {
+    "dir": "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.omo/teams/team-71f9b0bf",
+    "team": "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.omo/teams/team-71f9b0bf/team.json",
+    "guide": "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.omo/teams/team-71f9b0bf/guide.md",
+    "artifacts": "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.omo/teams/team-71f9b0bf/artifacts"
+  },
+  "members": [
+    {
+      "id": "A",
+      "name": "domain-crypto",
+      "focus": "internal/domain/video*.go and internal/videocredential/*.go",
+      "lens": "ownership",
+      "deliverable": "Finish typed video and encryption behavior, tests, scoped report",
+      "taskName": "m7a_domain_crypto",
+      "agentPath": "/root/m7a_domain_crypto",
+      "threadId": null,
+      "threadTitle": null,
+      "cwd": "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink",
+      "worktree": {
+        "path": null,
+        "branch": null
+      },
+      "status": "archived"
+    },
+    {
+      "id": "B",
+      "name": "storage-lifecycle",
+      "focus": "013 schema, migrate/video_foundation_test.go, core/video_history_test.go, existing DeletePond/HTTP changes",
+      "lens": "ownership",
+      "deliverable": "Finish storage and resource deletion validation, scoped report",
+      "taskName": "m7a_storage_lifecycle",
+      "agentPath": "/root/m7a_storage_lifecycle",
+      "threadId": null,
+      "threadTitle": null,
+      "cwd": "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink",
+      "worktree": {
+        "path": null,
+        "branch": null
+      },
+      "status": "archived"
+    },
+    {
+      "id": "C",
+      "name": "camera-api-seams",
+      "focus": "Read-only next camera API, authorization and provider composition seams",
+      "lens": "ownership",
+      "deliverable": "Concrete file/reference map for next increment, no production edits",
+      "taskName": "m7a_camera_api_seams",
+      "agentPath": "/root/m7a_camera_api_seams",
+      "threadId": null,
+      "threadTitle": null,
+      "cwd": "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink",
+      "worktree": {
+        "path": null,
+        "branch": null
+      },
+      "status": "archived"
+    },
+    {
+      "id": "D",
+      "name": "rtsp-build-seams",
+      "focus": "Read-only pinned ZLM security patch and build/test recipe seams",
+      "lens": "ownership",
+      "deliverable": "Concrete fixed-source patch locations, build prerequisites and adversarial fixture approach for upcoming media increment",
+      "taskName": "m7a_rtsp_build_seams",
+      "agentPath": "/root/m7a_rtsp_build_seams",
+      "threadId": null,
+      "threadTitle": null,
+      "cwd": null,
+      "worktree": {
+        "path": null,
+        "branch": null
+      },
+      "status": "archived"
+    }
+  ],
+  "log": [
+    {
+      "ts": "2026-10-10T17:08:29.188Z",
+      "event": "created",
+      "detail": "team m7a-foundation"
+    },
+    {
+      "ts": "2026-10-10T17:08:39.535Z",
+      "event": "add-member",
+      "detail": "member A (ownership): internal/domain/video*.go and internal/videocredential/*.go"
+    },
+    {
+      "ts": "2026-10-10T17:08:39.610Z",
+      "event": "add-member",
+      "detail": "member B (ownership): 013 schema, migrate/video_foundation_test.go, core/video_history_test.go, existing DeletePond/HTTP changes"
+    },
+    {
+      "ts": "2026-10-10T17:08:39.688Z",
+      "event": "add-member",
+      "detail": "member C (ownership): Read-only next camera API, authorization and provider composition seams"
+    },
+    {
+      "ts": "2026-10-10T17:09:39.944Z",
+      "event": "bind-agent",
+      "detail": "member A -> agent /root/m7a_domain_crypto"
+    },
+    {
+      "ts": "2026-10-10T17:09:40.026Z",
+      "event": "bind-agent",
+      "detail": "member B -> agent /root/m7a_storage_lifecycle"
+    },
+    {
+      "ts": "2026-10-10T17:09:40.107Z",
+      "event": "bind-agent",
+      "detail": "member C -> agent /root/m7a_camera_api_seams"
+    },
+    {
+      "ts": "2026-10-10T17:11:20.554Z",
+      "event": "set-status",
+      "detail": "member C -> reported: API/auth/composition seam map delivered read-only"
+    },
+    {
+      "ts": "2026-10-10T17:22:27.721Z",
+      "event": "set-status",
+      "detail": "member B -> reported: Fresh PG16/Timescale race+shuffle storage/HTTP tests passed without skips; no further code edits; report and logs refreshed"
+    },
+    {
+      "ts": "2026-10-10T17:22:28.390Z",
+      "event": "add-member",
+      "detail": "member D (ownership): Read-only pinned ZLM security patch and build/test recipe seams"
+    },
+    {
+      "ts": "2026-10-10T17:22:41.684Z",
+      "event": "bind-agent",
+      "detail": "member D -> agent /root/m7a_rtsp_build_seams"
+    },
+    {
+      "ts": "2026-10-10T17:23:49.682Z",
+      "event": "set-status",
+      "detail": "member A -> reported: Domain/crypto source stable; direct race/vet evidence and scoped report recorded; full phase acceptance remains pending"
+    },
+    {
+      "ts": "2026-10-10T17:24:01.733Z",
+      "event": "set-status",
+      "detail": "member D -> reported: Read-only pinned ZLM RTSP patch/build seams and adversarial fixture protocol delivered in artifacts/rtsp-build-seams.md; no product edits or build claimed."
+    },
+    {
+      "ts": "2026-10-10T17:24:26.317Z",
+      "event": "archive",
+      "detail": "All four reports delivered and copied into docs evidence; V2 has no runtime archive operation; members ended normally."
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+Sat Oct 10 18:00:12 UTC 2026
+snapshot 9a1a1f44af06b1b46a66624bbb0d0c73ed67dfed
+
+command: go test -race -shuffle=on -count=1 ./internal/domain ./internal/videocredential
+ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.013s
+ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	1.012s
