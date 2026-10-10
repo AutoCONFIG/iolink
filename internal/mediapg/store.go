@@ -125,25 +125,24 @@ func (s *Store) CreatePlayback(ctx context.Context, in media.CreateSession) (med
 		if decodeErr != nil || job.CameraID != in.Session.CameraID || job.SourceVersion != in.Session.SourceVersion || job.StreamID != streamID {
 			return media.Session{}, media.ErrConflict
 		}
-		if jobStatus == "failed" || jobStatus == "cancelled" {
-			if _, err = tx.Exec(ctx, `UPDATE video_streams SET state='pending',updated_at=clock_timestamp() WHERE id=$1 AND state IN ('failed','unknown','stopped')`, streamID); err != nil {
+		var streamState string
+		if err = tx.QueryRow(ctx, `SELECT state FROM video_streams WHERE id=$1 FOR UPDATE`, streamID).Scan(&streamState); err != nil {
+			return media.Session{}, media.ErrUnavailable
+		}
+		if jobStatus == "succeeded" && streamState == "ready" {
+			if _, err = tx.Exec(ctx, `UPDATE video_sessions SET state='ready' WHERE id=$1 AND state='pending'`, in.Session.ID); err != nil {
+				return media.Session{}, media.ErrUnavailable
+			}
+			in.Session.State = media.SessionReady
+		} else if jobStatus == "failed" || jobStatus == "cancelled" || jobStatus == "succeeded" {
+			if _, err = tx.Exec(ctx, `UPDATE video_streams SET state='pending',updated_at=clock_timestamp() WHERE id=$1`, streamID); err != nil {
 				return media.Session{}, media.ErrUnavailable
 			}
 			_, err = tx.Exec(ctx, `INSERT INTO jobs(tenant_id,kind,idempotency_key,payload) VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING`, in.Session.TenantID, jobStart, in.StartJobKey+":"+in.Session.ID, payload)
 			if err != nil {
 				return media.Session{}, media.ErrUnavailable
 			}
-		} else {
-			updated, execErr := tx.Exec(ctx, `UPDATE video_sessions SET state='ready' WHERE id=$1 AND state='pending' AND EXISTS (SELECT 1 FROM video_streams WHERE id=$2 AND state='ready')`, in.Session.ID, streamID)
-			if err = execErr; err != nil {
-				return media.Session{}, media.ErrUnavailable
-			}
-			if updated.RowsAffected() == 0 {
-				in.Session.State = media.SessionPending
-			}
-		}
-		if jobStatus == "succeeded" {
-			in.Session.State = media.SessionReady
+			in.Session.State = media.SessionPending
 		}
 	}
 	in.Session.StreamID = streamID

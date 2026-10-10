@@ -71,3 +71,61 @@ func TestResolveSegmentMappingRechecksCurrentAuthorization(t *testing.T) {
 		t.Fatalf("revoked session err=%v", err)
 	}
 }
+
+func TestCreateRestartsAfterStoppedSharedStream(t *testing.T) {
+	p, store, ctx := fixture(t)
+	target, err := store.PreparePlayback(ctx, 40)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := store.CreatePlayback(ctx, createInput(t, target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	lease, ok, err := store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-restart-start")
+	if err != nil || !ok {
+		t.Fatalf("lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobReady, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	if err = store.StopOwnedPlayback(ctx, first.ID, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	lease, ok, err = store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-restart-stop")
+	if err != nil || !ok || lease.Kind != media.JobStop {
+		t.Fatalf("stop lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobStopped, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	second, err := store.CreatePlayback(ctx, createInputToken(t, target, "media-token-restart"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if second.State != media.SessionPending || second.StreamID != first.StreamID {
+		t.Fatalf("session=%+v", second)
+	}
+	var streamState string
+	var startJobs int
+	if err = p.QueryRow(t.Context(), `SELECT state,(SELECT count(*) FROM jobs WHERE kind='video.start') FROM video_streams WHERE id=$1`, first.StreamID).Scan(&streamState, &startJobs); err != nil {
+		t.Fatal(err)
+	}
+	if streamState != "pending" || startJobs != 2 {
+		t.Fatalf("stream=%s startJobs=%d", streamState, startJobs)
+	}
+	lease, ok, err = store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-restart-again")
+	if err != nil || !ok || lease.Kind != media.JobStart {
+		t.Fatalf("restart lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobReady, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	var readyState string
+	if err = p.QueryRow(t.Context(), `SELECT state FROM video_sessions WHERE id=$1`, second.ID).Scan(&readyState); err != nil {
+		t.Fatal(err)
+	}
+	if readyState != "ready" {
+		t.Fatalf("restart session state=%s", readyState)
+	}
+}
