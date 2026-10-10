@@ -77,11 +77,26 @@ func TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation(t *testing.T) {
 				t.Fatal("login returned no token")
 			}
 			for _, path := range []string{"farms", "ponds", "devices", "alarms"} {
-				var rows []struct {
+				type resourceRow struct {
 					ID       int64  `json:"id"`
 					DeviceNo string `json:"device_no"`
 				}
-				m6bHTTPRequest(t, server.URL, login.Token, http.MethodGet, "/admin/v1/"+path, "", http.StatusOK, &rows)
+				var rows []resourceRow
+				if path == "devices" {
+					var page struct {
+						List     []resourceRow `json:"list"`
+						Total    int64         `json:"total"`
+						Page     int           `json:"page"`
+						PageSize int           `json:"page_size"`
+					}
+					m6bHTTPRequest(t, server.URL, login.Token, http.MethodGet, "/admin/v1/"+path, "", http.StatusOK, &page)
+					if page.Total != 1 || page.Page != 1 || page.PageSize != 20 {
+						t.Fatalf("device page included hidden resources or invalid defaults: %+v", page)
+					}
+					rows = page.List
+				} else {
+					m6bHTTPRequest(t, server.URL, login.Token, http.MethodGet, "/admin/v1/"+path, "", http.StatusOK, &rows)
+				}
 				if len(rows) != 1 {
 					t.Fatalf("%s returned %d rows, want assigned farm only", path, len(rows))
 				}
