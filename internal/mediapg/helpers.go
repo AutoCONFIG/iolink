@@ -84,9 +84,12 @@ func ensureStream(ctx context.Context, tx pgx.Tx, in media.CreateSession) (strin
 	if _, err := tx.Exec(ctx, `INSERT INTO video_streams(id,camera_id,tenant_id,source_version,state) VALUES($1,$2,$3,$4,'pending') ON CONFLICT(camera_id,source_version) DO NOTHING`, streamID, in.Session.CameraID, in.Session.TenantID, in.Session.SourceVersion); err != nil {
 		return "", err
 	}
-	var got string
-	if err := tx.QueryRow(ctx, `SELECT id::text FROM video_streams WHERE camera_id=$1 AND tenant_id=$2 AND source_version=$3 FOR UPDATE`, in.Session.CameraID, in.Session.TenantID, in.Session.SourceVersion).Scan(&got); err != nil {
+	var got, state string
+	if err := tx.QueryRow(ctx, `SELECT id::text,state FROM video_streams WHERE camera_id=$1 AND tenant_id=$2 AND source_version=$3 FOR UPDATE`, in.Session.CameraID, in.Session.TenantID, in.Session.SourceVersion).Scan(&got, &state); err != nil {
 		return "", err
+	}
+	if state == "stopping" {
+		return "", media.ErrConflict
 	}
 	return got, nil
 }

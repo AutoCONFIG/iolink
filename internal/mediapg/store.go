@@ -221,6 +221,9 @@ func (s *Store) StopOwnedPlayback(ctx context.Context, sessionID string, now tim
 			return media.ErrUnavailable
 		}
 		if active == 0 {
+			if _, err = tx.Exec(ctx, `UPDATE video_streams SET state='stopping',updated_at=clock_timestamp() WHERE id=$1`, sess.StreamID); err != nil {
+				return media.ErrUnavailable
+			}
 			payload := map[string]any{"session_id": sess.ID, "camera_id": sess.CameraID, "source_version": sess.SourceVersion, "stream_id": sess.StreamID, "action": "stop"}
 			if _, err = tx.Exec(ctx, `INSERT INTO jobs(tenant_id,kind,idempotency_key,payload)
  VALUES($1,$2,$3,$4) ON CONFLICT(tenant_id,kind,idempotency_key) DO NOTHING`, sess.TenantID, jobStop, sess.StreamID, payload); err != nil {

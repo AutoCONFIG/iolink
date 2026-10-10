@@ -89,26 +89,23 @@ func (s *Store) RevalidateJob(ctx context.Context, lease media.Lease) (media.Job
 	var enabled bool
 	var sourceVersion int64
 	err = tx.QueryRow(ctx, `SELECT c.enabled,c.source_version FROM video_cameras c WHERE c.id=$1 AND c.tenant_id=$2`, lease.CameraID, tenantID).Scan(&enabled, &sourceVersion)
-	if errors.Is(err, pgx.ErrNoRows) {
-		var liveSession bool
-		if lease.Kind == media.JobStop {
-			if err = tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM video_sessions WHERE stream_id=$1 AND camera_id=$2 AND tenant_id=$3 AND source_version=$4 AND state IN ('pending','ready') AND expires_at>clock_timestamp())`, lease.StreamID, lease.CameraID, tenantID, lease.SourceVersion).Scan(&liveSession); err != nil {
-				return media.JobAuthorization{}, media.ErrUnavailable
-			}
+	cameraErr := err
+	if cameraErr != nil && !errors.Is(cameraErr, pgx.ErrNoRows) {
+		return media.JobAuthorization{}, media.ErrUnavailable
+	}
+	var stopSuperseded bool
+	if lease.Kind == media.JobStop {
+		var fenceErr error
+		stopSuperseded, fenceErr = fenceStopStream(ctx, tx, lease, tenantID)
+		if fenceErr != nil {
+			return media.JobAuthorization{}, fenceErr
 		}
+	}
+	if errors.Is(cameraErr, pgx.ErrNoRows) {
 		if err = tx.Commit(ctx); err != nil {
 			return media.JobAuthorization{}, media.ErrUnavailable
 		}
-		return media.JobAuthorization{Target: target, Active: false, SourceCurrent: false, StopSuperseded: liveSession}, nil
-	}
-	if err != nil {
-		return media.JobAuthorization{}, media.ErrUnavailable
-	}
-	var liveSession bool
-	if lease.Kind == media.JobStop {
-		if err = tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM video_sessions WHERE stream_id=$1 AND camera_id=$2 AND tenant_id=$3 AND source_version=$4 AND state IN ('pending','ready') AND expires_at>clock_timestamp())`, lease.StreamID, lease.CameraID, tenantID, lease.SourceVersion).Scan(&liveSession); err != nil {
-			return media.JobAuthorization{}, media.ErrUnavailable
-		}
+		return media.JobAuthorization{Target: target, Active: false, SourceCurrent: false, StopSuperseded: stopSuperseded}, nil
 	}
 	var userID, userTokenVersion, tenantPermissionVersion, memberPermissionVersion int64
 	var currentUserTokenVersion, currentTenantPermissionVersion, currentMemberPermissionVersion int64
@@ -131,7 +128,7 @@ func (s *Store) RevalidateJob(ctx context.Context, lease media.Lease) (media.Job
 		if err = tx.Commit(ctx); err != nil {
 			return media.JobAuthorization{}, media.ErrUnavailable
 		}
-		return media.JobAuthorization{Target: target, Active: false, SourceCurrent: sourceVersion == lease.SourceVersion}, nil
+		return media.JobAuthorization{Target: target, Active: false, SourceCurrent: sourceVersion == lease.SourceVersion, StopSuperseded: stopSuperseded}, nil
 	}
 	if err != nil {
 		return media.JobAuthorization{}, media.ErrUnavailable
@@ -151,5 +148,26 @@ func (s *Store) RevalidateJob(ctx context.Context, lease media.Lease) (media.Job
 	if err = tx.Commit(ctx); err != nil {
 		return media.JobAuthorization{}, media.ErrUnavailable
 	}
-	return media.JobAuthorization{Target: target, Active: enabled, SourceCurrent: sourceVersion == lease.SourceVersion, StopSuperseded: liveSession}, nil
+	return media.JobAuthorization{Target: target, Active: enabled, SourceCurrent: sourceVersion == lease.SourceVersion, StopSuperseded: stopSuperseded}, nil
+}
+
+func fenceStopStream(ctx context.Context, tx pgx.Tx, lease media.Lease, tenantID int64) (bool, error) {
+	var cameraID, streamTenant, sourceVersion int64
+	if err := tx.QueryRow(ctx, `SELECT camera_id,tenant_id,source_version FROM video_streams WHERE id=$1 FOR UPDATE`, lease.StreamID).Scan(&cameraID, &streamTenant, &sourceVersion); errors.Is(err, pgx.ErrNoRows) {
+		return false, media.ErrLeaseLost
+	} else if err != nil {
+		return false, media.ErrUnavailable
+	} else if cameraID != lease.CameraID || streamTenant != tenantID || sourceVersion != lease.SourceVersion {
+		return false, media.ErrLeaseLost
+	}
+	var live bool
+	if err := tx.QueryRow(ctx, `SELECT EXISTS (SELECT 1 FROM video_sessions WHERE stream_id=$1 AND camera_id=$2 AND tenant_id=$3 AND source_version=$4 AND state IN ('pending','ready') AND expires_at>clock_timestamp())`, lease.StreamID, lease.CameraID, tenantID, lease.SourceVersion).Scan(&live); err != nil {
+		return false, media.ErrUnavailable
+	}
+	if !live {
+		if _, err := tx.Exec(ctx, `UPDATE video_streams SET state='stopping',updated_at=clock_timestamp() WHERE id=$1`, lease.StreamID); err != nil {
+			return false, media.ErrUnavailable
+		}
+	}
+	return live, nil
 }
