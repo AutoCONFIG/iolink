@@ -98,7 +98,12 @@ manifest 由网关获取并重写所有 URI 为同源带 token 的 gateway 路�
 仅支持有限 live HLS manifest（≤256KiB）及 H264/AAC TS 段（≤8MiB），关闭 master、
 外部 URI、KEY、MAP、byterange 和 fMP4；非支持标签/绝对路径/转义遍历/重定向一律502。
 网关分配随机 segment_id，持久映射到固定 stream 下规范段名，绑定 session/source_version，
-禁止把任意客户端 segment_id 当文件路径。段超时10秒，manifest 3秒，
+禁止把任意客户端 segment_id 当文件路径。固定 ZLM 的普通TS相对路径为
+`YYYY-MM-DD/HH/MM-SS_index.ts`，须保留日期/小时目录，不能只存 basename。
+运行时按这一固定布局解析日期、时间和非负数字index，DDL以同布局正则与128字符上限兜底；
+拒绝编码、绝对路径、额外目录、query/fragment、反斜线、点段和外部URI。
+由adapter使用固定stream根目录加已解析相对路径构造私有请求，不接受客户端指定provider路径。
+段超时10秒，manifest 3秒，
 授权失效主动 cancel。每用户≤5 session、每 camera≤20 session，超限429，Retry-After:1。
 映射在源 HLS 窗口结束或 session 到期后清理；负载测试验证并发与上限而非无限缓存。
 
@@ -223,5 +228,7 @@ sipgo固定至 `03cdf8e07c69e96719816d70f13a44a105e52d5a`。后续运行镜像�
   on_http_access 带目录/秒数缓存，不能单独保障实时撤权。
 - [ZLM RTP端口对](https://github.com/ZLMediaKit/ZLMediaKit/blob/46220e6a866592c140d719ca2981bd2276344f5e/src/Rtp/RtpServer.cpp#L137)：
   显式 RTP 端口同时绑定相邻 RTCP 端口；每路占用一个偶数/奇数端口对。
+- [ZLM HLS段路径](https://github.com/ZLMediaKit/ZLMediaKit/blob/46220e6a866592c140d719ca2981bd2276344f5e/src/Record/HlsMakerImp.cpp#L157)：
+  `onOpenSegment` 生成日期/小时目录下的TS；网关和DDL均保留受限相对路径。
 - [sipgo注册demo](https://github.com/emiago/sipgo/blob/03cdf8e07c69e96719816d70f13a44a105e52d5a/example/register/server/main.go)：
   仅单注册示范，不能复用共享nonce/用户名日志。

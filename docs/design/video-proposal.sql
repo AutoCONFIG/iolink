@@ -130,7 +130,7 @@ CREATE INDEX idx_video_sessions_user ON video_sessions(tenant_id, user_id, id);
 CREATE TABLE video_segments (
     session_id UUID NOT NULL REFERENCES video_sessions(id) ON DELETE CASCADE,
     segment_id UUID NOT NULL,
-    provider_name TEXT NOT NULL CHECK (provider_name ~ '^[A-Za-z0-9_-]+[.]ts$' AND length(provider_name)<=128),
+    provider_name TEXT NOT NULL CHECK (provider_name ~ '^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])/([01][0-9]|2[0-3])/[0-5][0-9]-[0-5][0-9]_[0-9]+[.]ts$' AND length(provider_name)<=128),
     expires_at TIMESTAMPTZ NOT NULL,
     PRIMARY KEY (session_id, segment_id),
     UNIQUE (session_id, provider_name)
