@@ -12,7 +12,7 @@
 | A02 | 总览 /dashboard | GET /stats + /ponds；critical/warning/normal及latest；无数据和过期属性明确显示 |
 | A03 | 农场和用户分配 /farms | farms CRUD、users检索、PUT farms/{id}/owner；未分配提示；转交/解除二次确认并说明历史权限变化 |
 | A04 | 池塘 /ponds | ponds CRUD；有任何设备（含停用）/历史/规则/报警引用409时显示具体原因，不提示直接删历史 |
-| A05 | 设备 /devices | 注册（可选60/300秒周期）、列表、详情、调塘、停用；secret一次性展示与复制，关闭后不再请求明文；调塘提示历史保留原塘 |
+| A05 | 设备 /devices | 注册（可选60/300秒周期）、分页列表（搜索/池塘/状态筛选，默认隐藏停用设备）、详情、调塘、停用；secret一次性展示与复制，关闭后不再请求明文；调塘提示历史保留原塘 |
 | A06 | 规则 /alarms/rules | alarm-rules CRUD；metric/上下限/level/enabled；min<max及至少一端；level由规则选择 |
 | A07 | 报警 /alarms | 列表level/only_unconfirmed/分页，单条/批量确认；批量失败整批不更新 |
 | A08 | 系统 /system | POST /password；更改后清理旧token重新登录；版本、依赖与通知状态 |

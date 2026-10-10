@@ -44,7 +44,7 @@
 | R15 AUDIT | M2 用户分配闭环 | 微信新用户A建档→管理员检索/建场分配→A看到池塘→B不可见→转交B后A立即不可见；解除后无人可见且暂停通知 | D/I（fake微信仅软件）/X；users、farms owner契约 |
 | R16 BASE | M2 农场/池塘管理 | 创建/修改/合法删除；未知对象404；有任何设备（含停用）/历史/规则/报警引用409；DELETE已不存在204；不会静默删历史 | U/D/I；adminapi/core |
 | R17 BASE | M2 设备注册/详情 | 唯一device_no、64hex随机secret、摘要库存；注册需合法pond；可选report_interval=60/300、缺省继承全局且详情返回；设备详情含latest；列表空[]且限制offset/limit；N | U/D/I；admin_store、API |
-| R18 AUDIT | M2 设备调塘/停用 | 旧连接撤销、原子调塘、影子清空；旧历史按旧塘权限；A塘未确认报警调塘后B同指标独立报警，A/B各自确认；停用拒绝连接/控制、保留历史；include_disabled可见；N | D/I；device生命周期 |
+| R18 AUDIT | M2 设备调塘/停用 | 旧连接撤销、原子调塘、影子清空；旧历史按旧塘权限；A塘未确认报警调塘后B同指标独立报警，A/B各自确认；停用拒绝连接/控制、保留历史；status=all 或 status=disabled 可见；N | D/I；device生命周期 |
 | R19 BASE | M2 规则管理 | CRUD和enabled；每塘/指标唯一；非法metric/level/无阈值/min>=max拒绝；更新立即影响下次采集；N | U/D/I；adminapi、alarm_rules |
 | R20 AUDIT | M2 所有用户资源隔离 | A/B对池塘详情/设备详情/latest/history/确认报警逐一互访均404且未改库；列表过滤正确；转交/调塘后仍按当前授权和历史快照；新旧塘报警分别只能各自owner读/确认 | D/I；appapi、所有repository |
 | R21 BASE | M2 报警中心 | limit/offset/level/only_unconfirmed生效；单确认204；批确认全部成功或任一失败整体不变；不存在404；N | U/D/I；双API |

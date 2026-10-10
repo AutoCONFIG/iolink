@@ -785,6 +785,64 @@ func (s *Service) ListDevices(ctx context.Context, includeDisabled bool, pondID 
 	return out, rows.Err()
 }
 
+func (s *Service) ListDevicesPage(ctx context.Context, query domain.DeviceListQuery) (domain.DevicePage, error) {
+	if query.Limit <= 0 || query.Limit > 200 {
+		query.Limit = 20
+	}
+	if query.Offset < 0 {
+		query.Offset = 0
+	}
+	status := strings.TrimSpace(query.Status)
+	search := strings.TrimSpace(query.Search)
+	where := `WHERE ($1 OR d.disabled_at IS NULL) AND ($2=0 OR d.pond_id=$2)`
+	args := []any{query.IncludeDisabled, query.PondID}
+	if status == "disabled" {
+		where += ` AND d.disabled_at IS NOT NULL`
+	} else if status == "active" {
+		where += ` AND d.disabled_at IS NULL`
+	} else if status == "online" || status == "offline" {
+		where += ` AND d.status=$3 AND d.disabled_at IS NULL`
+		args = append(args, status)
+	}
+	if search != "" {
+		index := len(args) + 1
+		where += fmt.Sprintf(` AND (d.device_no ILIKE $%d OR coalesce(d.name,'') ILIKE $%d OR coalesce(d.model,'') ILIKE $%d OR p.name ILIKE $%d)`, index, index, index, index)
+		args = append(args, "%"+search+"%")
+	}
+	clause, scopedArgs := tenantFilter(ctx, "f", len(args)+1)
+	where += clause
+	args = append(args, scopedArgs...)
+	defaultIntervalIndex := len(args) + 1
+	limitIndex, offsetIndex := defaultIntervalIndex+1, defaultIntervalIndex+2
+	args = append(args, int(s.defaultInterval.Seconds()), query.Limit, query.Offset)
+	q := fmt.Sprintf(`SELECT d.id,d.pond_id,d.device_no,coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,$%d),count(*) OVER() FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id %s ORDER BY d.id LIMIT $%d OFFSET $%d`, defaultIntervalIndex, where, limitIndex, offsetIndex)
+	rows, err := s.pool.Query(ctx, q, args...)
+	if err != nil {
+		return domain.DevicePage{}, err
+	}
+	defer rows.Close()
+	result := domain.DevicePage{Items: []domain.Device{}}
+	for rows.Next() {
+		var d domain.Device
+		var total int
+		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval, &total); err != nil {
+			return domain.DevicePage{}, err
+		}
+		result.Items = append(result.Items, d)
+		result.Total = total
+	}
+	if err := rows.Err(); err != nil {
+		return domain.DevicePage{}, err
+	}
+	if len(result.Items) == 0 {
+		countQuery := fmt.Sprintf(`SELECT count(*) FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id %s`, where)
+		if err := s.pool.QueryRow(ctx, countQuery, args[:defaultIntervalIndex-1]...).Scan(&result.Total); err != nil {
+			return domain.DevicePage{}, err
+		}
+	}
+	return result, nil
+}
+
 func (s *Service) GetDevice(ctx context.Context, deviceNo string) (domain.Device, error) {
 	var d domain.Device
 	q := `SELECT d.id,d.pond_id,d.device_no,coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,$2) FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`

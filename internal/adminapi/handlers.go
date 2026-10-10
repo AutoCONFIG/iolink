@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 
@@ -340,12 +341,12 @@ func (s *Server) listPonds(c *gin.Context) {
 			item["status"] = string(lvl)
 		}
 		item["latest"] = s.pondLatest(c.Request.Context(), p.ID)
-		devs, e := s.deps.Store.ListDevices(c.Request.Context(), false, p.ID, 200, 0)
+		page, e := s.deps.Store.ListDevicesPage(c.Request.Context(), domain.DeviceListQuery{PondID: p.ID, Limit: 200})
 		if e != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
 			return
 		}
-		item["device_count"] = len(devs)
+		item["device_count"] = len(page.Items)
 		out = append(out, item)
 	}
 	limit, offset, err := page(c)
@@ -386,12 +387,12 @@ func (s *Server) pondLatest(ctx context.Context, pondID int64) gin.H {
 	if s.deps.Telemetry == nil {
 		return nil
 	}
-	devs, err := s.deps.Store.ListDevices(ctx, false, 0, 200, 0)
+	page, err := s.deps.Store.ListDevicesPage(ctx, domain.DeviceListQuery{Limit: 200})
 	if err != nil {
 		return nil
 	}
 	var best *domain.Reading
-	for _, d := range devs {
+	for _, d := range page.Items {
 		if d.PondID != pondID {
 			continue
 		}
@@ -552,38 +553,57 @@ func (s *Server) registerDevice(c *gin.Context) {
 }
 
 func (s *Server) listDevices(c *gin.Context) {
-	include, err := strconv.ParseBool(c.DefaultQuery("include_disabled", "false"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid include_disabled"})
+	pageNumber, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || pageNumber < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid page"})
+		return
+	}
+	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", "20"))
+	if err != nil || pageSize < 1 || pageSize > 200 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid page_size"})
 		return
 	}
 	pondID := int64(0)
 	if raw := c.Query("pond_id"); raw != "" {
-		var err error
 		pondID, err = strconv.ParseInt(raw, 10, 64)
 		if err != nil || pondID < 1 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pond_id"})
 			return
 		}
 	}
-	limit, offset, err := page(c)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pagination"})
+	status, statusProvided := c.GetQuery("status")
+	if !statusProvided {
+		status = "active"
+	}
+	if status == "" || (status != "active" && status != "all" && status != "online" && status != "offline" && status != "disabled") {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
 		return
 	}
-	devs, err := s.deps.Store.ListDevices(c.Request.Context(), include, pondID, limit, offset)
+	search := c.Query("name")
+	if utf8.RuneCountInString(search) > 128 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
+		return
+	}
+	maxInt := int(^uint(0) >> 1)
+	if pageNumber-1 > maxInt/pageSize {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid page"})
+		return
+	}
+	query := domain.DeviceListQuery{PondID: pondID, Status: status, Search: search, Limit: pageSize, Offset: (pageNumber - 1) * pageSize}
+	query.IncludeDisabled = status == "all" || status == "disabled"
+	result, err := s.deps.Store.ListDevicesPage(c.Request.Context(), query)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	if devs == nil {
-		devs = []domain.Device{}
+	if result.Items == nil {
+		result.Items = []domain.Device{}
 	}
-	out := make([]gin.H, 0, len(devs))
-	for _, d := range devs {
+	out := make([]gin.H, 0, len(result.Items))
+	for _, d := range result.Items {
 		out = append(out, gin.H{"id": d.ID, "device_no": d.DeviceNo, "pond_id": d.PondID, "name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval})
 	}
-	c.JSON(http.StatusOK, out)
+	c.JSON(http.StatusOK, gin.H{"list": out, "total": result.Total, "page": pageNumber, "page_size": pageSize})
 }
 
 func (s *Server) getDevice(c *gin.Context) {

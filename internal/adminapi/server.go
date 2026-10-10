@@ -42,7 +42,7 @@ type AdminStore interface {
 	DeletePond(ctx context.Context, id int64) error // ErrPondHasDevices if devices bound
 
 	RegisterDevice(ctx context.Context, pondID int64, name, model string, reportInterval int) (dev domain.Device, secret string, err error)
-	ListDevices(ctx context.Context, includeDisabled bool, pondID int64, limit, offset int) ([]domain.Device, error)
+	ListDevicesPage(ctx context.Context, query domain.DeviceListQuery) (domain.DevicePage, error)
 	GetDevice(ctx context.Context, deviceNo string) (domain.Device, error)
 	MoveDevice(ctx context.Context, deviceNo string, pondID int64) error
 	DeleteDevice(ctx context.Context, deviceNo string) error

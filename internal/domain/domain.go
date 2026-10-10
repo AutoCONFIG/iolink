@@ -100,6 +100,20 @@ type Device struct {
 	ReportInterval int          `json:"report_interval"`
 }
 
+type DeviceListQuery struct {
+	IncludeDisabled bool
+	PondID          int64
+	Status          string
+	Search          string
+	Limit           int
+	Offset          int
+}
+
+type DevicePage struct {
+	Items []Device
+	Total int
+}
+
 type DeviceStatus string
 
 const (

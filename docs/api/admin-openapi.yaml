@@ -611,16 +611,14 @@ paths:
       tags:
       - devices
       summary: 设备列表
-      description: 默认返回未停用设备，include_disabled=true 包含停用设备；不返回明文 secret 或摘要。
+      description: 按 ThingsPanel 风格返回分页资源集合；支持名称/编号搜索、池塘筛选和在线状态筛选。不返回明文 secret 或摘要。
       responses:
         '200':
           description: 成功
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Device'
+                $ref: '#/components/schemas/DevicePage'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -635,12 +633,35 @@ paths:
           type: integer
           format: int64
           minimum: 1
-      - name: include_disabled
+      - name: name
         in: query
         required: false
         schema:
-          type: boolean
-          default: false
+          type: string
+          maxLength: 128
+          description: 按设备名称、编号或型号模糊搜索
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum: [active, all, online, offline, disabled]
+          default: active
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - name: page_size
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 20
       - *id001
       - *id002
     post:
@@ -1484,7 +1505,26 @@ components:
           - 300
           description: 注册确定的预期上报周期，秒。
       additionalProperties: false
-      description: 小程序只返回未停用设备，管理端可使用 include_disabled 查询停用设备。name/model 未设置时为空字符串；永不返回 secret 或摘要。
+      description: name/model 未设置时为空字符串；永不返回 secret 或摘要。
+    DevicePage:
+      type: object
+      required: [list, total, page, page_size]
+      properties:
+        list:
+          type: array
+          items:
+            $ref: '#/components/schemas/Device'
+        total:
+          type: integer
+          minimum: 0
+        page:
+          type: integer
+          minimum: 1
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 200
+      additionalProperties: false
     Alarm:
       type: object
       required:

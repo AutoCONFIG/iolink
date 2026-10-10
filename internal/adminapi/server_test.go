@@ -34,6 +34,7 @@ type fakeStore struct {
 	rejections       [][]byte
 	registerErr      error
 	restoreErr       error
+	lastDeviceQuery  domain.DeviceListQuery
 }
 
 type fakeProductCatalog struct{}
@@ -110,6 +111,11 @@ func (f *fakeStore) ListDevices(_ context.Context, _ bool, _ int64, _, _ int) ([
 		out = append(out, d)
 	}
 	return out, nil
+}
+
+func (f *fakeStore) ListDevicesPage(_ context.Context, query domain.DeviceListQuery) (domain.DevicePage, error) {
+	f.lastDeviceQuery = query
+	return domain.DevicePage{Items: []domain.Device{{ID: 3, PondID: 1, DeviceNo: "dev-page", Name: "页面设备", Model: "S5", Status: domain.DeviceOnline}}, Total: 9}, nil
 }
 
 func (f *fakeStore) GetDevice(_ context.Context, no string) (domain.Device, error) {
@@ -563,6 +569,52 @@ func TestSupportCanReadTenantBusinessRoutes(t *testing.T) {
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("support farms status=%d, want 200", resp.StatusCode)
+	}
+}
+
+func TestDeviceListReturnsPagedResourceEnvelope(t *testing.T) {
+	hash := platform.HashPassword("admin123")
+	policy, err := authorization.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+	store := &fakeStore{admin: &domain.User{ID: 9, Username: strptr("admin"), PasswordHash: &hash, Authority: "USER"}, tenantRole: "owner", devices: map[string]domain.Device{}, rules: map[int64]domain.AlarmRule{}}
+	store.devices["dev-page"] = domain.Device{ID: 3, PondID: 1, DeviceNo: "dev-page", Name: "页面设备", Model: "S5", Status: domain.DeviceOnline}
+	ts := httptest.NewServer(New(Config{SecretKey: "test-key", JWT: time.Hour}, Deps{Store: store, Policy: policy}).Routes())
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	resp := authGet(t, ts, token, "/admin/v1/devices?page=2&page_size=5&status=online&name=page")
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("status=%d", resp.StatusCode)
+	}
+	var body struct {
+		List     []domain.Device `json:"list"`
+		Total    int             `json:"total"`
+		Page     int             `json:"page"`
+		PageSize int             `json:"page_size"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
+		t.Fatal(err)
+	}
+	if body.Page != 2 || body.PageSize != 5 || body.Total != 9 || len(body.List) != 1 {
+		t.Fatalf("unexpected page envelope: %+v", body)
+	}
+	if store.lastDeviceQuery.Status != "online" || store.lastDeviceQuery.Search != "page" || store.lastDeviceQuery.Limit != 5 || store.lastDeviceQuery.Offset != 5 {
+		t.Fatalf("unexpected device query: %+v", store.lastDeviceQuery)
+	}
+}
+
+func TestDeviceListRejectsInvalidFilters(t *testing.T) {
+	ts := newTestServerWithRole(t, "USER", "owner")
+	defer ts.Close()
+	token := adminLogin(t, ts)
+	for _, query := range []string{"status=", "name=" + strings.Repeat("x", 129), "page=999999999999999999&page_size=200"} {
+		resp := authGet(t, ts, token, "/admin/v1/devices?"+query)
+		resp.Body.Close()
+		if resp.StatusCode != http.StatusBadRequest {
+			t.Fatalf("query %q status=%d, want 400", query, resp.StatusCode)
+		}
 	}
 }
 
