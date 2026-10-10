@@ -1,0 +1,25 @@
+$ go test -race -shuffle=on -count=1 -v ./internal/media ./internal/playback
+?   	git.hyhy.fun/rsplab/iolink/internal/media	[no test files]
+-test.shuffle 1791658979376378889
+=== RUN   TestAuthorizeMediaFailsClosedWhenVideoIsDisabled
+--- PASS: TestAuthorizeMediaFailsClosedWhenVideoIsDisabled (0.00s)
+=== RUN   TestRequestPlaybackReturnsSourceVersionConflictWithoutGrant
+--- PASS: TestRequestPlaybackReturnsSourceVersionConflictWithoutGrant (0.00s)
+=== RUN   TestProcessMediaJobUsesLeaseAndRecordsUnknownWithoutReplay
+--- PASS: TestProcessMediaJobUsesLeaseAndRecordsUnknownWithoutReplay (0.00s)
+=== RUN   TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing
+--- PASS: TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing (0.00s)
+=== RUN   TestAuthorizeMediaChecksAudienceClaimsHashAndPendingState
+--- PASS: TestAuthorizeMediaChecksAudienceClaimsHashAndPendingState (0.00s)
+=== RUN   TestReadPlaybackExpiresAtExactBoundary
+--- PASS: TestReadPlaybackExpiresAtExactBoundary (0.00s)
+=== RUN   TestReadAndStopPreserveOwnerOnlyStoreContract
+--- PASS: TestReadAndStopPreserveOwnerOnlyStoreContract (0.00s)
+=== RUN   TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey
+--- PASS: TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey (0.00s)
+=== RUN   TestProcessMediaJobLeaseCASFailureIsUnknownToCaller
+--- PASS: TestProcessMediaJobLeaseCASFailureIsUnknownToCaller (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/playback	1.011s
+
+$ go vet ./internal/media ./internal/playback

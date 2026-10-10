@@ -1,0 +1,15 @@
+M7a playback job and manifest URL guard verification (2026-10-11).
+
+Command: go test -race -shuffle=on -count=1 ./internal/playback ./internal/media
+Output: targeted playback/media tests passed, including inactive/source-stale JobStart skip cases, provider call count assertions, HTTPS manifest acceptance, and invalid empty/relative/http/no-host manifest rejection.
+
+Command: go vet ./internal/playback ./internal/media
+Output: exit 0 (no diagnostics)
+
+Command: sh deploy/zlm-secure-build/build-probe.sh
+Output: approved patch applied and reverse-checked; unapplied, dirty, and unapproved inputs rejected before fetch/build.
+
+Command: make verify
+Exit: 0 (go build, go vet, and go test -race -shuffle=on ./... -count=1).
+
+Judgment: a revalidated JobStart that is inactive or source-stale is persisted as skipped and cannot be reported ready; enabled playback only creates a grant with an absolute HTTPS manifest base and rejects invalid bases before session insertion.

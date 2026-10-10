@@ -1,0 +1,8 @@
+source_commit= 46220e6a866592c140d719ca2981bd2276344f5e
+submodules= 5
+status= external_blocked
+base_image_digest= None
+patch rtsp-redirect-origin-controls path_exists= False sha256= None
+patch rtsp-log-redaction-and-retry-ownership path_exists= False sha256= None
+FAIL_CLOSED: manifest status is not approved
+manifest_gate_exit=1

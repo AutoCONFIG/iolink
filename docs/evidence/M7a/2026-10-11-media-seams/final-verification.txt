@@ -1,0 +1,21 @@
+M7a media/playback seam verification for the implementation source snapshot.
+
+Implementation source commit: 8f011599e94f886077f7947bbbe5150774b97ff
+Evidence-packaging commits after this source snapshot change documentation only. The independent code and gate reports pin the exact final review tree; this receipt deliberately does not self-reference a documentation commit that contains the receipt.
+
+Command: go test -race -shuffle=on -count=1 ./internal/media ./internal/playback
+Exit status: 0
+Output: internal/media has no test files; internal/playback passed.
+
+Command: go vet ./internal/media ./internal/playback
+Exit status: 0
+
+Command: sh deploy/zlm-secure-build/build-probe.sh
+Exit status: 0
+Output: approved patch applied and reverse-checked; unapplied, dirty, and unapproved inputs rejected before fetch/build.
+
+Command: make verify
+Exit status: 0
+Output included go build ./..., go vet ./..., and go test -race -shuffle=on ./... -count=1. Relevant packages internal/media/zlm, internal/playback, internal/license, and internal/wechat passed.
+
+Judgment: the current candidate passes scoped and full repository verification. Video remains closed unless the composition root supplies the explicitly enabled provider, license, token, and HTTPS manifest capabilities.

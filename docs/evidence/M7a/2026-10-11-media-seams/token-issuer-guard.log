@@ -1,0 +1,19 @@
+M7a nil token issuer regression verification, executed after the gate finding.
+
+Command: go test -race -shuffle=on -count=1 ./internal/media ./internal/playback && go vet ./internal/media ./internal/playback
+Exit status: 0
+Output:
+?   git.hyhy.fun/rsplab/iolink/internal/media [no test files]
+ok  git.hyhy.fun/rsplab/iolink/internal/playback 1.011s
+
+TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing configured Enabled=true with provider and license guard and Tokens=nil. It returned ErrUnavailable and asserted the fake store did not create a session.
+
+Command: make verify
+Exit status: 0
+Output included go build, go vet, and go test -race -shuffle=on ./... -count=1. Relevant output:
+?   git.hyhy.fun/rsplab/iolink/internal/media [no test files]
+ok  git.hyhy.fun/rsplab/iolink/internal/media/zlm 1.012s
+ok  git.hyhy.fun/rsplab/iolink/internal/playback 1.012s
+?   git.hyhy.fun/rsplab/iolink/internal/wire [no test files]
+
+Judgment: PASS. Commit 4bf9a27 adds the Tokens nil guard and no-insertion regression. No provider side effect is reached when the token issuer is unavailable.

@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "status": "external_blocked",
+  "source": {
+    "repository": "https://github.com/ZLMediaKit/ZLMediaKit.git",
+    "commit": "46220e6a866592c140d719ca2981bd2276344f5e",
+    "submodules": {
+      "ZLToolKit": "d7d601200f65f3111dbf9d20ed7f14d2654bbd6e",
+      "jsoncpp": "ca98c98457b1163cca1f7d8db62827c115fec6d1",
+      "media-server": "21c4451ff2e4c4bb1c817e606c8b4e5deac1e719",
+      "pybind11": "ed5057ded698e305210269dafa57574ecf964483",
+      "webassist": "6689195ac89462d40accd88f13dfde58902da57b"
+    }
+  },
+  "patches": [
+    {
+      "id": "rtsp-redirect-origin-controls",
+      "path": "patches/0001-rtsp-origin-and-redirect-policy.patch",
+      "sha256": null,
+      "required": true,
+      "seams": [
+        "src/Rtsp/RtspPlayer.cpp:handleResponse",
+        "src/Rtsp/RtspPlayer.cpp:handleResDESCRIBE",
+        "src/Rtsp/Rtsp.cpp:SdpTrack::getControlUrl",
+        "src/Rtsp/Rtsp.cpp:SdpParser::getControlUrl",
+        "src/Rtsp/RtspPlayer.cpp:sendRtspRequest"
+      ]
+    },
+    {
+      "id": "rtsp-log-redaction-and-retry-ownership",
+      "path": "patches/0002-redact-rtsp-secrets-and-disable-provider-retries.patch",
+      "sha256": null,
+      "required": true,
+      "seams": [
+        "src/Rtsp/RtspPlayer.cpp:play",
+        "src/Rtsp/RtspPlayer.cpp:onPlayResult_l",
+        "src/Rtsp/RtspPlayer.cpp:sendRtspRequest",
+        "src/Player/PlayerProxy.cpp:failure-and-retry",
+        "server/WebApi.cpp:request-error-boundary"
+      ]
+    }
+  ],
+  "build": {
+    "base_image": "ubuntu:24.04",
+    "base_image_digest": null,
+    "configure": [
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DENABLE_FFMPEG=OFF",
+      "-DENABLE_WEBRTC=OFF",
+      "-DENABLE_TESTS=ON"
+    ],
+    "toolchain": ["build-essential", "cmake", "git", "ca-certificates", "libssl-dev"],
+    "artifact": "MediaServer"
+  },
+  "runtime": {
+    "published_ports": [],
+    "api_network": "private",
+    "hls_network": "private",
+    "source_egress": "allowlisted-numeric-ip-only",
+    "retry_count": 0,
+    "probe_version": "zlm-security-v1"
+  }
+}
