@@ -23,39 +23,53 @@ const (
 var mediaNow = time.Date(2026, 10, 11, 1, 0, 0, 0, time.UTC)
 
 type store struct {
-	access     media.MediaAccess
-	mapping    media.SegmentMapping
-	createErr  error
-	created    []media.SegmentMapping
-	resolveErr error
+	access             media.MediaAccess
+	mapping            media.SegmentMapping
+	createErr          error
+	created            []media.SegmentMapping
+	attempted          int
+	partialErr         bool
+	resolveErr         error
+	resolveSawDeadline bool
 }
 
 func (s *store) PreparePlayback(context.Context, int64) (media.PlaybackTarget, error) {
 	return media.PlaybackTarget{}, errors.New("unused")
 }
+
 func (s *store) CreatePlayback(context.Context, media.CreateSession) (media.Session, error) {
 	return media.Session{}, errors.New("unused")
 }
+
 func (s *store) ReadOwnedPlayback(context.Context, string) (media.Session, error) {
 	return media.Session{}, errors.New("unused")
 }
+
 func (s *store) StopOwnedPlayback(context.Context, string, time.Time) error {
 	return errors.New("unused")
 }
+
 func (s *store) ClaimJob(context.Context, time.Time, time.Duration, string) (media.Lease, bool, error) {
 	return media.Lease{}, false, errors.New("unused")
 }
+
 func (s *store) RevalidateJob(context.Context, media.Lease) (media.JobAuthorization, error) {
 	return media.JobAuthorization{}, errors.New("unused")
 }
+
 func (s *store) FinishJob(context.Context, media.Lease, media.JobResult, time.Time) error {
 	return errors.New("unused")
 }
+
 func (s *store) AuthorizeMedia(context.Context, media.MediaClaims, [32]byte, time.Time) (media.MediaAccess, error) {
 	return s.access, nil
 }
+
 func (s *store) CreateSegmentMappings(_ context.Context, mappings []media.SegmentMapping) ([]media.SegmentMapping, error) {
 	if s.createErr != nil {
+		if s.partialErr && len(mappings) > 0 {
+			s.attempted = 1
+		}
 		return nil, s.createErr
 	}
 	s.created = append([]media.SegmentMapping(nil), mappings...)
@@ -64,7 +78,9 @@ func (s *store) CreateSegmentMappings(_ context.Context, mappings []media.Segmen
 	}
 	return mappings, nil
 }
-func (s *store) ResolveSegmentMapping(_ context.Context, _, id string) (media.SegmentMapping, error) {
+
+func (s *store) ResolveSegmentMapping(ctx context.Context, _, id string) (media.SegmentMapping, error) {
+	_, s.resolveSawDeadline = ctx.Deadline()
 	if s.resolveErr != nil {
 		return media.SegmentMapping{}, s.resolveErr
 	}
@@ -152,9 +168,18 @@ func TestManifestRejectsUnknownTagsAndBatchFailureLeavesNoMappings(t *testing.T)
 
 	s, store = service(t, media.SessionReady, []byte("#EXTM3U\n#EXTINF:2,\n2026-10-11/01/02-03_0.ts\n#EXTINF:2,\n2026-10-11/01/02-05_1.ts\n"), nil)
 	store.createErr = errors.New("atomic mapping failure")
+	store.partialErr = true
 	recorder = request(mediahttp.New(s), "/media/v1/"+mediaToken+"/"+mediaUUID+"/index.m3u8")
-	if recorder.Code != http.StatusServiceUnavailable || len(store.created) != 0 {
-		t.Fatalf("batch failure status=%d created=%d", recorder.Code, len(store.created))
+	if recorder.Code != http.StatusServiceUnavailable || store.attempted != 1 || len(store.created) != 0 {
+		t.Fatalf("batch failure status=%d attempted=%d created=%d", recorder.Code, store.attempted, len(store.created))
+	}
+}
+
+func TestSegmentResolveUsesBoundedContext(t *testing.T) {
+	s, store := service(t, media.SessionReady, nil, nil)
+	_, err := s.ReadSegment(context.Background(), mediaToken, mediaUUID, segmentID)
+	if !errors.Is(err, playback.ErrNotFound) || !store.resolveSawDeadline {
+		t.Fatalf("resolve err=%v deadline=%v", err, store.resolveSawDeadline)
 	}
 }
 
