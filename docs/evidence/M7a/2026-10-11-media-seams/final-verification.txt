@@ -1,26 +1,20 @@
-M7a media/playback seam verification executed in the current run.
+M7a media/playback seam verification on the final candidate snapshot.
 
-Command: go test -race -shuffle=on -count=1 ./internal/media ./internal/playback && go vet ./internal/media ./internal/playback
-Exit status: 0
-Output:
-?   git.hyhy.fun/rsplab/iolink/internal/media [no test files]
-ok  git.hyhy.fun/rsplab/iolink/internal/playback 1.012s
+Commit: 1897f1362cec02ae472216114dd7dd16954c1ee2
 
-Command: go test ./...
+Command: go test -race -shuffle=on -count=1 ./internal/media ./internal/playback
 Exit status: 0
-Output included all command and internal packages. Relevant lines:
-?   git.hyhy.fun/rsplab/iolink/internal/media [no test files]
-ok  git.hyhy.fun/rsplab/iolink/internal/media/zlm (cached)
-ok  git.hyhy.fun/rsplab/iolink/internal/playback 0.003s
-?   git.hyhy.fun/rsplab/iolink/internal/wire [no test files]
+Output: internal/media has no test files; internal/playback passed.
+
+Command: go vet ./internal/media ./internal/playback
+Exit status: 0
+
+Command: sh deploy/zlm-secure-build/build-probe.sh
+Exit status: 0
+Output: approved patch applied and reverse-checked; unapplied, dirty, and unapproved inputs rejected before fetch/build.
 
 Command: make verify
 Exit status: 0
-Output included go build, go vet, and go test -race -shuffle=on ./... -count=1. Relevant final lines:
-?   git.hyhy.fun/rsplab/iolink/internal/media [no test files]
-ok  git.hyhy.fun/rsplab/iolink/internal/media/zlm 1.012s
-ok  git.hyhy.fun/rsplab/iolink/internal/playback 1.014s
-?   git.hyhy.fun/rsplab/iolink/internal/wire [no test files]
+Output included go build ./..., go vet ./..., and go test -race -shuffle=on ./... -count=1. Relevant packages internal/media/zlm, internal/playback, internal/license, and internal/wechat passed.
 
-Judgment: PASS. The scoped media/playback packages, full package suite, and repository verification all exited zero in this run. The capability remains closed unless Config.Enabled is true with provider and license dependencies.
-Commit observed at verification: 6b508c52a76ae12373e8b315254589dcf4784aea
+Judgment: the current candidate passes scoped and full repository verification. Video remains closed unless the composition root supplies the explicitly enabled provider, license, token, and HTTPS manifest capabilities.
