@@ -32,3 +32,7 @@ ok  git.hyhy.fun/rsplab/iolink/internal/playback   1.012s
 ```
 
 The tests cover successful same-origin rewrites and TS delivery, no-store headers, pending/425, invalid paths, unsafe and unknown HLS tags, atomic mapping failure with no residual rows, unknown mappings, and the 8 MiB segment limit. Real ZLMediaKit, RTSP cameras, browser playback, and external network acceptance remain `external_blocked` for this seam.
+
+## Independent final review
+
+The exact reviewed implementation snapshot is `5765e23aac2f3c54f15f27a7fc1ef0eccbe88a90`. The independent code review is [final-code-review.md](final-code-review.md): `APPROVE`, `blockers=[]`, with only maintainability and real-adapter evidence gaps recorded as non-blocking risks. The independent gate review is [final-gate-review.md](final-gate-review.md): `APPROVE`, `blockers=[]`. The HTTP handler remains unmounted while secure provider and real runtime evidence are unavailable.
