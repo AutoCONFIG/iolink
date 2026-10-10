@@ -70,9 +70,10 @@ type fakeLicense struct{ err error }
 func (f fakeLicense) RequireVideo(context.Context, media.LicenseSnapshot) error { return f.err }
 
 type fakeTokens struct {
-	raw      string
-	issueErr error
-	claims   media.MediaClaims
+	raw       string
+	issueErr  error
+	verifyErr error
+	claims    media.MediaClaims
 }
 
 func (f fakeTokens) Issue(_ context.Context, claims media.MediaClaims) (media.IssuedToken, error) {
@@ -84,7 +85,9 @@ func (f fakeTokens) Issue(_ context.Context, claims media.MediaClaims) (media.Is
 	}
 	return media.IssuedToken{Raw: f.raw, Claims: f.claims}, nil
 }
-func (f fakeTokens) Verify(context.Context, string) (media.MediaClaims, error) { return f.claims, nil }
+func (f fakeTokens) Verify(context.Context, string) (media.MediaClaims, error) {
+	return f.claims, f.verifyErr
+}
 
 type fakeProvider struct{ startErr, stopErr error }
 
@@ -233,7 +236,7 @@ func TestAuthorizeMediaChecksAudienceClaimsHashAndPendingState(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.AuthorizeMedia(actor(), "token", "s"); !errors.Is(err, playback.ErrPending) {
+	if _, err := s.AuthorizeMedia(context.Background(), "token", "s"); !errors.Is(err, playback.ErrPending) {
 		t.Fatalf("pending err=%v", err)
 	}
 	if store.authorizeHash != sha256.Sum256([]byte("token")) {
@@ -242,15 +245,36 @@ func TestAuthorizeMediaChecksAudienceClaimsHashAndPendingState(t *testing.T) {
 	bad := claims
 	bad.Audience = "other"
 	s, _ = playback.New(playback.Config{Store: store, Tokens: fakeTokens{claims: bad}, Enabled: true, Now: func() time.Time { return now }})
-	if _, err := s.AuthorizeMedia(actor(), "token", "s"); !errors.Is(err, playback.ErrUnauthorized) {
+	if _, err := s.AuthorizeMedia(context.Background(), "token", "s"); !errors.Is(err, playback.ErrUnauthorized) {
 		t.Fatalf("audience err=%v", err)
+	}
+}
+
+func TestAuthorizeMediaRejectsTokenErrorsAndRevokedSessionsWithoutActor(t *testing.T) {
+	now := time.Date(2026, 10, 11, 1, 0, 0, 0, time.UTC)
+	claims := media.MediaClaims{SessionID: "s", TenantID: 21, CameraID: 9, UserID: 34, SourceVersion: 7, Audience: "iolink-media-v1", IssuedAt: now.Add(-time.Second), ExpiresAt: now.Add(time.Minute), JTI: "j"}
+	store := &fakeStore{authorize: media.MediaAccess{SessionID: "s", TenantID: 21, CameraID: 9, SourceVersion: 7, State: media.SessionRevoked, ExpiresAt: claims.ExpiresAt}}
+	s, err := playback.New(playback.Config{Store: store, Tokens: fakeTokens{claims: claims}, Enabled: true, Now: func() time.Time { return now }})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.AuthorizeMedia(context.Background(), "token", "s"); !errors.Is(err, playback.ErrForbidden) {
+		t.Fatalf("revoked session err=%v", err)
+	}
+	store = &fakeStore{}
+	s, _ = playback.New(playback.Config{Store: store, Tokens: fakeTokens{claims: claims, verifyErr: errors.New("invalid token")}, Enabled: true, Now: func() time.Time { return now }})
+	if _, err := s.AuthorizeMedia(context.Background(), "token", "s"); !errors.Is(err, playback.ErrUnauthorized) {
+		t.Fatalf("token verification err=%v", err)
+	}
+	if store.authorizeHash != ([32]byte{}) {
+		t.Fatal("invalid token reached authorization store")
 	}
 }
 
 func TestAuthorizeMediaFailsClosedWhenVideoIsDisabled(t *testing.T) {
 	store := &fakeStore{}
 	s := service(t, store, false, nil, nil, fakeTokens{})
-	if _, err := s.AuthorizeMedia(actor(), "token", "s"); !errors.Is(err, playback.ErrUnavailable) {
+	if _, err := s.AuthorizeMedia(context.Background(), "token", "s"); !errors.Is(err, playback.ErrUnavailable) {
 		t.Fatalf("disabled gateway err=%v", err)
 	}
 }

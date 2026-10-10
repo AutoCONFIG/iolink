@@ -178,9 +178,6 @@ func (s *Service) StopPlayback(ctx context.Context, sessionID string) error {
 }
 
 func (s *Service) AuthorizeMedia(ctx context.Context, rawToken, sessionID string) (MediaAccess, error) {
-	if err := requireActor(ctx); err != nil {
-		return MediaAccess{}, err
-	}
 	if rawToken == "" || sessionID == "" {
 		return MediaAccess{}, ErrUnauthorized
 	}

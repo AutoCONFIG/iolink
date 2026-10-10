@@ -37,6 +37,39 @@ for patch in manifest["patches"]:
         raise SystemExit(f"ZLMediaKit security patch digest mismatch: {patch['id']}")
 PY
 
+git -C "$source_dir" diff --quiet || { echo "ZLMediaKit source checkout is dirty" >&2; exit 1; }
+git -C "$source_dir" diff --cached --quiet || { echo "ZLMediaKit source index is dirty" >&2; exit 1; }
+[ -z "$(git -C "$source_dir" status --porcelain --untracked-files=all)" ] || { echo "ZLMediaKit source checkout is dirty" >&2; exit 1; }
+
+required_patches=$(python3 - "$manifest" <<'PY'
+import json, pathlib, sys
+manifest = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+for patch in manifest["patches"]:
+    if patch.get("required"):
+        print(patch["path"])
+PY
+)
+
+for patch in $required_patches; do
+	patch_path="$manifest_dir/$patch"
+	git -C "$source_dir" apply --check --whitespace=error "$patch_path" || {
+		echo "required ZLMediaKit security patch does not apply: $patch" >&2
+		exit 1
+	}
+done
+
+for patch in $required_patches; do
+	patch_path="$manifest_dir/$patch"
+	git -C "$source_dir" apply --whitespace=error "$patch_path" || {
+		echo "failed to apply required ZLMediaKit security patch: $patch" >&2
+		exit 1
+	}
+	git -C "$source_dir" apply --check --reverse --whitespace=error "$patch_path" || {
+		echo "required ZLMediaKit security patch application could not be verified: $patch" >&2
+		exit 1
+	}
+done
+
 git -C "$source_dir" submodule update --init --recursive
 git -C "$source_dir" submodule status --recursive | grep '^-' >/dev/null 2>&1 && {
 	echo "uninitialized ZLMediaKit submodule" >&2

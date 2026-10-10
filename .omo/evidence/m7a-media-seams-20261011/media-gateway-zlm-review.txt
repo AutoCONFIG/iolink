@@ -1,0 +1,26 @@
+M7a review blocker verification (2026-10-11, shared worktree)
+
+Command: go test -race -shuffle=on -count=1 ./internal/playback ./internal/media
+Output:
+ok   git.hyhy.fun/rsplab/iolink/internal/playback 1.011s
+?    git.hyhy.fun/rsplab/iolink/internal/media [no test files]
+
+Command: go vet ./internal/playback ./internal/media
+Output: exit 0 (no diagnostics)
+
+Command: sh deploy/zlm-secure-build/build-probe.sh
+Output:
+zlm build probe: approved patch applied and reverse-checked; unapplied, dirty, and unapproved inputs rejected before build/fetch.
+
+Command: make verify
+Exit: 0
+Observed output included:
+go build ./...
+go vet ./...
+go test -race -shuffle=on ./... -count=1
+ok git.hyhy.fun/rsplab/iolink/internal/playback 1.013s
+ok git.hyhy.fun/rsplab/iolink/internal/license 30.353s
+ok git.hyhy.fun/rsplab/iolink/internal/media/zlm 1.013s
+ok git.hyhy.fun/rsplab/iolink/internal/wechat 1.017s
+
+Judgment: AuthorizeMedia now accepts context.Background for the security: [] media gateway and still fails closed on token verification, audience/claims, disabled capability, and revoked session state. build.sh rejects dirty source trees, validates every required patch with git apply --check, applies it, reverse-checks the applied patch, then continues to build; the probe exercises approved success plus unapplied, dirty, and unapproved failures before fetch/build.
