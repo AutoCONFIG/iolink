@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+const (
+	MaxManifestBytes = 256 * 1024
+	MaxSegmentBytes  = 8 * 1024 * 1024
+)
+
 var (
 	ErrInvalid            = errors.New("invalid media request")
 	ErrUnavailable        = errors.New("media unavailable")
@@ -197,7 +202,7 @@ type SegmentMapping struct {
 }
 
 type SegmentMappingStore interface {
-	CreateSegmentMapping(context.Context, SegmentMapping) (SegmentMapping, error)
+	CreateSegmentMappings(context.Context, []SegmentMapping) ([]SegmentMapping, error)
 	ResolveSegmentMapping(context.Context, string, string) (SegmentMapping, error)
 }
 

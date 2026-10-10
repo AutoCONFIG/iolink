@@ -68,11 +68,6 @@ type Grant struct {
 
 type MediaAccess = media.MediaAccess
 
-const (
-	maxManifestBytes = 256 * 1024
-	maxSegmentBytes  = 8 * 1024 * 1024
-)
-
 var segmentPathPattern = regexp.MustCompile(`^(\d{4}-\d{2}-\d{2})/(\d{2})/(\d{2})-(\d{2})_(\d+)\.ts$`)
 
 func New(cfg Config) (*Service, error) {
@@ -247,7 +242,7 @@ func (s *Service) ReadManifest(ctx context.Context, rawToken, sessionID string) 
 	if err != nil {
 		return nil, normalizeMediaSourceError(err)
 	}
-	if len(manifest) == 0 || len(manifest) > maxManifestBytes {
+	if len(manifest) == 0 || len(manifest) > media.MaxManifestBytes {
 		return nil, ErrBadMedia
 	}
 	return s.rewriteManifest(ctx, access, rawToken, manifest)
@@ -281,7 +276,7 @@ func (s *Service) ReadSegment(ctx context.Context, rawToken, sessionID, segmentI
 	if err != nil {
 		return nil, normalizeMediaSourceError(err)
 	}
-	if len(segment) == 0 || len(segment) > maxSegmentBytes {
+	if len(segment) == 0 || len(segment) > media.MaxSegmentBytes {
 		return nil, ErrBadMedia
 	}
 	return segment, nil
@@ -313,18 +308,25 @@ func (s *Service) rewriteManifest(ctx context.Context, access media.MediaAccess,
 		}
 		segmentLines = append(segmentLines, i)
 	}
+	mappings := make([]media.SegmentMapping, 0, len(segmentLines))
 	for _, i := range segmentLines {
 		line := lines[i]
 		requestedID := uuid.NewString()
-		mapping := media.SegmentMapping{ID: requestedID, SessionID: access.SessionID, StreamID: access.StreamID, SourceVersion: access.SourceVersion, Path: line}
-		mapping, err := s.cfg.Mappings.CreateSegmentMapping(ctx, mapping)
-		if err != nil {
-			return nil, normalizeMediaStoreError(err)
-		}
-		if mapping.ID == "" || mapping.ID != requestedID || mapping.SessionID != access.SessionID || mapping.StreamID != access.StreamID || mapping.SourceVersion != access.SourceVersion || !validSegmentPath(mapping.Path) {
+		mappings = append(mappings, media.SegmentMapping{ID: requestedID, SessionID: access.SessionID, StreamID: access.StreamID, SourceVersion: access.SourceVersion, Path: line})
+	}
+	created, err := s.cfg.Mappings.CreateSegmentMappings(ctx, mappings)
+	if err != nil {
+		return nil, normalizeMediaStoreError(err)
+	}
+	if len(created) != len(mappings) {
+		return nil, ErrUnavailable
+	}
+	for i, mapping := range created {
+		requested := mappings[i]
+		if mapping.ID == "" || mapping.ID != requested.ID || mapping.SessionID != access.SessionID || mapping.StreamID != access.StreamID || mapping.SourceVersion != access.SourceVersion || mapping.Path != requested.Path || !validSegmentPath(mapping.Path) {
 			return nil, ErrBadMedia
 		}
-		lines[i] = "/media/v1/" + url.PathEscape(rawToken) + "/" + url.PathEscape(access.SessionID) + "/segments/" + url.PathEscape(mapping.ID)
+		lines[segmentLines[i]] = "/media/v1/" + url.PathEscape(rawToken) + "/" + url.PathEscape(access.SessionID) + "/segments/" + url.PathEscape(mapping.ID)
 	}
 	return []byte(strings.Join(lines, "\n") + "\n"), nil
 }
@@ -336,7 +338,7 @@ func allowedManifestTag(line string) bool {
 	if line == "#EXTM3U" || strings.HasPrefix(line, "#EXTINF:") || strings.HasPrefix(line, "#EXT-X-VERSION:") || strings.HasPrefix(line, "#EXT-X-TARGETDURATION:") || strings.HasPrefix(line, "#EXT-X-MEDIA-SEQUENCE:") || strings.HasPrefix(line, "#EXT-X-DISCONTINUITY-SEQUENCE:") || line == "#EXT-X-DISCONTINUITY" || strings.HasPrefix(line, "#EXT-X-PROGRAM-DATE-TIME:") || line == "#EXT-X-GAP" || line == "#EXT-X-INDEPENDENT-SEGMENTS" || line == "#EXT-X-ENDLIST" || line == "#EXT-X-PLAYLIST-TYPE:EVENT" {
 		return true
 	}
-	return strings.HasPrefix(line, "#") && !strings.HasPrefix(line, "#EXT-")
+	return false
 }
 
 func validSegmentPath(path string) bool {

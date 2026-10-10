@@ -25,6 +25,8 @@ var mediaNow = time.Date(2026, 10, 11, 1, 0, 0, 0, time.UTC)
 type store struct {
 	access     media.MediaAccess
 	mapping    media.SegmentMapping
+	createErr  error
+	created    []media.SegmentMapping
 	resolveErr error
 }
 
@@ -52,12 +54,15 @@ func (s *store) FinishJob(context.Context, media.Lease, media.JobResult, time.Ti
 func (s *store) AuthorizeMedia(context.Context, media.MediaClaims, [32]byte, time.Time) (media.MediaAccess, error) {
 	return s.access, nil
 }
-func (s *store) CreateSegmentMapping(_ context.Context, mapping media.SegmentMapping) (media.SegmentMapping, error) {
-	if mapping.ID == "" {
-		return media.SegmentMapping{}, errors.New("missing id")
+func (s *store) CreateSegmentMappings(_ context.Context, mappings []media.SegmentMapping) ([]media.SegmentMapping, error) {
+	if s.createErr != nil {
+		return nil, s.createErr
 	}
-	s.mapping = mapping
-	return mapping, nil
+	s.created = append([]media.SegmentMapping(nil), mappings...)
+	if len(mappings) > 0 {
+		s.mapping = mappings[0]
+	}
+	return mappings, nil
 }
 func (s *store) ResolveSegmentMapping(_ context.Context, _, id string) (media.SegmentMapping, error) {
 	if s.resolveErr != nil {
@@ -135,6 +140,21 @@ func TestManifestRejectsUnsafeTagsAndSegmentRejectsUnknownMapping(t *testing.T) 
 	recorder = request(handler, "/media/v1/"+mediaToken+"/"+mediaUUID+"/segments/"+segmentID)
 	if recorder.Code != http.StatusNotFound {
 		t.Fatalf("unknown mapping status=%d body=%s", recorder.Code, recorder.Body.String())
+	}
+}
+
+func TestManifestRejectsUnknownTagsAndBatchFailureLeavesNoMappings(t *testing.T) {
+	s, store := service(t, media.SessionReady, []byte("#EXTM3U\n#EXT-X-UNKNOWN:blocked\n2026-10-11/01/02-03_0.ts\n"), nil)
+	recorder := request(mediahttp.New(s), "/media/v1/"+mediaToken+"/"+mediaUUID+"/index.m3u8")
+	if recorder.Code != http.StatusBadGateway || len(store.created) != 0 {
+		t.Fatalf("unknown tag status=%d created=%d", recorder.Code, len(store.created))
+	}
+
+	s, store = service(t, media.SessionReady, []byte("#EXTM3U\n#EXTINF:2,\n2026-10-11/01/02-03_0.ts\n#EXTINF:2,\n2026-10-11/01/02-05_1.ts\n"), nil)
+	store.createErr = errors.New("atomic mapping failure")
+	recorder = request(mediahttp.New(s), "/media/v1/"+mediaToken+"/"+mediaUUID+"/index.m3u8")
+	if recorder.Code != http.StatusServiceUnavailable || len(store.created) != 0 {
+		t.Fatalf("batch failure status=%d created=%d", recorder.Code, len(store.created))
 	}
 }
 
