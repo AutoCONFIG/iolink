@@ -1,0 +1,27 @@
+# M7a media session and playback seams
+
+This increment adds provider-neutral application seams while the video capability remains disabled by default. It does not add a provider, SQL adapter, HTTP route, ZLM build, RTSP client, GB runtime, or playback UI.
+
+## Scope
+
+- `internal/media/contracts.go` defines session, source-version, token, media authorization, job, lease/CAS, license, and provider ports.
+- `internal/playback/service.go` implements `RequestPlayback`, `ReadPlayback`, `StopPlayback`, `AuthorizeMedia`, and `ProcessMediaJob` orchestration.
+- `internal/playback/service_test.go` exercises the required lifecycle and failure contracts with fakes only.
+
+The service rejects requests when `Enabled` is false, when provider/license capability is absent, or when actor context is missing. `CreatePlayback` is required to perform the atomic session plus start-job write and to recheck source version. `FinishJob` is required to CAS lease token, source version, and session validity. The store owns live membership and owner checks; media authorization receives only a SHA-256 token hash and claims.
+
+## Evidence
+
+| Scenario | Invocation | Observable result | Artifact |
+|---|---|---|---|
+| Playback TTL and source-version job identity | `go test -race -shuffle=on -count=1 -v ./internal/media ./internal/playback` | `TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey` passes; grant is exactly 300 seconds and start key is `start:9:7` | [targeted-race.log](targeted-race.log) |
+| Owner-only read/stop and exact expiry boundary | same command | cross-user read/stop return not-found and `now == expires_at` becomes expired | [targeted-race.log](targeted-race.log) |
+| License/provider fail-closed | same command | disabled runtime, missing license, and rejected license produce errors before session insertion | [targeted-race.log](targeted-race.log) |
+| Token gateway authorization | same command | audience validation, token hash handoff, and pending state are exercised; pending returns `ErrPending` | [targeted-race.log](targeted-race.log) |
+| Job lease/CAS/unknown semantics | same command | provider unknown is persisted as `unknown` with the lease token; CAS lease loss returns `ErrLeaseLost` without replay | [targeted-race.log](targeted-race.log) |
+| Static checks | `go vet ./internal/media ./internal/playback` | exit status 0 | [targeted-race.log](targeted-race.log) |
+| Full Go package regression | `go test ./...` | exit status 0; all packages pass, including `internal/media/zlm` and `internal/playback` | [full-test.log](full-test.log) |
+
+## Limits
+
+No production composition root enables this service. Real PostgreSQL transaction code, media token cryptography, provider safety construction, RTSP/GB ingest, and external camera/WeChat acceptance remain for later M7a increments.
