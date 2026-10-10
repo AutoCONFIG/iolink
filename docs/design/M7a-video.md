@@ -1,7 +1,7 @@
 # M7a 视频接入设计
 
-范围：TODO 11a / R43，附带 R36.b/R37.b/R39.b。这是实施前设计，当前没有视频生产实现，
-设计批准不等于播放验收通过。API 见 [video-openapi](../api/video-openapi.yaml)，
+范围：TODO 11a / R43，附带 R36.b/R37.b/R39.b。这是冻结的实施设计，实际进度只由
+[IMPLEMENTED](../IMPLEMENTED.md)记录，设计批准不等于播放验收通过。API 见 [video-openapi](../api/video-openapi.yaml)，
 DDL 提案见 [video-proposal.sql](video-proposal.sql)，部署见 [M7a部署](../deploy/M7a-video.md)。
 
 ## 业务边界与页面
