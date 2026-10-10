@@ -53,8 +53,14 @@ func (s *Service) EnsureUser(ctx context.Context, openID string) (*domain.User, 
 
 func (s *Service) UserTokenVersion(ctx context.Context, id int64) (int, error) {
 	var version int
-	err := s.pool.QueryRow(ctx, `SELECT token_version FROM users WHERE id=$1 AND authority='USER'`, id).Scan(&version)
+	err := s.pool.QueryRow(ctx, `SELECT token_version FROM users WHERE id=$1`, id).Scan(&version)
 	return version, err
+}
+
+func (s *Service) UserAuthority(ctx context.Context, id int64) (string, error) {
+	var authority string
+	err := s.pool.QueryRow(ctx, `SELECT coalesce(authority,'USER') FROM users WHERE id=$1`, id).Scan(&authority)
+	return authority, err
 }
 
 func (s *Service) DefaultTenantForUser(ctx context.Context, id int64) (int64, error) {

@@ -85,6 +85,12 @@ func (r *usersRepo) FindByOpenID(ctx context.Context, openID string) (*iolinkcon
 	return &u, nil
 }
 
+func (r *usersRepo) UserAuthority(ctx context.Context, id int64) (string, error) {
+	var authority string
+	err := r.q.QueryRow(ctx, `SELECT coalesce(authority,'USER') FROM users WHERE id=$1`, id).Scan(&authority)
+	return authority, err
+}
+
 func (r *usersRepo) EnsureUser(ctx context.Context, openID string) (*iolinkcontractsdomain.User, error) {
 	const q = `INSERT INTO users (open_id) VALUES ($1)
 		ON CONFLICT (open_id) DO UPDATE SET open_id = EXCLUDED.open_id

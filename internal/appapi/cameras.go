@@ -39,6 +39,14 @@ func abortCameraAuth(c *gin.Context, status int, legacy string) {
 }
 
 func (s *Server) cameraContextRequired(c *gin.Context) {
+	if !c.GetBool("platform_authority_checked") {
+		c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"code": "unavailable", "message": "unavailable"})
+		return
+	}
+	if c.GetBool("platform_admin") {
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"code": "forbidden", "message": "forbidden"})
+		return
+	}
 	_, scoped := domain.TenantID(c.Request.Context())
 	if !scoped {
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"code": "forbidden", "message": "forbidden"})

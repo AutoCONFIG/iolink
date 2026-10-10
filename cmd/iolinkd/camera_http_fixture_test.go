@@ -24,6 +24,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 	"git.hyhy.fun/rsplab/iolink/internal/testdb"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -50,10 +51,11 @@ func newCameraHTTPFixture(t *testing.T, verification ...bool) cameraHTTPFixture 
 	hash := platform.HashPassword(cameraHTTPPassword)
 	_, err = p.Exec(t.Context(), `INSERT INTO tenants(id,name) VALUES(1701,'camera-a'),(1702,'camera-b');
  INSERT INTO users(id,open_id,username,password_hash,authority) SELECT id,'camera-'||id,'camera-'||id,NULL,CASE WHEN id=1707 THEN 'ADMIN' ELSE 'USER' END FROM generate_series(1701,1708) id;
- INSERT INTO tenant_memberships(tenant_id,user_id,role,expires_at) VALUES(1701,1701,'owner',NULL),(1701,1702,'admin',NULL),(1701,1703,'member',NULL),(1701,1704,'viewer',NULL),(1701,1705,'support',now()+interval '1 hour'),(1702,1706,'owner',NULL);
+ INSERT INTO tenant_memberships(tenant_id,user_id,role,expires_at) VALUES(1701,1701,'owner',NULL),(1701,1702,'admin',NULL),(1701,1703,'member',NULL),(1701,1704,'viewer',NULL),(1701,1705,'support',now()+interval '1 hour'),(1701,1707,'support',now()+interval '1 hour'),(1702,1706,'owner',NULL);
  INSERT INTO farms(id,tenant_id,owner_id,name) VALUES(1701,1701,1701,'allowed'),(1702,1701,1701,'hidden'),(1703,1702,1706,'foreign');
  INSERT INTO ponds(id,farm_id,name) VALUES(1701,1701,'allowed'),(1702,1702,'hidden'),(1703,1703,'foreign');
  INSERT INTO farm_memberships(tenant_id,farm_id,user_id,role,expires_at) SELECT 1701,1701,id,CASE WHEN id=1705 THEN 'support' ELSE 'viewer' END,CASE WHEN id=1705 THEN now()+interval '1 hour' END FROM generate_series(1703,1705) id;
+ INSERT INTO farm_memberships(tenant_id,farm_id,user_id,role,expires_at) VALUES(1701,1701,1707,'support',now()+interval '1 hour');
  INSERT INTO video_cameras(id,tenant_id,farm_id,pond_id,name,source_kind,rtsp_uri,credential_cipher) VALUES(1701,1701,1701,1701,'allowed','rtsp','rtsp://192.168.10.20:554/live',decode(repeat('aa',29),'hex')),(1702,1701,1702,1702,'hidden','rtsp','rtsp://192.168.10.21:554/live',NULL),(1703,1702,1703,1703,'foreign','rtsp','rtsp://192.168.10.22:554/live',NULL);`)
 	if err != nil {
 		t.Fatal(err)
@@ -133,6 +135,22 @@ func (f cameraHTTPFixture) login(t *testing.T, id int, mini bool) string {
 		t.Fatal("login failed")
 	}
 	return result.Token
+}
+
+func (f cameraHTTPFixture) adminMiniToken(t *testing.T) string {
+	t.Helper()
+	var version int
+	var membershipVersion int64
+	var role string
+	if err := f.pool.QueryRow(t.Context(), `SELECT u.token_version,tm.permission_version,tm.role FROM users u JOIN tenant_memberships tm ON tm.user_id=u.id WHERE u.id=1707 AND tm.tenant_id=1701`).Scan(&version, &membershipVersion, &role); err != nil {
+		t.Fatal(err)
+	}
+	claims := jwt.MapClaims{"uid": int64(1707), "ver": version, "exp": time.Now().Add(time.Hour).Unix(), "tenant_id": int64(1701), "tenant_ver": membershipVersion, "tenant_role": role}
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(platform.DeriveAppKey(cameraHTTPRoot))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return token
 }
 func (f cameraHTTPFixture) installLicense(t *testing.T, features []string, expired bool) {
 	t.Helper()

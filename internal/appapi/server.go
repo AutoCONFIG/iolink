@@ -55,6 +55,10 @@ type tenantRoleStore interface {
 	TenantRole(ctx context.Context, userID, tenantID int64) (string, error)
 }
 
+type userAuthorityStore interface {
+	UserAuthority(ctx context.Context, userID int64) (string, error)
+}
+
 type tenantMembershipStore interface {
 	ListUserTenants(ctx context.Context, userID int64) ([]iolinkcontractsdomain.TenantMembership, error)
 	TenantMembershipVersion(ctx context.Context, userID, tenantID int64) (int64, error)
@@ -308,6 +312,15 @@ func (s *Server) authRequired(c *gin.Context) {
 	if err != nil || int64(version) != int64(current) {
 		abortCameraAuth(c, http.StatusUnauthorized, "token revoked")
 		return
+	}
+	if authorities, ok := s.deps.Users.(userAuthorityStore); ok {
+		authority, authorityErr := authorities.UserAuthority(c.Request.Context(), int64(uid))
+		if authorityErr != nil {
+			abortCameraAuth(c, http.StatusUnauthorized, "authority unavailable")
+			return
+		}
+		c.Set("platform_admin", authority == "ADMIN")
+		c.Set("platform_authority_checked", true)
 	}
 	tenants, tenantStoreOK := s.deps.Users.(tenantTokenStore)
 	if !tenantStoreOK {

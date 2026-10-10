@@ -49,6 +49,28 @@ func TestCameraHTTPRealPGAuthenticationAndEndpointSeparation(t *testing.T) {
 	f.request(t, owner, http.MethodPost, "/user/v1/cameras/1701/playback", "", 404)
 }
 
+func TestCameraHTTPRealPGPlatformAdminMiniCameraForbidden(t *testing.T) {
+	f := newCameraHTTPFixture(t)
+	token := f.adminMiniToken(t)
+	var before int
+	if err := f.pool.QueryRow(t.Context(), `SELECT count(*) FROM video_cameras`).Scan(&before); err != nil {
+		t.Fatal(err)
+	}
+	for _, path := range []string{"/api/v1/cameras", "/api/v1/cameras/1701"} {
+		raw := f.request(t, token, http.MethodGet, path, "", http.StatusForbidden)
+		if string(raw) != `{"code":"forbidden","message":"forbidden"}` {
+			t.Fatalf("path=%s response=%s", path, raw)
+		}
+	}
+	var after int
+	if err := f.pool.QueryRow(t.Context(), `SELECT count(*) FROM video_cameras`).Scan(&after); err != nil {
+		t.Fatal(err)
+	}
+	if after != before {
+		t.Fatalf("camera count changed from %d to %d", before, after)
+	}
+}
+
 func TestCameraHTTPRealPGPaginationFiltersBeforeCursor(t *testing.T) {
 	// Given: owner and viewer have different camera visibility.
 	f := newCameraHTTPFixture(t)
