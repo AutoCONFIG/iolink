@@ -11,10 +11,10 @@
 - 013生产schema：摄像机、GB设备/目录/通道、媒体stream/session/segment及完整复合FK。
 - 既有池塘删除遇到视频历史FK返回409，逻辑停用也不级联删除历史。
 
-实现源码为 `50e72e5040f18061fb3df52be8437b6186e6c36b`；
-后续测试修订 `2d93000` 仅将既有设备分页测试对齐当前契约。
-`bf740ae` 补强超长密文测试，使用认证有效的4097字节明文外部密文；生产 cipher 未变。
-本增量正在完成全仓库验证和实现双审，未将 M7a 整阶段记为完成。
+实现与验证冻结在 `9a1a1f44af06b1b46a66624bbb0d0c73ed67dfed`；
+其中 `2d93000` 仅将既有设备分页测试对齐当前契约；`bf740ae` 补强超长密文测试，使用认证有效的4097字节明文外部密文，生产 cipher 未变。
+本基础增量已完成全仓库验证，并获得同一冻结快照上的独立 code review 与 gate review APPROVE。
+这只闭环领域、加密、013存储和保留历史删除行为，未将 M7a 整阶段记为完成。
 没有视频开关配置、摄像机HTTP/媒体provider/worker/GB runtime/播放器。
 SSRF允许列表/DNS钉住、License视频入口、实时授权、媒体token/撤权须随下一增量验证。
 外部摄像机、微信真机及现场TLS/ACL/NAT仍为 `external_blocked`。
@@ -47,5 +47,5 @@ Web 未修改，子模块保持 `f62f66347f6bd7d7e5dbd3ec3a6e7a83fbf13350`。
 
 ## 双审
 
-全仓库检查已通过，实现双审针对同一冻结快照执行中；设计批准不能替代实现批准。
-独立 code/gate 审阅者均不得参与本次编辑。
+全仓库检查已通过；实现和 gate 双审均针对 `9a1a1f44af06b1b46a66624bbb0d0c73ed67dfed`，两位审阅者均明确 APPROVE，且未参与本次编辑。
+设计批准不能替代实现批准。收据：[code review](final-code-review.md)、[gate review](final-gate-review.md)、[manual QA](manual-qa.md)。
