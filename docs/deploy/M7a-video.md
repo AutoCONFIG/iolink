@@ -21,11 +21,18 @@ Linux主机限制media网络egress，Docker网络本身不是SSRF防火墙。
 
 ## 必需配置（待实现字段，当前不能直接放入 .env 使用）
 
-- 视频显式enabled开关、ZLM固定镜像digest、私有API地址、非默认随机API secret文件、
+- 视频显式enabled开关、ZLM专用安全构建的固定镜像digest、私有API地址、非默认随机API secret文件、
   camera允许CIDR/host/RTSP端口、GB server ID/realm/receiver IP/peer CIDR、SIP监听地址。
 - ZLM `protocol.enable_hls=1`，H264/AAC TS，不开启fMP4/录制/转码；
   `rtp_proxy.port_range=30000-30019`，每路显式 openRtpServer指定端口。
   关闭固定10000 listener及未用RTSP/RTMP/WebRTC/SRT，具体字段需用选定镜像实测。
+- 不使用固定源码的原版镜像直接拉RTSP。安全构建须包含
+  [来源边界补丁要求](../design/M7a-video.md#来源凭据与-ssrf)，记录上游SHA、补丁SHA256、
+  构建配方和最终镜像digest；能力探测及恶意RTSP测试通过后才批准该digest。
+  镜像缺失/不匹配/探测失败时开启视频须启动失败；基础里程碑保持视频关闭。
+  `addStreamProxy` 使用 `retry_count=0` 和 TCP interleaved，worker负责全部重连。
+  禁ZLM API debug/报文日志；补丁必须移除各等级的源URL、账号、密码、digest和SDP原文，
+  禁止只靠日志等级隐藏；有效配置和日志证据不得包含secret或源地址。
 - ZLM API secret、camera密文root、TLS私钥只读挂载，不进入镜像/git/日志。
   iolinkd/media容器非root、最小写卷、日志轮转、无特权/host network。
 - Nginx /media/v1 关闭access_log/缓存、禁止query转发、禁止公开ZLM路径，
@@ -47,3 +54,9 @@ docker网络与宿主机ACL、RTSP/GB peer、HTTPS域名、codec以及软件/真
 从外部网络检查ZLM API/HLS/其他listener不可达；合法客户端经网关访问媒体，
 篡改/撤销/过期token均拒绝；禁止直接访问ZLM bypass。
 没有服务器ACL、公网TLS和真camera证据时仅软件验证，部署验收为external_blocked。
+
+安全构建专项验收：同一构建运行正常 H264/AAC RTSP 源和恶意 RTSP server。
+服务端返回3xx到允许网段内另一目标及禁止地址时，目标端均不得收到连接；
+外部 Content-Base、session/track control 不得收到带认证请求，正常同源相对control仍可播放。
+断流后 provider 不自行重连；worker重新校验后才连接。捕获所有日志等级验证无源URI、
+账号、密码、digest或SDP。未取得这些运行证据不得将RTSP软件链路记为通过。
