@@ -159,6 +159,17 @@ func TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing(t *testing.T
 	}
 }
 
+func TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing(t *testing.T) {
+	store := &fakeStore{target: target()}
+	s := service(t, store, true, fakeProvider{}, fakeLicense{}, nil)
+	if _, err := s.RequestPlayback(actor(), 9); !errors.Is(err, playback.ErrUnavailable) {
+		t.Fatalf("missing token issuer err=%v", err)
+	}
+	if store.created {
+		t.Fatal("missing token issuer inserted a session")
+	}
+}
+
 func TestReadAndStopPreserveOwnerOnlyStoreContract(t *testing.T) {
 	store := &fakeStore{session: media.Session{ID: "s", TenantID: 21, UserID: 999, State: media.SessionReady}}
 	s := service(t, store, false, nil, nil, nil)

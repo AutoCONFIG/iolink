@@ -80,7 +80,7 @@ func (s *Service) RequestPlayback(ctx context.Context, cameraID int64) (Grant, e
 	if err := requireActor(ctx); err != nil {
 		return Grant{}, err
 	}
-	if !s.cfg.Enabled || s.cfg.License == nil || s.cfg.Provider == nil {
+	if !s.cfg.Enabled || s.cfg.License == nil || s.cfg.Provider == nil || s.cfg.Tokens == nil {
 		return Grant{}, ErrUnavailable
 	}
 	if cameraID <= 0 {
