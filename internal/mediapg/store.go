@@ -217,7 +217,7 @@ func (s *Store) StopOwnedPlayback(ctx context.Context, sessionID string, now tim
 			return media.ErrUnavailable
 		}
 		var active int
-		if err = tx.QueryRow(ctx, `SELECT count(*) FROM video_sessions WHERE stream_id=$1 AND state IN ('pending','ready')`, sess.StreamID).Scan(&active); err != nil {
+		if err = tx.QueryRow(ctx, `SELECT count(*) FROM video_sessions WHERE stream_id=$1 AND state IN ('pending','ready') AND expires_at>clock_timestamp()`, sess.StreamID).Scan(&active); err != nil {
 			return media.ErrUnavailable
 		}
 		if active == 0 {

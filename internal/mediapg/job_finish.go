@@ -61,7 +61,7 @@ func (s *Store) FinishJob(ctx context.Context, lease media.Lease, result media.J
 	if streamCamera != job.CameraID || streamTenant != tenantID || streamSource != job.SourceVersion {
 		return media.ErrLeaseLost
 	}
-	rows, err := tx.Query(ctx, `SELECT id::text,camera_id,tenant_id,source_version,state FROM video_sessions WHERE stream_id=$1 ORDER BY id FOR UPDATE`, job.StreamID)
+	rows, err := tx.Query(ctx, `SELECT id::text,camera_id,tenant_id,source_version,state,expires_at>clock_timestamp() FROM video_sessions WHERE stream_id=$1 ORDER BY id FOR UPDATE`, job.StreamID)
 	if err != nil {
 		return media.ErrPersistenceUnknown
 	}
@@ -71,7 +71,8 @@ func (s *Store) FinishJob(ctx context.Context, lease media.Lease, result media.J
 		var sessionID string
 		var cameraID, sessionTenant, source int64
 		var state media.SessionState
-		if err = rows.Scan(&sessionID, &cameraID, &sessionTenant, &source, &state); err != nil {
+		var live bool
+		if err = rows.Scan(&sessionID, &cameraID, &sessionTenant, &source, &state, &live); err != nil {
 			rows.Close()
 			return media.ErrPersistenceUnknown
 		}
@@ -83,10 +84,10 @@ func (s *Store) FinishJob(ctx context.Context, lease media.Lease, result media.J
 		if sessionID == job.SessionID {
 			payloadSessionFound = true
 		}
-		if state == media.SessionPending {
+		if live && state == media.SessionPending {
 			pending++
 		}
-		if state == media.SessionPending || state == media.SessionReady {
+		if live && (state == media.SessionPending || state == media.SessionReady) {
 			active++
 		}
 	}

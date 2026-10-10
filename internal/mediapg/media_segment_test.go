@@ -129,3 +129,69 @@ func TestCreateRestartsAfterStoppedSharedStream(t *testing.T) {
 		t.Fatalf("restart session state=%s", readyState)
 	}
 }
+
+func TestSharedStartSurvivesRevokedFirstSession(t *testing.T) {
+	p, store, ctx := fixture(t)
+	target, err := store.PreparePlayback(ctx, 40)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := store.CreatePlayback(ctx, createInput(t, target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := store.CreatePlayback(ctx, createInputToken(t, target, "media-token-second"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	lease, ok, err := store.ClaimJob(ctx, time.Now().UTC(), time.Minute, "worker-revoked-first")
+	if err != nil || !ok {
+		t.Fatalf("lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	if _, err = p.Exec(t.Context(), `UPDATE video_sessions SET state='revoked',revoked_at=clock_timestamp() WHERE id=$1`, first.ID); err != nil {
+		t.Fatal(err)
+	}
+	auth, err := store.RevalidateJob(ctx, lease)
+	if err != nil || !auth.Active || auth.Target.UserID != 1 {
+		t.Fatalf("auth=%+v err=%v", auth, err)
+	}
+	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobReady, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	var firstState, secondState string
+	if err = p.QueryRow(t.Context(), `SELECT (SELECT state FROM video_sessions WHERE id=$1),(SELECT state FROM video_sessions WHERE id=$2)`, first.ID, second.ID).Scan(&firstState, &secondState); err != nil {
+		t.Fatal(err)
+	}
+	if firstState != "revoked" || secondState != "ready" {
+		t.Fatalf("first=%s second=%s", firstState, secondState)
+	}
+}
+
+func TestExpiredSiblingDoesNotBlockLastSessionStop(t *testing.T) {
+	p, store, ctx := fixture(t)
+	target, err := store.PreparePlayback(ctx, 40)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := store.CreatePlayback(ctx, createInput(t, target))
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := store.CreatePlayback(ctx, createInputToken(t, target, "media-token-expired"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = p.Exec(t.Context(), `UPDATE video_sessions SET created_at=clock_timestamp()-interval '4 minutes',expires_at=clock_timestamp()-interval '1 second' WHERE id=$1`, first.ID); err != nil {
+		t.Fatal(err)
+	}
+	if err = store.StopOwnedPlayback(ctx, second.ID, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	var stopJobs, streamState int
+	if err = p.QueryRow(t.Context(), `SELECT (SELECT count(*) FROM jobs WHERE kind='video.stop'),(SELECT count(*) FROM video_streams WHERE state='pending')`).Scan(&stopJobs, &streamState); err != nil {
+		t.Fatal(err)
+	}
+	if stopJobs != 1 || streamState != 1 {
+		t.Fatalf("stopJobs=%d pendingStreams=%d", stopJobs, streamState)
+	}
+}
