@@ -1,0 +1,26 @@
+2026-10-11T01:21:35+08:00
+go version go1.26.8 linux/amd64
+/iolink-m7a-foundation-20261011-93c1 running timescale/timescaledb:latest-pg16 {"5432/tcp":[{"HostIp":"127.0.0.1","HostPort":"32904"}]}
+                                         version                                          | extversion
+------------------------------------------------------------------------------------------+------------
+ PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit | 2.30.2
+(1 row)
+
+   rolname   | rolcreatedb
+-------------+-------------
+ iolink_test | t
+(1 row)
+
+642c1ff4979865737592d04703d997e4c254dae4
+67cb61db0d985ebd974c5eb03bc50c500727dee154201ebfd6ec07b2d3735f45  internal/migrate/sql/013_video_foundation.sql
+a325839d19820c5cd217a13294b60c1f4b8dfe4041ad342b8d4af8e2fc2a47b1  internal/migrate/video_foundation_test.go
+98f87e206c8876ea40acacb2ffbc53998578c619ef1d9ac17471e1f364cbf8b9  internal/core/video_history_test.go
+fa8d359cd4ecfd6e20f98b121e137ef275f1cbe4ef9a929ce08810bd0696c94b  internal/core/admin_store.go
+8866ec0a508d0714fa0180ed5db141b56aef1785fafc23237a626fc4b8d32cfa  internal/adminapi/handlers.go
+18dc8546915ce7d5703951a91063e3c32e96ca3ce5f730dc77c91fa51265fd8d  docs/evidence/M7a/2026-10-09/proposal-check.sql
+7e37925607a8f5ac5a4fa4eaab0d24726af8e47ff11be6fe97d488d7d780614e  docs/evidence/M7a/2026-10-11-design/port-pairs-check.sql
+f5509b31e63c241627ff4f17c4d9567a9a977148be99f462447fe3bf391be3a2  docs/evidence/M7a/2026-10-11-design/hls-path-check.sql
+DDL proposal excluding design-only header matches migration: exit_code=0
+internal/migrate/video_foundation_test.go pure_LOC=157
+internal/core/video_history_test.go pure_LOC=94
+Scoped test invocation: GIN_MODE=release go test -race -shuffle=on -count=1 -v ./internal/migrate ./internal/core -run TestM7aVideo (isolated IOLINK_TEST_PG_DSN set; credential omitted)

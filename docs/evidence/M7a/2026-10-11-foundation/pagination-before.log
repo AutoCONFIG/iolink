@@ -1,0 +1,35 @@
+-test.shuffle 1791653133809500931
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/member
+2026/10/11 01:25:34 INFO http request request_id=CEKPH3TXQIS3W7MPBNR3G4SHCT route=/admin/v1/login method=POST status=200 duration_ms=164 tenant_id=0 actor_id=0
+2026/10/11 01:25:34 INFO http request request_id=5HNPFEENEBH5EVSRTEJMCNNPTA route=/admin/v1/farms method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/11 01:25:34 INFO http request request_id=AXDZJJAIUESDXQ7AZQQHQJVWHJ route=/admin/v1/ponds method=GET status=200 duration_ms=9 tenant_id=801 actor_id=802
+2026/10/11 01:25:34 INFO http request request_id=NKGHKFA6X33XPGNA55PZRZGCQL route=/admin/v1/devices method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+    m6b_http_test.go:84: json: cannot unmarshal object into Go value of type []struct { ID int64 "json:\"id\""; DeviceNo string "json:\"device_no\"" }
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/viewer
+2026/10/11 01:25:34 INFO http request request_id=2D2E3CHWC2TSJ7FNYSUMAL7NVX route=/admin/v1/login method=POST status=200 duration_ms=141 tenant_id=0 actor_id=0
+2026/10/11 01:25:34 INFO http request request_id=E4EQR74EK5GSPLMMMX4STU4FPM route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/11 01:25:34 INFO http request request_id=5UGI545JW3FUN7K7SVU7ZWGK2L route=/admin/v1/ponds method=GET status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/11 01:25:34 INFO http request request_id=ZA7MLVQMXMQ6HLR4WURVSPWLLQ route=/admin/v1/devices method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+    m6b_http_test.go:84: json: cannot unmarshal object into Go value of type []struct { ID int64 "json:\"id\""; DeviceNo string "json:\"device_no\"" }
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/support
+2026/10/11 01:25:35 INFO http request request_id=PO55B5M3DMOQXDOTODK4U22K4T route=/admin/v1/login method=POST status=200 duration_ms=133 tenant_id=0 actor_id=0
+2026/10/11 01:25:35 INFO http request request_id=5BRFKGPSKDNOWNDHXW3N7A6HUK route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/11 01:25:35 INFO http request request_id=QNYWEAB6Y45INIYFMEXKAGJSEC route=/admin/v1/ponds method=GET status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/11 01:25:35 INFO http request request_id=4FXQTKNZFMWN5QW26GEBV6HYOO route=/admin/v1/devices method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+    m6b_http_test.go:84: json: cannot unmarshal object into Go value of type []struct { ID int64 "json:\"id\""; DeviceNo string "json:\"device_no\"" }
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/tenant_manager_without_farm_assignment_owner
+2026/10/11 01:25:35 INFO http request request_id=JHXWSMMXKHRN5RDFIIPX3XFQOH route=/admin/v1/login method=POST status=200 duration_ms=136 tenant_id=0 actor_id=0
+2026/10/11 01:25:35 INFO http request request_id=AXPAJFSG6A7JQN4XAZD4Z7AWN7 route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=5 tenant_id=801 actor_id=802
+=== RUN   TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/tenant_manager_without_farm_assignment_admin
+2026/10/11 01:25:35 INFO http request request_id=L2XGZVREOBJYVTQSZUV5UWSCC6 route=/admin/v1/login method=POST status=200 duration_ms=143 tenant_id=0 actor_id=0
+2026/10/11 01:25:35 INFO http request request_id=WK5QGIZNAH32UCZZTA577XCGKY route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=4 tenant_id=801 actor_id=802
+--- FAIL: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation (1.58s)
+    --- FAIL: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/member (0.18s)
+    --- FAIL: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/viewer (0.15s)
+    --- FAIL: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/support (0.15s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/tenant_manager_without_farm_assignment_owner (0.15s)
+    --- PASS: TestM6bAdminHTTPAssignedFarmReadsAndBatchConfirmation/tenant_manager_without_farm_assignment_admin (0.15s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.632s
+FAIL
