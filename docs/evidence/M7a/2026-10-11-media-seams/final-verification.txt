@@ -1,0 +1,26 @@
+M7a media/playback seam verification executed in the current run.
+
+Command: go test -race -shuffle=on -count=1 ./internal/media ./internal/playback && go vet ./internal/media ./internal/playback
+Exit status: 0
+Output:
+?   git.hyhy.fun/rsplab/iolink/internal/media [no test files]
+ok  git.hyhy.fun/rsplab/iolink/internal/playback 1.012s
+
+Command: go test ./...
+Exit status: 0
+Output included all command and internal packages. Relevant lines:
+?   git.hyhy.fun/rsplab/iolink/internal/media [no test files]
+ok  git.hyhy.fun/rsplab/iolink/internal/media/zlm (cached)
+ok  git.hyhy.fun/rsplab/iolink/internal/playback 0.003s
+?   git.hyhy.fun/rsplab/iolink/internal/wire [no test files]
+
+Command: make verify
+Exit status: 0
+Output included go build, go vet, and go test -race -shuffle=on ./... -count=1. Relevant final lines:
+?   git.hyhy.fun/rsplab/iolink/internal/media [no test files]
+ok  git.hyhy.fun/rsplab/iolink/internal/media/zlm 1.012s
+ok  git.hyhy.fun/rsplab/iolink/internal/playback 1.014s
+?   git.hyhy.fun/rsplab/iolink/internal/wire [no test files]
+
+Judgment: PASS. The scoped media/playback packages, full package suite, and repository verification all exited zero in this run. The capability remains closed unless Config.Enabled is true with provider and license dependencies.
+Commit observed at verification: 6b508c52a76ae12373e8b315254589dcf4784aea
