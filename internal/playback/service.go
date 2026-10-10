@@ -309,10 +309,16 @@ func (s *Service) rewriteManifest(ctx context.Context, access media.MediaAccess,
 		segmentLines = append(segmentLines, i)
 	}
 	mappings := make([]media.SegmentMapping, 0, len(segmentLines))
+	rewritten := append([]string(nil), lines...)
 	for _, i := range segmentLines {
 		line := lines[i]
 		requestedID := uuid.NewString()
 		mappings = append(mappings, media.SegmentMapping{ID: requestedID, SessionID: access.SessionID, StreamID: access.StreamID, SourceVersion: access.SourceVersion, Path: line})
+		rewritten[i] = "/media/v1/" + url.PathEscape(rawToken) + "/" + url.PathEscape(access.SessionID) + "/segments/" + url.PathEscape(requestedID)
+	}
+	output := []byte(strings.Join(rewritten, "\n") + "\n")
+	if len(output) > media.MaxManifestBytes {
+		return nil, ErrBadMedia
 	}
 	created, err := s.cfg.Mappings.CreateSegmentMappings(ctx, mappings)
 	if err != nil {
@@ -326,9 +332,8 @@ func (s *Service) rewriteManifest(ctx context.Context, access media.MediaAccess,
 		if mapping.ID == "" || mapping.ID != requested.ID || mapping.SessionID != access.SessionID || mapping.StreamID != access.StreamID || mapping.SourceVersion != access.SourceVersion || mapping.Path != requested.Path || !validSegmentPath(mapping.Path) {
 			return nil, ErrBadMedia
 		}
-		lines[segmentLines[i]] = "/media/v1/" + url.PathEscape(rawToken) + "/" + url.PathEscape(access.SessionID) + "/segments/" + url.PathEscape(mapping.ID)
 	}
-	return []byte(strings.Join(lines, "\n") + "\n"), nil
+	return output, nil
 }
 
 func allowedManifestTag(line string) bool {

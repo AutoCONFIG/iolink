@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -193,6 +194,22 @@ func TestSegmentResolveUsesBoundedContext(t *testing.T) {
 	_, err := s.ReadSegment(context.Background(), mediaToken, mediaUUID, segmentID)
 	if !errors.Is(err, playback.ErrNotFound) || !store.resolveSawDeadline {
 		t.Fatalf("resolve err=%v deadline=%v", err, store.resolveSawDeadline)
+	}
+}
+
+func TestManifestExpansionLimitRejectsBeforeBatchWrite(t *testing.T) {
+	var source strings.Builder
+	source.WriteString("#EXTM3U\n")
+	for i := 0; i < 300; i++ {
+		source.WriteString("2026-10-11/01/02-03_")
+		source.WriteString(strconv.Itoa(i))
+		source.WriteString(".ts\n")
+	}
+	s, store := service(t, media.SessionReady, []byte(source.String()), nil)
+	longToken := strings.Repeat("a", 1024)
+	_, err := s.ReadManifest(context.Background(), longToken, mediaUUID)
+	if !errors.Is(err, playback.ErrBadMedia) || len(store.created) != 0 {
+		t.Fatalf("expanded manifest err=%v created=%d", err, len(store.created))
 	}
 }
 
