@@ -25,7 +25,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusMethodNotAllowed, "invalid_request", "method not allowed")
 		return
 	}
-	if h.playback == nil || r.URL.RawQuery != "" {
+	if h.playback == nil || r.URL.RawQuery != "" || r.URL.RawPath != "" || r.URL.Fragment != "" {
 		writeError(w, http.StatusBadRequest, "invalid_request", "invalid media path")
 		return
 	}
@@ -51,7 +51,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write(body)
 		return
 	}
-	if len(parts) == 6 && parts[4] == "segments" && validUUID(parts[5]) {
+	if len(parts) == 6 && parts[4] == "segments" {
+		if !validUUID(parts[5]) {
+			writeError(w, http.StatusBadRequest, "invalid_request", "invalid media path")
+			return
+		}
 		body, err := h.playback.ReadSegment(ctx, token, sessionID, parts[5])
 		if err != nil {
 			writeMediaError(w, err)

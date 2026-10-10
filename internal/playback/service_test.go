@@ -38,6 +38,7 @@ type fakeStore struct {
 func (f *fakeStore) PreparePlayback(context.Context, int64) (media.PlaybackTarget, error) {
 	return f.target, f.prepareErr
 }
+
 func (f *fakeStore) CreatePlayback(_ context.Context, in media.CreateSession) (media.Session, error) {
 	f.create = in
 	f.created = true
@@ -46,6 +47,7 @@ func (f *fakeStore) CreatePlayback(_ context.Context, in media.CreateSession) (m
 	}
 	return in.Session, nil
 }
+
 func (f *fakeStore) ReadOwnedPlayback(context.Context, string) (media.Session, error) {
 	return f.session, f.readErr
 }
@@ -53,14 +55,17 @@ func (f *fakeStore) StopOwnedPlayback(context.Context, string, time.Time) error 
 func (f *fakeStore) ClaimJob(context.Context, time.Time, time.Duration, string) (media.Lease, bool, error) {
 	return f.claim, f.claimOK, f.claimErr
 }
+
 func (f *fakeStore) RevalidateJob(context.Context, media.Lease) (media.JobAuthorization, error) {
 	return f.revalidate, f.revalidateErr
 }
+
 func (f *fakeStore) FinishJob(_ context.Context, lease media.Lease, result media.JobResult, _ time.Time) error {
 	f.finishLease = lease
 	f.finish = result
 	return f.finishErr
 }
+
 func (f *fakeStore) AuthorizeMedia(_ context.Context, _ media.MediaClaims, hash [32]byte, _ time.Time) (media.MediaAccess, error) {
 	f.authorizeHash = hash
 	return f.authorize, f.authorizeErr
@@ -86,6 +91,7 @@ func (f fakeTokens) Issue(_ context.Context, claims media.MediaClaims) (media.Is
 	}
 	return media.IssuedToken{Raw: f.raw, Claims: f.claims}, nil
 }
+
 func (f fakeTokens) Verify(context.Context, string) (media.MediaClaims, error) {
 	return f.claims, f.verifyErr
 }
@@ -99,6 +105,7 @@ func (f *fakeProvider) Start(context.Context, media.StartRequest) error {
 	f.startCalls++
 	return f.startErr
 }
+
 func (f *fakeProvider) Stop(context.Context, media.StopRequest) error {
 	f.stopCalls++
 	return f.stopErr
@@ -184,7 +191,7 @@ func TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing(t *testing.T) {
 }
 
 func TestRequestPlaybackRequiresAbsoluteHTTPSManifestURLWhenEnabled(t *testing.T) {
-	for _, base := range []string{"", "/media/v1", "http://media.example.test/media/v1", "https://"} {
+	for _, base := range []string{"", "/media/v1", "http://media.example.test/media/v1", "https://", "https://user:pass@media.example.test/media/v1", "https://media.example.test/media/v1?debug=1", "https://media.example.test/media/v1#fragment"} {
 		store := &fakeStore{target: target()}
 		s, err := playback.New(playback.Config{
 			Store: store, Enabled: true, Provider: &fakeProvider{}, License: fakeLicense{}, Tokens: fakeTokens{raw: "token"},

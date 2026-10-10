@@ -500,7 +500,7 @@ func manifestURL(base, token, sessionID string) string {
 
 func validManifestBaseURL(raw string) bool {
 	u, err := url.Parse(raw)
-	return err == nil && u.IsAbs() && strings.EqualFold(u.Scheme, "https") && u.Host != ""
+	return err == nil && u.IsAbs() && strings.EqualFold(u.Scheme, "https") && u.Host != "" && u.Hostname() != "" && u.User == nil && u.RawQuery == "" && u.Fragment == "" && u.Opaque == ""
 }
 
 func jobResult(providerErr error, attempts int, now time.Time, kind media.JobKind) (media.JobResult, error) {

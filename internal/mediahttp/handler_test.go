@@ -160,6 +160,29 @@ func TestGenericAuthorizationStoreFailureReturns503(t *testing.T) {
 	}
 }
 
+func TestHandlerRejectsEncodedAndFragmentPathsAndMalformedSegmentID(t *testing.T) {
+	s, _ := service(t, media.SessionReady, []byte("#EXTM3U\n"), nil)
+	handler := mediahttp.New(s)
+	encoded := httptest.NewRequest(http.MethodGet, "/media/v1/"+mediaToken+"/"+mediaUUID+"/index.m3u8", nil)
+	encoded.URL.RawPath = "/media/v1/" + mediaToken + "/" + mediaUUID + "/index%2Em3u8"
+	recorder := httptest.NewRecorder()
+	handler.ServeHTTP(recorder, encoded)
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("encoded path status=%d", recorder.Code)
+	}
+	fragment := httptest.NewRequest(http.MethodGet, "/media/v1/"+mediaToken+"/"+mediaUUID+"/index.m3u8", nil)
+	fragment.URL.Fragment = "unexpected"
+	recorder = httptest.NewRecorder()
+	handler.ServeHTTP(recorder, fragment)
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("fragment path status=%d", recorder.Code)
+	}
+	recorder = request(handler, "/media/v1/"+mediaToken+"/"+mediaUUID+"/segments/not-a-uuid")
+	if recorder.Code != http.StatusBadRequest {
+		t.Fatalf("malformed segment status=%d", recorder.Code)
+	}
+}
+
 func TestManifestRejectsUnsafeTagsAndSegmentRejectsUnknownMapping(t *testing.T) {
 	s, _ := service(t, media.SessionReady, []byte("#EXTM3U\n#EXT-X-KEY:METHOD=AES-128,URI=secret\n"), nil)
 	handler := mediahttp.New(s)
