@@ -84,7 +84,7 @@ func (s *Server) authRequired(c *gin.Context) {
 	h := c.GetHeader("Authorization")
 	const prefix = "Bearer "
 	if len(h) <= len(prefix) || h[:len(prefix)] != prefix {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing bearer token"})
+		abortCameraAuth(c, http.StatusUnauthorized, "missing bearer token")
 		return
 	}
 	tok, err := jwt.Parse(h[len(prefix):], func(t *jwt.Token) (any, error) {
@@ -94,33 +94,33 @@ func (s *Server) authRequired(c *gin.Context) {
 		return platform.DeriveAdminKey(s.cfg.SecretKey), nil
 	})
 	if err != nil || !tok.Valid {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		abortCameraAuth(c, http.StatusUnauthorized, "invalid token")
 		return
 	}
 	claims := tok.Claims.(jwt.MapClaims)
 	if _, ok := claims["exp"].(float64); !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing exp"})
+		abortCameraAuth(c, http.StatusUnauthorized, "missing exp")
 		return
 	}
 	aid, ok := claims["aid"].(float64)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
+		abortCameraAuth(c, http.StatusUnauthorized, "bad claims")
 		return
 	}
 	c.Set("aid", int64(aid))
 	version, ok := claims["ver"].(float64)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
+		abortCameraAuth(c, http.StatusUnauthorized, "bad claims")
 		return
 	}
 	current, err := s.deps.Store.AdminTokenVersion(c.Request.Context(), int64(aid))
 	if err != nil || int64(version) != int64(current) {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token revoked"})
+		abortCameraAuth(c, http.StatusUnauthorized, "token revoked")
 		return
 	}
 	admin, adminErr := s.deps.Store.FindAdminByID(c.Request.Context(), int64(aid))
 	if adminErr != nil || (admin.Authority != "ADMIN" && admin.Authority != "USER") {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid admin"})
+		abortCameraAuth(c, http.StatusUnauthorized, "invalid admin")
 		return
 	}
 	platformAdmin := admin.Authority == "ADMIN"
@@ -134,33 +134,33 @@ func (s *Server) authRequired(c *gin.Context) {
 		if !tenantOK && !membershipOK {
 			_, membershipErr := tenants.DefaultTenantForUser(c.Request.Context(), int64(aid))
 			if membershipErr == nil {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+				abortCameraAuth(c, http.StatusUnauthorized, "tenant context required")
 				return
 			}
 			if !errors.Is(membershipErr, domain.ErrNotFound) && !errors.Is(membershipErr, domain.ErrInactiveTenant) {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant unavailable"})
+				abortCameraAuth(c, http.StatusUnauthorized, "tenant unavailable")
 				return
 			}
 			if !platformAdmin && errors.Is(membershipErr, domain.ErrInactiveTenant) {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant membership inactive"})
+				abortCameraAuth(c, http.StatusUnauthorized, "tenant membership inactive")
 				return
 			}
 			c.Next()
 			return
 		}
 		if !tenantOK || !membershipOK {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+			abortCameraAuth(c, http.StatusUnauthorized, "tenant context required")
 			return
 		}
 		membershipVersion, err := tenants.TenantMembershipVersion(c.Request.Context(), int64(aid), int64(tenantRaw))
 		if err != nil || int64(membershipRaw) != membershipVersion {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant membership revoked"})
+			abortCameraAuth(c, http.StatusUnauthorized, "tenant membership revoked")
 			return
 		}
 		role, roleErr := tenants.TenantRole(c.Request.Context(), int64(aid), int64(tenantRaw))
 		claimRole, roleOK := claims["tenant_role"].(string)
 		if roleErr != nil || !roleOK || claimRole != role {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant role invalid"})
+			abortCameraAuth(c, http.StatusUnauthorized, "tenant role invalid")
 			return
 		}
 		requestContext := domain.WithTenantUserID(domain.WithTenantRole(domain.WithTenantID(c.Request.Context(), int64(tenantRaw)), role), int64(aid))

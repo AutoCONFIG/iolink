@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"crypto/rsa"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,6 +23,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/adminapi"
 	"git.hyhy.fun/rsplab/iolink/internal/appapi"
 	"git.hyhy.fun/rsplab/iolink/internal/authorization"
+	"git.hyhy.fun/rsplab/iolink/internal/camera"
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"git.hyhy.fun/rsplab/iolink/internal/migrate"
@@ -242,6 +244,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	if err := svc.ObserveLicenseClock(ctx); err != nil && !errors.Is(err, license.ErrClockError) {
 		return err
 	}
+	var cameraLicensePublicKey *rsa.PublicKey
 	if cfg.LicensePublicKeyFile != "" {
 		rawKey, readErr := os.ReadFile(cfg.LicensePublicKeyFile)
 		if readErr != nil {
@@ -252,6 +255,12 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 			return &startupError{errors.New("license public key invalid")}
 		}
 		svc.SetLicenseRuntime(&core.LicenseRuntime{PublicKey: publicKey, KeyID: cfg.LicenseKeyID})
+		cameraLicensePublicKey = publicKey
+	}
+
+	cameras, err := cameraService(pool, cfg.SecretKey, camera.Dependencies{License: camera.LicenseVerifier{PublicKey: cameraLicensePublicKey, KeyID: cfg.LicenseKeyID}, LicenseClock: svc})
+	if err != nil {
+		return err
 	}
 
 	notificationSender := wechat.NewSender(wechat.Config{
@@ -293,7 +302,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	admin := adminapi.New(adminapi.Config{
 		SecretKey: cfg.SecretKey,
 		JWT:       12 * time.Hour,
-	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy, Logger: log, APIKeys: svc})
+	}, adminapi.Deps{Store: svc, Telemetry: svc.Telemetry(), Catalog: svc.Products(), Policy: policy, Logger: log, APIKeys: svc, Cameras: cameras})
 	open := openapi.New(openapi.Deps{Logger: log, Auth: svc, Resources: svc})
 
 	// --- appapi: /api/v1 for the mini program, backed by core repos ---
@@ -311,6 +320,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 		Telemetry: svc.Telemetry(),
 		Alarms:    svc.Alarms(),
 		Users:     svc, // svc implements UserStore
+		Cameras:   cameras,
 	}, log)
 
 	// single port: root mux mounts admin API, app API and health endpoint

@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"git.hyhy.fun/rsplab/iolink/internal/camera"
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"git.hyhy.fun/rsplab/iolink/internal/operations"
@@ -106,6 +107,7 @@ type Deps struct {
 	Catalog   ProductCatalog
 	Policy    domain.PermissionPolicy
 	APIKeys   APIKeyAdminStore
+	Cameras   camera.API
 }
 
 type APIKeyAdminStore interface {
@@ -157,6 +159,7 @@ func (s *Server) UserRoutes() http.Handler {
 	v1.POST("/login", s.userLogin)
 	s.mountAuthRoutes(v1, false)
 	s.mountTenantRoutes(v1, true)
+	s.mountCameraRoutes(v1)
 	return r
 }
 

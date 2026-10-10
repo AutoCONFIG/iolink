@@ -35,7 +35,8 @@ type Deps struct {
 	Telemetry iolinkcontractsdomain.TelemetryRepo
 	Alarms    iolinkcontractsdomain.AlarmRepo
 	// Users abstracts login (openid lookup); core implements with users table.
-	Users UserStore
+	Users   UserStore
+	Cameras CameraReader
 }
 
 // UserStore is the auth-facing slice of the users domain.
@@ -52,6 +53,10 @@ type tenantTokenStore interface {
 
 type tenantRoleStore interface {
 	TenantRole(ctx context.Context, userID, tenantID int64) (string, error)
+}
+
+type userAuthorityStore interface {
+	UserAuthority(ctx context.Context, userID int64) (string, error)
 }
 
 type tenantMembershipStore interface {
@@ -97,6 +102,7 @@ func (s *Server) Routes() http.Handler {
 		auth.GET("/stats/summary", s.statsSummary)
 		auth.POST("/alarms/:id/confirm", s.confirmAlarm)
 	}
+	s.mountCameraRoutes(v1)
 	v2 := r.Group("/api/v2", s.authRequired)
 	v2.POST("/devices/:device_no/telemetry", s.submitTelemetryV2)
 	v2.GET("/devices/:device_no/model/latest", s.modelLatestV2)
@@ -273,7 +279,7 @@ func (s *Server) authRequired(c *gin.Context) {
 	h := c.GetHeader("Authorization")
 	const prefix = "Bearer "
 	if len(h) <= len(prefix) || h[:len(prefix)] != prefix {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing bearer token"})
+		abortCameraAuth(c, http.StatusUnauthorized, "missing bearer token")
 		return
 	}
 	tok, err := jwt.Parse(h[len(prefix):], func(t *jwt.Token) (any, error) {
@@ -283,60 +289,69 @@ func (s *Server) authRequired(c *gin.Context) {
 		return platform.DeriveAppKey(s.cfg.SecretKey), nil
 	})
 	if err != nil || !tok.Valid {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		abortCameraAuth(c, http.StatusUnauthorized, "invalid token")
 		return
 	}
 	claims := tok.Claims.(jwt.MapClaims)
 	if _, ok := claims["exp"].(float64); !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing exp"})
+		abortCameraAuth(c, http.StatusUnauthorized, "missing exp")
 		return
 	}
 	uid, ok := claims["uid"].(float64)
 	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
+		abortCameraAuth(c, http.StatusUnauthorized, "bad claims")
 		return
 	}
 	c.Set("uid", int64(uid))
 	version, ok := claims["ver"].(float64)
 	if !ok || s.deps.Users == nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "bad claims"})
+		abortCameraAuth(c, http.StatusUnauthorized, "bad claims")
 		return
 	}
 	current, err := s.deps.Users.UserTokenVersion(c.Request.Context(), int64(uid))
 	if err != nil || int64(version) != int64(current) {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token revoked"})
+		abortCameraAuth(c, http.StatusUnauthorized, "token revoked")
 		return
+	}
+	if authorities, ok := s.deps.Users.(userAuthorityStore); ok {
+		authority, authorityErr := authorities.UserAuthority(c.Request.Context(), int64(uid))
+		if authorityErr != nil {
+			abortCameraAuth(c, http.StatusUnauthorized, "authority unavailable")
+			return
+		}
+		c.Set("platform_admin", authority == "ADMIN")
+		c.Set("platform_authority_checked", true)
 	}
 	tenants, tenantStoreOK := s.deps.Users.(tenantTokenStore)
 	if !tenantStoreOK {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant store unavailable"})
+		abortCameraAuth(c, http.StatusUnauthorized, "tenant store unavailable")
 		return
 	}
 	{
 		tenantRaw, tenantOK := claims["tenant_id"].(float64)
 		membershipRaw, membershipOK := claims["tenant_ver"].(float64)
 		if !tenantOK && !membershipOK {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+			abortCameraAuth(c, http.StatusUnauthorized, "tenant context required")
 			return
 		}
 		if !tenantOK || !membershipOK {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant context required"})
+			abortCameraAuth(c, http.StatusUnauthorized, "tenant context required")
 			return
 		}
 		membershipVersion, err := tenants.TenantMembershipVersion(c.Request.Context(), int64(uid), int64(tenantRaw))
 		if err != nil || int64(membershipRaw) != membershipVersion {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant membership revoked"})
+			abortCameraAuth(c, http.StatusUnauthorized, "tenant membership revoked")
 			return
 		}
 		roles, roleStoreOK := s.deps.Users.(tenantRoleStore)
 		if !roleStoreOK {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant role unavailable"})
+			abortCameraAuth(c, http.StatusUnauthorized, "tenant role unavailable")
 			return
 		}
 		role, roleErr := roles.TenantRole(c.Request.Context(), int64(uid), int64(tenantRaw))
 		claimRole, roleOK := claims["tenant_role"].(string)
 		if roleErr != nil || !roleOK || claimRole != role {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "tenant role invalid"})
+			abortCameraAuth(c, http.StatusUnauthorized, "tenant role invalid")
 			return
 		}
 		c.Set("tenant_id", int64(tenantRaw))

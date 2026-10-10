@@ -22,7 +22,7 @@ topology:
     - {name: JobStore, owner: job_service, capability: durable_jobs_and_leases}
     - {name: TransactionRunner, owner: application, capability: atomic_business_and_outbox_commit}
   forbidden_port_names: [Repository, Service, Manager, Client, Provider, Store, UniversalPort]
-  provider_import_roots: [internal/domain, internal/application]
+  provider_import_roots: [internal/domain, internal/application, internal/camera]
 typed_errors: [unauthenticated, forbidden, not_found, invalid_argument, conflict, unavailable, timeout, unknown_outcome, already_processed]
 cross_cutting_invariants:
   authorization: "every application command/query receives AuthContext and checks tenant plus resource ownership at the operation boundary"
