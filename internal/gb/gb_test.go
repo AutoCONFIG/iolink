@@ -275,12 +275,16 @@ func TestMemoryNonceStoreIsBounded(t *testing.T) {
 	nonces := NewMemoryNonceStore()
 	expires := time.Now().Add(time.Hour)
 	for i := 0; i < MaxMemoryNonces+1; i++ {
-		if _, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", ExpiresAt: expires}); err != nil {
+		nonce, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", ExpiresAt: expires})
+		if err != nil {
 			t.Fatalf("issue %d: %v", i, err)
+		}
+		if _, err := nonces.Consume(context.Background(), nonce, time.Now()); err != nil {
+			t.Fatalf("consume %d: %v", i, err)
 		}
 	}
 	nonces.mu.Lock()
-	got := len(nonces.entries)
+	got := len(nonces.entries) + len(nonces.used)
 	nonces.mu.Unlock()
 	if got > MaxMemoryNonces {
 		t.Fatalf("nonce store grew to %d", got)

@@ -11,13 +11,13 @@ import (
 type MemoryNonceStore struct {
 	mu      sync.Mutex
 	entries map[string]NonceRecord
-	used    map[string]struct{}
+	used    map[string]time.Time
 }
 
 const MaxMemoryNonces = 4096
 
 func NewMemoryNonceStore() *MemoryNonceStore {
-	return &MemoryNonceStore{entries: make(map[string]NonceRecord), used: make(map[string]struct{})}
+	return &MemoryNonceStore{entries: make(map[string]NonceRecord), used: make(map[string]time.Time)}
 }
 
 func (s *MemoryNonceStore) Issue(_ context.Context, record NonceRecord) (string, error) {
@@ -35,15 +35,23 @@ func (s *MemoryNonceStore) Issue(_ context.Context, record NonceRecord) (string,
 		s.entries = make(map[string]NonceRecord)
 	}
 	if s.used == nil {
-		s.used = make(map[string]struct{})
+		s.used = make(map[string]time.Time)
 	}
-	if len(s.entries) >= MaxMemoryNonces {
+	for len(s.entries)+len(s.used) >= MaxMemoryNonces {
 		var oldest string
 		var oldestExpiry time.Time
 		for value, item := range s.entries {
 			if oldest == "" || item.ExpiresAt.Before(oldestExpiry) {
 				oldest, oldestExpiry = value, item.ExpiresAt
 			}
+		}
+		for value, expiry := range s.used {
+			if oldest == "" || expiry.Before(oldestExpiry) {
+				oldest, oldestExpiry = value, expiry
+			}
+		}
+		if oldest == "" {
+			return "", ErrNonceInvalid
 		}
 		delete(s.entries, oldest)
 		delete(s.used, oldest)
@@ -61,6 +69,10 @@ func (s *MemoryNonceStore) Consume(_ context.Context, nonce string, now time.Tim
 	for value, record := range s.entries {
 		if !now.Before(record.ExpiresAt) {
 			delete(s.entries, value)
+		}
+	}
+	for value, expiry := range s.used {
+		if !now.Before(expiry) {
 			delete(s.used, value)
 		}
 	}
@@ -72,7 +84,7 @@ func (s *MemoryNonceStore) Consume(_ context.Context, nonce string, now time.Tim
 		return NonceRecord{}, ErrNonceInvalid
 	}
 	delete(s.entries, nonce)
-	s.used[nonce] = struct{}{}
+	s.used[nonce] = record.ExpiresAt
 	if !now.Before(record.ExpiresAt) {
 		return NonceRecord{}, ErrNonceInvalid
 	}
