@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -35,6 +37,7 @@ var (
 	ErrPersistenceUnknown = media.ErrPersistenceUnknown
 	ErrLicenseRequired    = media.ErrLicenseRequired
 	ErrLicenseUnavailable = media.ErrLicenseUnavailable
+	ErrBadMedia           = media.ErrBadMedia
 )
 
 type Config struct {
@@ -42,9 +45,14 @@ type Config struct {
 	License         media.LicenseGuard
 	Tokens          media.TokenIssuer
 	Provider        media.Provider
+	Manifest        media.ManifestSource
+	Segments        media.SegmentSource
+	Mappings        media.SegmentMappingStore
 	Enabled         bool
 	ManifestBaseURL string
 	LeaseDuration   time.Duration
+	ManifestTimeout time.Duration
+	SegmentTimeout  time.Duration
 	Now             func() time.Time
 }
 
@@ -59,6 +67,13 @@ type Grant struct {
 }
 
 type MediaAccess = media.MediaAccess
+
+const (
+	maxManifestBytes = 256 * 1024
+	maxSegmentBytes  = 8 * 1024 * 1024
+)
+
+var segmentPathPattern = regexp.MustCompile(`^(\d{4}-\d{2}-\d{2})/(\d{2})/(\d{2})-(\d{2})_(\d+)\.ts$`)
 
 func New(cfg Config) (*Service, error) {
 	if cfg.Store == nil {
@@ -209,6 +224,166 @@ func (s *Service) AuthorizeMedia(ctx context.Context, rawToken, sessionID string
 		return MediaAccess{}, ErrForbidden
 	}
 	return access, nil
+}
+
+func (s *Service) ReadManifest(ctx context.Context, rawToken, sessionID string) ([]byte, error) {
+	if ctx == nil {
+		return nil, ErrForbidden
+	}
+	access, err := s.AuthorizeMedia(ctx, rawToken, sessionID)
+	if err != nil {
+		return nil, err
+	}
+	if s.cfg.Manifest == nil {
+		return nil, ErrUnavailable
+	}
+	timeout := s.cfg.ManifestTimeout
+	if timeout <= 0 {
+		timeout = 3 * time.Second
+	}
+	fetchCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	manifest, err := s.cfg.Manifest.FetchManifest(fetchCtx, access)
+	if err != nil {
+		return nil, normalizeMediaSourceError(err)
+	}
+	if len(manifest) == 0 || len(manifest) > maxManifestBytes {
+		return nil, ErrBadMedia
+	}
+	return s.rewriteManifest(ctx, access, rawToken, manifest)
+}
+
+func (s *Service) ReadSegment(ctx context.Context, rawToken, sessionID, segmentID string) ([]byte, error) {
+	if ctx == nil {
+		return nil, ErrForbidden
+	}
+	access, err := s.AuthorizeMedia(ctx, rawToken, sessionID)
+	if err != nil {
+		return nil, err
+	}
+	if s.cfg.Segments == nil || s.cfg.Mappings == nil || segmentID == "" {
+		return nil, ErrUnavailable
+	}
+	mapping, err := s.cfg.Mappings.ResolveSegmentMapping(ctx, sessionID, segmentID)
+	if err != nil {
+		return nil, normalizeMediaStoreError(err)
+	}
+	if mapping.ID != segmentID || mapping.SessionID != sessionID || mapping.StreamID != access.StreamID || mapping.SourceVersion != access.SourceVersion || !validSegmentPath(mapping.Path) {
+		return nil, ErrNotFound
+	}
+	timeout := s.cfg.SegmentTimeout
+	if timeout <= 0 {
+		timeout = 10 * time.Second
+	}
+	fetchCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	segment, err := s.cfg.Segments.FetchSegment(fetchCtx, access, mapping.Path)
+	if err != nil {
+		return nil, normalizeMediaSourceError(err)
+	}
+	if len(segment) == 0 || len(segment) > maxSegmentBytes {
+		return nil, ErrBadMedia
+	}
+	return segment, nil
+}
+
+func (s *Service) rewriteManifest(ctx context.Context, access media.MediaAccess, rawToken string, manifest []byte) ([]byte, error) {
+	text := strings.ReplaceAll(string(manifest), "\r\n", "\n")
+	text = strings.TrimSuffix(text, "\n")
+	lines := strings.Split(text, "\n")
+	if len(lines) == 0 || lines[0] != "#EXTM3U" || s.cfg.Mappings == nil {
+		return nil, ErrBadMedia
+	}
+	segmentLines := make([]int, 0, len(lines))
+	for i, line := range lines {
+		if strings.ContainsAny(line, "\x00\r") {
+			return nil, ErrBadMedia
+		}
+		if strings.HasPrefix(line, "#") {
+			if !allowedManifestTag(line) {
+				return nil, ErrBadMedia
+			}
+			continue
+		}
+		if i == 0 || line == "" {
+			return nil, ErrBadMedia
+		}
+		if !validSegmentPath(line) {
+			return nil, ErrBadMedia
+		}
+		segmentLines = append(segmentLines, i)
+	}
+	for _, i := range segmentLines {
+		line := lines[i]
+		requestedID := uuid.NewString()
+		mapping := media.SegmentMapping{ID: requestedID, SessionID: access.SessionID, StreamID: access.StreamID, SourceVersion: access.SourceVersion, Path: line}
+		mapping, err := s.cfg.Mappings.CreateSegmentMapping(ctx, mapping)
+		if err != nil {
+			return nil, normalizeMediaStoreError(err)
+		}
+		if mapping.ID == "" || mapping.ID != requestedID || mapping.SessionID != access.SessionID || mapping.StreamID != access.StreamID || mapping.SourceVersion != access.SourceVersion || !validSegmentPath(mapping.Path) {
+			return nil, ErrBadMedia
+		}
+		lines[i] = "/media/v1/" + url.PathEscape(rawToken) + "/" + url.PathEscape(access.SessionID) + "/segments/" + url.PathEscape(mapping.ID)
+	}
+	return []byte(strings.Join(lines, "\n") + "\n"), nil
+}
+
+func allowedManifestTag(line string) bool {
+	if strings.Contains(line, `URI=`) || strings.Contains(line, "../") || strings.Contains(line, "\\") {
+		return false
+	}
+	if line == "#EXTM3U" || strings.HasPrefix(line, "#EXTINF:") || strings.HasPrefix(line, "#EXT-X-VERSION:") || strings.HasPrefix(line, "#EXT-X-TARGETDURATION:") || strings.HasPrefix(line, "#EXT-X-MEDIA-SEQUENCE:") || strings.HasPrefix(line, "#EXT-X-DISCONTINUITY-SEQUENCE:") || line == "#EXT-X-DISCONTINUITY" || strings.HasPrefix(line, "#EXT-X-PROGRAM-DATE-TIME:") || line == "#EXT-X-GAP" || line == "#EXT-X-INDEPENDENT-SEGMENTS" || line == "#EXT-X-ENDLIST" || line == "#EXT-X-PLAYLIST-TYPE:EVENT" {
+		return true
+	}
+	return strings.HasPrefix(line, "#") && !strings.HasPrefix(line, "#EXT-")
+}
+
+func validSegmentPath(path string) bool {
+	if path == "" || strings.ContainsAny(path, `%?#\\`) || strings.HasPrefix(path, "/") || strings.Contains(path, "..") {
+		return false
+	}
+	m := segmentPathPattern.FindStringSubmatch(path)
+	if len(m) != 6 {
+		return false
+	}
+	if _, err := time.Parse("2006-01-02", m[1]); err != nil {
+		return false
+	}
+	hour, err := strconv.Atoi(m[2])
+	if err != nil || hour > 23 {
+		return false
+	}
+	minute, err := strconv.Atoi(m[3])
+	if err != nil || minute > 59 {
+		return false
+	}
+	second, err := strconv.Atoi(m[4])
+	if err != nil || second > 59 {
+		return false
+	}
+	_, err = strconv.ParseUint(m[5], 10, 32)
+	return err == nil
+}
+
+func normalizeMediaSourceError(err error) error {
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, media.ErrUnavailable) || errors.Is(err, media.ErrNotFound) || errors.Is(err, media.ErrForbidden) {
+		return err
+	}
+	return ErrBadMedia
+}
+
+func normalizeMediaStoreError(err error) error {
+	normalized := normalizeStoreError(err)
+	switch normalized {
+	case ErrNotFound, ErrForbidden, ErrConflict:
+		return normalized
+	default:
+		return ErrUnavailable
+	}
 }
 
 func (s *Service) ProcessMediaJob(ctx context.Context, workerID string) (bool, error) {

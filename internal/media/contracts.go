@@ -22,6 +22,7 @@ var (
 	ErrPersistenceUnknown = errors.New("media persistence result unknown")
 	ErrLicenseRequired    = errors.New("video license required")
 	ErrLicenseUnavailable = errors.New("video license unavailable")
+	ErrBadMedia           = errors.New("bad media")
 )
 
 type JobKind string
@@ -177,6 +178,27 @@ type TokenIssuer interface {
 type Provider interface {
 	Start(context.Context, StartRequest) error
 	Stop(context.Context, StopRequest) error
+}
+
+type ManifestSource interface {
+	FetchManifest(context.Context, MediaAccess) ([]byte, error)
+}
+
+type SegmentSource interface {
+	FetchSegment(context.Context, MediaAccess, string) ([]byte, error)
+}
+
+type SegmentMapping struct {
+	ID            string
+	SessionID     string
+	StreamID      string
+	SourceVersion int64
+	Path          string
+}
+
+type SegmentMappingStore interface {
+	CreateSegmentMapping(context.Context, SegmentMapping) (SegmentMapping, error)
+	ResolveSegmentMapping(context.Context, string, string) (SegmentMapping, error)
 }
 
 type StartRequest struct {
