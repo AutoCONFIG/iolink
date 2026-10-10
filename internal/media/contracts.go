@@ -121,9 +121,10 @@ type Lease struct {
 }
 
 type JobAuthorization struct {
-	Target        PlaybackTarget
-	Active        bool
-	SourceCurrent bool
+	Target         PlaybackTarget
+	Active         bool
+	SourceCurrent  bool
+	StopSuperseded bool
 }
 
 type JobResult struct {

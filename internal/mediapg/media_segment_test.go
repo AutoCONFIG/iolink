@@ -225,7 +225,7 @@ func TestStopJobSkipsWhenNewSessionArrivesBeforeClaim(t *testing.T) {
 		t.Fatalf("stop lease=%+v ok=%v err=%v", lease, ok, err)
 	}
 	auth, err := store.RevalidateJob(ctx, lease)
-	if err != nil || auth.Active {
+	if err != nil || !auth.StopSuperseded {
 		t.Fatalf("stop auth=%+v err=%v", auth, err)
 	}
 	if err = store.FinishJob(ctx, lease, media.JobResult{Status: media.JobSkipped, NextAt: time.Now().UTC()}, time.Now().UTC()); err != nil {

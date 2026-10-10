@@ -183,7 +183,7 @@ func TestProcessMediaJobSkipsStopWhenStreamHasLiveReplacement(t *testing.T) {
 	store := &fakeStore{
 		claim:      media.Lease{Job: media.Job{ID: "7", Kind: media.JobStop, CameraID: 9, SourceVersion: 7, StreamID: "stream-7", SessionID: "session-7", Attempts: 1}, LeaseToken: "lease", LeasedUntil: time.Date(2026, 10, 11, 1, 0, 30, 0, time.UTC)},
 		claimOK:    true,
-		revalidate: media.JobAuthorization{Active: false, SourceCurrent: true},
+		revalidate: media.JobAuthorization{Active: false, SourceCurrent: true, StopSuperseded: true},
 	}
 	provider := &fakeProvider{}
 	s := service(t, store, true, provider, fakeLicense{}, fakeTokens{})
@@ -194,6 +194,25 @@ func TestProcessMediaJobSkipsStopWhenStreamHasLiveReplacement(t *testing.T) {
 		t.Fatalf("stop calls=%d", provider.stopCalls)
 	}
 	if store.finish.Status != media.JobSkipped {
+		t.Fatalf("finish=%+v", store.finish)
+	}
+}
+
+func TestProcessMediaJobStopsStaleProviderWhenNoReplacement(t *testing.T) {
+	store := &fakeStore{
+		claim:      media.Lease{Job: media.Job{ID: "8", Kind: media.JobStop, CameraID: 9, SourceVersion: 7, StreamID: "stream-8", SessionID: "session-8", Attempts: 1}, LeaseToken: "lease", LeasedUntil: time.Date(2026, 10, 11, 1, 0, 30, 0, time.UTC)},
+		claimOK:    true,
+		revalidate: media.JobAuthorization{Active: false, SourceCurrent: false},
+	}
+	provider := &fakeProvider{}
+	s := service(t, store, true, provider, fakeLicense{}, fakeTokens{})
+	if ok, err := s.ProcessMediaJob(actor(), "worker"); !ok || err != nil {
+		t.Fatalf("ok=%v err=%v", ok, err)
+	}
+	if provider.stopCalls != 1 {
+		t.Fatalf("stop calls=%d", provider.stopCalls)
+	}
+	if store.finish.Status != media.JobStopped {
 		t.Fatalf("finish=%+v", store.finish)
 	}
 }

@@ -428,7 +428,7 @@ func (s *Service) ProcessMediaJob(ctx context.Context, workerID string) (bool, e
 			providerErr = normalizeLicenseError(providerErr)
 		}
 	case media.JobStop:
-		if !auth.Active || !auth.SourceCurrent {
+		if auth.StopSuperseded {
 			skipped = true
 			break
 		}
