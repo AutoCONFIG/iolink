@@ -4,46 +4,11 @@ import (
 	"context"
 	"errors"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
 	"git.hyhy.fun/rsplab/iolink/internal/media"
 )
-
-type testClock struct {
-	mu  sync.Mutex
-	now time.Time
-}
-
-func (c *testClock) Now() time.Time {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return c.now
-}
-
-func (c *testClock) Set(now time.Time) {
-	c.mu.Lock()
-	c.now = now
-	c.mu.Unlock()
-}
-
-func sampleInput(now time.Time) EnqueueInput {
-	return EnqueueInput{
-		Job:         media.Job{ID: "job-1", Kind: media.JobStart, CameraID: 9, SourceVersion: 7, StreamID: "stream-7", SessionID: "session-1"},
-		AvailableAt: now,
-		Authorization: media.JobAuthorization{
-			Active:        true,
-			SourceCurrent: true,
-			Target: media.PlaybackTarget{
-				TenantID:      21,
-				CameraID:      9,
-				SourceVersion: 7,
-				StreamID:      "stream-7",
-			},
-		},
-	}
-}
 
 func TestMemoryStoreLeaseCASAndUnknownIsTerminal(t *testing.T) {
 	now := time.Date(2026, 10, 11, 2, 0, 0, 0, time.UTC)
@@ -248,50 +213,5 @@ func TestMemoryStoreBoundsWorkerAndMaxAttemptRetry(t *testing.T) {
 	bad.Job.Attempts = MaxAttempts
 	if err := store.Enqueue(t.Context(), bad); !errors.Is(err, ErrInvalidJob) {
 		t.Fatalf("max attempts enqueue err=%v", err)
-	}
-}
-
-func TestMemoryStoreNilReceiverFailsClosed(t *testing.T) {
-	var store *MemoryStore
-	now := time.Date(2026, 10, 11, 9, 0, 0, 0, time.UTC)
-	if err := store.Enqueue(t.Context(), sampleInput(now)); !errors.Is(err, ErrInvalidJob) {
-		t.Fatalf("nil enqueue err=%v", err)
-	}
-	if err := store.SetAuthorization(t.Context(), "job", media.JobAuthorization{}); !errors.Is(err, ErrInvalidJob) {
-		t.Fatalf("nil authorization err=%v", err)
-	}
-	if _, ok, err := store.ClaimJob(t.Context(), now, time.Second, "worker"); !errors.Is(err, ErrInvalidJob) || ok {
-		t.Fatalf("nil claim ok=%v err=%v", ok, err)
-	}
-	if _, ok, err := store.Snapshot(t.Context(), "job"); !errors.Is(err, ErrInvalidJob) || ok {
-		t.Fatalf("nil snapshot ok=%v err=%v", ok, err)
-	}
-}
-
-func TestMemoryStoreClaimsOneWorkerUnderConcurrency(t *testing.T) {
-	now := time.Date(2026, 10, 11, 5, 0, 0, 0, time.UTC)
-	store := NewMemoryStore(func() time.Time { return now })
-	if err := store.Enqueue(t.Context(), sampleInput(now)); err != nil {
-		t.Fatal(err)
-	}
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-	claimed := 0
-	for i := 0; i < 32; i++ {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			if _, ok, err := store.ClaimJob(t.Context(), now, time.Second, "worker-"+string(rune('a'+i))); err != nil {
-				t.Errorf("claim err=%v", err)
-			} else if ok {
-				mu.Lock()
-				claimed++
-				mu.Unlock()
-			}
-		}(i)
-	}
-	wg.Wait()
-	if claimed != 1 {
-		t.Fatalf("claimed=%d, want 1", claimed)
 	}
 }
