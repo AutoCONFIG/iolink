@@ -3,6 +3,7 @@ package mediajobs
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -58,11 +59,11 @@ func TestMemoryStoreLeaseCASAndUnknownIsTerminal(t *testing.T) {
 	if first.Attempts != 1 || first.LeaseToken == "" || !first.LeasedUntil.Equal(now.Add(10*time.Second)) {
 		t.Fatalf("first lease=%+v", first)
 	}
-	if _, ok, err = store.ClaimJob(t.Context(), now.Add(time.Second), 10*time.Second, "worker-b"); err != nil || ok {
+	if _, ok, err = store.ClaimJob(t.Context(), now.Add(time.Hour), 10*time.Second, "worker-b"); err != nil || ok {
 		t.Fatalf("claim before lease expiry ok=%v err=%v", ok, err)
 	}
 	clock.Set(now.Add(10 * time.Second))
-	second, ok, err := store.ClaimJob(t.Context(), now.Add(10*time.Second), 10*time.Second, "worker-b")
+	second, ok, err := store.ClaimJob(t.Context(), now, 10*time.Second, "worker-b")
 	if err != nil || !ok || second.LeaseToken == first.LeaseToken || second.Attempts != 2 {
 		t.Fatalf("reclaimed lease=%+v ok=%v err=%v", second, ok, err)
 	}
@@ -130,6 +131,7 @@ func TestMemoryStoreSourceFenceAndRetrySchedule(t *testing.T) {
 	if _, ok, err := store.ClaimJob(t.Context(), now.Add(4*time.Second), time.Second, "worker-3"); err != nil || ok {
 		t.Fatalf("early retry claim ok=%v err=%v", ok, err)
 	}
+	clock.Set(next)
 	lease, ok, err = store.ClaimJob(t.Context(), next, time.Second, "worker-3")
 	if err != nil || !ok || lease.Attempts != 3 {
 		t.Fatalf("scheduled retry lease=%+v ok=%v err=%v", lease, ok, err)
@@ -190,6 +192,79 @@ func TestMemoryStoreSkippedResultCancelsWithoutReplay(t *testing.T) {
 	}
 	if _, ok, err := store.ClaimJob(t.Context(), now.Add(time.Minute), time.Second, "worker-2"); err != nil || ok {
 		t.Fatalf("cancelled claim ok=%v err=%v", ok, err)
+	}
+}
+
+func TestMemoryStoreStaleStartCanCommitSkippedCancellation(t *testing.T) {
+	now := time.Date(2026, 10, 11, 7, 0, 0, 0, time.UTC)
+	store := NewMemoryStore(func() time.Time { return now })
+	if err := store.Enqueue(t.Context(), sampleInput(now)); err != nil {
+		t.Fatal(err)
+	}
+	lease, ok, err := store.ClaimJob(t.Context(), now, time.Second, "worker")
+	if err != nil || !ok {
+		t.Fatalf("claim ok=%v err=%v", ok, err)
+	}
+	auth := sampleInput(now).Authorization
+	auth.SourceCurrent = false
+	auth.Target.SourceVersion++
+	if err := store.SetAuthorization(t.Context(), lease.ID, auth); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.FinishJob(t.Context(), lease, media.JobResult{Status: media.JobSkipped, ErrorCode: "source_stale", NextAt: now}, now); err != nil {
+		t.Fatalf("stale skip finish err=%v", err)
+	}
+	snapshot, ok, err := store.Snapshot(t.Context(), lease.ID)
+	if err != nil || !ok || snapshot.Status != "cancelled" {
+		t.Fatalf("stale skip snapshot=%+v ok=%v err=%v", snapshot, ok, err)
+	}
+}
+
+func TestMemoryStoreBoundsWorkerAndMaxAttemptRetry(t *testing.T) {
+	now := time.Date(2026, 10, 11, 8, 0, 0, 0, time.UTC)
+	store := NewMemoryStore(func() time.Time { return now })
+	input := sampleInput(now)
+	input.Job.ID = "job-max"
+	input.Job.Attempts = MaxAttempts - 1
+	if err := store.Enqueue(t.Context(), input); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok, err := store.ClaimJob(t.Context(), now, time.Second, strings.Repeat("w", 129)); !errors.Is(err, ErrInvalidJob) || ok {
+		t.Fatalf("long worker ok=%v err=%v", ok, err)
+	}
+	lease, ok, err := store.ClaimJob(t.Context(), now, time.Second, "worker")
+	if err != nil || !ok || lease.Attempts != MaxAttempts {
+		t.Fatalf("last attempt lease=%+v ok=%v err=%v", lease, ok, err)
+	}
+	next := now.Add(time.Second)
+	if err := store.FinishJob(t.Context(), lease, media.JobResult{Status: media.JobRetryable, NextAt: next}, now); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok, err := store.ClaimJob(t.Context(), next, time.Second, "worker"); err != nil || ok {
+		t.Fatalf("retry exceeded max ok=%v err=%v", ok, err)
+	}
+	bad := input
+	bad.Job.ID = "job-too-many"
+	bad.Job.Attempts = MaxAttempts
+	if err := store.Enqueue(t.Context(), bad); !errors.Is(err, ErrInvalidJob) {
+		t.Fatalf("max attempts enqueue err=%v", err)
+	}
+}
+
+func TestMemoryStoreNilReceiverFailsClosed(t *testing.T) {
+	var store *MemoryStore
+	now := time.Date(2026, 10, 11, 9, 0, 0, 0, time.UTC)
+	if err := store.Enqueue(t.Context(), sampleInput(now)); !errors.Is(err, ErrInvalidJob) {
+		t.Fatalf("nil enqueue err=%v", err)
+	}
+	if err := store.SetAuthorization(t.Context(), "job", media.JobAuthorization{}); !errors.Is(err, ErrInvalidJob) {
+		t.Fatalf("nil authorization err=%v", err)
+	}
+	if _, ok, err := store.ClaimJob(t.Context(), now, time.Second, "worker"); !errors.Is(err, ErrInvalidJob) || ok {
+		t.Fatalf("nil claim ok=%v err=%v", ok, err)
+	}
+	if _, ok, err := store.Snapshot(t.Context(), "job"); !errors.Is(err, ErrInvalidJob) || ok {
+		t.Fatalf("nil snapshot ok=%v err=%v", ok, err)
 	}
 }
 

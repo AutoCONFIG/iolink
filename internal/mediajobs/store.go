@@ -16,6 +16,7 @@ import (
 const (
 	MaxAttempts = 6
 	maxLease    = 5 * time.Minute
+	maxWorkerID = 128
 )
 
 var (
@@ -95,7 +96,7 @@ func (s *MemoryStore) SetAuthorization(ctx context.Context, id string, auth medi
 	if err := contextError(ctx); err != nil {
 		return err
 	}
-	if id == "" {
+	if s == nil || id == "" {
 		return ErrInvalidJob
 	}
 	s.mu.Lock()
@@ -112,10 +113,13 @@ func (s *MemoryStore) ClaimJob(ctx context.Context, now time.Time, lease time.Du
 	if err := contextError(ctx); err != nil {
 		return media.Lease{}, false, err
 	}
-	if s == nil || now.IsZero() || lease <= 0 || lease > maxLease || strings.TrimSpace(workerID) == "" {
+	if s == nil || now.IsZero() || lease <= 0 || lease > maxLease || strings.TrimSpace(workerID) == "" || len(strings.TrimSpace(workerID)) > maxWorkerID {
 		return media.Lease{}, false, ErrInvalidJob
 	}
-	now = now.UTC()
+	now = s.clock().UTC()
+	if now.IsZero() {
+		return media.Lease{}, false, ErrInvalidJob
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	var selected *entry
@@ -206,6 +210,9 @@ func (s *MemoryStore) FinishJob(ctx context.Context, lease media.Lease, result m
 func (s *MemoryStore) Snapshot(ctx context.Context, id string) (Snapshot, bool, error) {
 	if err := contextError(ctx); err != nil {
 		return Snapshot{}, false, err
+	}
+	if s == nil {
+		return Snapshot{}, false, ErrInvalidJob
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
