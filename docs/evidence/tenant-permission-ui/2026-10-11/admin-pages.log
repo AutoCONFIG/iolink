@@ -1,0 +1,10 @@
+
+Running 5 tests using 1 worker
+
+  ✓  1 e2e/admin-pages.spec.ts:9:1 › 所有管理页面在桌面和窄屏保持可用 (23.5s)
+  ✓  2 e2e/admin-pages.spec.ts:33:1 › 创建、确认和改密流程显示可恢复状态 (5.0s)
+  ✓  3 e2e/admin-pages.spec.ts:61:1 › 过期会话回到登录页并清理本地令牌 (384ms)
+  ✓  4 e2e/admin-pages.spec.ts:72:1 › 产品页可创建包含数值和枚举字段的版本并发布分配 (4.9s)
+  ✓  5 e2e/admin-pages.spec.ts:108:1 › 组织成员角色变更、支持期限和停用状态可保存 (3.1s)
+
+  5 passed (37.9s)

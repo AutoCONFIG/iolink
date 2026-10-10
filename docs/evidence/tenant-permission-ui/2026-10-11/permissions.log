@@ -1,0 +1,15 @@
+
+Running 10 tests using 1 worker
+
+  ✓   1 e2e/tenant-permissions.spec.ts:44:3 › member reads business resources without management actions (2.3s)
+  ✓   2 e2e/tenant-permissions.spec.ts:44:3 › viewer reads business resources without management actions (2.2s)
+  ✓   3 e2e/tenant-permissions.spec.ts:44:3 › support reads business resources without management actions (2.1s)
+  ✓   4 e2e/tenant-permissions.spec.ts:79:3 › owner retains management forms and reports rejected writes (2.5s)
+  ✓   5 e2e/tenant-permissions.spec.ts:79:3 › admin retains management forms and reports rejected writes (2.9s)
+  ✓   6 e2e/tenant-permissions.spec.ts:104:3 › owner alarm confirmation follows the server policy (769ms)
+  ✓   7 e2e/tenant-permissions.spec.ts:104:3 › admin alarm confirmation follows the server policy (744ms)
+  ✓   8 e2e/tenant-permissions.spec.ts:104:3 › member alarm confirmation follows the server policy (845ms)
+  ✓   9 e2e/tenant-permissions.spec.ts:104:3 › support alarm confirmation follows the server policy (736ms)
+  ✓  10 e2e/tenant-permissions.spec.ts:104:3 › viewer alarm confirmation follows the server policy (457ms)
+
+  10 passed (16.8s)

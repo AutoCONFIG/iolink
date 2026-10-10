@@ -1,0 +1,35 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 e2e/tenant-permissions.spec.ts:44:3 › viewer reads business resources without management actions (6.2s)
+
+
+  1) e2e/tenant-permissions.spec.ts:44:3 › viewer reads business resources without management actions
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByRole('button', { name: '新增养殖场' })
+    Expected: 0
+    Received: 1
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByRole('button', { name: '新增养殖场' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: '新增养殖场' })
+        14 × locator resolved to 1 element
+           - unexpected value "1"
+
+
+      50 |     await page.goto('/ponds')
+      51 |     await expect(page.getByText('测试池塘', { exact: true })).toBeVisible()
+    > 52 |     await expect(page.getByRole('button', { name: '新增养殖场' })).toHaveCount(0)
+         |                                                               ^
+      53 |     await expect(page.getByRole('button', { name: '新增池塘' })).toHaveCount(0)
+      54 |     await expect(page.getByText('当前角色仅可查看，请联系组织管理员')).toBeVisible()
+      55 |     await page.screenshot({ path: info.outputPath(`${role}-ponds.png`), fullPage: true })
+        at /tmp/iolink-permission-baseline-20261011/e2e/tenant-permissions.spec.ts:52:63
+
+    Error Context: test-results/tenant-permissions/tenant-permissions-viewer--77af3--without-management-actions/error-context.md
+
+  1 failed
+    e2e/tenant-permissions.spec.ts:44:3 › viewer reads business resources without management actions
