@@ -1,6 +1,7 @@
-M7a media/playback seam verification on the final candidate snapshot.
+M7a media/playback seam verification for the implementation source snapshot.
 
-Commit: 1897f1362cec02ae472216114dd7dd16954c1ee2
+Implementation source commit: 8f011599e94f886077f7947bbbe5150774b97ff
+Evidence-packaging commits after this source snapshot change documentation only. The independent code and gate reports pin the exact final review tree; this receipt deliberately does not self-reference a documentation commit that contains the receipt.
 
 Command: go test -race -shuffle=on -count=1 ./internal/media ./internal/playback
 Exit status: 0

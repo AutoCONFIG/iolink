@@ -30,7 +30,7 @@ The service rejects playback-management requests when `Enabled` is false, when p
 
 ## Final candidate
 
-The current implementation candidate is commit `1897f1362cec02ae472216114dd7dd16954c1ee2` (`docs: record playback boundary guards`). It includes the nil token issuer guard, token-only media gateway boundary, fail-closed ZLM patch application gate, revoked-job skip behavior, and HTTPS manifest validation. The current-snapshot receipt is [final-verification.txt](final-verification.txt); focused historical receipts remain in [token-issuer-guard.log](token-issuer-guard.log), [media-gateway-zlm-review.log](media-gateway-zlm-review.log), and [playback-job-url-guards.log](playback-job-url-guards.log). Independent code and gate approval is still required for this exact snapshot.
+The implementation source snapshot is commit `8f011599e94f886077f7947bbbe5150774b97ff` (`fix: skip revoked jobs and require https manifests`). Commits after it only package evidence documentation; they do not alter product code. The nil token issuer guard, token-only media gateway boundary, fail-closed ZLM patch application gate, revoked-job skip behavior, and HTTPS manifest validation are covered by the focused receipts [token-issuer-guard.log](token-issuer-guard.log), [media-gateway-zlm-review.log](media-gateway-zlm-review.log), and [playback-job-url-guards.log](playback-job-url-guards.log). Independent code and gate reports pin the exact final review tree.
 
 ## Limits
 
