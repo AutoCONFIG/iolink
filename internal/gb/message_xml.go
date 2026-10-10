@@ -80,7 +80,7 @@ func ParseMessageXML(raw []byte, expectedDevice string) (XMLMessage, error) {
 	}
 	sum, ok := parseDecimal(wire.SumNum)
 	deviceListNum, listOK := parseDecimal(wire.DeviceList.Num)
-	if !ok || !listOK || sum > MaxCatalogItems || deviceListNum != len(wire.DeviceList.Items) || sum < deviceListNum {
+	if !ok || !listOK || sum > MaxCatalogItems || deviceListNum != len(wire.DeviceList.Items) || sum < deviceListNum || (sum > 0 && deviceListNum == 0) {
 		return XMLMessage{}, ErrXMLInvalid
 	}
 	msg.SumNum = sum

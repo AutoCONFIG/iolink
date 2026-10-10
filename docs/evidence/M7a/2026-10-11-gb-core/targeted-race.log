@@ -1,6 +1,1 @@
--test.shuffle 1791666514693980417
---- FAIL: TestMessageXMLKeepaliveCatalogAndBounds (0.00s)
-    gb_test.go:330: sum err=<nil>
-FAIL
-FAIL	git.hyhy.fun/rsplab/iolink/internal/gb	0.020s
-FAIL
+ok  	git.hyhy.fun/rsplab/iolink/internal/gb	1.023s
