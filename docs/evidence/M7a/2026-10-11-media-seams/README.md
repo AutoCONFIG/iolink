@@ -32,6 +32,8 @@ The service rejects playback-management requests when `Enabled` is false, when p
 
 The implementation source snapshot is commit `8f011599e94f886077f7947bbbe5150774b97ff` (`fix: skip revoked jobs and require https manifests`). Commits after it only package evidence documentation; they do not alter product code. The nil token issuer guard, token-only media gateway boundary, fail-closed ZLM patch application gate, revoked-job skip behavior, and HTTPS manifest validation are covered by the focused receipts [token-issuer-guard.log](token-issuer-guard.log), [media-gateway-zlm-review.log](media-gateway-zlm-review.log), and [playback-job-url-guards.log](playback-job-url-guards.log). Independent code and gate reports pin the exact final review tree.
 
+The exact final review tree is `c315742561b4f2547e45baff1b43db620d3a5dce`. The independent code review is [final-code-review.md](final-code-review.md): `recommendation=APPROVE`, `blockers=[]`, with maintainability and future URL/test-hardening notes recorded as non-blocking risks. The independent gate review is [final-gate-review.md](final-gate-review.md): `recommendation=APPROVE`, `blockers=[]`. Both reviews keep ZLM/RTSP/GB/runtime/browser/WeChat work explicitly `external_blocked`.
+
 ## Limits
 
 No production composition root enables this service. Real PostgreSQL transaction code, media token cryptography, provider safety construction, RTSP/GB ingest, and external camera/WeChat acceptance remain for later M7a increments.
