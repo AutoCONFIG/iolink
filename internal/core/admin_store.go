@@ -597,6 +597,10 @@ func (s *Service) DeletePond(ctx context.Context, id int64) error {
 		return domain.ErrNotFound
 	}
 	if err != nil {
+		var pgerr *pgconn.PgError
+		if errors.As(err, &pgerr) && pgerr.Code == "23503" {
+			return domain.ErrConflict
+		}
 		return err
 	}
 	return tx.Commit(ctx)
