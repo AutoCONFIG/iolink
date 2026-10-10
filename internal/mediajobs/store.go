@@ -170,10 +170,14 @@ func (s *MemoryStore) RevalidateJob(ctx context.Context, lease media.Lease) (med
 	if s == nil || !validLease(lease) {
 		return media.JobAuthorization{}, media.ErrLeaseLost
 	}
+	now := s.clock().UTC()
+	if now.IsZero() {
+		return media.JobAuthorization{}, media.ErrLeaseLost
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	j, ok := s.jobs[lease.ID]
-	if !ok || !leaseMatches(j, lease) || j.status != "running" || !j.leasedUntil.After(s.clock().UTC()) {
+	if !ok || !leaseMatches(j, lease) || j.status != "running" || !j.leasedUntil.After(now) {
 		return media.JobAuthorization{}, media.ErrLeaseLost
 	}
 	auth := j.authorization
@@ -189,10 +193,14 @@ func (s *MemoryStore) FinishJob(ctx context.Context, lease media.Lease, result m
 		return ErrInvalidJob
 	}
 	now = now.UTC()
+	clockNow := s.clock().UTC()
+	if clockNow.IsZero() {
+		return media.ErrLeaseLost
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	j, ok := s.jobs[lease.ID]
-	if !ok || !leaseMatches(j, lease) || j.status != "running" || !j.leasedUntil.After(now) || !j.leasedUntil.After(s.clock().UTC()) {
+	if !ok || !leaseMatches(j, lease) || j.status != "running" || !j.leasedUntil.After(now) || !j.leasedUntil.After(clockNow) {
 		return media.ErrLeaseLost
 	}
 	if result.Status != media.JobSkipped && ((j.authorization.Target.SourceVersion != 0 && j.authorization.Target.SourceVersion != lease.SourceVersion) || (j.authorization.Target.CameraID != 0 && j.authorization.Target.CameraID != lease.CameraID) || (j.authorization.Target.StreamID != "" && j.authorization.Target.StreamID != lease.StreamID)) {
