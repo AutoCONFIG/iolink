@@ -8,6 +8,7 @@ import (
 	"net/netip"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -50,6 +51,50 @@ type testDeviceStore struct {
 	peerErr    error
 	applied    []Registration
 	markStatus string
+}
+
+type serialRegistrationStore struct {
+	mu                sync.Mutex
+	peer              *Registration
+	active, maxActive int
+}
+
+func (s *serialRegistrationStore) LookupDevice(context.Context, string) (RegisteredDevice, error) {
+	return RegisteredDevice{}, ErrUnknownDevice
+}
+func (s *serialRegistrationStore) LookupPeer(_ context.Context, peer netip.AddrPort) (Registration, error) {
+	s.mu.Lock()
+	s.active++
+	if s.active > s.maxActive {
+		s.maxActive = s.active
+	}
+	got := s.peer
+	s.mu.Unlock()
+	time.Sleep(time.Millisecond)
+	s.mu.Lock()
+	s.active--
+	s.mu.Unlock()
+	if got == nil || got.Peer != peer {
+		return Registration{}, ErrPeerNotFound
+	}
+	return *got, nil
+}
+func (s *serialRegistrationStore) ApplyRegistration(_ context.Context, registration Registration) error {
+	s.mu.Lock()
+	s.active++
+	if s.active > s.maxActive {
+		s.maxActive = s.active
+	}
+	s.mu.Unlock()
+	time.Sleep(time.Millisecond)
+	s.mu.Lock()
+	s.peer = &registration
+	s.active--
+	s.mu.Unlock()
+	return nil
+}
+func (s *serialRegistrationStore) MarkKeepalive(context.Context, string, netip.AddrPort, time.Time, string) error {
+	return nil
 }
 
 func (d *testDeviceStore) LookupDevice(_ context.Context, id string) (RegisteredDevice, error) {
@@ -229,6 +274,35 @@ func TestRegisterFailsClosedOnPeerLookupError(t *testing.T) {
 	req.Authorization = ptrDigest(digestFor(req, "nonce-1", "secret", false))
 	if _, err := s.HandleRegister(context.Background(), req); !errors.Is(err, ErrRegistrationConflict) {
 		t.Fatalf("lookup error=%v", err)
+	}
+}
+
+func TestRegistrationConflictCheckAndApplyAreSerialized(t *testing.T) {
+	store := &serialRegistrationStore{}
+	s := &Service{Devices: store}
+	peer := netip.MustParseAddrPort("192.0.2.10:5060")
+	results := make(chan error, 2)
+	for _, device := range []string{"34020000002000000001", "34020000002000000002"} {
+		go func(device string) {
+			results <- s.applyRegistration(context.Background(), peer, device, Registration{DeviceID: device, Peer: peer})
+		}(device)
+	}
+	var success, conflicts int
+	for range 2 {
+		if err := <-results; err == nil {
+			success++
+		} else if errors.Is(err, ErrRegistrationConflict) {
+			conflicts++
+		}
+	}
+	if success != 1 || conflicts != 1 {
+		t.Fatalf("success=%d conflicts=%d", success, conflicts)
+	}
+	store.mu.Lock()
+	maxActive := store.maxActive
+	store.mu.Unlock()
+	if maxActive != 1 {
+		t.Fatalf("registration calls overlapped: %d", maxActive)
 	}
 }
 
