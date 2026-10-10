@@ -23,7 +23,7 @@ func (s *Store) ClaimJob(ctx context.Context, now time.Time, lease time.Duration
 	var kind, payloadRaw string
 	var attempts int
 	err = tx.QueryRow(ctx, `SELECT id,tenant_id,kind,payload::text,attempts FROM jobs
-	 WHERE kind IN ('video.start','video.stop') AND attempts < 6 AND ((status='scheduled' AND available_at<=clock_timestamp()) OR (status='running' AND leased_until IS NOT NULL AND leased_until<=clock_timestamp()))
+	 WHERE kind IN ('video.start','video.stop') AND attempts < 6 AND ((status IN ('scheduled','retryable') AND available_at<=clock_timestamp()) OR (status='running' AND leased_until IS NOT NULL AND leased_until<=clock_timestamp()))
 	 ORDER BY available_at,id FOR UPDATE SKIP LOCKED LIMIT 1`).Scan(&id, &tenantID, &kind, &payloadRaw, &attempts)
 	if errors.Is(err, pgx.ErrNoRows) {
 		if err = tx.Commit(ctx); err != nil {

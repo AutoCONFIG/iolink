@@ -123,6 +123,9 @@ func finishStreamAndSessions(ctx context.Context, tx pgx.Tx, job media.Job, resu
 		streamState = "stopped"
 	case media.JobRetryable:
 		streamState = "starting"
+		if job.Kind == media.JobStop {
+			streamState = "stopping"
+		}
 	case media.JobSkipped, media.JobDisabled, media.JobFailed, media.JobUnknown:
 		if job.Kind == media.JobStop && result.Status == media.JobSkipped {
 			streamState = "ready"
