@@ -1,10 +1,10 @@
--test.shuffle 1791653108505836536
-=== RUN   TestVideoGBSourceKeepsDeviceAndChannel
---- PASS: TestVideoGBSourceKeepsDeviceAndChannel (0.00s)
-=== RUN   TestVideoRTSPSourcePreservesValidEncodedPath
---- PASS: TestVideoRTSPSourcePreservesValidEncodedPath (0.00s)
-=== RUN   TestVideoRTSPSourceDoesNotSerializeOrFormatURI
---- PASS: TestVideoRTSPSourceDoesNotSerializeOrFormatURI (0.00s)
+-test.shuffle 1791653771557528186
+=== RUN   TestVideoPlaybackActiveAtChecksExactBoundariesAndTerminalStates
+--- PASS: TestVideoPlaybackActiveAtChecksExactBoundariesAndTerminalStates (0.00s)
+=== RUN   TestVideoPlaybackZeroWindowIsInactive
+--- PASS: TestVideoPlaybackZeroWindowIsInactive (0.00s)
+=== RUN   TestVideoPlaybackWindowEnforcesFiveMinuteMaximum
+--- PASS: TestVideoPlaybackWindowEnforcesFiveMinuteMaximum (0.00s)
 === RUN   TestVideoRTSPSourceRejectsUnsafeSyntax
 === RUN   TestVideoRTSPSourceRejectsUnsafeSyntax/case_0
 === RUN   TestVideoRTSPSourceRejectsUnsafeSyntax/case_1
@@ -57,25 +57,27 @@
     --- PASS: TestVideoRTSPSourceRejectsUnsafeSyntax/case_22 (0.00s)
     --- PASS: TestVideoRTSPSourceRejectsUnsafeSyntax/case_23 (0.00s)
     --- PASS: TestVideoRTSPSourceRejectsUnsafeSyntax/case_24 (0.00s)
+=== RUN   TestVideoRTSPSourceDoesNotSerializeOrFormatURI
+--- PASS: TestVideoRTSPSourceDoesNotSerializeOrFormatURI (0.00s)
 === RUN   TestVideoCodecsRejectImplicitTranscoding
 --- PASS: TestVideoCodecsRejectImplicitTranscoding (0.00s)
-=== RUN   TestVideoPlaybackActiveAtChecksExactBoundariesAndTerminalStates
---- PASS: TestVideoPlaybackActiveAtChecksExactBoundariesAndTerminalStates (0.00s)
+=== RUN   TestVideoGBSourceKeepsDeviceAndChannel
+--- PASS: TestVideoGBSourceKeepsDeviceAndChannel (0.00s)
+=== RUN   TestVideoRTSPSourcePreservesValidEncodedPath
+--- PASS: TestVideoRTSPSourcePreservesValidEncodedPath (0.00s)
 === RUN   TestVideoGBSourceRejectsInvalidIdentity
 --- PASS: TestVideoGBSourceRejectsInvalidIdentity (0.00s)
-=== RUN   TestVideoPlaybackZeroWindowIsInactive
---- PASS: TestVideoPlaybackZeroWindowIsInactive (0.00s)
-=== RUN   TestVideoPlaybackWindowEnforcesFiveMinuteMaximum
---- PASS: TestVideoPlaybackWindowEnforcesFiveMinuteMaximum (0.00s)
 PASS
-ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.015s
--test.shuffle 1791653108504209276
+ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.013s
+-test.shuffle 1791653771558110232
 === RUN   TestVideoCredentialSealUsesDistinctRandomNonces
 --- PASS: TestVideoCredentialSealUsesDistinctRandomNonces (0.00s)
-=== RUN   TestVideoCredentialOpensIndependentAES256GCMEnvelope
---- PASS: TestVideoCredentialOpensIndependentAES256GCMEnvelope (0.00s)
+=== RUN   TestVideoCredentialRoundTripMaximumUnicodeFields
+--- PASS: TestVideoCredentialRoundTripMaximumUnicodeFields (0.00s)
 === RUN   TestVideoCredentialRoundTripEscapedMaximumUnicodeFields
 --- PASS: TestVideoCredentialRoundTripEscapedMaximumUnicodeFields (0.00s)
+=== RUN   TestVideoCredentialRejectsZeroInstancesAndBinding
+--- PASS: TestVideoCredentialRejectsZeroInstancesAndBinding (0.00s)
 === RUN   TestVideoCredentialRoundTripAtSizeBoundaries
 === RUN   TestVideoCredentialRoundTripAtSizeBoundaries/1
 === RUN   TestVideoCredentialRoundTripAtSizeBoundaries/4096
@@ -84,27 +86,25 @@ ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.015s
     --- PASS: TestVideoCredentialRoundTripAtSizeBoundaries/4096 (0.00s)
 === RUN   TestVideoCredentialFailsClosedOnInvalidInputs
 --- PASS: TestVideoCredentialFailsClosedOnInvalidInputs (0.00s)
-=== RUN   TestVideoCredentialRoundTrip
---- PASS: TestVideoCredentialRoundTrip (0.00s)
-=== RUN   TestVideoCredentialRoundTripMaximumUnicodeFields
---- PASS: TestVideoCredentialRoundTripMaximumUnicodeFields (0.00s)
 === RUN   TestVideoCredentialRejectsOversizedEnvelope
 --- PASS: TestVideoCredentialRejectsOversizedEnvelope (0.00s)
-=== RUN   TestVideoCredentialHonorsExpiredDeadline
---- PASS: TestVideoCredentialHonorsExpiredDeadline (0.00s)
-=== RUN   TestVideoCredentialRejectsWrongKeyAndBinding
---- PASS: TestVideoCredentialRejectsWrongKeyAndBinding (0.00s)
-=== RUN   TestVideoCredentialRejectsZeroInstancesAndBinding
---- PASS: TestVideoCredentialRejectsZeroInstancesAndBinding (0.00s)
-=== RUN   TestVideoCredentialHonorsCanceledContext
---- PASS: TestVideoCredentialHonorsCanceledContext (0.00s)
 === RUN   TestVideoCredentialRejectsTamperedAndTruncatedEnvelope
 --- PASS: TestVideoCredentialRejectsTamperedAndTruncatedEnvelope (0.00s)
+=== RUN   TestVideoCredentialOpensIndependentAES256GCMEnvelope
+--- PASS: TestVideoCredentialOpensIndependentAES256GCMEnvelope (0.00s)
+=== RUN   TestVideoCredentialHonorsCanceledContext
+--- PASS: TestVideoCredentialHonorsCanceledContext (0.00s)
+=== RUN   TestVideoCredentialRejectsWrongKeyAndBinding
+--- PASS: TestVideoCredentialRejectsWrongKeyAndBinding (0.00s)
+=== RUN   TestVideoCredentialRoundTrip
+--- PASS: TestVideoCredentialRoundTrip (0.00s)
 === RUN   TestVideoCredentialEnvelopeUsesAES256GCMWithIndependentHKDFKey
 === RUN   TestVideoCredentialEnvelopeUsesAES256GCMWithIndependentHKDFKey/derived_camera_key
 === RUN   TestVideoCredentialEnvelopeUsesAES256GCMWithIndependentHKDFKey/root_key_directly
 --- PASS: TestVideoCredentialEnvelopeUsesAES256GCMWithIndependentHKDFKey (0.00s)
     --- PASS: TestVideoCredentialEnvelopeUsesAES256GCMWithIndependentHKDFKey/derived_camera_key (0.00s)
     --- PASS: TestVideoCredentialEnvelopeUsesAES256GCMWithIndependentHKDFKey/root_key_directly (0.00s)
+=== RUN   TestVideoCredentialHonorsExpiredDeadline
+--- PASS: TestVideoCredentialHonorsExpiredDeadline (0.00s)
 PASS
-ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	1.012s
+ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	1.014s
