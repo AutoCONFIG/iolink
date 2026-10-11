@@ -217,6 +217,22 @@ func TestProcessMediaJobStopsStaleProviderWhenNoReplacement(t *testing.T) {
 	}
 }
 
+func TestProcessMediaJobRecordsRetryableStop(t *testing.T) {
+	store := &fakeStore{
+		claim:      media.Lease{Job: media.Job{ID: "9", Kind: media.JobStop, CameraID: 9, SourceVersion: 7, StreamID: "stream-9", SessionID: "session-9", Attempts: 1}, LeaseToken: "lease", LeasedUntil: time.Date(2026, 10, 11, 1, 0, 30, 0, time.UTC)},
+		claimOK:    true,
+		revalidate: media.JobAuthorization{Active: true, SourceCurrent: true},
+	}
+	provider := &fakeProvider{stopErr: media.ErrRetryable}
+	s := service(t, store, true, provider, fakeLicense{}, fakeTokens{})
+	if ok, err := s.ProcessMediaJob(actor(), "worker"); !ok || !errors.Is(err, media.ErrRetryable) {
+		t.Fatalf("ok=%v err=%v", ok, err)
+	}
+	if provider.stopCalls != 1 || store.finish.Status != media.JobRetryable {
+		t.Fatalf("stop calls=%d finish=%+v", provider.stopCalls, store.finish)
+	}
+}
+
 func TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing(t *testing.T) {
 	store := &fakeStore{target: target()}
 	s := service(t, store, true, &fakeProvider{}, fakeLicense{}, nil)
