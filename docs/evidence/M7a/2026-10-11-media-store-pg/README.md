@@ -34,8 +34,8 @@ The exact implementation snapshot is
   (96 operations / 568 fixtures), and architecture manifest checks passed;
 - the exact-snapshot independent code and gate reviews are archived as
   [final-code-review.md](final-code-review.md) and
-  [final-gate-review.md](final-gate-review.md); both must explicitly approve
-  this snapshot before release.
+  [final-gate-review.md](final-gate-review.md); both approved the product
+  snapshot, which was published as `v0.0.26`.
 
 The media provider composition, ZLM/RTSP/GB network runtime, browser playback,
 WeChat playback, and physical camera/GB evidence remain `external_blocked` or
