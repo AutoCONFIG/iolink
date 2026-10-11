@@ -1,0 +1,148 @@
+-test.shuffle 1791679809275882944
+=== RUN   TestLookupDeviceDecryptsBoundCredentialAndRejectsEmptyPolicy
+--- PASS: TestLookupDeviceDecryptsBoundCredentialAndRejectsEmptyPolicy (0.86s)
+=== RUN   TestRegistrationRejectsDisabledExpiredAndOutOfPolicyPeers
+--- PASS: TestRegistrationRejectsDisabledExpiredAndOutOfPolicyPeers (0.91s)
+=== RUN   TestSameAddressPortDifferentTransportAndUniqueConflict
+--- PASS: TestSameAddressPortDifferentTransportAndUniqueConflict (0.91s)
+=== RUN   TestRegistrationBindsTransportAndKeepaliveAndUnregisters
+--- PASS: TestRegistrationBindsTransportAndKeepaliveAndUnregisters (0.60s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbpg	4.294s
+-test.shuffle 1791679809524676004
+=== RUN   TestEmbeddedMigrations
+--- PASS: TestEmbeddedMigrations (0.00s)
+=== RUN   TestM7aVideoCredentialsPersistAsBoundCiphertext
+=== RUN   TestM7aVideoCredentialsPersistAsBoundCiphertext/GB_device
+=== RUN   TestM7aVideoCredentialsPersistAsBoundCiphertext/RTSP_camera
+--- PASS: TestM7aVideoCredentialsPersistAsBoundCiphertext (1.00s)
+    --- PASS: TestM7aVideoCredentialsPersistAsBoundCiphertext/GB_device (0.00s)
+    --- PASS: TestM7aVideoCredentialsPersistAsBoundCiphertext/RTSP_camera (0.00s)
+=== RUN   TestConcurrentUp
+--- PASS: TestConcurrentUp (0.87s)
+=== RUN   TestLegacyTenantReconciliationAndRollback
+--- PASS: TestLegacyTenantReconciliationAndRollback (0.96s)
+=== RUN   TestPersistenceFoundationDeclaresFailClosedIdempotency
+--- PASS: TestPersistenceFoundationDeclaresFailClosedIdempotency (0.00s)
+=== RUN   TestRejectLegacyDrift
+--- PASS: TestRejectLegacyDrift (0.18s)
+=== RUN   TestM6bLegacyPlatformOwnerBusinessBoundary
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] POST   /admin/v1/register        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).register-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/session         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).session-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/tenants         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listTenants-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/tenants/:id/members --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listTenantMembers-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/tenants/:id/members/:user_id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setTenantMember-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/license         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getLicense-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/license         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).importLicense-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/tenants         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createTenant-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/platform/stats  --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).platformStats-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/platform/users  --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).platformUsers-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/tenants/:id/status --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setTenantStatus-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/users           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listUsers-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id/owner --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setFarmOwner-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/farms/:id/members --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarmMembers-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id/members/:user_id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setFarmMember-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/devices/:device_no/restore --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).restoreDevice-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/devices/:device_no/pond --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).moveDevice-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/api-keys        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAPIKeys-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/api-keys/audit  --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAPIKeyAudit-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/api-keys        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createAPIKey-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/api-keys/:key_id/rotate --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).rotateAPIKey-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/api-keys/:key_id/revoke --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).revokeAPIKey-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/products        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listProducts-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createProduct-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/products/:product_id/models --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listProductModels-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products/:product_id/models --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createProductModel-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products/:product_id/models/:version/publish --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).publishProductModel-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices/:device_no/product --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDeviceProduct-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/devices/:device_no/product --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).assignDeviceProduct-fm (4 handlers)
+2026/10/11 08:50:13 INFO http request request_id=O5A3XR6RZZTB66GU56KKLLHGUV route=/admin/v1/login method=POST status=200 duration_ms=161 tenant_id=0 actor_id=0
+    platform_owner_test.go:57: POST /admin/v1/login status=200 expected=200
+2026/10/11 08:50:13 WARN http request request_id=MGEYLMRDTIXHIO2SWJVKRROCFZ route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+    platform_owner_test.go:58: GET /admin/v1/farms status=403 expected=403
+    platform_owner_test.go:66: migration platform memberships=0 reconciliation=1 legacy farm/owner preserved=1
+2026/10/11 08:50:13 INFO http request request_id=DW46TZGEOLUNXMUGTBGOKMZLM4 route=/admin/v1/login method=POST status=200 duration_ms=137 tenant_id=0 actor_id=0
+    platform_owner_test.go:67: POST /admin/v1/login status=200 expected=200
+2026/10/11 08:50:13 INFO http request request_id=7YLKXRA36GQ2QHEYK57BVGYNGK route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=1 actor_id=9202
+    platform_owner_test.go:69: GET /admin/v1/farms status=200 expected=200
+2026/10/11 08:50:13 INFO http request request_id=O37X5JD2LSPIWMZWGLKOSS54HT route=/admin/v1/login method=POST status=200 duration_ms=145 tenant_id=0 actor_id=0
+    platform_owner_test.go:92: POST /admin/v1/login status=200 expected=200
+2026/10/11 08:50:13 INFO http request request_id=X76JBWOGPD4FTDT2HWCCOBMUNT route=/admin/v1/farms method=GET status=200 duration_ms=2 tenant_id=1 actor_id=9201
+    platform_owner_test.go:93: GET /admin/v1/farms status=200 expected=200
+2026/10/11 08:50:13 WARN http request request_id=2W6CN2E43SG2RLNTCPLAZDFOQ4 route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    platform_owner_test.go:100: GET /admin/v1/farms status=401 expected=401
+2026/10/11 08:50:13 INFO http request request_id=DYMPGXLG3IFW6WNY74WT5PSY73 route=/admin/v1/login method=POST status=200 duration_ms=154 tenant_id=0 actor_id=0
+    platform_owner_test.go:101: POST /admin/v1/login status=200 expected=200
+2026/10/11 08:50:13 WARN http request request_id=C4XDBMMNOUX2WX535CI7RDFME5 route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+    platform_owner_test.go:102: GET /admin/v1/farms status=403 expected=403
+2026/10/11 08:50:13 INFO http request request_id=WXNJZSS7HTRLQ5IU2IFXO3NOMO route=/admin/v1/login method=POST status=200 duration_ms=145 tenant_id=0 actor_id=0
+    platform_owner_test.go:106: POST /admin/v1/login status=200 expected=200
+2026/10/11 08:50:13 WARN http request request_id=HXT5Z5KOII5G7BCIC2ODDEDJUN route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    platform_owner_test.go:110: GET /admin/v1/farms status=401 expected=401
+--- PASS: TestM6bLegacyPlatformOwnerBusinessBoundary (1.41s)
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/global_GB_device_identity
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/unique_camera_source_stream
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/session_source_version_binding
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/stream_tenant_binding
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/camera_credential_envelope
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/device_credential_envelope
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/positive_source_version
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/session_state_enum
+=== RUN   TestM7aVideoFoundationRejectsInvalidStorage/positive_session_lifetime
+--- PASS: TestM7aVideoFoundationRejectsInvalidStorage (0.48s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/global_GB_device_identity (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/unique_camera_source_stream (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/session_source_version_binding (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/stream_tenant_binding (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/camera_credential_envelope (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/device_credential_envelope (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/positive_source_version (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/session_state_enum (0.00s)
+    --- PASS: TestM7aVideoFoundationRejectsInvalidStorage/positive_session_lifetime (0.00s)
+=== RUN   TestM6bMembershipMigrationRollbackAndLegacyBackfill
+--- PASS: TestM6bMembershipMigrationRollbackAndLegacyBackfill (0.46s)
+=== RUN   TestM7aVideoFoundationMigrationRollsBackAtomically
+--- PASS: TestM7aVideoFoundationMigrationRollsBackAtomically (0.53s)
+=== RUN   TestAtomicFailureAndChecksum
+--- PASS: TestAtomicFailureAndChecksum (0.44s)
+=== RUN   TestM7aVideoFoundationMigrationConstraints
+--- PASS: TestM7aVideoFoundationMigrationConstraints (0.46s)
+=== RUN   TestRejectHistoryGapAndNewerVersion
+=== RUN   TestRejectHistoryGapAndNewerVersion/DELETE_FROM_schema_migrations_WHERE_version=1
+=== RUN   TestRejectHistoryGapAndNewerVersion/INSERT_INTO_schema_migrations(version,name,checksum)_VALUES(99,'future','future')
+--- PASS: TestRejectHistoryGapAndNewerVersion (1.01s)
+    --- PASS: TestRejectHistoryGapAndNewerVersion/DELETE_FROM_schema_migrations_WHERE_version=1 (0.45s)
+    --- PASS: TestRejectHistoryGapAndNewerVersion/INSERT_INTO_schema_migrations(version,name,checksum)_VALUES(99,'future','future') (0.56s)
+=== RUN   TestFreshUpAndBootstrap
+--- PASS: TestFreshUpAndBootstrap (1.06s)
+=== RUN   TestLegacyAdoptionAndPreservation
+--- PASS: TestLegacyAdoptionAndPreservation (0.59s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	10.527s

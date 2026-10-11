@@ -1,0 +1,45 @@
+go build ./...
+go vet ./...
+go test -race -shuffle=on ./... -count=1
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	27.288s
+ok  	git.hyhy.fun/rsplab/iolink/cmd/license-sign	1.700s
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-once	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-sim	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/offline-sbom	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/tp-spike-pub	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.061s
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	14.747s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.115s
+ok  	git.hyhy.fun/rsplab/iolink/internal/authorization	1.041s
+ok  	git.hyhy.fun/rsplab/iolink/internal/camera	1.026s
+ok  	git.hyhy.fun/rsplab/iolink/internal/camerapg	81.124s
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	188.176s
+ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.028s
+?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/gb	1.605s
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalog	1.023s
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalogpg	17.756s
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbpg	13.143s
+ok  	git.hyhy.fun/rsplab/iolink/internal/ingestion	5.222s
+ok  	git.hyhy.fun/rsplab/iolink/internal/license	68.895s
+?   	git.hyhy.fun/rsplab/iolink/internal/media	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/rtp	1.023s
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/rtsp	1.023s
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/zlm	1.044s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediahttp	1.089s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediajobs	1.014s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediapg	35.719s
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	26.140s
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	17.052s
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	1.614s
+ok  	git.hyhy.fun/rsplab/iolink/internal/openapi	1.222s
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.092s
+ok  	git.hyhy.fun/rsplab/iolink/internal/persistence	3.167s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	1.998s
+ok  	git.hyhy.fun/rsplab/iolink/internal/playback	1.017s
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	10.628s
+?   	git.hyhy.fun/rsplab/iolink/internal/testdb	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	1.018s
+?   	git.hyhy.fun/rsplab/iolink/internal/web	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.036s
+?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]
