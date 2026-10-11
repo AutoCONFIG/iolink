@@ -1,0 +1,82 @@
+-test.shuffle 1791675763788983332
+=== RUN   TestPrepareCreateAndFinishPlayback
+--- PASS: TestPrepareCreateAndFinishPlayback (1.08s)
+=== RUN   TestRevalidateRejectsRevokedMembership
+--- PASS: TestRevalidateRejectsRevokedMembership (1.02s)
+=== RUN   TestFinishRejectsMalformedLeaseAndPayloadFence
+--- PASS: TestFinishRejectsMalformedLeaseAndPayloadFence (1.52s)
+=== RUN   TestAuthorizeRejectsCurrentVersionRevocation
+=== RUN   TestAuthorizeRejectsCurrentVersionRevocation/member_policy
+=== RUN   TestAuthorizeRejectsCurrentVersionRevocation/user_token
+=== RUN   TestAuthorizeRejectsCurrentVersionRevocation/tenant_policy
+--- PASS: TestAuthorizeRejectsCurrentVersionRevocation (0.97s)
+    --- PASS: TestAuthorizeRejectsCurrentVersionRevocation/member_policy (0.00s)
+    --- PASS: TestAuthorizeRejectsCurrentVersionRevocation/user_token (0.00s)
+    --- PASS: TestAuthorizeRejectsCurrentVersionRevocation/tenant_policy (0.00s)
+=== RUN   TestClaimRejectsMaxAttempts
+--- PASS: TestClaimRejectsMaxAttempts (0.98s)
+=== RUN   TestCreateRestartsAfterStoppedSharedStream
+--- PASS: TestCreateRestartsAfterStoppedSharedStream (0.98s)
+=== RUN   TestCreateRejectsSourceVersionChangeWithoutPartialRows
+--- PASS: TestCreateRejectsSourceVersionChangeWithoutPartialRows (0.91s)
+=== RUN   TestReadAndStopRejectCurrentAuthorization
+--- PASS: TestReadAndStopRejectCurrentAuthorization (0.94s)
+=== RUN   TestAuthorizeRejectsWrongHash
+--- PASS: TestAuthorizeRejectsWrongHash (0.91s)
+=== RUN   TestStopOnlyStopsLastSharedSession
+--- PASS: TestStopOnlyStopsLastSharedSession (0.97s)
+=== RUN   TestResolveSegmentMappingRechecksCurrentAuthorization
+--- PASS: TestResolveSegmentMappingRechecksCurrentAuthorization (0.95s)
+=== RUN   TestStopJobSkipsWhenNewSessionArrivesBeforeClaim
+--- PASS: TestStopJobSkipsWhenNewSessionArrivesBeforeClaim (1.00s)
+=== RUN   TestExpiredSiblingDoesNotBlockLastSessionStop
+--- PASS: TestExpiredSiblingDoesNotBlockLastSessionStop (0.93s)
+=== RUN   TestPrepareRejectsUnavailableLicenseSnapshot
+--- PASS: TestPrepareRejectsUnavailableLicenseSnapshot (2.54s)
+=== RUN   TestCreateSameSessionIsIdempotent
+--- PASS: TestCreateSameSessionIsIdempotent (0.92s)
+=== RUN   TestSharedStartSurvivesRevokedFirstSession
+--- PASS: TestSharedStartSurvivesRevokedFirstSession (0.92s)
+=== RUN   TestFinishRejectsOldSourceLeaseWithoutStateMutation
+--- PASS: TestFinishRejectsOldSourceLeaseWithoutStateMutation (0.96s)
+=== RUN   TestCreateDuplicateStartJobSharesStream
+--- PASS: TestCreateDuplicateStartJobSharesStream (0.94s)
+=== RUN   TestAuthorizeUsesDatabaseClockForExpiry
+--- PASS: TestAuthorizeUsesDatabaseClockForExpiry (0.92s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediapg	21.398s
+-test.shuffle 1791675763788395743
+=== RUN   TestAuthorizeMediaChecksAudienceClaimsHashAndPendingState
+--- PASS: TestAuthorizeMediaChecksAudienceClaimsHashAndPendingState (0.00s)
+=== RUN   TestProcessMediaJobUsesLeaseAndRecordsUnknownWithoutReplay
+--- PASS: TestProcessMediaJobUsesLeaseAndRecordsUnknownWithoutReplay (0.00s)
+=== RUN   TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing
+--- PASS: TestRequestPlaybackFailsClosedWhenCapabilityOrLicenseIsMissing (0.00s)
+=== RUN   TestAuthorizeMediaFailsClosedWhenVideoIsDisabled
+--- PASS: TestAuthorizeMediaFailsClosedWhenVideoIsDisabled (0.00s)
+=== RUN   TestProcessMediaJobSkipsStopWhenStreamHasLiveReplacement
+--- PASS: TestProcessMediaJobSkipsStopWhenStreamHasLiveReplacement (0.00s)
+=== RUN   TestRequestPlaybackRequiresAbsoluteHTTPSManifestURLWhenEnabled
+--- PASS: TestRequestPlaybackRequiresAbsoluteHTTPSManifestURLWhenEnabled (0.00s)
+=== RUN   TestProcessMediaJobLeaseCASFailureIsUnknownToCaller
+--- PASS: TestProcessMediaJobLeaseCASFailureIsUnknownToCaller (0.00s)
+=== RUN   TestReadAndStopPreserveOwnerOnlyStoreContract
+--- PASS: TestReadAndStopPreserveOwnerOnlyStoreContract (0.00s)
+=== RUN   TestReadPlaybackExpiresAtExactBoundary
+--- PASS: TestReadPlaybackExpiresAtExactBoundary (0.00s)
+=== RUN   TestProcessMediaJobSkipsInactiveOrStaleStartWithoutProvider
+=== RUN   TestProcessMediaJobSkipsInactiveOrStaleStartWithoutProvider/inactive
+=== RUN   TestProcessMediaJobSkipsInactiveOrStaleStartWithoutProvider/stale-source
+--- PASS: TestProcessMediaJobSkipsInactiveOrStaleStartWithoutProvider (0.00s)
+    --- PASS: TestProcessMediaJobSkipsInactiveOrStaleStartWithoutProvider/inactive (0.00s)
+    --- PASS: TestProcessMediaJobSkipsInactiveOrStaleStartWithoutProvider/stale-source (0.00s)
+=== RUN   TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey
+--- PASS: TestRequestPlaybackPersistsFiveMinuteSessionAndVersionedIdempotencyKey (0.00s)
+=== RUN   TestRequestPlaybackReturnsSourceVersionConflictWithoutGrant
+--- PASS: TestRequestPlaybackReturnsSourceVersionConflictWithoutGrant (0.00s)
+=== RUN   TestAuthorizeMediaRejectsTokenErrorsAndRevokedSessionsWithoutActor
+--- PASS: TestAuthorizeMediaRejectsTokenErrorsAndRevokedSessionsWithoutActor (0.00s)
+=== RUN   TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing
+--- PASS: TestRequestPlaybackFailsClosedWhenTokenIssuerIsMissing (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/playback	1.012s
