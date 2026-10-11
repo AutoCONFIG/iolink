@@ -170,6 +170,15 @@ func TestPeerIdentityRejectsUnknownTransport(t *testing.T) {
 	if got, err := NewPeerIdentity(netip.AddrPort{}, TransportUDP); !errors.Is(err, ErrInvalidRequest) || got.Valid() {
 		t.Fatalf("invalid address accepted as %#v err=%v", got, err)
 	}
+	for _, addr := range []netip.AddrPort{
+		netip.MustParseAddrPort("192.0.2.10:0"),
+		netip.MustParseAddrPort("0.0.0.0:5060"),
+		netip.MustParseAddrPort("[::]:5060"),
+	} {
+		if got, err := NewPeerIdentity(addr, TransportUDP); !errors.Is(err, ErrInvalidRequest) || got.Valid() {
+			t.Fatalf("invalid peer address %s accepted as %#v err=%v", addr, got, err)
+		}
+	}
 }
 
 func TestRegisterDigestChallengeAndSuccess(t *testing.T) {

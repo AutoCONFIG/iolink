@@ -62,7 +62,7 @@ func NewPeerIdentity(addr netip.AddrPort, transport TransportProtocol) (PeerIden
 }
 
 func (p PeerIdentity) Valid() bool {
-	return p.Addr.IsValid() && p.Transport.valid()
+	return p.Addr.IsValid() && p.Addr.Port() != 0 && !p.Addr.Addr().IsUnspecified() && p.Transport.valid()
 }
 
 type RegisteredDevice struct {
