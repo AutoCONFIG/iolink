@@ -30,6 +30,7 @@ func (n *testNonceStore) Issue(_ context.Context, r NonceRecord) (string, error)
 	n.records[nonce] = r
 	return nonce, nil
 }
+
 func (n *testNonceStore) Consume(_ context.Context, value string, now time.Time) (NonceRecord, error) {
 	r, ok := n.records[value]
 	if !ok || n.consumed[value] {
@@ -60,7 +61,8 @@ type serialRegistrationStore struct {
 func (s *serialRegistrationStore) LookupDevice(context.Context, string) (RegisteredDevice, error) {
 	return RegisteredDevice{}, ErrUnknownDevice
 }
-func (s *serialRegistrationStore) LookupPeer(_ context.Context, peer netip.AddrPort) (Registration, error) {
+
+func (s *serialRegistrationStore) LookupPeer(_ context.Context, peer PeerIdentity) (Registration, error) {
 	s.mu.Lock()
 	s.active++
 	if s.active > s.maxActive {
@@ -77,6 +79,7 @@ func (s *serialRegistrationStore) LookupPeer(_ context.Context, peer netip.AddrP
 	}
 	return *got, nil
 }
+
 func (s *serialRegistrationStore) ApplyRegistration(_ context.Context, registration Registration) error {
 	s.mu.Lock()
 	s.active++
@@ -91,7 +94,8 @@ func (s *serialRegistrationStore) ApplyRegistration(_ context.Context, registrat
 	s.mu.Unlock()
 	return nil
 }
-func (s *serialRegistrationStore) MarkKeepalive(context.Context, string, netip.AddrPort, time.Time, string) error {
+
+func (s *serialRegistrationStore) MarkKeepalive(context.Context, string, PeerIdentity, time.Time, string) error {
 	return nil
 }
 
@@ -101,7 +105,8 @@ func (d *testDeviceStore) LookupDevice(_ context.Context, id string) (Registered
 	}
 	return d.device, nil
 }
-func (d *testDeviceStore) LookupPeer(_ context.Context, p netip.AddrPort) (Registration, error) {
+
+func (d *testDeviceStore) LookupPeer(_ context.Context, p PeerIdentity) (Registration, error) {
 	if d.peerErr != nil {
 		return Registration{}, d.peerErr
 	}
@@ -110,12 +115,14 @@ func (d *testDeviceStore) LookupPeer(_ context.Context, p netip.AddrPort) (Regis
 	}
 	return Registration{}, ErrPeerNotFound
 }
+
 func (d *testDeviceStore) ApplyRegistration(_ context.Context, r Registration) error {
 	d.applied = append(d.applied, r)
 	d.peer = &r
 	return nil
 }
-func (d *testDeviceStore) MarkKeepalive(_ context.Context, id string, p netip.AddrPort, now time.Time, status string) error {
+
+func (d *testDeviceStore) MarkKeepalive(_ context.Context, id string, p PeerIdentity, now time.Time, status string) error {
 	d.markStatus = status
 	state := RegistrationOnline
 	if status != "OK" {
@@ -130,7 +137,8 @@ func testService() (*Service, *testDeviceStore, *testNonceStore, *testClock, Reg
 	peer := netip.MustParseAddrPort("192.0.2.10:5060")
 	device := RegisteredDevice{DeviceID: "34020000002000000001", Realm: "3402000000", Password: []byte("secret"), AllowedPeers: []netip.Prefix{netip.MustParsePrefix("192.0.2.0/24")}}
 	store, nonces, clock := &testDeviceStore{device: device}, &testNonceStore{records: map[string]NonceRecord{}, consumed: map[string]bool{}}, &testClock{now: now}
-	return &Service{Devices: store, Nonces: nonces, Clock: clock}, store, nonces, clock, RegisterRequest{DeviceID: device.DeviceID, Username: device.DeviceID, Realm: device.Realm, Method: "REGISTER", URI: "sip:" + device.DeviceID + "@3402000000", Source: peer, Expires: 300}
+	identity := PeerIdentity{Addr: peer, Transport: TransportUDP}
+	return &Service{Devices: store, Nonces: nonces, Clock: clock}, store, nonces, clock, RegisterRequest{DeviceID: device.DeviceID, Username: device.DeviceID, Realm: device.Realm, Method: "REGISTER", URI: "sip:" + device.DeviceID + "@3402000000", Source: identity, Expires: 300}
 }
 
 func digestFor(req RegisterRequest, nonce, password string, qop bool) DigestAuthorization {
@@ -144,6 +152,24 @@ func digestFor(req RegisterRequest, nonce, password string, qop bool) DigestAuth
 		a.Response = md5Hex(ha1 + ":" + nonce + ":" + ha2)
 	}
 	return a
+}
+
+func TestPeerIdentityRejectsUnknownTransport(t *testing.T) {
+	addr := netip.MustParseAddrPort("192.0.2.10:5060")
+	if got, err := NewPeerIdentity(addr, TransportUDP); err != nil || !got.Valid() {
+		t.Fatalf("udp identity=%#v err=%v", got, err)
+	}
+	if got, err := NewPeerIdentity(addr, TransportTCP); err != nil || !got.Valid() {
+		t.Fatalf("tcp identity=%#v err=%v", got, err)
+	}
+	for _, transport := range []TransportProtocol{"", "UDP", "tls", "udp\x00"} {
+		if got, err := NewPeerIdentity(addr, transport); !errors.Is(err, ErrInvalidRequest) || got.Valid() {
+			t.Fatalf("transport %q accepted as %#v err=%v", transport, got, err)
+		}
+	}
+	if got, err := NewPeerIdentity(netip.AddrPort{}, TransportUDP); !errors.Is(err, ErrInvalidRequest) || got.Valid() {
+		t.Fatalf("invalid address accepted as %#v err=%v", got, err)
+	}
 }
 
 func TestRegisterDigestChallengeAndSuccess(t *testing.T) {
@@ -177,6 +203,21 @@ func TestRegisterDigestQOPAndReplay(t *testing.T) {
 	}
 }
 
+func TestRegisterDigestBindsNonceToTransport(t *testing.T) {
+	s, store, _, _, req := testService()
+	if _, err := s.Challenge(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+	req.Source.Transport = TransportTCP
+	req.Authorization = ptrDigest(digestFor(req, "nonce-1", "secret", false))
+	if _, err := s.HandleRegister(context.Background(), req); !errors.Is(err, ErrNonceInvalid) {
+		t.Fatalf("cross-transport register=%v", err)
+	}
+	if len(store.applied) != 0 {
+		t.Fatalf("cross-transport register applied %d times", len(store.applied))
+	}
+}
+
 func TestRegisterTransactionRetransmitReturnsSameResponse(t *testing.T) {
 	s, store, _, _, req := testService()
 	req.TransactionID = "branch-z9hG4bK-1"
@@ -197,7 +238,7 @@ func TestRegisterTransactionRetransmitReturnsSameResponse(t *testing.T) {
 func TestRegisterRejectsUnknownPeerDeviceAndDigestFields(t *testing.T) {
 	s, _, _, _, req := testService()
 	bad := req
-	bad.Source = netip.MustParseAddrPort("198.51.100.5:5060")
+	bad.Source = PeerIdentity{Addr: netip.MustParseAddrPort("198.51.100.5:5060"), Transport: req.Source.Transport}
 	if _, err := s.Challenge(context.Background(), bad); !errors.Is(err, ErrPeerNotAllowed) {
 		t.Fatalf("peer=%v", err)
 	}
@@ -283,7 +324,7 @@ func TestRegisterFailsClosedOnPeerLookupError(t *testing.T) {
 func TestRegistrationConflictCheckAndApplyAreSerialized(t *testing.T) {
 	store := &serialRegistrationStore{}
 	s := &Service{Devices: store}
-	peer := netip.MustParseAddrPort("192.0.2.10:5060")
+	peer := PeerIdentity{Addr: netip.MustParseAddrPort("192.0.2.10:5060"), Transport: TransportUDP}
 	results := make(chan error, 2)
 	for _, device := range []string{"34020000002000000001", "34020000002000000002"} {
 		go func(device string) {
@@ -311,7 +352,7 @@ func TestRegistrationConflictCheckAndApplyAreSerialized(t *testing.T) {
 
 func TestRegistrationStatusExpiresAndKeepaliveThreshold(t *testing.T) {
 	now := time.Date(2026, 10, 11, 2, 0, 0, 0, time.UTC)
-	base := Registration{LastSeenAt: now, ExpiresAt: now.Add(time.Hour)}
+	base := Registration{LastSeenAt: now, ExpiresAt: now.Add(time.Hour), Status: RegistrationOnline}
 	if base.StatusAt(now) != RegistrationOnline {
 		t.Fatal("fresh registration offline")
 	}
@@ -344,12 +385,32 @@ func TestHandleKeepaliveRequiresRegisteredPeer(t *testing.T) {
 		t.Fatalf("keepalive=%#v %v", got, err)
 	}
 	bad := req.Source
-	bad = netip.AddrPortFrom(netip.MustParseAddr("192.0.2.11"), bad.Port())
+	bad.Addr = netip.AddrPortFrom(netip.MustParseAddr("192.0.2.11"), bad.Addr.Port())
 	if _, err := s.HandleMessage(context.Background(), bad, raw); !errors.Is(err, ErrUnknownDevice) {
 		t.Fatalf("unregistered peer=%v", err)
 	}
 	if _, err := s.HandleSIPMessage(context.Background(), "MESSAGE", req.Source, make([]byte, MaxSIPMessageSize+1)); !errors.Is(err, ErrXMLTooLarge) {
 		t.Fatalf("SIP size=%v", err)
+	}
+}
+
+func TestHandleKeepaliveRequiresRegisteredTransport(t *testing.T) {
+	s, store, _, _, req := testService()
+	if _, err := s.Challenge(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+	req.Authorization = ptrDigest(digestFor(req, "nonce-1", "secret", false))
+	if _, err := s.HandleRegister(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+	peer := req.Source
+	peer.Transport = TransportTCP
+	raw := []byte(`<Notify><CmdType>Keepalive</CmdType><SN>13</SN><DeviceID>` + req.DeviceID + `</DeviceID><Status>OK</Status></Notify>`)
+	if _, err := s.HandleMessage(context.Background(), peer, raw); !errors.Is(err, ErrUnknownDevice) {
+		t.Fatalf("cross-transport keepalive=%v", err)
+	}
+	if store.markStatus != "" {
+		t.Fatalf("cross-transport keepalive mutated store: %s", store.markStatus)
 	}
 }
 
@@ -375,7 +436,8 @@ func TestHandleKeepaliveRejectsExpiredRegistration(t *testing.T) {
 func TestMemoryNonceStoreExpiresAndRejectsReplay(t *testing.T) {
 	nonces := NewMemoryNonceStore()
 	now := time.Date(2026, 10, 11, 2, 0, 0, 0, time.UTC)
-	nonce, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", Peer: netip.MustParseAddr("192.0.2.10"), ExpiresAt: now.Add(time.Minute)})
+	peer := PeerIdentity{Addr: netip.MustParseAddrPort("192.0.2.10:5060"), Transport: TransportUDP}
+	nonce, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", Peer: peer, ExpiresAt: now.Add(time.Minute)})
 	if err != nil || len(nonce) < 20 {
 		t.Fatalf("nonce=%q err=%v", nonce, err)
 	}
@@ -385,7 +447,7 @@ func TestMemoryNonceStoreExpiresAndRejectsReplay(t *testing.T) {
 	if _, err := nonces.Consume(context.Background(), nonce, now); !errors.Is(err, ErrNonceReplay) {
 		t.Fatalf("replay=%v", err)
 	}
-	expired, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", Peer: netip.MustParseAddr("192.0.2.10"), ExpiresAt: now})
+	expired, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", Peer: peer, ExpiresAt: now})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -398,7 +460,7 @@ func TestMemoryNonceStoreIsBounded(t *testing.T) {
 	nonces := NewMemoryNonceStore()
 	expires := time.Now().Add(time.Hour)
 	for i := 0; i < MaxMemoryNonces+1; i++ {
-		nonce, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", ExpiresAt: expires})
+		nonce, err := nonces.Issue(context.Background(), NonceRecord{DeviceID: "34020000002000000001", Peer: PeerIdentity{Addr: netip.MustParseAddrPort("192.0.2.10:5060"), Transport: TransportUDP}, ExpiresAt: expires})
 		if err != nil {
 			t.Fatalf("issue %d: %v", i, err)
 		}

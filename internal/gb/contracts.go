@@ -37,6 +37,34 @@ const (
 
 type Clock interface{ Now() time.Time }
 
+type TransportProtocol string
+
+const (
+	TransportUDP TransportProtocol = "udp"
+	TransportTCP TransportProtocol = "tcp"
+)
+
+func (p TransportProtocol) valid() bool {
+	return p == TransportUDP || p == TransportTCP
+}
+
+type PeerIdentity struct {
+	Addr      netip.AddrPort
+	Transport TransportProtocol
+}
+
+func NewPeerIdentity(addr netip.AddrPort, transport TransportProtocol) (PeerIdentity, error) {
+	identity := PeerIdentity{Addr: addr, Transport: transport}
+	if !identity.Valid() {
+		return PeerIdentity{}, ErrInvalidRequest
+	}
+	return identity, nil
+}
+
+func (p PeerIdentity) Valid() bool {
+	return p.Addr.IsValid() && p.Transport.valid()
+}
+
 type RegisteredDevice struct {
 	DeviceID     string
 	Realm        string
@@ -58,7 +86,7 @@ func (d RegisteredDevice) AllowsPeer(peer netip.Addr) bool {
 
 type Registration struct {
 	DeviceID     string
-	Peer         netip.AddrPort
+	Peer         PeerIdentity
 	RegisteredAt time.Time
 	LastSeenAt   time.Time
 	ExpiresAt    time.Time
@@ -73,7 +101,7 @@ const (
 )
 
 func (r Registration) StatusAt(now time.Time) RegistrationStatus {
-	if r.Status == RegistrationOffline || now.IsZero() || r.ExpiresAt.IsZero() || !now.Before(r.ExpiresAt) || r.LastSeenAt.IsZero() || now.Sub(r.LastSeenAt) >= KeepaliveMissLimit*KeepalivePeriod {
+	if r.Status != RegistrationOnline || now.IsZero() || r.ExpiresAt.IsZero() || !now.Before(r.ExpiresAt) || r.LastSeenAt.IsZero() || now.Sub(r.LastSeenAt) >= KeepaliveMissLimit*KeepalivePeriod {
 		return RegistrationOffline
 	}
 	return RegistrationOnline
@@ -81,15 +109,15 @@ func (r Registration) StatusAt(now time.Time) RegistrationStatus {
 
 type DeviceStore interface {
 	LookupDevice(context.Context, string) (RegisteredDevice, error)
-	LookupPeer(context.Context, netip.AddrPort) (Registration, error)
+	LookupPeer(context.Context, PeerIdentity) (Registration, error)
 	ApplyRegistration(context.Context, Registration) error
-	MarkKeepalive(context.Context, string, netip.AddrPort, time.Time, string) error
+	MarkKeepalive(context.Context, string, PeerIdentity, time.Time, string) error
 }
 
 type NonceRecord struct {
 	DeviceID  string
 	Realm     string
-	Peer      netip.Addr
+	Peer      PeerIdentity
 	URI       string
 	ExpiresAt time.Time
 }
@@ -100,7 +128,7 @@ type NonceStore interface {
 }
 
 type Transport interface {
-	Send(context.Context, netip.AddrPort, []byte) error
+	Send(context.Context, PeerIdentity, []byte) error
 }
 
 type DigestAuthorization struct {
@@ -121,7 +149,7 @@ type RegisterRequest struct {
 	Realm         string
 	Method        string
 	URI           string
-	Source        netip.AddrPort
+	Source        PeerIdentity
 	Expires       int
 	Authorization *DigestAuthorization
 	TransactionID string
@@ -159,8 +187,8 @@ type MessageResult struct {
 	Status  RegistrationStatus
 }
 
-func (s *Service) HandleMessage(ctx context.Context, source netip.AddrPort, raw []byte) (MessageResult, error) {
-	if s == nil || s.Devices == nil || s.Clock == nil || !source.IsValid() {
+func (s *Service) HandleMessage(ctx context.Context, source PeerIdentity, raw []byte) (MessageResult, error) {
+	if s == nil || s.Devices == nil || s.Clock == nil || !source.Valid() {
 		return MessageResult{}, ErrInvalidRequest
 	}
 	message, err := ParseMessageXML(raw, "")
@@ -171,11 +199,11 @@ func (s *Service) HandleMessage(ctx context.Context, source netip.AddrPort, raw 
 	if err != nil {
 		return MessageResult{}, ErrUnknownDevice
 	}
-	if !device.AllowsPeer(source.Addr()) {
+	if !device.AllowsPeer(source.Addr.Addr()) {
 		return MessageResult{}, ErrPeerNotAllowed
 	}
 	registration, err := s.Devices.LookupPeer(ctx, source)
-	if err != nil || registration.DeviceID != message.DeviceID {
+	if err != nil || registration.DeviceID != message.DeviceID || registration.Peer != source {
 		return MessageResult{}, ErrUnknownDevice
 	}
 	now := s.Clock.Now()
@@ -195,7 +223,7 @@ func (s *Service) HandleMessage(ctx context.Context, source netip.AddrPort, raw 
 	return MessageResult{Message: message, Status: registration.StatusAt(now)}, nil
 }
 
-func (s *Service) HandleSIPMessage(ctx context.Context, method string, source netip.AddrPort, raw []byte) (MessageResult, error) {
+func (s *Service) HandleSIPMessage(ctx context.Context, method string, source PeerIdentity, raw []byte) (MessageResult, error) {
 	if method != "MESSAGE" {
 		return MessageResult{}, ErrInvalidRequest
 	}

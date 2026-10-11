@@ -21,7 +21,7 @@ func NewMemoryNonceStore() *MemoryNonceStore {
 }
 
 func (s *MemoryNonceStore) Issue(_ context.Context, record NonceRecord) (string, error) {
-	if s == nil || record.ExpiresAt.IsZero() {
+	if s == nil || !record.Peer.Valid() || record.ExpiresAt.IsZero() {
 		return "", ErrNonceInvalid
 	}
 	b := make([]byte, 24)

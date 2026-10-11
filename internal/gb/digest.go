@@ -6,7 +6,6 @@ import (
 	"crypto/subtle"
 	"encoding/hex"
 	"errors"
-	"net/netip"
 	"strings"
 	"time"
 )
@@ -40,21 +39,21 @@ func digestResponse(a DigestAuthorization, method, password string) (string, err
 }
 
 func (s *Service) Challenge(ctx context.Context, req RegisterRequest) (RegisterResult, error) {
-	if s == nil || s.Devices == nil || s.Nonces == nil || s.Clock == nil || !validDeviceID(req.DeviceID) || req.Username != req.DeviceID || !validText(req.Method, 32) || req.Method != "REGISTER" || !req.Source.IsValid() {
+	if s == nil || s.Devices == nil || s.Nonces == nil || s.Clock == nil || !validDeviceID(req.DeviceID) || req.Username != req.DeviceID || !validText(req.Method, 32) || req.Method != "REGISTER" || !req.Source.Valid() {
 		return RegisterResult{}, ErrInvalidRequest
 	}
 	device, err := s.Devices.LookupDevice(ctx, req.DeviceID)
 	if err != nil {
 		return RegisterResult{}, ErrUnknownDevice
 	}
-	if device.DeviceID != req.DeviceID || req.Realm != device.Realm || !device.AllowsPeer(req.Source.Addr()) {
+	if device.DeviceID != req.DeviceID || req.Realm != device.Realm || !device.AllowsPeer(req.Source.Addr.Addr()) {
 		return RegisterResult{}, ErrPeerNotAllowed
 	}
 	if !validText(device.Realm, 128) || !validText(req.URI, 2048) {
 		return RegisterResult{}, ErrInvalidRequest
 	}
 	expires := s.Clock.Now().Add(60 * time.Second)
-	nonce, err := s.Nonces.Issue(ctx, NonceRecord{DeviceID: req.DeviceID, Realm: device.Realm, Peer: req.Source.Addr(), URI: req.URI, ExpiresAt: expires})
+	nonce, err := s.Nonces.Issue(ctx, NonceRecord{DeviceID: req.DeviceID, Realm: device.Realm, Peer: req.Source, URI: req.URI, ExpiresAt: expires})
 	if err != nil || !validText(nonce, 256) {
 		return RegisterResult{}, ErrNonceInvalid
 	}
@@ -62,7 +61,7 @@ func (s *Service) Challenge(ctx context.Context, req RegisterRequest) (RegisterR
 }
 
 func (s *Service) HandleRegister(ctx context.Context, req RegisterRequest) (RegisterResult, error) {
-	if s == nil || s.Devices == nil || s.Nonces == nil || s.Clock == nil || !validDeviceID(req.DeviceID) || req.Username != req.DeviceID || req.Method != "REGISTER" || !req.Source.IsValid() || !validText(req.URI, 2048) || (req.TransactionID != "" && !validText(req.TransactionID, 128)) {
+	if s == nil || s.Devices == nil || s.Nonces == nil || s.Clock == nil || !validDeviceID(req.DeviceID) || req.Username != req.DeviceID || req.Method != "REGISTER" || !req.Source.Valid() || !validText(req.URI, 2048) || (req.TransactionID != "" && !validText(req.TransactionID, 128)) {
 		return RegisterResult{}, ErrInvalidRequest
 	}
 	if req.TransactionID != "" {
@@ -74,7 +73,7 @@ func (s *Service) HandleRegister(ctx context.Context, req RegisterRequest) (Regi
 	if err != nil {
 		return RegisterResult{}, ErrUnknownDevice
 	}
-	if device.DeviceID != req.DeviceID || req.Realm != device.Realm || !device.AllowsPeer(req.Source.Addr()) {
+	if device.DeviceID != req.DeviceID || req.Realm != device.Realm || !device.AllowsPeer(req.Source.Addr.Addr()) {
 		return RegisterResult{}, ErrPeerNotAllowed
 	}
 	if req.Authorization == nil {
@@ -91,7 +90,7 @@ func (s *Service) HandleRegister(ctx context.Context, req RegisterRequest) (Regi
 		}
 		return RegisterResult{}, ErrNonceInvalid
 	}
-	if record.DeviceID != req.DeviceID || record.Realm != device.Realm || record.Peer != req.Source.Addr() || record.URI != req.URI || !s.Clock.Now().Before(record.ExpiresAt) {
+	if record.DeviceID != req.DeviceID || record.Realm != device.Realm || record.Peer != req.Source || record.URI != req.URI || !s.Clock.Now().Before(record.ExpiresAt) {
 		return RegisterResult{}, ErrNonceInvalid
 	}
 	expected, err := digestResponse(a, req.Method, string(device.Password))
@@ -122,7 +121,10 @@ func (s *Service) HandleRegister(ctx context.Context, req RegisterRequest) (Regi
 	return result, nil
 }
 
-func (s *Service) applyRegistration(ctx context.Context, source netip.AddrPort, deviceID string, registration Registration) error {
+func (s *Service) applyRegistration(ctx context.Context, source PeerIdentity, deviceID string, registration Registration) error {
+	if !source.Valid() || !validDeviceID(deviceID) || registration.DeviceID != deviceID || registration.Peer != source {
+		return ErrInvalidRequest
+	}
 	s.registrationMu.Lock()
 	defer s.registrationMu.Unlock()
 	peerReg, lookupErr := s.Devices.LookupPeer(ctx, source)
@@ -138,8 +140,8 @@ func (s *Service) applyRegistration(ctx context.Context, source netip.AddrPort, 
 	return nil
 }
 
-func (s *Service) transaction(id string, source netip.AddrPort, deviceID string) (RegisterResult, bool) {
-	key := id + "|" + source.String() + "|" + deviceID
+func (s *Service) transaction(id string, source PeerIdentity, deviceID string) (RegisterResult, bool) {
+	key := id + "|" + source.Addr.String() + "|" + string(source.Transport) + "|" + deviceID
 	now := s.Clock.Now()
 	s.transactionMu.Lock()
 	defer s.transactionMu.Unlock()
@@ -155,11 +157,11 @@ func (s *Service) transaction(id string, source netip.AddrPort, deviceID string)
 	return item.result, ok && now.Before(item.expiresAt)
 }
 
-func (s *Service) rememberTransaction(id string, source netip.AddrPort, deviceID string, result RegisterResult) {
+func (s *Service) rememberTransaction(id string, source PeerIdentity, deviceID string, result RegisterResult) {
 	if id == "" {
 		return
 	}
-	key := id + "|" + source.String() + "|" + deviceID
+	key := id + "|" + source.Addr.String() + "|" + string(source.Transport) + "|" + deviceID
 	s.transactionMu.Lock()
 	defer s.transactionMu.Unlock()
 	if s.transactions == nil {
