@@ -1,0 +1,41 @@
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/cmd/license-sign	(cached)
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-once	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-sim	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/offline-sbom	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/tp-spike-pub	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/authorization	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/camera	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/camerapg	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/domain	(cached)
+?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/gb	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalog	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalogpg	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/ingestion	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/license	(cached)
+?   	git.hyhy.fun/rsplab/iolink/internal/media	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/rtp	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/rtsp	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/zlm	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediahttp	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediajobs	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediapg	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/openapi	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/persistence	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/playback	(cached)
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	(cached)
+?   	git.hyhy.fun/rsplab/iolink/internal/testdb	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	(cached)
+?   	git.hyhy.fun/rsplab/iolink/internal/web	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	(cached)
+?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]
