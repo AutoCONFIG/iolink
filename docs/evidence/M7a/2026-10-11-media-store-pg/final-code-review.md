@@ -1,10 +1,10 @@
 # M7a PostgreSQL media Store code review — exact SHA `55c7b42`
 
-**codeQualityStatus:** WATCH  
-**recommendation:** APPROVE  
-**reportPath:** `.omo/evidence/m7a-mediapg-code-review-55c7b42.md`  
-**blockers:** `[]`  
-**reviewed SHA:** `55c7b42d4c3eec77a122fc4d29295a0b4973ab4c`  
+**codeQualityStatus:** WATCH
+**recommendation:** APPROVE
+**reportPath:** `.omo/evidence/m7a-mediapg-code-review-55c7b42.md`
+**blockers:** `[]`
+**reviewed SHA:** `55c7b42d4c3eec77a122fc4d29295a0b4973ab4c`
 **review mode:** independent, read-only, detached worktree `/tmp/iolink-review-55c7b42`
 
 ## Scope
