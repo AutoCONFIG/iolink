@@ -2,7 +2,9 @@ package adminapi
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
+	"math/big"
 	"net/http"
 	"strconv"
 	"time"
@@ -541,8 +543,33 @@ func (s *Server) registerDevice(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 		return
 	}
+	// Suggested transport Client ID for the ThingsPanel-style copy-paste
+	// flow; purely advisory (any unique value is accepted by the broker).
+	digits := func(n int) (string, error) {
+		buf := make([]byte, n)
+		for i := range buf {
+			b, err := rand.Int(rand.Reader, big.NewInt(10))
+			if err != nil {
+				return "", err
+			}
+			buf[i] = byte('0' + b.Int64())
+		}
+		return string(buf), nil
+	}
+	head, err := digits(8)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+		return
+	}
+	tail, err := digits(3)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"device_no":       dev.DeviceNo,
+		"mqtt_username":   dev.MqttUsername,
+		"client_id":       "mqtt_" + head + "-" + tail,
 		"secret":          secret, // shown once; only sha256 stored
 		"pond_id":         dev.PondID,
 		"model":           dev.Model,
@@ -601,7 +628,7 @@ func (s *Server) listDevices(c *gin.Context) {
 	}
 	out := make([]gin.H, 0, len(result.Items))
 	for _, d := range result.Items {
-		out = append(out, gin.H{"id": d.ID, "device_no": d.DeviceNo, "pond_id": d.PondID, "name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval})
+		out = append(out, gin.H{"id": d.ID, "device_no": d.DeviceNo, "mqtt_username": d.MqttUsername, "pond_id": d.PondID, "name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval})
 	}
 	c.JSON(http.StatusOK, gin.H{"list": out, "total": result.Total, "page": pageNumber, "page_size": pageSize})
 }
@@ -612,7 +639,7 @@ func (s *Server) getDevice(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
 		return
 	}
-	item := gin.H{"id": d.ID, "device_no": d.DeviceNo, "pond_id": d.PondID, "model": d.Model, "name": d.Name, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval, "latest": nil}
+	item := gin.H{"id": d.ID, "device_no": d.DeviceNo, "mqtt_username": d.MqttUsername, "pond_id": d.PondID, "model": d.Model, "name": d.Name, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval, "latest": nil}
 	if s.deps.Telemetry != nil {
 		if rd, e := s.deps.Telemetry.Latest(c.Request.Context(), d.DeviceNo); e == nil {
 			item["latest"] = adminWaterLatestJSON(rd)

@@ -32,6 +32,14 @@ func TestConnectAuthGenericClientID(t *testing.T) {
 			t.Fatalf("client id %q rejected", id)
 		}
 	}
+	// Usernames are opaque issued tokens, free of topic grammar.
+	for _, name := range []string{"iolink-one-seed01", "de/v1", "a+user"} {
+		cl := client(name)
+		cl.ID = "fixed-client"
+		if !h.OnConnectAuthenticate(cl, good) {
+			t.Fatalf("username %q rejected", name)
+		}
+	}
 
 	reject := func(name string, cl *mqtt.Client, pk packets.Packet) {
 		t.Helper()
@@ -40,7 +48,6 @@ func TestConnectAuthGenericClientID(t *testing.T) {
 		}
 	}
 	reject("empty username", client(""), good)
-	reject("separator username", client("de/v1"), good)
 	wildcardID := client("one")
 	wildcardID.ID = "a+"
 	reject("wildcard client id", wildcardID, good)
@@ -207,8 +214,28 @@ type blockedHandler struct {
 
 type unavailableRevisionAuth struct{}
 
-func (unavailableRevisionAuth) Authenticate(string, string) bool { return true }
-func (unavailableRevisionAuth) DeviceRevision(string) int64      { return -1 }
+func (unavailableRevisionAuth) Resolve(username, _ string) (string, bool) { return username, true }
+func (unavailableRevisionAuth) DeviceRevision(string) int64               { return -1 }
+
+func TestResolveFailureAtEstablishmentFailsClosed(t *testing.T) {
+	f := &fakeHandler{}
+	s := New(Config{}, f, fakeAuth{false}, testLogger())
+	cl := client("one")
+	h := newBrokerHook(s)
+	h.OnSessionEstablished(cl, packets.Packet{})
+	if s.isCurrent(cl) {
+		t.Fatal("unresolved session must not pass ACL")
+	}
+	s.mu.Lock()
+	_, mapped := s.deviceOf[cl]
+	s.mu.Unlock()
+	if mapped {
+		t.Fatal("unresolved client must not be mapped")
+	}
+	if len(f.events) != 0 {
+		t.Fatal("unresolved session emitted status")
+	}
+}
 
 func TestRevisionLookupFailureFailsClosed(t *testing.T) {
 	f := &fakeHandler{}
@@ -242,11 +269,11 @@ func TestSlowDeviceDoesNotBlockOthersOrCancellation(t *testing.T) {
 	s := New(Config{}, h, fakeAuth{true}, testLogger())
 	a, b := client("slow"), client("healthy")
 	done := make(chan struct{})
-	go func() { s.connected(a); close(done) }()
+	go func() { s.connected(a, ""); close(done) }()
 	<-h.entered
 	healthy := make(chan struct{})
 	go func() {
-		s.connected(b)
+		s.connected(b, "")
 		if !s.isCurrent(b) {
 			t.Error("healthy client missing")
 		}

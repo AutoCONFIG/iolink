@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -101,7 +102,8 @@ func (f *fakeStore) RegisterDevice(_ context.Context, pondID int64, _ string, mo
 	}
 	no := "dev-abc12345"
 	secret := strings.Repeat("ab", 32) // 64 hex chars, like the real generator
-	f.devices[no] = domain.Device{ID: 1, PondID: pondID, DeviceNo: no, Model: model, Status: domain.DeviceOffline}
+	username := "iolink-" + no + "-abc123"
+	f.devices[no] = domain.Device{ID: 1, PondID: pondID, DeviceNo: no, MqttUsername: username, Model: model, Status: domain.DeviceOffline}
 	return f.devices[no], secret, nil
 }
 
@@ -723,8 +725,10 @@ func TestRegisterDeviceSecretOnce(t *testing.T) {
 	}
 	defer resp.Body.Close()
 	var out struct {
-		DeviceNo string `json:"device_no"`
-		Secret   string `json:"secret"`
+		DeviceNo     string `json:"device_no"`
+		MqttUsername string `json:"mqtt_username"`
+		ClientID     string `json:"client_id"`
+		Secret       string `json:"secret"`
 	}
 	_ = json.NewDecoder(resp.Body).Decode(&out)
 	if out.DeviceNo == "" || out.Secret == "" {
@@ -732,6 +736,14 @@ func TestRegisterDeviceSecretOnce(t *testing.T) {
 	}
 	if len(out.Secret) != 64 {
 		t.Fatalf("secret too weak: %q", out.Secret)
+	}
+	// ThingsPanel-style issued credentials: the username encodes the device
+	// number with a 6-hex suffix, and the suggested client id is advisory.
+	if !strings.HasPrefix(out.MqttUsername, "iolink-"+out.DeviceNo+"-") || len(out.MqttUsername) != len("iolink-"+out.DeviceNo)+7 {
+		t.Fatalf("issued username malformed: %q (device %q)", out.MqttUsername, out.DeviceNo)
+	}
+	if matched, _ := regexp.MatchString(`^mqtt_\d{8}-\d{3}$`, out.ClientID); !matched {
+		t.Fatalf("suggested client id malformed: %q", out.ClientID)
 	}
 }
 

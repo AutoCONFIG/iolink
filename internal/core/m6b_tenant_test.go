@@ -167,7 +167,7 @@ func TestM6bTenantMembershipVersionAndRevocation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !svc.Authenticate(device.DeviceNo, secret) {
+	if _, ok := svc.Resolve(device.MqttUsername, secret); !ok {
 		t.Fatal("active tenant device authentication rejected")
 	}
 	supportDevices, err := svc.ListDevices(supportCtx, false, 0, 50, 0)
@@ -177,7 +177,7 @@ func TestM6bTenantMembershipVersionAndRevocation(t *testing.T) {
 	if _, err := p.Exec(ctx, `UPDATE tenants SET active=false WHERE id=601; UPDATE tenant_memberships SET permission_version=permission_version+1 WHERE tenant_id=601`); err != nil {
 		t.Fatal(err)
 	}
-	if svc.Authenticate(device.DeviceNo, secret) {
+	if _, ok := svc.Resolve(device.MqttUsername, secret); ok {
 		t.Fatal("inactive tenant device authenticated")
 	}
 	err = svc.HandleEvent(event.Event{Kind: event.KindProperties, DeviceNo: device.DeviceNo, Ts: time.Now().UTC(), MessageID: "inactive", Properties: map[string]float64{"temperature": 24}})

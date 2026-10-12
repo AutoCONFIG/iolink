@@ -674,14 +674,36 @@ func (s *Service) RegisterDevice(ctx context.Context, pondID int64, name, model 
 	if no == "" {
 		return domain.Device{}, "", errors.New("could not allocate device_no")
 	}
+	// ThingsPanel-style issued username: opaque but self-describing, stored
+	// plaintext so the console can always show it again. Suffix is 6 hex
+	// chars (3 bytes), matching the documented iolink-<device_no>-<6hex>.
+	var username string
+	for attempt := 0; attempt < 5; attempt++ {
+		cand := make([]byte, 3)
+		if _, err := rand.Read(cand); err != nil {
+			return domain.Device{}, "", err
+		}
+		username = "iolink-" + no + "-" + hex.EncodeToString(cand)
+		var exists int
+		if err := tx.QueryRow(ctx, `SELECT count(*) FROM devices WHERE mqtt_username=$1`, username).Scan(&exists); err != nil {
+			return domain.Device{}, "", err
+		}
+		if exists == 0 {
+			break
+		}
+		username = ""
+	}
+	if username == "" {
+		return domain.Device{}, "", errors.New("could not allocate mqtt_username")
+	}
 
 	var d domain.Device
 	err = tx.QueryRow(ctx,
-		`INSERT INTO devices (pond_id, device_no, secret_hash, name, model, report_interval)
-			 VALUES ($1,$2,$3,$4,$5,$6)
-			 RETURNING id, pond_id, device_no, coalesce(name,''), coalesce(model,''), status, last_seen_at, created_at, disabled_at, coalesce(report_interval,$6)`,
-		pondID, no, hash, name, model, reportInterval).
-		Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
+		`INSERT INTO devices (pond_id, device_no, mqtt_username, secret_hash, name, model, report_interval)
+			 VALUES ($1,$2,$3,$4,$5,$6,$7)
+			 RETURNING id, pond_id, device_no, mqtt_username, coalesce(name,''), coalesce(model,''), status, last_seen_at, created_at, disabled_at, coalesce(report_interval,$7)`,
+		pondID, no, username, hash, name, model, reportInterval).
+		Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.MqttUsername, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
 	if err != nil {
 		return domain.Device{}, "", err
 	}
@@ -819,7 +841,7 @@ func (s *Service) ListDevicesPage(ctx context.Context, query domain.DeviceListQu
 	defaultIntervalIndex := len(args) + 1
 	limitIndex, offsetIndex := defaultIntervalIndex+1, defaultIntervalIndex+2
 	args = append(args, int(s.defaultInterval.Seconds()), query.Limit, query.Offset)
-	q := fmt.Sprintf(`SELECT d.id,d.pond_id,d.device_no,coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,$%d),count(*) OVER() FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id %s ORDER BY d.id LIMIT $%d OFFSET $%d`, defaultIntervalIndex, where, limitIndex, offsetIndex)
+	q := fmt.Sprintf(`SELECT d.id,d.pond_id,d.device_no,coalesce(d.mqtt_username,''),coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,$%d),count(*) OVER() FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id %s ORDER BY d.id LIMIT $%d OFFSET $%d`, defaultIntervalIndex, where, limitIndex, offsetIndex)
 	rows, err := s.pool.Query(ctx, q, args...)
 	if err != nil {
 		return domain.DevicePage{}, err
@@ -829,7 +851,7 @@ func (s *Service) ListDevicesPage(ctx context.Context, query domain.DeviceListQu
 	for rows.Next() {
 		var d domain.Device
 		var total int
-		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval, &total); err != nil {
+		if err := rows.Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.MqttUsername, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval, &total); err != nil {
 			return domain.DevicePage{}, err
 		}
 		result.Items = append(result.Items, d)
@@ -849,12 +871,12 @@ func (s *Service) ListDevicesPage(ctx context.Context, query domain.DeviceListQu
 
 func (s *Service) GetDevice(ctx context.Context, deviceNo string) (domain.Device, error) {
 	var d domain.Device
-	q := `SELECT d.id,d.pond_id,d.device_no,coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,$2) FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
+	q := `SELECT d.id,d.pond_id,d.device_no,coalesce(d.mqtt_username,''),coalesce(d.name,''),coalesce(d.model,''),d.status,d.last_seen_at,d.created_at,d.disabled_at,coalesce(d.report_interval,$2) FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id WHERE d.device_no=$1`
 	args := []any{deviceNo, int(s.defaultInterval.Seconds())}
 	clause, scopedArgs := tenantFilter(ctx, "f", len(args)+1)
 	q += clause
 	args = append(args, scopedArgs...)
-	err := s.pool.QueryRow(ctx, q, args...).Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
+	err := s.pool.QueryRow(ctx, q, args...).Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.MqttUsername, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
 	return d, err
 }
 

@@ -28,7 +28,7 @@ func setup(t *testing.T) (*core.Service, *pgxpool.Pool) {
 		t.Fatal(err)
 	}
 	execute(t, p, `INSERT INTO users(id,open_id) VALUES(1,'test-user'); INSERT INTO tenants(name) VALUES ('test-tenant'); INSERT INTO tenant_memberships(tenant_id,user_id,role) SELECT id,1,'owner' FROM tenants WHERE name='test-tenant'; INSERT INTO farms(id,owner_id,tenant_id,name) SELECT 1,1,id,'farm' FROM tenants WHERE name='test-tenant'; INSERT INTO ponds(id,farm_id,name) VALUES(1,1,'A'),(2,1,'B')`)
-	execute(t, p, `INSERT INTO devices(pond_id,device_no,secret_hash) VALUES(1,'one',$1)`, core.HashDeviceSecret("test-secret"))
+	execute(t, p, `INSERT INTO devices(pond_id,device_no,mqtt_username,secret_hash) VALUES(1,'one','iolink-one-seed01',$1)`, core.HashDeviceSecret("test-secret"))
 	s, err := core.New(ctx, p, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	if err != nil {
 		t.Fatal(err)
@@ -274,8 +274,14 @@ func TestHistoryBoundedAndInvalidRules(t *testing.T) {
 func TestAuthenticationStatusAndRestart(t *testing.T) {
 	s, p := setup(t)
 	ctx := context.Background()
-	if !s.Authenticate("one", "test-secret") || s.Authenticate("one", "bad") {
-		t.Fatal("device credential check")
+	if _, ok := s.Resolve("iolink-one-seed01", "test-secret"); !ok {
+		t.Fatal("issued credentials rejected")
+	}
+	if _, ok := s.Resolve("iolink-one-seed01", "bad"); ok {
+		t.Fatal("bad password accepted")
+	}
+	if _, ok := s.Resolve("unknown-user", "test-secret"); ok {
+		t.Fatal("unknown username accepted")
 	}
 	e := event.Event{Kind: event.KindStatusChange, DeviceNo: "one", Ts: time.Now(), Online: true}
 	for range 2 {
@@ -306,7 +312,7 @@ func TestAuthenticationStatusAndRestart(t *testing.T) {
 		t.Fatal("restart stale online")
 	}
 	execute(t, p, "UPDATE devices SET disabled_at=now()")
-	if s.Authenticate("one", "test-secret") {
+	if _, ok := s.Resolve("iolink-one-seed01", "test-secret"); ok {
 		t.Fatal("disabled device accepted")
 	}
 }
@@ -321,8 +327,8 @@ func TestDeviceSecretIsRandomAndReturnedOnlyOnCreation(t *testing.T) {
 	s, p := setup(t)
 	ctx := context.Background()
 	one, secret, err := s.RegisterDevice(ctx, 1, "audit", "audit", 0)
-	if err != nil || len(secret) != 64 {
-		t.Fatal("registration secret", err)
+	if err != nil || len(secret) != 64 || one.MqttUsername == "" {
+		t.Fatal("registration credentials", err)
 	}
 	_, other, err := s.RegisterDevice(ctx, 1, "audit", "audit", 0)
 	if err != nil || other == secret {
@@ -341,7 +347,7 @@ func TestDeviceSecretIsRandomAndReturnedOnlyOnCreation(t *testing.T) {
 		t.Fatal("secret leaked from list")
 	}
 	execute(t, p, "UPDATE devices SET secret_hash='corrupt' WHERE device_no=$1", one.DeviceNo)
-	if s.Authenticate(one.DeviceNo, secret) {
+	if _, ok := s.Resolve(one.MqttUsername, secret); ok {
 		t.Fatal("corrupt hash accepted")
 	}
 }

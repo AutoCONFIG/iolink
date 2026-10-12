@@ -4,7 +4,7 @@
 //
 // Usage:
 //
-//	go run ./cmd/mqtt-sim -device dev-001 -secret s3cret -interval 5s
+//	go run ./cmd/mqtt-sim -device dev-001 -username iolink-dev-abc12345-abcdef -secret s3cret -interval 5s
 package main
 
 import (
@@ -20,18 +20,19 @@ import (
 
 func main() {
 	addr := flag.String("addr", "localhost:1883", "mqtt broker addr")
-	device := flag.String("device", "dev-001", "device_no (MQTT username)")
+	device := flag.String("device", "dev-001", "device_no (topic identity)")
+	username := flag.String("username", "", "issued MQTT username (iolink-<device_no>-xxxxxx)")
 	secret := flag.String("secret", "", "device secret (MQTT password)")
 	interval := flag.Duration("interval", 5*time.Second, "report interval")
 	flag.Parse()
-	if *secret == "" {
-		log.Fatal("-secret required (device triple auth)")
+	if *secret == "" || *username == "" {
+		log.Fatal("-username and -secret required (issued credential pair)")
 	}
 
 	opts := mqtt.NewClientOptions().
 		AddBroker(fmt.Sprintf("tcp://%s", *addr)).
 		SetClientID(*device).
-		SetUsername(*device).
+		SetUsername(*username).
 		SetPassword(*secret).
 		SetCleanSession(true)
 	client := mqtt.NewClient(opts)

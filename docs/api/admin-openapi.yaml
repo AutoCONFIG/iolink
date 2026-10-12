@@ -667,7 +667,7 @@ paths:
     post:
       tags:
       - devices
-      summary: 注册设备并返回一次性 secret
+      summary: 注册设备并返回接入凭据（签发型 username + 一次性 secret）
       description: 强制绑定已存在 pond_id；无裸设备/裸解绑状态。device_no 服务端生成且永久唯一。secret 只在本次响应显示，服务端仅存摘要。POST 非幂等，响应丢失不得自动重试；管理员核实后停用旧记录并重新注册。M6c 新增实例授权及配额守卫：无有效授权 403 license_required，设备额度不足 403 device_quota_exceeded，时钟回拨 409 license_clock_error，验签能力缺失 503 license_unavailable；拒绝不产生设备/凭据/审计/outbox 的部分业务写入。
       responses:
         '200':
@@ -678,6 +678,8 @@ paths:
                 type: object
                 required:
                 - device_no
+                - mqtt_username
+                - client_id
                 - secret
                 - pond_id
                 - name
@@ -687,6 +689,12 @@ paths:
                 properties:
                   device_no:
                     type: string
+                  mqtt_username:
+                    type: string
+                    description: 注册时签发的MQTT用户名（iolink-<device_no>-<6hex>），数据库明文存储，控制台可随时查看。
+                  client_id:
+                    type: string
+                    description: 建议的MQTT Client ID（mqtt_<8数字>-<3数字>），仅建议值，任意唯一值均可。
                   secret:
                     type: string
                     minLength: 64
@@ -1467,6 +1475,7 @@ components:
       required:
       - id
       - device_no
+      - mqtt_username
       - pond_id
       - name
       - model
@@ -1479,6 +1488,9 @@ components:
         id: *id006
         device_no: &id008
           type: string
+        mqtt_username: &idMqttUsername
+          type: string
+          description: 注册时签发的MQTT用户名（iolink-<device_no>-<6hex>），控制台可随时查看。
         pond_id: *id006
         name: &id009
           type: string
@@ -1574,6 +1586,7 @@ components:
       required:
       - id
       - device_no
+      - mqtt_username
       - pond_id
       - name
       - model
@@ -1586,6 +1599,7 @@ components:
       properties:
         id: *id006
         device_no: *id008
+        mqtt_username: *idMqttUsername
         pond_id: *id006
         name: *id009
         model: *id010

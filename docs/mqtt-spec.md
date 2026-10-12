@@ -4,7 +4,7 @@
 
 ## M1 认证与Topic
 
-MQTT 3.1.1/5.0；局域测试1883，生产TLS8883。设备身份由username=device_no与password（注册时返回的secret，目标32字节随机、64hex）决定；ClientID是任意唯一的传输会话键（1–128字节UTF-8，不含通配符），不参与鉴权，允许每次连接换用新ClientID。无效凭据/停用拒绝；必须使用清理会话（3.1.1要求CleanSession=1；MQTT 5要求Clean Start=1且Session Expiry Interval=0），禁止凭任意ClientID恢复持久会话队列（否则同ClientID的其他设备可继承订阅与未确认下行消息）。同一device_no只允许一个活动会话：新合法连接按username替换并踢除旧连接（Session Taken Over），状态变化幂等，与ClientID无关。
+MQTT 3.1.1/5.0；局域测试1883，生产TLS8883。接入凭据为ThingsPanel式签发三元组：Username=注册时签发的接入用户名（`iolink-<device_no>-<6hex>`，数据库明文存储、控制台可随时查看），Password=注册时返回的secret（目标32字节随机、64hex，仅显示一次），ClientID是任意唯一的传输会话键（1–128字节UTF-8，不含通配符，注册弹窗给出建议值），不参与鉴权，允许每次连接换用新ClientID。broker按username反查设备（devices.mqtt_username），解析出的device_no是topic与ACL键。无效凭据/停用拒绝；必须使用清理会话（3.1.1要求CleanSession=1；MQTT 5要求Clean Start=1且Session Expiry Interval=0），禁止凭任意ClientID恢复持久会话队列（否则同ClientID的其他设备可继承订阅与未确认下行消息）。同一device_no只允许一个活动会话：新合法连接按username替换并踢除旧连接（Session Taken Over），状态变化幂等，与ClientID无关。
 
 | 方向 | Topic | 权限/用途 |
 |---|---|---|

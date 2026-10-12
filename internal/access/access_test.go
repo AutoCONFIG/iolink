@@ -30,7 +30,7 @@ func TestHandleGenericReportPreservesEnumAndNumberProperties(t *testing.T) {
 
 type fakeAuth struct{ ok bool }
 
-func (f fakeAuth) Authenticate(string, string) bool { return f.ok }
+func (f fakeAuth) Resolve(username, _ string) (string, bool) { return username, f.ok && username != "" }
 
 func f64(v float64) *float64 { return &v }
 

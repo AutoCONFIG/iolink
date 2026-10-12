@@ -59,7 +59,7 @@ func TestM2OwnershipLifecycleAndTokenRevocation(t *testing.T) {
 	if err != nil || len(secret) != 64 {
 		t.Fatal(err)
 	}
-	if s.Authenticate(dev.DeviceNo, secret) == false {
+	if _, ok := s.Resolve(dev.MqttUsername, secret); !ok {
 		t.Fatal("new device credential rejected")
 	}
 	if err := s.HandleEvent(event.Event{Kind: event.KindProperties, DeviceNo: dev.DeviceNo, Ts: time.Now().UTC(), MessageID: "m1", Properties: map[string]float64{"temperature": 26}}); err != nil {
@@ -233,7 +233,7 @@ func TestM2OwnershipLifecycleAndTokenRevocation(t *testing.T) {
 	if err := s.DeleteDevice(ctx, dev.DeviceNo); err != nil {
 		t.Fatal(err)
 	}
-	if s.Authenticate(dev.DeviceNo, secret) {
+	if _, ok := s.Resolve(dev.MqttUsername, secret); ok {
 		t.Fatal("disabled device authenticated")
 	}
 	if err := s.DeletePond(ctx, pond.ID); !errors.Is(err, domain.ErrPondHasDevices) {

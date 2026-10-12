@@ -82,7 +82,7 @@ func rawConnect(t *testing.T, addr string, version byte, will bool) (net.Conn, b
 		body = append(body, mqttString("iolink/down/other/cmd")...)
 		body = append(body, mqttString(`{"attack":true}`)...)
 	}
-	body = append(body, mqttString("one")...)
+	body = append(body, mqttString("iolink-one-seed01")...)
 	body = append(body, mqttString("test-secret")...)
 	if _, err = c.Write(mqttPacket(0x10, body)); err != nil {
 		t.Fatal(err)
@@ -124,7 +124,7 @@ func TestRealMQTTAuthenticationACLAndPersistence(t *testing.T) {
 		t.Fatal("rejected will emitted online")
 	}
 	connect := func(id, secret string, want bool) mqtt.Client {
-		opts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID(id).SetUsername("one").SetPassword(secret).SetAutoReconnect(false).SetConnectTimeout(2 * time.Second)
+		opts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID(id).SetUsername("iolink-one-seed01").SetPassword(secret).SetAutoReconnect(false).SetConnectTimeout(2 * time.Second)
 		c := mqtt.NewClient(opts)
 		tok := c.Connect()
 		if !tok.WaitTimeout(3 * time.Second) {
@@ -139,13 +139,20 @@ func TestRealMQTTAuthenticationACLAndPersistence(t *testing.T) {
 		return c
 	}
 	connect("one", "wrong", false)
+	// Unknown issued username is rejected at the broker even with a valid
+	// secret shape (ACCEPTANCE R05).
+	uopts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID("unknown-user-1").SetUsername("iolink-nobody-000000").SetPassword("test-secret").SetAutoReconnect(false).SetConnectTimeout(2 * time.Second)
+	unknown := mqtt.NewClient(uopts)
+	if tok := unknown.Connect(); !tok.WaitTimeout(3*time.Second) || tok.Error() == nil {
+		t.Fatal("unknown username accepted")
+	}
 	if count(t, pool, "SELECT count(*) FROM devices WHERE status='online'") != 0 {
 		t.Fatal("failed auth emitted online")
 	}
 	// Generic client IDs: any client ID may carry the device pair, and a new
 	// session for the same device_no retires the previous connection.
 	lost := make(chan struct{})
-	mopts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID("generic-1").SetUsername("one").SetPassword("test-secret").SetAutoReconnect(false).SetConnectTimeout(2 * time.Second)
+	mopts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID("generic-1").SetUsername("iolink-one-seed01").SetPassword("test-secret").SetAutoReconnect(false).SetConnectTimeout(2 * time.Second)
 	mopts.SetConnectionLostHandler(func(_ mqtt.Client, _ error) { close(lost) })
 	generic := mqtt.NewClient(mopts)
 	if tok := generic.Connect(); !tok.WaitTimeout(3*time.Second) || tok.Error() != nil {
@@ -267,7 +274,7 @@ func TestRealMQTTSecondProductPreservesNumericAndEnumFields(t *testing.T) {
 	}
 	t.Cleanup(func() { broker.Close() })
 	go broker.Run(t.Context())
-	opts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID("one").SetUsername("one").SetPassword("test-secret").SetAutoReconnect(false)
+	opts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID("one").SetUsername("iolink-one-seed01").SetPassword("test-secret").SetAutoReconnect(false)
 	client := mqtt.NewClient(opts)
 	tok := client.Connect()
 	if !tok.WaitTimeout(3*time.Second) || tok.Error() != nil {

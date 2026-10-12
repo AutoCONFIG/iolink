@@ -1,6 +1,6 @@
 // mqtt-once publishes a single one-shot payload — dev/acceptance helper.
 //
-//	go run ./cmd/mqtt-once -device dev-001 -secret dev-secret-001 -payload '{"dissolved_oxygen":3.6}'
+//	go run ./cmd/mqtt-once -device dev-001 -username iolink-dev-abc12345-abcdef -secret dev-secret-001 -payload '{"dissolved_oxygen":3.6}'
 package main
 
 import (
@@ -15,19 +15,20 @@ import (
 
 func main() {
 	addr := flag.String("addr", "localhost:1883", "mqtt broker addr")
-	device := flag.String("device", "dev-001", "device_no")
-	secret := flag.String("secret", "", "device secret")
+	device := flag.String("device", "dev-001", "device_no (topic identity)")
+	username := flag.String("username", "", "issued MQTT username (iolink-<device_no>-xxxxxx)")
+	secret := flag.String("secret", "", "device secret (MQTT password)")
 	kind := flag.String("kind", "properties", "uplink kind: properties|ack")
 	payload := flag.String("payload", "{}", "JSON payload")
 	flag.Parse()
-	if *secret == "" {
-		log.Fatal("-secret required")
+	if *secret == "" || *username == "" {
+		log.Fatal("-username and -secret required (issued credential pair)")
 	}
 	var pretty map[string]any
 	_ = json.Unmarshal([]byte(*payload), &pretty)
 
 	opts := mqtt.NewClientOptions().AddBroker("tcp://" + *addr).
-		SetClientID(*device).SetUsername(*device).SetPassword(*secret)
+		SetClientID(*device).SetUsername(*username).SetPassword(*secret)
 	client := mqtt.NewClient(opts)
 	if tok := client.Connect(); tok.Wait() && tok.Error() != nil {
 		log.Fatalf("connect: %v", tok.Error())

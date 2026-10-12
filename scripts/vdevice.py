@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """iolink 虚拟设备节点 — 标准 MQTT 3.1.1/5.0 客户端模拟真实硬件。
 
-接入参数与任何标准 MQTT 客户端一致（ThingsPanel/ MQTTX 等通用配置均可）：
-  Username   = 设备编号（注册时返回的 dev-xxxxxxxx）
-  Password   = 设备 Secret（注册时一次性显示，64 位 hex）
-  Client ID  = 任意唯一值（默认自动生成 vdev-xxxx）
+接入参数与任何标准 MQTT 客户端一致（ThingsPanel/MQTTX 等通用配置均可）：
+  Client ID  = 任意唯一值（注册弹窗会给出建议值；默认自动生成 vdev-xxxx）
+  Username   = 注册时签发的接入用户名（iolink-<设备号>-xxxxxx，弹窗可直接复制）
+  Password   = 注册时签发的 Secret（仅显示一次，64 位 hex）
   Clean Session = 必须开启；不设置遗嘱（Will）
   上报 topic: iolink/up/{device_no}/properties  (QoS1, retain=false)
   回执 topic: iolink/up/{device_no}/ack
-  命令 topic: iolink/down/{device_no}/cmd       (自动订阅)
+  命令 topic: iolink/down/{device_no}/cmd       (自动订阅，device_no 从
+               username 中解析，也可用 --device 显式指定)
 
 用法示例：
   python3 vdevice.py --host rsplab.hyhy.fun --port 1183 \
-      --device dev-xxxxxxxx --secret <64hex> --interval 60
+      --username iolink-dev-xxxxxxxx-abcdef --secret <64hex> --interval 60
 
 依赖：pip install paho-mqtt
 """
@@ -42,7 +43,7 @@ def log(msg):
 class VirtualDevice:
     def __init__(self, args):
         self.args = args
-        self.device = args.device
+        self.device = args.device or self._device_from_username(args.username)
         self.interval = args.interval
         self.interval_changed = threading.Event()
         self.stop = threading.Event()
@@ -50,18 +51,26 @@ class VirtualDevice:
         self.t0 = time.time()
         self.battery = round(random.uniform(88, 100), 1)
         self.connected = threading.Event()
-        if hasattr(mqtt, "CallbackAPIVersion"):  # paho 2.x
+        try:
             self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
                                       client_id=args.client_id, clean_session=True,
                                       protocol=mqtt.MQTTv5 if args.mqtt5 else mqtt.MQTTv311)
-        else:  # paho 1.x
+        except AttributeError:
             self.client = mqtt.Client(client_id=args.client_id, clean_session=True,
                                       protocol=mqtt.MQTTv5 if args.mqtt5 else mqtt.MQTTv311)
-        self.client.username_pw_set(self.device, args.secret)
+        self.client.username_pw_set(args.username, args.secret)
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
         self.client.on_message = self._on_command
         self.client.reconnect_delay_set(1, 30)
+
+    @staticmethod
+    def _device_from_username(username):
+        # 签发格式 iolink-<device_no>-<6hex>；解析失败则要求显式 --device
+        parts = username.rsplit("-", 1)
+        if username.startswith("iolink-dev-") and len(parts) == 2 and len(parts[1]) == 6:
+            return parts[0][len("iolink-"):]
+        raise SystemExit("无法从 username 解析设备编号，请用 --device dev-xxxxxxxx 显式指定")
 
     # ---- MQTT 回调（兼容 paho 1.x / 2.x 的参数个数差异）----
 
@@ -180,8 +189,9 @@ def main():
     p = argparse.ArgumentParser(description="iolink 标准 MQTT 虚拟设备节点")
     p.add_argument("--host", required=True, help="broker 地址，例如 rsplab.hyhy.fun")
     p.add_argument("--port", type=int, default=1883, help="broker 端口（测试环境 1183）")
-    p.add_argument("--device", required=True, help="设备编号 dev-xxxxxxxx（即 MQTT Username）")
-    p.add_argument("--secret", required=True, help="设备 Secret（即 MQTT Password，64 位 hex）")
+    p.add_argument("--username", required=True, help="注册时签发的 MQTT 用户名（iolink-<设备号>-xxxxxx）")
+    p.add_argument("--secret", required=True, help="注册时签发的 Secret（MQTT Password，64 位 hex）")
+    p.add_argument("--device", default=None, help="设备编号 dev-xxxxxxxx（默认从 username 解析）")
     p.add_argument("--client-id", default=f"vdev-{uuid.uuid4().hex[:8]}",
                    help="MQTT Client ID，任意唯一值（默认自动生成）")
     p.add_argument("--interval", type=int, default=60, choices=VALID_INTERVALS,

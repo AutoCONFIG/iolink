@@ -6,7 +6,6 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/wire"
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/packets"
-	"strings"
 	"unicode/utf8"
 )
 
@@ -28,10 +27,11 @@ func (h *brokerHook) OnConnectAuthenticate(cl *mqtt.Client, pk packets.Packet) b
 	if cl == nil || pk.Connect.WillFlag {
 		return false
 	}
-	// Identity comes solely from the username pair; the client ID is an
-	// arbitrary transport session key (docs/mqtt-spec.md).
-	no := string(cl.Properties.Username)
-	if no == "" || strings.ContainsAny(no, "/+#") || !ValidClientID(cl.ID) {
+	// ThingsPanel-style issued credentials: the username is a platform token
+	// resolved to the owning device_no; the client ID is an arbitrary
+	// transport session key (docs/mqtt-spec.md).
+	username := string(cl.Properties.Username)
+	if username == "" || !ValidClientID(cl.ID) {
 		return false
 	}
 	// Clean sessions only: a persistent session keyed by an arbitrary client
@@ -45,19 +45,26 @@ func (h *brokerHook) OnConnectAuthenticate(cl *mqtt.Client, pk packets.Packet) b
 	if pk.ProtocolVersion >= 5 && pk.Properties.SessionExpiryIntervalFlag && pk.Properties.SessionExpiryInterval > 0 {
 		return false
 	}
-	if !h.srv.auth.Authenticate(no, string(pk.Connect.Password)) {
+	deviceNo, ok := h.srv.auth.Resolve(username, string(pk.Connect.Password))
+	if !ok {
 		return false
 	}
-	if p, ok := h.srv.auth.(interface{ DeviceRevision(string) int64 }); ok && p.DeviceRevision(no) < 0 {
+	if p, ok := h.srv.auth.(interface{ DeviceRevision(string) int64 }); ok && p.DeviceRevision(deviceNo) < 0 {
 		return false
 	}
 	return true
 }
 func (h *brokerHook) OnACLCheck(cl *mqtt.Client, topic string, write bool) bool {
-	return cl != nil && h.srv.isCurrent(cl) && CheckACL(string(cl.Properties.Username), topic, write)
+	if cl == nil || !h.srv.isCurrent(cl) {
+		return false
+	}
+	no, ok := h.srv.deviceFor(cl)
+	return ok && CheckACL(no, topic, write)
 }
-func (h *brokerHook) OnSessionEstablished(cl *mqtt.Client, _ packets.Packet) { h.srv.connected(cl) }
-func (h *brokerHook) OnDisconnect(cl *mqtt.Client, _ error, _ bool)          { h.srv.disconnected(cl) }
+func (h *brokerHook) OnSessionEstablished(cl *mqtt.Client, pk packets.Packet) {
+	h.srv.connected(cl, string(pk.Connect.Password))
+}
+func (h *brokerHook) OnDisconnect(cl *mqtt.Client, _ error, _ bool) { h.srv.disconnected(cl) }
 func (h *brokerHook) OnPublish(cl *mqtt.Client, pk packets.Packet) (packets.Packet, error) {
 	reject := func(reason string) (packets.Packet, error) {
 		MetricRejected.WithLabelValues(reason).Inc()
@@ -66,8 +73,12 @@ func (h *brokerHook) OnPublish(cl *mqtt.Client, pk packets.Packet) (packets.Pack
 	if cl == nil || !h.srv.isCurrent(cl) {
 		return reject("session")
 	}
-	no, kind, err := ParseUplinkTopic(pk.TopicName)
-	if err != nil || no != string(cl.Properties.Username) {
+	no, ok := h.srv.deviceFor(cl)
+	if !ok {
+		return reject("session")
+	}
+	noInTopic, kind, err := ParseUplinkTopic(pk.TopicName)
+	if err != nil || noInTopic != no {
 		return reject("topic")
 	}
 	if len(pk.Payload) > 65536 || pk.FixedHeader.Retain || pk.FixedHeader.Qos != 1 {

@@ -7,17 +7,18 @@ import (
 	"unicode/utf8"
 )
 
-// Authenticator verifies the device pair on MQTT connect (username=device_no,
-// password=secret). core provides the production impl (devices.secret_hash);
-// tests use fakes.
+// Authenticator verifies the issued username/password pair on MQTT connect
+// and resolves it to the owning device_no. core provides the production
+// impl (devices.mqtt_username + devices.secret_hash); tests use fakes.
 type Authenticator interface {
-	Authenticate(deviceNo, secret string) bool
+	Resolve(username, password string) (deviceNo string, ok bool)
 }
 
-// NoopAuth accepts everything — DEV ONLY, logs loudly via Server logger.
+// NoopAuth passes every username through as its own device — DEV ONLY,
+// logs loudly via Server logger.
 type NoopAuth struct{}
 
-func (NoopAuth) Authenticate(string, string) bool { return true }
+func (NoopAuth) Resolve(username, _ string) (string, bool) { return username, username != "" }
 
 // ValidClientID reports whether a client-supplied MQTT client ID is
 // acceptable. Client IDs carry no identity — the username pair does — so the

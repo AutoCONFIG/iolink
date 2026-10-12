@@ -44,8 +44,9 @@ CREATE TABLE ponds (
 CREATE TABLE devices (
     id          BIGSERIAL PRIMARY KEY,
     pond_id     BIGINT       NOT NULL REFERENCES ponds(id),
-    device_no   VARCHAR(64)  NOT NULL UNIQUE,          -- 硬件身份,MQTT username
+    device_no   VARCHAR(64)  NOT NULL UNIQUE,          -- 硬件身份,topic 与 ACL 键
     secret_hash VARCHAR(128) NOT NULL,                -- 设备密钥哈希(access 鉴权用)
+    mqtt_username VARCHAR(128) UNIQUE,                -- 注册时签发的 MQTT 用户名(ThingsPanel 式,可回看)
     model       VARCHAR(64),
     status      VARCHAR(16)  NOT NULL DEFAULT 'offline',  -- online | offline
     last_seen_at TIMESTAMPTZ,

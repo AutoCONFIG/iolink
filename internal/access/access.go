@@ -79,6 +79,7 @@ type Server struct {
 	broker   *mqtt.Server
 	mu       sync.Mutex
 	sessions map[string]*session
+	deviceOf map[*mqtt.Client]string // resolved device_no per live MQTT client
 	now      func() time.Time
 	workers  sync.WaitGroup
 	slots    chan struct{}
@@ -94,7 +95,7 @@ func New(cfg Config, handler event.Handler, auth Authenticator, log *slog.Logger
 	if auth == nil {
 		auth = denyAuth{}
 	}
-	s := &Server{cfg: cfg, handler: handler, auth: auth, log: log, sessions: map[string]*session{}, now: time.Now, slots: make(chan struct{}, 16)}
+	s := &Server{cfg: cfg, handler: handler, auth: auth, log: log, sessions: map[string]*session{}, deviceOf: map[*mqtt.Client]string{}, now: time.Now, slots: make(chan struct{}, 16)}
 	caps := mqtt.NewDefaultServerCapabilities()
 	// Bound allocations before decoding, allowing MQTT headers beyond 64KiB payload.
 	caps.MaximumPacketSize = 65536 + 1024
@@ -104,7 +105,21 @@ func New(cfg Config, handler event.Handler, auth Authenticator, log *slog.Logger
 
 type denyAuth struct{}
 
-func (denyAuth) Authenticate(string, string) bool { return false }
+func (denyAuth) Resolve(string, string) (string, bool) { return "", false }
+
+// deviceFor returns the resolved device_no of a live client session.
+func (s *Server) deviceFor(cl *mqtt.Client) (string, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	no, ok := s.deviceOf[cl]
+	return no, ok
+}
+
+func (s *Server) setDeviceFor(cl *mqtt.Client, no string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.deviceOf[cl] = no
+}
 func (s *Server) Serve() error {
 	if err := s.broker.AddHook(newBrokerHook(s), nil); err != nil {
 		return err
@@ -202,8 +217,17 @@ func (s *Server) lookup(no string, create bool) *session {
 	}
 	return ss
 }
-func (s *Server) connected(cl *mqtt.Client) {
-	no := string(cl.Properties.Username)
+func (s *Server) connected(cl *mqtt.Client, password string) {
+	// Re-resolve at session establishment: the deviceOf mapping below drives
+	// every ACL decision for this connection, so it must not trust
+	// CONNACK-time state alone (the device may have been disabled in between).
+	no, ok := s.auth.Resolve(string(cl.Properties.Username), password)
+	if !ok {
+		// The broker already CONNACKed this client; without a mapping every
+		// ACL check would fail forever, so retire the zombie now.
+		go s.retireClient(cl)
+		return
+	}
 	interval := s.cfg.ReportInterval
 	if p, ok := s.auth.(interface{ ReportInterval(string) time.Duration }); ok {
 		if d := p.ReportInterval(no); d > 0 {
@@ -224,6 +248,7 @@ func (s *Server) connected(cl *mqtt.Client) {
 		ss.revision = revision
 	}
 	old := ss.client
+	s.setDeviceFor(cl, no)
 	ss.client = cl
 	ss.interval = interval
 	ss.lastSeen = s.now()
@@ -255,7 +280,13 @@ func (s *Server) retireClient(old *mqtt.Client) {
 	}
 }
 func (s *Server) disconnected(cl *mqtt.Client) {
-	no := string(cl.Properties.Username)
+	no, ok := s.deviceFor(cl)
+	s.mu.Lock()
+	delete(s.deviceOf, cl)
+	s.mu.Unlock()
+	if !ok {
+		return
+	}
 	ss := s.lookup(no, false)
 	if ss == nil {
 		return
@@ -271,7 +302,11 @@ func (s *Server) disconnected(cl *mqtt.Client) {
 	}
 }
 func (s *Server) isCurrent(cl *mqtt.Client) bool {
-	ss := s.lookup(string(cl.Properties.Username), false)
+	no, ok := s.deviceFor(cl)
+	if !ok {
+		return false
+	}
+	ss := s.lookup(no, false)
 	if ss == nil {
 		return false
 	}
@@ -281,7 +316,7 @@ func (s *Server) isCurrent(cl *mqtt.Client) bool {
 		return false
 	}
 	if p, ok := s.auth.(interface{ DeviceRevision(string) int64 }); ok {
-		revision := p.DeviceRevision(string(cl.Properties.Username))
+		revision := p.DeviceRevision(no)
 		if revision < 0 || revision != ss.revision {
 			return false
 		}

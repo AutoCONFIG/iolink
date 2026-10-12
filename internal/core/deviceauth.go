@@ -8,23 +8,32 @@ import (
 	"time"
 )
 
-// Device-triple authentication for the access module.
+// Device-pair authentication for the access module.
 //
 // Satisfies access.Authenticator via Go structural typing: core never
 // imports the access module — cmd/iolinkd passes the Service in.
 
-// Authenticate verifies a device triple against devices.secret_hash
-// (sha256 hex of the device secret). Satisfies access.Authenticator.
-func (s *Service) Authenticate(deviceNo, secret string) bool {
-	sum := sha256.Sum256([]byte(secret))
+// Resolve authenticates a ThingsPanel-style issued username/password pair
+// and returns the device_no the username was issued for. The username is
+// stored plaintext in devices.mqtt_username; only the sha256 of the secret
+// is persisted. Satisfies access.Authenticator.
+func (s *Service) Resolve(username, password string) (string, bool) {
+	if username == "" {
+		return "", false
+	}
+	sum := sha256.Sum256([]byte(password))
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	var encoded string
-	if err := s.pool.QueryRow(ctx, `SELECT d.secret_hash FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id JOIN tenants t ON t.id=f.tenant_id WHERE d.device_no=$1 AND d.disabled_at IS NULL AND t.active`, deviceNo).Scan(&encoded); err != nil {
-		return false
+	var deviceNo, encoded string
+	err := s.pool.QueryRow(ctx, `SELECT d.device_no, d.secret_hash FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id JOIN tenants t ON t.id=f.tenant_id WHERE d.mqtt_username=$1 AND d.disabled_at IS NULL AND t.active`, username).Scan(&deviceNo, &encoded)
+	if err != nil {
+		return "", false
 	}
 	stored, err := hex.DecodeString(encoded)
-	return err == nil && len(stored) == len(sum) && subtle.ConstantTimeCompare(stored, sum[:]) == 1
+	if err != nil || len(stored) != len(sum) || subtle.ConstantTimeCompare(stored, sum[:]) != 1 {
+		return "", false
+	}
+	return deviceNo, true
 }
 
 // HashDeviceSecret is the canonical way to compute secret_hash when

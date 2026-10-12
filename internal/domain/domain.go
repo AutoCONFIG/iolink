@@ -91,6 +91,7 @@ type Device struct {
 	ID             int64        `json:"id"`
 	PondID         int64        `json:"pond_id"`
 	DeviceNo       string       `json:"device_no"`
+	MqttUsername   string       `json:"mqtt_username"`
 	Model          string       `json:"model"`
 	Name           string       `json:"name"`
 	Status         DeviceStatus `json:"status"`
