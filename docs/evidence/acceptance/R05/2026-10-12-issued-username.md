@@ -41,6 +41,14 @@
 - 收尾修复：cmd/mqtt-sim、cmd/mqtt-once 帮助文本示例改为真实签发形状（iolink-dev-abc12345-abcdef）；新增 TestResolveFailureAtEstablishmentFailsClosed（僵尸连接分支 fail-closed 单测，-race 通过）。
 - 记录为后续项：016 存量库回填分支的仓库内 DSN 用例（本轮由两位审阅者真实 PG 探针独立验证通过，行为正确）。
 
-## 部署与端到端验证
+## 部署与端到端验证（rsplab.hyhy.fun，2026-10-12，最终态）
 
-提交并打 tag v0.0.30 推 GitHub 触发 CI 后，部署 rsplab.hyhy.fun，用 `scripts/vdevice.py` 以新签发流程（API 注册 → username+secret → 任意 ClientID）从外部验证。状态：pending（部署后回填）。
+- tag v0.0.30 推 GitHub（AutoCONFIG/iolink），GitHub Actions CI 产出 `ghcr.io/autoconfig/iolink:v0.0.30` 与 `latest`；测试环境 `docker compose pull && up -d` 完成部署，`/readyz` ok。迁移 016 在存量库自动应用：现有设备 dev-752a4ede 回填签发用户名 `iolink-dev-752a4ede-c95ac9`（6hex 形状正确）。
+- 从本机走外部路径（rsplab.hyhy.fun:1183，MQTT 3.1.1，paho）验证：
+  1. 临时设备 dev-vnode04 签发 username `iolink-dev-vnode04-e2e01`（产品 water-quality）；
+  2. 旧形式 username=device_no + secret → **CONNECT 被拒**（严格签发型生效）；
+  3. 签发型 username + 任意 ClientID → **连接成功**；
+  4. QoS1 发布 `iolink/up/dev-vnode04/properties` → PUBACK 确认；
+  5. sensor_data 入库 1 行、设备状态 online；
+  6. 临时设备已删除，无残留。
+- 状态：deployed & verified。用户侧切换指引：MQTTX Username 改为设备详情页"MQTT 接入"区块显示的签发用户名（dev-752a4ede 为 `iolink-dev-752a4ede-c95ac9`），Password 不变。
