@@ -47,4 +47,4 @@
   5. 第二连接（另一任意 ClientID `mqtt_r05e2e-second`）建立后，旧连接立即收到断开（Session Taken Over 替换）；
   6. 断开后状态转 offline；
   7. 临时设备行已删除，无残留。
-- 状态：deployed & verified（注意：当前线上容器为本地构建的 r05-test 快照镜像；git 恢复推送、CI 产出 v0.0.29 镜像后需 `docker compose pull && up -d` 切回正式镜像并删除 override 与 /root/iolink-src-r05）。
+- 状态：deployed & verified（最终态）。origin git.hyhy.fun 当日宕机（Cloudflare 521/522，external_blocked），tag 已通过同步的 GitHub 远端（AutoCONFIG/iolink）推送，GitHub Actions CI 产出 `ghcr.io/autoconfig/iolink:v0.0.29` 与 `latest`；测试环境已 `docker compose pull && up -d` 切回正式镜像并二轮冒烟复验（同上 7 步全部通过），watchtower 屏蔽已移除、本地构建镜像与 /root/iolink-src-r05 源码目录已删除。origin 的补推在后台持续重试。
