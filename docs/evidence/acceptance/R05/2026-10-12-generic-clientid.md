@@ -36,6 +36,15 @@
 - `make verify`（无 DSN）→ 通过（34 ok，无 FAIL）。
 - `cd web && npm run build` → 构建成功。
 
-## 部署与端到端验证
+## 部署与端到端验证（rsplab.hyhy.fun，2026-10-12）
 
-见同日测试环境记录：本文件提交后部署 rsplab.hyhy.fun 并以真实 MQTT 客户端验证任意 ClientID 连接、错误密码拒绝、上报转在线、旧连接踢除。状态：pending（部署后回填）。
+- git.hyhy.fun 当日宕机（Cloudflare 522/521），tag v0.0.29 暂无法推送、CI 镜像暂不可用（external_blocked，恢复后补推并切回 ghcr 正式镜像）。作为替代，本地以 `git archive` 导出提交 713306a 干净快照（不含工作树其他在途修改）+ web 子模块 a84e8f7，`docker build` 出 `ghcr.io/autoconfig/iolink:r05-test` 并 `docker load` 到测试服务器部署（compose override 屏蔽 watchtower，验证期临时措施）。
+- 部署后 `/readyz` ok，随后以真实 MQTT 客户端（paho，MQTT 3.1.1，QoS1，clean session）在服务器本机 127.0.0.1:1183 验证：
+  1. 临时设备 dev-r05e2e01（数据库直建，sha256(secret_hash)，用后即删）；
+  2. 任意 ClientID `mqtt_r05e2e-727` + username=device_no + password=secret → CONNACK rc=0；
+  3. devices.status 落库为 online；
+  4. 错误密码 → CONNACK rc=5 拒绝；
+  5. 第二连接（另一任意 ClientID `mqtt_r05e2e-second`）建立后，旧连接立即收到断开（Session Taken Over 替换）；
+  6. 断开后状态转 offline；
+  7. 临时设备行已删除，无残留。
+- 状态：deployed & verified（注意：当前线上容器为本地构建的 r05-test 快照镜像；git 恢复推送、CI 产出 v0.0.29 镜像后需 `docker compose pull && up -d` 切回正式镜像并删除 override 与 /root/iolink-src-r05）。
