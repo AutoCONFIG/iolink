@@ -28,8 +28,24 @@ func (h *brokerHook) OnConnectAuthenticate(cl *mqtt.Client, pk packets.Packet) b
 	if cl == nil || pk.Connect.WillFlag {
 		return false
 	}
+	// Identity comes solely from the username pair; the client ID is an
+	// arbitrary transport session key (docs/mqtt-spec.md).
 	no := string(cl.Properties.Username)
-	if no == "" || cl.ID != no || strings.ContainsAny(no, "/+#") || !h.srv.auth.Authenticate(no, string(pk.Connect.Password)) {
+	if no == "" || strings.ContainsAny(no, "/+#") || !ValidClientID(cl.ID) {
+		return false
+	}
+	// Clean sessions only: a persistent session keyed by an arbitrary client
+	// ID would let one device resume another device's subscriptions and
+	// queued downlink messages. This covers v3 CleanSession and v5 both
+	// Clean Start and Session Expiry Interval (inheritClientSession hands
+	// over subscriptions and inflight QoS1 messages on CleanStart=0).
+	if !pk.Connect.Clean {
+		return false
+	}
+	if pk.ProtocolVersion >= 5 && pk.Properties.SessionExpiryIntervalFlag && pk.Properties.SessionExpiryInterval > 0 {
+		return false
+	}
+	if !h.srv.auth.Authenticate(no, string(pk.Connect.Password)) {
 		return false
 	}
 	if p, ok := h.srv.auth.(interface{ DeviceRevision(string) int64 }); ok && p.DeviceRevision(no) < 0 {

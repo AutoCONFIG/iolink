@@ -36,7 +36,7 @@
 
 ## 3. 接入和状态
 
-设备鉴权采用 device_no/secret；ClientID 必须等于 device_no，不允许一套凭据多个在线会话。secret 由 CSPRNG 生成 32 字节、64 字符 hex，仅注册/显式轮换返回一次；数据库存摘要，连接比对恒时。当前三元组实现有差异，按 R05 复核。
+设备鉴权采用 device_no/secret；身份完全由 username(device_no)+password 决定，ClientID 是任意唯一的传输会话键、不参与鉴权；不允许一套凭据多个在线会话，新合法连接按 device_no 替换并踢除旧连接。连接必须使用清理会话（3.1.1 CleanSession=1；MQTT 5 Clean Start=1 且 Session Expiry Interval=0），防止凭任意 ClientID 恢复他人持久会话队列（含 MQTT 5 Clean Start=0 的订阅与未确认下行继承）。secret 由 CSPRNG 生成 32 字节、64 字符 hex，仅注册/显式轮换返回一次；数据库存摘要，连接比对恒时。
 
 设备 MQTT 3.1.1/5.0，QoS1，上报和回执 topic 及范围见 mqtt-spec.md。认证成功后才 online；仅允许自身 properties/ack 发布、自身 cmd 订阅。拒绝跨设备 topic、通配符订阅、伪造设备名和超大包（64 KiB）。数据库写失败不得伪称入库成功；接入层须记录错误和重试策略，QoS1 传输确认不等于业务持久化承诺。基础采集接受至少一次语义，固件携带 message_id 时在设备窗口内去重；无 ID 的旧固件允许重复遥测但报警仍唯一。
 

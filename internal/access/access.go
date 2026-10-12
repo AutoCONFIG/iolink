@@ -16,6 +16,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/wire"
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/listeners"
+	"github.com/mochi-mqtt/server/v2/packets"
 )
 
 func (s *Server) HandleGenericReport(no string, raw map[string]json.RawMessage) error {
@@ -222,11 +223,35 @@ func (s *Server) connected(cl *mqtt.Client) {
 		}
 		ss.revision = revision
 	}
+	old := ss.client
 	ss.client = cl
 	ss.interval = interval
 	ss.lastSeen = s.now()
 	if err := s.transition(no, ss, true); err != nil {
 		s.log.Error("online persistence", "device", no, "err", err)
+	}
+	// Client IDs are arbitrary, so a second live connection for the same
+	// device_no is not a broker-level takeover; retire the previous one so a
+	// device truly has a single active session.
+	if old != nil && old != cl && !old.IsTakenOver() && !old.Closed() {
+		go s.retireClient(old)
+	}
+}
+
+// retireClient kicks a previous connection of the same device with a graceful
+// Session Taken Over DISCONNECT. The write can block indefinitely on a
+// stalled peer with keepalive=0, so the TCP connection is force-closed when
+// it does not finish promptly.
+func (s *Server) retireClient(old *mqtt.Client) {
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		_ = s.broker.DisconnectClient(old, packets.ErrSessionTakenOver)
+	}()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		old.Stop(packets.ErrSessionTakenOver)
 	}
 }
 func (s *Server) disconnected(cl *mqtt.Client) {

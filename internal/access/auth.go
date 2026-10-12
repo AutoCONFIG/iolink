@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
-// Authenticator verifies the device triple on MQTT connect.
-// core provides the production impl (devices.secret_hash); tests use fakes.
+// Authenticator verifies the device pair on MQTT connect (username=device_no,
+// password=secret). core provides the production impl (devices.secret_hash);
+// tests use fakes.
 type Authenticator interface {
 	Authenticate(deviceNo, secret string) bool
 }
@@ -16,6 +18,17 @@ type Authenticator interface {
 type NoopAuth struct{}
 
 func (NoopAuth) Authenticate(string, string) bool { return true }
+
+// ValidClientID reports whether a client-supplied MQTT client ID is
+// acceptable. Client IDs carry no identity — the username pair does — so the
+// bar is syntax only: non-empty, at most 128 bytes of UTF-8, no topic
+// wildcard characters.
+func ValidClientID(id string) bool {
+	if id == "" || len(id) > 128 || strings.ContainsAny(id, "+#") {
+		return false
+	}
+	return utf8.ValidString(id)
+}
 
 // Topic helpers: the single place that knows the topic grammar
 // (docs/mqtt-spec.md). Pure functions → unit-testable without a broker.

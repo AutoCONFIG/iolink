@@ -7,6 +7,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/wire"
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/packets"
+	"strings"
 	"testing"
 	"time"
 )
@@ -15,6 +16,84 @@ func client(no string) *mqtt.Client {
 	c := &mqtt.Client{ID: no}
 	c.Properties.Username = []byte(no)
 	return c
+}
+
+func TestConnectAuthGenericClientID(t *testing.T) {
+	f := &fakeHandler{}
+	s := New(Config{}, f, fakeAuth{true}, testLogger())
+	h := newBrokerHook(s)
+	good := packets.Packet{ProtocolVersion: 4, Connect: packets.ConnectParams{Clean: true, Password: []byte("s")}}
+
+	// Any client ID is accepted: identity is the username pair only.
+	for _, id := range []string{"one", "mqtt_20842687-727", "设备-1", "client.example-01"} {
+		cl := client("one")
+		cl.ID = id
+		if !h.OnConnectAuthenticate(cl, good) {
+			t.Fatalf("client id %q rejected", id)
+		}
+	}
+
+	reject := func(name string, cl *mqtt.Client, pk packets.Packet) {
+		t.Helper()
+		if h.OnConnectAuthenticate(cl, pk) {
+			t.Fatalf("%s accepted", name)
+		}
+	}
+	reject("empty username", client(""), good)
+	reject("separator username", client("de/v1"), good)
+	wildcardID := client("one")
+	wildcardID.ID = "a+"
+	reject("wildcard client id", wildcardID, good)
+	longID := client("one")
+	longID.ID = strings.Repeat("a", 129)
+	reject("oversized client id", longID, good)
+	badID := client("one")
+	badID.ID = "\xff"
+	reject("non-utf8 client id", badID, good)
+	emptyID := client("one")
+	emptyID.ID = ""
+	reject("empty client id", emptyID, good)
+
+	persistent := good
+	persistent.Connect.Clean = false
+	reject("v3 persistent session", client("one"), persistent)
+
+	v5expiry := good
+	v5expiry.ProtocolVersion = 5
+	v5expiry.Properties = packets.Properties{SessionExpiryIntervalFlag: true, SessionExpiryInterval: 30}
+	reject("v5 persistent session", client("one"), v5expiry)
+
+	v5resumed := good
+	v5resumed.ProtocolVersion = 5
+	v5resumed.Connect.Clean = false
+	reject("v5 clean start 0 without expiry property", client("one"), v5resumed)
+
+	v5resumedZero := v5resumed
+	v5resumedZero.Properties = packets.Properties{SessionExpiryIntervalFlag: true}
+	reject("v5 clean start 0 with zero expiry", client("one"), v5resumedZero)
+
+	// v5 clean start with explicit zero expiry is a clean session.
+	v5zero := good
+	v5zero.ProtocolVersion = 5
+	v5zero.Properties = packets.Properties{SessionExpiryIntervalFlag: true}
+	if !h.OnConnectAuthenticate(client("one"), v5zero) {
+		t.Fatal("v5 clean start with zero expiry rejected")
+	}
+
+	will := good
+	will.Connect.WillFlag = true
+	reject("will flag", client("one"), will)
+
+	denied := New(Config{}, f, fakeAuth{false}, testLogger())
+	hDenied := newBrokerHook(denied)
+	if hDenied.OnConnectAuthenticate(client("one"), good) {
+		t.Fatal("wrong secret accepted")
+	}
+	unavailable := New(Config{}, f, unavailableRevisionAuth{}, testLogger())
+	hUnavailable := newBrokerHook(unavailable)
+	if hUnavailable.OnConnectAuthenticate(client("one"), good) {
+		t.Fatal("unavailable revision accepted")
+	}
 }
 func TestAuthenticatedLifecycleWatchdogAndTakeover(t *testing.T) {
 	for _, period := range []time.Duration{time.Minute, 5 * time.Minute} {
@@ -25,10 +104,11 @@ func TestAuthenticatedLifecycleWatchdogAndTakeover(t *testing.T) {
 			s.now = func() time.Time { return now }
 			a := client("one")
 			h := newBrokerHook(s)
-			bad := client("one")
-			bad.ID = "different"
-			if h.OnConnectAuthenticate(bad, packets.Packet{}) {
-				t.Fatal("mismatch accepted")
+			good := packets.Packet{ProtocolVersion: 4, Connect: packets.ConnectParams{Clean: true, Password: []byte("s")}}
+			generic := client("one")
+			generic.ID = "mqtt_20842687-727"
+			if !h.OnConnectAuthenticate(generic, good) {
+				t.Fatal("arbitrary client id with valid pair rejected")
 			}
 			if len(f.events) != 0 {
 				t.Fatal("authentication emitted status")

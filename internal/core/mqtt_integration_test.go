@@ -138,12 +138,20 @@ func TestRealMQTTAuthenticationACLAndPersistence(t *testing.T) {
 		}
 		return c
 	}
-	connect("mismatch", "test-secret", false)
 	connect("one", "wrong", false)
 	if count(t, pool, "SELECT count(*) FROM devices WHERE status='online'") != 0 {
 		t.Fatal("failed auth emitted online")
 	}
-	c := connect("one", "test-secret", true)
+	// Generic client IDs: any client ID may carry the device pair, and a new
+	// session for the same device_no retires the previous connection.
+	lost := make(chan struct{})
+	mopts := mqtt.NewClientOptions().AddBroker("tcp://" + addr).SetClientID("generic-1").SetUsername("one").SetPassword("test-secret").SetAutoReconnect(false).SetConnectTimeout(2 * time.Second)
+	mopts.SetConnectionLostHandler(func(_ mqtt.Client, _ error) { close(lost) })
+	generic := mqtt.NewClient(mopts)
+	if tok := generic.Connect(); !tok.WaitTimeout(3*time.Second) || tok.Error() != nil {
+		t.Fatalf("generic client id rejected: %v", tok.Error())
+	}
+	t.Cleanup(func() { generic.Disconnect(100) })
 	waitCount := func(q string, want int) {
 		t.Helper()
 		deadline := time.Now().Add(3 * time.Second)
@@ -154,6 +162,13 @@ func TestRealMQTTAuthenticationACLAndPersistence(t *testing.T) {
 			time.Sleep(10 * time.Millisecond)
 		}
 		t.Fatalf("SQL expected count %d", want)
+	}
+	waitCount("SELECT count(*) FROM devices WHERE status='online'", 1)
+	c := connect("one", "test-secret", true)
+	select {
+	case <-lost:
+	case <-time.After(3 * time.Second):
+		t.Fatal("previous connection of the same device not kicked")
 	}
 	waitCount("SELECT count(*) FROM devices WHERE status='online'", 1)
 	for _, topic := range []string{"iolink/down/one/cmd"} {
