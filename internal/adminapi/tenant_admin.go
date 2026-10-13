@@ -1,19 +1,19 @@
 package adminapi
 
 import (
+	"encoding/json"
 	"errors"
-	"git.hyhy.fun/rsplab/iolink/internal/domain"
-	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
+
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"github.com/gin-gonic/gin"
 )
 
 type tenantStatusRequest struct {
 	Active *bool `json:"active"`
-}
-type tenantCreateRequest struct {
-	Name string `json:"name" binding:"required"`
 }
 type tenantMemberRequest struct {
 	Role      string     `json:"role"`
@@ -72,12 +72,17 @@ func (s *Server) createTenant(c *gin.Context) {
 		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "tenant creation unavailable"})
 		return
 	}
-	var req tenantCreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	var req map[string]string
+	decoder := json.NewDecoder(c.Request.Body)
+	if err := decoder.Decode(&req); err != nil || len(req) != 1 || req["name"] == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
-	tenant, err := store.CreateTenant(c.Request.Context(), req.Name, aid(c))
+	if err := decoder.Decode(&struct{}{}); err != io.EOF {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	tenant, err := store.CreateTenant(c.Request.Context(), req["name"], aid(c))
 	if err != nil {
 		switch {
 		case errors.Is(err, domain.ErrConflict):

@@ -5,13 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"git.hyhy.fun/rsplab/iolink/internal/adminapi"
-	"git.hyhy.fun/rsplab/iolink/internal/authorization"
-	corepkg "git.hyhy.fun/rsplab/iolink/internal/core"
-	"git.hyhy.fun/rsplab/iolink/internal/domain"
-	"git.hyhy.fun/rsplab/iolink/internal/migrate"
-	"git.hyhy.fun/rsplab/iolink/internal/platform"
-	"git.hyhy.fun/rsplab/iolink/internal/testdb"
 	"io"
 	"log/slog"
 	"net/http"
@@ -19,6 +12,14 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"git.hyhy.fun/rsplab/iolink/internal/adminapi"
+	"git.hyhy.fun/rsplab/iolink/internal/authorization"
+	corepkg "git.hyhy.fun/rsplab/iolink/internal/core"
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/migrate"
+	"git.hyhy.fun/rsplab/iolink/internal/platform"
+	"git.hyhy.fun/rsplab/iolink/internal/testdb"
 )
 
 func TestPlatformConsoleOnboardingAndIsolation(t *testing.T) {
@@ -115,8 +116,25 @@ func TestPlatformConsoleOnboardingAndIsolation(t *testing.T) {
 	}
 	call("PUT", "/tenants/1/members/1", idle, `{"role":"owner","active":true}`, 403)
 	call("POST", "/tenants", idle, `{"name":"unauthorized"}`, 403)
+	for _, body := range []string{
+		`{"name":"invalid-org","unexpected":"extra"}`,
+		`{"name":"invalid-org"} {"name":"second-org"}`,
+		`{"name":"invalid-org"} true`,
+		`{"name":"invalid-org"} trailing`,
+		`{"Name":"invalid-org"}`,
+		`{"name":null}`,
+		`[{"name":"invalid-org"}]`,
+		`null`,
+		`{}`,
+	} {
+		call("POST", "/tenants", admin, body, 400)
+	}
+	var malformedWrites int
+	if err := p.QueryRow(ctx, `SELECT (SELECT count(*) FROM tenants WHERE name<>'__iolink_system__')+(SELECT count(*) FROM audit_events WHERE action='tenant.created')`).Scan(&malformedWrites); err != nil || malformedWrites != 0 {
+		t.Fatalf("invalid tenant request left writes=%d err=%v", malformedWrites, err)
+	}
 	var tenant domain.Tenant
-	raw = call("POST", "/tenants", admin, `{"name":"customer-org"}`, 201)
+	raw = call("POST", "/tenants", admin, "{\"name\":\"customer-org\"}\n\t ", 201)
 	if err := json.Unmarshal(raw, &tenant); err != nil || tenant.ID == 0 {
 		t.Fatal("tenant response invalid")
 	}
