@@ -1,0 +1,14 @@
+farms|1|377c9a9ff696ef8d479fa7f54fa1d2ef
+ponds|1|474dde8f36d27051ba35c4498a5f5210
+devices|1|bd026fd0e111addbc4b2080cc1c83666
+alarms|1|6f278d0096895971fef7155c44cc121f
+sensor_data|2|e66aad930dfbace0aec2081e92a1cc90
+device_shadows|1|d53650a080fba902d94da31ff4892754
+telemetry|1|45ee51c1cf0bd23b96135b42f74808f8
+products|1|da85d6babb96e05cab5fdf73999983db
+product_models|1|2f36aacaa082745ae129ca973deb83c8
+jobs|1|98cf21376f0b29ec93a331c7c53124ff
+outbox_events|1|87429cd77736d502a43c4c54a06f8f03
+notification_outbox|1|ae7f5da7ea9f5842f2ec8850f284eef0
+
+EXIT_CODE=0

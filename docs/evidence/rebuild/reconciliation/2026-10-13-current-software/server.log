@@ -1,0 +1,9 @@
+{"time":"2026-10-13T23:14:36.701847491+08:00","level":"INFO","msg":"added hook","hook":"redacted"}
+{"time":"2026-10-13T23:14:36.701949002+08:00","level":"INFO","msg":"iolinkd started","http":"redacted","mqtt":"redacted"}
+{"time":"2026-10-13T23:14:36.701997143+08:00","level":"INFO","msg":"attached listener","id":"redacted","protocol":"redacted","address":"redacted"}
+{"time":"2026-10-13T23:14:36.702010929+08:00","level":"INFO","msg":"mochi mqtt starting","version":"redacted"}
+{"time":"2026-10-13T23:14:36.702225663+08:00","level":"INFO","msg":"mochi mqtt server started"}
+{"time":"2026-10-13T23:14:37.603201812+08:00","level":"INFO","msg":"shutting down"}
+{"time":"2026-10-13T23:14:37.603227881+08:00","level":"INFO","msg":"gracefully stopping server"}
+{"time":"2026-10-13T23:14:37.603273236+08:00","level":"INFO","msg":"stopping hook","hook":"redacted"}
+{"time":"2026-10-13T23:14:37.603295579+08:00","level":"INFO","msg":"mochi mqtt server stopped"}

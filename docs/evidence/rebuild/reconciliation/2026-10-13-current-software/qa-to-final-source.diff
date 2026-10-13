@@ -1,0 +1,35 @@
+diff --git a/internal/adminapi/handlers.go b/internal/adminapi/handlers.go
+index 76540cc..de09347 100644
+--- a/internal/adminapi/handlers.go
++++ b/internal/adminapi/handlers.go
+@@ -345,7 +345,7 @@ func (s *Server) listPonds(c *gin.Context) {
+ 		latest, count, err := s.pondLatest(c.Request.Context(), p.ID)
+ 		if err != nil {
+ 			s.logLatestFailure(c.Request.Context(), err)
+-			c.JSON(http.StatusInternalServerError, gin.H{"error": "telemetry query failed"})
++			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+ 			return
+ 		}
+ 		item["latest"] = latest
+@@ -610,7 +610,7 @@ func (s *Server) getDevice(c *gin.Context) {
+ 			item["latest"] = adminWaterLatestJSON(rd)
+ 		} else if !errors.Is(e, domain.ErrNotFound) && !errors.Is(e, domain.ErrInvalidProductModel) {
+ 			s.logLatestFailure(c.Request.Context(), e)
+-			c.JSON(http.StatusInternalServerError, gin.H{"error": "telemetry query failed"})
++			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+ 			return
+ 		}
+ 	}
+diff --git a/internal/adminapi/latest_reading_test.go b/internal/adminapi/latest_reading_test.go
+index 3616251..3f6ff74 100644
+--- a/internal/adminapi/latest_reading_test.go
++++ b/internal/adminapi/latest_reading_test.go
+@@ -118,7 +118,7 @@ func TestLatestHandlersDistinguishAbsenceFromProviderFailure(t *testing.T) {
+ 				if w.Code != tc.want {
+ 					t.Fatalf("status=%d body=%s", w.Code, w.Body.String())
+ 				}
+-				if tc.want == 500 && w.Body.String() != `{"error":"telemetry query failed"}` {
++				if tc.want == 500 && w.Body.String() != `{"error":"internal_error"}` {
+ 					t.Fatalf("unsafe error body=%s", w.Body.String())
+ 				}
+ 			})

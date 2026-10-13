@@ -1,0 +1,40 @@
+HTTP/1.1 503 Service Unavailable
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Tue, 13 Oct 2026 15:14:37 GMT
+Content-Length: 15
+
+db unavailable
+
+HTTP/1.1 503 Service Unavailable
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Tue, 13 Oct 2026 15:14:37 GMT
+Content-Length: 15
+
+db unavailable
+
+HTTP/1.1 503 Service Unavailable
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Tue, 13 Oct 2026 15:14:37 GMT
+Content-Length: 15
+
+db unavailable
+
+HTTP/1.1 503 Service Unavailable
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Tue, 13 Oct 2026 15:14:37 GMT
+Content-Length: 15
+
+db unavailable
+
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+Date: Tue, 13 Oct 2026 15:14:37 GMT
+Content-Length: 3
+
+ok
+
+RECOVERY_SECONDS=0.42574684000283014

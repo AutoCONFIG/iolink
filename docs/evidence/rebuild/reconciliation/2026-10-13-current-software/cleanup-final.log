@@ -1,0 +1,4 @@
+qa_database_count=0
+container_owned_tmp_absent=true
+host_owned_tmp_absent=true
+shared_container_preserved=true

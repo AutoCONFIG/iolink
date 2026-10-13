@@ -1,0 +1,3 @@
+restore target must be explicitly isolated and named iolink_restore_*
+
+EXIT_CODE=2

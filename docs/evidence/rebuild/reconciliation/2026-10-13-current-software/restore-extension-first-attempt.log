@@ -1,0 +1,3 @@
+ERROR:  extension "timescaledb" already exists
+
+EXIT_CODE=3

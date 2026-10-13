@@ -1,0 +1,13 @@
+ timescaledb_pre_restore 
+-------------------------
+ t
+(1 row)
+
+ timescaledb_post_restore 
+--------------------------
+ t
+(1 row)
+
+restore verified
+
+EXIT_CODE=0

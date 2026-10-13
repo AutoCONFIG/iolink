@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/docs/evidence/rebuild/reconciliation/2026-10-13-current-software/run_ops_qa.py", line 103, in <module>
+    curl('/healthz', 'health-db-recovered.log', 200)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/docs/evidence/rebuild/reconciliation/2026-10-13-current-software/run_ops_qa.py", line 44, in curl
+    assert output.splitlines()[0].split()[1] == str(expected), f'{path} status unexpected'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: /healthz status unexpected
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/docs/evidence/rebuild/reconciliation/2026-10-13-current-software/run_ops_qa.py", line 145, in <module>
+    run(['docker','exec',CONTAINER,'rm','-r','--',CONTAINER_DIR], 'cleanup-container-tmp.log')
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/docs/evidence/rebuild/reconciliation/2026-10-13-current-software/run_ops_qa.py", line 28, in run
+    assert result.returncode == expected, f'{artifact}: exit {result.returncode}, expected {expected}'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: cleanup-container-tmp.log: exit 1, expected 0

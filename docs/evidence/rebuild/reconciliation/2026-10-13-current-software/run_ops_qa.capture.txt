@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+import json
+import os
+from pathlib import Path
+import secrets
+import socket
+import subprocess
+import time
+
+ROOT = Path('/tmp/iolink-latest-20261013')
+TMP = Path('/tmp/iolink-current-ops-20261013')
+OUT = Path(__file__).resolve().parent
+CONTAINER = 'iolink-latest-pg-20261013'
+DB = 'iolink_ops_20261013'
+RESTORE = 'iolink_restore_ops_20261013'
+BINARY = TMP / 'iolinkd'
+CONTAINER_DIR = '/tmp/iolink-current-ops-20261013'
+password = os.environ['IOLINK_QA_PASSWORD']
+env = dict(os.environ, IOLINK_PG_DSN=f'postgres://iolink:{password}@127.0.0.1:33126/{DB}?sslmode=disable',
+           IOLINK_SECRET_KEY=secrets.token_hex(32), IOLINK_LOG_DIR=str(TMP / 'logs'), GIN_MODE='release')
+
+
+def run(args, artifact, *, data=None, expected=0, extra_env=None):
+    result = subprocess.run(args, cwd=ROOT, env=extra_env or env, input=data, text=True, capture_output=True, timeout=90)
+    combined = result.stdout + result.stderr
+    assert password not in combined and env['IOLINK_SECRET_KEY'] not in combined, 'secret found in output'
+    (OUT / artifact).write_text(combined + f'\nEXIT_CODE={result.returncode}\n')
+    assert result.returncode == expected, f'{artifact}: exit {result.returncode}, expected {expected}'
+    return result.stdout
+
+
+def sql(statement, artifact, database='postgres'):
+    return run(['docker', 'exec', '-i', CONTAINER, 'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', 'iolink', '-d', database, '-At'], artifact, data=statement)
+
+
+def port():
+    with socket.socket() as sock:
+        sock.bind(('127.0.0.1', 0))
+        return sock.getsockname()[1]
+
+
+def curl(path, artifact, expected):
+    output = run(['curl', '-i', '--max-time', '8', '-sS', url + path], artifact)
+    assert output.splitlines()[0].split()[1] == str(expected), f'{path} status unexpected'
+    return output
+
+
+server = None
+created = []
+container_tmp_created = False
+started = time.monotonic()
+try:
+    sql(f'CREATE DATABASE {DB}; CREATE DATABASE {RESTORE};', 'database-create.log')
+    created.extend([DB, RESTORE])
+    run([str(BINARY), 'migrate', 'status'], 'migrate-before.log')
+    run([str(BINARY), 'migrate', 'up'], 'migrate-up.log')
+    run([str(BINARY), 'migrate', 'up'], 'migrate-repeat.log')
+    statuses = json.loads(run([str(BINARY), 'migrate', 'status'], 'migrate-after.log'))
+    assert len(statuses) == 16 and all(row['applied'] and not row['dirty'] for row in statuses)
+    run([str(BINARY), 'admin', 'init', 'ops-qa'], 'admin-init.log', data=secrets.token_urlsafe(24) + '\n')
+    fixture = """
+BEGIN;
+INSERT INTO tenants(id,name) VALUES(700001,'ops-qa-tenant');
+INSERT INTO users(id,open_id,authority) VALUES(700001,'ops-qa-user','USER');
+INSERT INTO farms(id,owner_id,name,tenant_id) VALUES(700001,700001,'ops-qa-farm',700001);
+INSERT INTO ponds(id,farm_id,name) VALUES(700001,700001,'ops-qa-pond');
+INSERT INTO devices(id,pond_id,device_no,secret_hash,mqtt_username) VALUES(700001,700001,'ops-qa-device','test-only-unusable-hash','ops-qa-issued-user');
+INSERT INTO sensor_data(ts,device_no,pond_id,tenant_id,temperature,signal) VALUES('2026-10-13T01:00:00Z','ops-qa-device',700001,700001,24.5,-62),('2026-10-13T01:01:00Z','ops-qa-device',700001,700001,25,-61);
+INSERT INTO device_shadows(device_no,pond_id,tenant_id,last,ts,model_version,product_id) VALUES('ops-qa-device',700001,700001,'{"temperature":25}','2026-10-13T01:01:00Z',1,iolink_default_product());
+INSERT INTO alarms(id,device_no,pond_id,metric,current_value,threshold,level,message) VALUES(700001,'ops-qa-device',700001,'temperature',25,24,'warning','ops fixture');
+INSERT INTO telemetry(ts,device_no,pond_id,tenant_id,model_version,product_id,properties) VALUES('2026-10-13T01:01:00Z','ops-qa-device',700001,700001,1,iolink_default_product(),'{"temperature":25}');
+INSERT INTO jobs(tenant_id,kind,idempotency_key,status,payload) VALUES(700001,'ops-qa-job','ops-qa-job-1','succeeded','{"qa":true}');
+INSERT INTO outbox_events(tenant_id,topic,idempotency_key,status,payload) VALUES(700001,'ops-qa-topic','ops-qa-event-1','sent','{"qa":true}');
+INSERT INTO notification_outbox(alarm_id,status,attempts) VALUES(700001,'disabled',0);
+COMMIT;
+"""
+    (OUT / 'fixture.sql').write_text(fixture)
+    sql(fixture, 'fixture-create.log', DB)
+    http_port, mqtt_port = port(), port()
+    url = f'http://127.0.0.1:{http_port}'
+    env.update(IOLINK_HTTP_ADDR=f'127.0.0.1:{http_port}', IOLINK_MQTT_ADDR=f'127.0.0.1:{mqtt_port}')
+    with (OUT / 'server.log').open('w') as log:
+        server = subprocess.Popen([str(BINARY), 'serve'], cwd=ROOT, env=env, stdout=log, stderr=log)
+        for _ in range(100):
+            probe = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}', url + '/healthz'], capture_output=True, text=True)
+            if probe.stdout == '200':
+                break
+            assert server.poll() is None, 'server exited before health'
+            time.sleep(.1)
+        curl('/healthz', 'health-ready.log', 200)
+        curl('/readyz', 'ready-ready.log', 200)
+        metrics = curl('/metrics', 'metrics.log', 200)
+        assert 'go_goroutines' in metrics and 'process_' in metrics
+        run(['python3', 'scripts/capacity_smoke.py', '--url', url + '/healthz', '--clients', '20', '--requests', '100'], 'capacity-smoke.log')
+        sql('UPDATE schema_migrations SET dirty=true WHERE version=16;', 'dirty-set.log', DB)
+        curl('/readyz', 'ready-dirty.log', 503)
+        curl('/healthz', 'health-dirty.log', 200)
+        sql('UPDATE schema_migrations SET dirty=false WHERE version=16;', 'dirty-clear.log', DB)
+        curl('/readyz', 'ready-recovered.log', 200)
+        sql(f'ALTER DATABASE {DB} ALLOW_CONNECTIONS false; SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname=\'{DB}\';', 'db-connections-deny.log')
+        curl('/healthz', 'health-db-unavailable.log', 503)
+        curl('/readyz', 'ready-db-unavailable.log', 503)
+        sql(f'ALTER DATABASE {DB} ALLOW_CONNECTIONS true;', 'db-connections-recover.log')
+        recovery = []
+        recovery_started = time.monotonic()
+        for _ in range(40):
+            result = subprocess.run(['curl','-i','--max-time','8','-sS',url+'/healthz'], capture_output=True, text=True)
+            recovery.append(result.stdout)
+            if result.returncode == 0 and result.stdout.startswith('HTTP/1.1 200'):
+                break
+            time.sleep(.1)
+        else:
+            raise AssertionError('health did not recover within bounded probes')
+        (OUT / 'db-recovery-probes.log').write_text('\n'.join(recovery) + f'\nRECOVERY_SECONDS={time.monotonic()-recovery_started}\n')
+        curl('/healthz', 'health-db-recovered.log', 200)
+        curl('/readyz', 'ready-db-recovered.log', 200)
+        shutdown_start = time.monotonic()
+        server.terminate()
+        server.wait(timeout=15)
+        assert server.returncode == 0, 'SIGTERM did not exit zero'
+        (OUT / 'shutdown.json').write_text(json.dumps({'signal':'SIGTERM','exit_code':server.returncode,'seconds':time.monotonic()-shutdown_start,'deadline_seconds':15}, indent=2)+'\n')
+        server = None
+    run(['docker', 'exec', CONTAINER, 'mkdir', '-p', CONTAINER_DIR], 'container-tmp.log')
+    container_tmp_created = True
+    run(['docker', 'cp', str(ROOT / 'deploy/backup.sh'), CONTAINER + ':' + CONTAINER_DIR + '/backup.sh'], 'copy-backup.log')
+    run(['docker', 'cp', str(ROOT / 'deploy/restore.sh'), CONTAINER + ':' + CONTAINER_DIR + '/restore.sh'], 'copy-restore.log')
+    def backup_script(database, script, artifact, *, backup=None, target='isolated', expected=0):
+        args = ['docker', 'exec', '-e', 'PGPASSWORD', '-e', 'PGHOST=127.0.0.1', '-e', 'PGUSER=iolink', '-e', 'PGDATABASE='+database,
+                '-e', 'BACKUP_DIR='+CONTAINER_DIR+'/backups', '-e', 'IOLINK_RESTORE_TARGET='+target]
+        if backup:
+            args += ['-e', 'BACKUP_FILE='+backup]
+        return run(args + [CONTAINER, 'bash', CONTAINER_DIR+'/'+script], artifact, expected=expected, extra_env=dict(env, PGPASSWORD=password))
+    backup_file = backup_script(DB, 'backup.sh', 'backup.log').strip()
+    for suffix in ['meta', 'summary', 'sha256']:
+        run(['docker', 'cp', CONTAINER+':'+backup_file+'.'+suffix, str(OUT / ('backup.'+suffix))], 'copy-backup-'+suffix+'.log')
+    sql('CREATE EXTENSION IF NOT EXISTS timescaledb;', 'restore-extension.log', RESTORE)
+    backup_script(RESTORE, 'restore.sh', 'restore.log', backup=backup_file)
+    tables = ['farms','ponds','devices','alarms','sensor_data','device_shadows','telemetry','products','product_models','jobs','outbox_events','notification_outbox']
+    query = ' UNION ALL '.join(f"SELECT '{table}',count(*),md5(coalesce(jsonb_agg(to_jsonb(t) ORDER BY to_jsonb(t)::text)::text,'[]')) FROM {table} t" for table in tables) + ';'
+    (OUT / 'compare.sql').write_text(query + '\n')
+    source_rows = sql(query, 'source-rows.log', DB)
+    restored_rows = sql(query, 'restored-rows.log', RESTORE)
+    assert source_rows == restored_rows, 'nonempty business/time-series values differ'
+    backup_script(DB, 'restore.sh', 'restore-nonisolated.log', backup=backup_file, expected=2)
+    backup_script(RESTORE, 'restore.sh', 'restore-flag.log', backup=backup_file, target='production', expected=2)
+    run(['docker','exec',CONTAINER,'truncate','-s','1',backup_file], 'tamper.log')
+    backup_script(RESTORE, 'restore.sh', 'restore-checksum.log', backup=backup_file, expected=2)
+    rows_after = sql(query, 'restore-after-reject.log', RESTORE)
+    assert restored_rows == rows_after, 'rejected restore changed target'
+    (OUT / 'surface-summary.json').write_text(json.dumps({'source_tree':'6ed49166e940861740b2c9a1fee4166c0523e2ca','web_source':'39299dfb0d7771690117a2765fb766a9b715f554','http_url':url,'database':DB,'restore_database':RESTORE,'migrations':len(statuses),'seconds':time.monotonic()-started}, indent=2)+'\n')
+    print('PASS: migration/init, real health/ready/metrics, small capacity, dirty-readiness recovery, SIGTERM, nonempty backup/restore, isolated-target and checksum rejections')
+finally:
+    if server is not None:
+        server.terminate()
+        server.wait(timeout=15)
+    for name in created:
+        sql(f'ALTER DATABASE {name} ALLOW_CONNECTIONS true;', 'cleanup-enable-'+name+'.log')
+        sql(f'DROP DATABASE {name} WITH (FORCE);', 'cleanup-'+name+'.log')
+    if container_tmp_created:
+        run(['docker','exec',CONTAINER,'rm','-r','--',CONTAINER_DIR], 'cleanup-container-tmp.log')

@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/docs/evidence/rebuild/reconciliation/2026-10-13-current-software/run_ops_qa.py", line 115, in <module>
+    sql('CREATE EXTENSION timescaledb;', 'restore-extension.log', RESTORE)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/docs/evidence/rebuild/reconciliation/2026-10-13-current-software/run_ops_qa.py", line 33, in sql
+    return run(['docker', 'exec', '-i', CONTAINER, 'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-U', 'iolink', '-d', database, '-At'], artifact, data=statement)
+  File "/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/docs/evidence/rebuild/reconciliation/2026-10-13-current-software/run_ops_qa.py", line 28, in run
+    assert result.returncode == expected, f'{artifact}: exit {result.returncode}, expected {expected}'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: restore-extension.log: exit 3, expected 0

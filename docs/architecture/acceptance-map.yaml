@@ -14,9 +14,9 @@ gate_parts:
     receipt: docs/evidence/rebuild/gates/M6b.json
 provider_operations:
   - {id: R01, provider: go-toolchain, operation: reproducible_build, required_level: L3, status: not_run, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
-  - {id: R02, provider: embedded-http, operation: contract_validation, required_level: L3, status: not_run, command: "make verify-contracts", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
-  - {id: R03, provider: postgres-timescale, operation: migration_safety, required_level: L3, status: not_run, command: "go test ./internal/migrate/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
-  - {id: R04, provider: postgres-timescale, operation: startup_configuration, required_level: L3, status: not_run, command: "go test ./internal/platform/... ./cmd/iolinkd/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
+  - {id: R02, provider: embedded-http, operation: contract_validation, required_level: L3, status: passed, command: "make verify-contracts", evidence_path: docs/evidence/deployment/2026-10-13-latest-readings/contracts.log}
+  - {id: R03, provider: postgres-timescale, operation: migration_safety, required_level: L3, status: passed, command: "IOLINK_TEST_PG_DSN=<isolated> go test -race -shuffle=on -v -count=1 ./internal/migrate ./internal/persistence ./internal/platform ./internal/operations ./internal/notifications", evidence_path: docs/evidence/rebuild/reconciliation/2026-10-13-current-software/focused-race.log}
+  - {id: R04, provider: postgres-timescale, operation: startup_configuration, required_level: L3, status: passed, command: "GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated> make verify", evidence_path: docs/evidence/deployment/2026-10-13-latest-readings/snapshot-final-verify.log}
   - {id: R05, provider: embedded-mqtt, operation: device_authentication, required_level: L3, status: not_run, command: "go test ./internal/access/... ./internal/core/deviceauth/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R06, provider: embedded-mqtt, operation: topic_acl, required_level: L3, status: not_run, command: "go test ./internal/access/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R07, provider: embedded-mqtt, operation: telemetry_field_validation, required_level: L3, status: not_run, command: "go test ./internal/access/... ./internal/core/...", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
@@ -74,19 +74,21 @@ requirements:
     owner: 1
     provider: software
     required_level: software
-    software_status: passed
+    software_status: not_run
     external_status: not_applicable
-    verification: "planned: make verify"
+    verification: "local frozen-source build/vet/race recorded in docs/evidence/deployment/2026-10-13-latest-readings/snapshot-verify.log; v0.0.34 image CI succeeded, test jobs skipped; complete clean-cache/CI acceptance remains pending"
     evidence: docs/evidence/acceptance/R01/
+    scope_note: "R01 requires full reproducible build/test and CI evidence; local software regression and image publication do not establish the complete row."
   - id: R02
     wave: M0-M2
     owner: 1
     provider: software
     required_level: software
-    software_status: passed
+    software_status: not_run
     external_status: not_applicable
-    verification: "planned: make verify-contracts"
+    verification: "R02.a standard schema/references and synthetic fixtures passed; historical MQTT software is separately recorded; complete target HTTP handler matrix R02.c remains unverified"
     evidence: docs/evidence/acceptance/R02/
+    scope_note: "R02.a/b/c are cumulative per ACCEPTANCE.md; synthetic fixtures and individual live HTTP tests do not certify the complete row."
   - id: R03
     wave: M0
     owner: 3
@@ -94,7 +96,7 @@ requirements:
     required_level: software
     software_status: passed
     external_status: not_applicable
-    verification: "planned: go test ./internal/migrate/..."
+    verification: "historical real migration/rollback/concurrency evidence in docs/evidence/2026-09-19/M0/README.md; current frozen-source real Timescale race replay in docs/evidence/rebuild/reconciliation/2026-10-13-current-software/focused-race.log"
     evidence: docs/evidence/acceptance/R03/
   - id: R04
     wave: M0
@@ -103,7 +105,7 @@ requirements:
     required_level: software
     software_status: passed
     external_status: not_applicable
-    verification: "planned: go test ./internal/platform/... ./cmd/iolinkd/..."
+    verification: "S4/S5 same-source approved initialization software in docs/evidence/deployment/2026-10-08-web-setup/README.md and 2026-10-08-platform-console/README.md; current platform/setupapi/CLI database regression in docs/evidence/deployment/2026-10-13-latest-readings/snapshot-verify.log; browser acceptance remains user-owned"
     evidence: docs/evidence/acceptance/R04/
   - id: R05
     wave: M1
@@ -418,10 +420,11 @@ requirements:
     owner: 10
     provider: software
     required_level: software
-    software_status: passed
+    software_status: not_run
     external_status: not_applicable
     verification: "real Timescale concurrent admission/restore and all signed features through production guard/fake executor (R39.a); R39.b real future entry points remain pending"
     evidence: docs/evidence/acceptance/R39/
+    scope_note: "R39.a approved on M6c candidate 8ad550552d56f061222cd1ff53226000003c703e; R39.b future real entry points remain unverified. Whole M6c gate intentionally blocks rather than promoting the complete requirement."
   - id: R40
     wave: M6c
     owner: 10

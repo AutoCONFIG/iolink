@@ -1,0 +1,4 @@
+CREATE EXTENSION
+NOTICE:  extension "timescaledb" already exists, skipping
+
+EXIT_CODE=0
