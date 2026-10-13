@@ -1,0 +1,51 @@
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /ponds                    --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (1 handlers)
+--- FAIL: TestPondLatestIncludesDevicesBeyondFirstPage (0.00s)
+    latest_reading_test.go:85: status=200 body=[{"area_mu":0,"created_at":"0001-01-01T00:00:00Z","device_count":200,"farm_id":1,"id":1,"latest":null,"name":"pond","status":"normal"}]
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /ponds                    --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (1 handlers)
+[GIN-debug] GET    /device/:device_no        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (1 handlers)
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /ponds                    --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (1 handlers)
+[GIN-debug] GET    /device/:device_no        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (1 handlers)
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /ponds                    --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (1 handlers)
+[GIN-debug] GET    /device/:device_no        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (1 handlers)
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /ponds                    --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (1 handlers)
+[GIN-debug] GET    /device/:device_no        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (1 handlers)
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /ponds                    --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (1 handlers)
+[GIN-debug] GET    /device/:device_no        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (1 handlers)
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /ponds                    --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (1 handlers)
+[GIN-debug] GET    /device/:device_no        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (1 handlers)
+--- FAIL: TestLatestHandlersDistinguishAbsenceFromProviderFailure (0.00s)
+    --- FAIL: TestLatestHandlersDistinguishAbsenceFromProviderFailure/provider_failure/ponds (0.00s)
+        latest_reading_test.go:114: status=200 body=[{"area_mu":0,"created_at":"0001-01-01T00:00:00Z","device_count":1,"farm_id":1,"id":1,"latest":null,"name":"pond","status":"normal"}]
+    --- FAIL: TestLatestHandlersDistinguishAbsenceFromProviderFailure/provider_failure/device (0.00s)
+        latest_reading_test.go:114: status=200 body={"created_at":"0001-01-01T00:00:00Z","device_no":"device","disabled_at":null,"id":1,"last_seen_at":null,"latest":null,"model":"","mqtt_username":"","name":"","pond_id":1,"report_interval":0,"status":""}
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/adminapi	0.007s
+FAIL

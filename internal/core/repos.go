@@ -396,6 +396,9 @@ func (r *telemetryRepo) Latest(ctx context.Context, no string) (domain.Reading, 
 		args = append(args, tenantID)
 	}
 	if err := r.pool.QueryRow(ctx, q, args...).Scan(&water); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Reading{}, domain.ErrNotFound
+		}
 		return domain.Reading{}, err
 	}
 	if !water {
@@ -415,6 +418,9 @@ func (r *telemetryRepo) Latest(ctx context.Context, no string) (domain.Reading, 
 	err := r.pool.QueryRow(ctx, shadowQ, shadowArgs...).
 		Scan(&raw, &ts, &stamps, &pond, &interval)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.Reading{}, domain.ErrNotFound
+		}
 		return domain.Reading{}, err
 	}
 	var generic map[string]json.RawMessage

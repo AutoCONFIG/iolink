@@ -1,0 +1,5 @@
+-test.shuffle 1791904019305395957
+=== RUN   TestLatestReadingHTTPWithLargePondAndDatabaseFailure
+--- PASS: TestLatestReadingHTTPWithLargePondAndDatabaseFailure (1.07s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	2.127s

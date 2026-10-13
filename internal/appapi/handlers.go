@@ -3,6 +3,8 @@ package appapi
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -43,7 +45,12 @@ func (s *Server) listPonds(c *gin.Context) {
 			return
 		}
 		item["device_count"] = len(devs)
-		item["latest"] = s.pondLatest(c.Request.Context(), p.ID, devs)
+		latest, err := s.pondLatest(c.Request.Context(), p.ID, devs)
+		if err != nil {
+			s.latestFailure(c, err)
+			return
+		}
+		item["latest"] = latest
 		out = append(out, item)
 	}
 	c.JSON(http.StatusOK, out)
@@ -65,12 +72,15 @@ func pondWorstLevel(alarms []iolinkcontractsdomain.Alarm) map[int64]iolinkcontra
 }
 
 // pondLatest picks the freshest shadow reading among the pond's devices.
-func (s *Server) pondLatest(ctx context.Context, pondID int64, devs []iolinkcontractsdomain.Device) gin.H {
+func (s *Server) pondLatest(ctx context.Context, pondID int64, devs []iolinkcontractsdomain.Device) (gin.H, error) {
 	var best *iolinkcontractsdomain.Reading
 	for _, d := range devs {
 		rd, err := s.deps.Telemetry.Latest(ctx, d.DeviceNo)
 		if err != nil {
-			continue
+			if errors.Is(err, iolinkcontractsdomain.ErrNotFound) || errors.Is(err, iolinkcontractsdomain.ErrInvalidProductModel) {
+				continue
+			}
+			return nil, fmt.Errorf("pond latest: %w", err)
 		}
 		if best == nil || rd.Timestamp.After(best.Timestamp) || (rd.Timestamp.Equal(best.Timestamp) && rd.DeviceNo < best.DeviceNo) {
 			cp := rd
@@ -78,9 +88,9 @@ func (s *Server) pondLatest(ctx context.Context, pondID int64, devs []iolinkcont
 		}
 	}
 	if best == nil {
-		return nil
+		return nil, nil
 	}
-	return waterLatestJSON(*best)
+	return waterLatestJSON(*best), nil
 }
 
 func (s *Server) getPond(c *gin.Context) {
@@ -109,7 +119,12 @@ func (s *Server) getPond(c *gin.Context) {
 	if level, ok := worst[p.ID]; ok {
 		status = string(level)
 	}
-	c.JSON(http.StatusOK, gin.H{"pond_id": p.ID, "pond_name": p.Name, "status": status, "device_count": len(devs), "latest": s.pondLatest(c.Request.Context(), p.ID, devs)})
+	latest, err := s.pondLatest(c.Request.Context(), p.ID, devs)
+	if err != nil {
+		s.latestFailure(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"pond_id": p.ID, "pond_name": p.Name, "status": status, "device_count": len(devs), "latest": latest})
 }
 
 func (s *Server) listDevices(c *gin.Context) {
@@ -165,8 +180,12 @@ func (s *Server) getDevice(c *gin.Context) {
 		"name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt,
 		"created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval, "latest": nil,
 	}
-	if rd, err := s.deps.Telemetry.Latest(c.Request.Context(), no); err == nil {
+	rd, err := s.deps.Telemetry.Latest(c.Request.Context(), no)
+	if err == nil {
 		resp["latest"] = waterLatestJSON(rd)
+	} else if !errors.Is(err, iolinkcontractsdomain.ErrNotFound) && !errors.Is(err, iolinkcontractsdomain.ErrInvalidProductModel) {
+		s.latestFailure(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, resp)
 }
@@ -187,10 +206,21 @@ func (s *Server) waterLatest(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported_product"})
 			return
 		}
-		c.JSON(http.StatusOK, nil)
+		if errors.Is(err, iolinkcontractsdomain.ErrNotFound) {
+			c.JSON(http.StatusOK, nil)
+			return
+		}
+		s.latestFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, waterLatestJSON(rd))
+}
+
+func (s *Server) latestFailure(c *gin.Context, err error) {
+	if s.log != nil {
+		s.log.ErrorContext(c.Request.Context(), "telemetry latest query failed", slog.String("stage", "telemetry_latest"), slog.String("outcome", "failed"), slog.Any("err", err))
+	}
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 }
 
 func (s *Server) waterHistory(c *gin.Context) {
@@ -243,6 +273,7 @@ func (s *Server) waterHistory(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"metric": metric, "unit": iolinkcontractsdomain.MetricUnits[metric], "points": points})
 }
+
 func historyWindow(name string, now time.Time) (time.Time, time.Time, error) {
 	// Asia/Shanghai has used UTC+8 since 1991; current business-day bounds.
 	local := now.In(time.FixedZone("Asia/Shanghai", 8*60*60))

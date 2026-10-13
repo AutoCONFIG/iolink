@@ -342,13 +342,14 @@ func (s *Server) listPonds(c *gin.Context) {
 		if lvl, ok := worst[p.ID]; ok {
 			item["status"] = string(lvl)
 		}
-		item["latest"] = s.pondLatest(c.Request.Context(), p.ID)
-		page, e := s.deps.Store.ListDevicesPage(c.Request.Context(), domain.DeviceListQuery{PondID: p.ID, Limit: 200})
-		if e != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+		latest, count, err := s.pondLatest(c.Request.Context(), p.ID)
+		if err != nil {
+			s.logLatestFailure(c.Request.Context(), err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 			return
 		}
-		item["device_count"] = len(page.Items)
+		item["latest"] = latest
+		item["device_count"] = count
 		out = append(out, item)
 	}
 	limit, offset, err := page(c)
@@ -383,42 +384,6 @@ func pondWorstLevel(alarms []domain.Alarm) map[int64]domain.AlarmLevel {
 		}
 	}
 	return worst
-}
-
-func (s *Server) pondLatest(ctx context.Context, pondID int64) gin.H {
-	if s.deps.Telemetry == nil {
-		return nil
-	}
-	page, err := s.deps.Store.ListDevicesPage(ctx, domain.DeviceListQuery{Limit: 200})
-	if err != nil {
-		return nil
-	}
-	var best *domain.Reading
-	for _, d := range page.Items {
-		if d.PondID != pondID {
-			continue
-		}
-		rd, err := s.deps.Telemetry.Latest(ctx, d.DeviceNo)
-		if err != nil {
-			continue
-		}
-		if best == nil || rd.Timestamp.After(best.Timestamp) || (rd.Timestamp.Equal(best.Timestamp) && rd.DeviceNo < best.DeviceNo) {
-			cp := rd
-			best = &cp
-		}
-	}
-	if best == nil {
-		return nil
-	}
-	timestamps := map[string]any{}
-	for _, key := range []string{"temperature", "dissolved_oxygen", "ph", "turbidity", "salinity", "signal"} {
-		if ts, ok := best.Timestamps[key]; ok {
-			timestamps[key] = ts
-		} else {
-			timestamps[key] = nil
-		}
-	}
-	return gin.H{"device_no": best.DeviceNo, "ts": best.Timestamp, "pond_id": best.PondID, "signal": best.Signal, "timestamps": timestamps, "report_interval": best.ReportInterval, "temperature": best.Temperature, "dissolved_oxygen": best.DO, "ph": best.PH, "turbidity": best.Turbidity, "salinity": best.Salinity}
 }
 
 func (s *Server) createPond(c *gin.Context) {
@@ -643,8 +608,10 @@ func (s *Server) getDevice(c *gin.Context) {
 	if s.deps.Telemetry != nil {
 		if rd, e := s.deps.Telemetry.Latest(c.Request.Context(), d.DeviceNo); e == nil {
 			item["latest"] = adminWaterLatestJSON(rd)
-		} else {
-			item["latest"] = nil
+		} else if !errors.Is(e, domain.ErrNotFound) && !errors.Is(e, domain.ErrInvalidProductModel) {
+			s.logLatestFailure(c.Request.Context(), e)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+			return
 		}
 	}
 	c.JSON(http.StatusOK, item)

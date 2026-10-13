@@ -188,6 +188,7 @@ type DeviceRepo interface {
 
 type TelemetryRepo interface {
 	// Latest returns the most recent reading per metric for a device.
+	// ErrNotFound denotes an absent shadow; provider failures remain errors.
 	Latest(ctx context.Context, deviceNo string) (Reading, error)
 	// History returns readings in [from, to], bucketed for charting.
 	History(ctx context.Context, deviceNo string, metric string, from, to time.Time, maxPoints int) ([]MetricPoint, error)
