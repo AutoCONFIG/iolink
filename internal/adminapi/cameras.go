@@ -22,7 +22,11 @@ func (s *Server) mountCameraRoutes(v1 *gin.RouterGroup) {
 
 func abortCameraAuth(c *gin.Context, status int, legacy string) {
 	if !c.GetBool("camera_route") {
-		c.AbortWithStatusJSON(status, gin.H{"error": legacy})
+		code := "unauthorized"
+		if status == http.StatusForbidden {
+			code = "forbidden"
+		}
+		c.AbortWithStatusJSON(status, gin.H{"error": code})
 		return
 	}
 	if legacy == "tenant context required" {
@@ -119,6 +123,7 @@ func (s *Server) listCameras(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, result)
 }
+
 func (s *Server) getCamera(c *gin.Context) {
 	id, err := cameraID(c)
 	if err != nil {
@@ -179,6 +184,7 @@ func (s *Server) writeCamera(c *gin.Context, replace bool) {
 	}
 	c.JSON(status, result)
 }
+
 func (s *Server) disableCamera(c *gin.Context) {
 	id, err := cameraID(c)
 	if err != nil {

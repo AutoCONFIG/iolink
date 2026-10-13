@@ -1,0 +1,34 @@
+-test.shuffle 1791911495038497560
+=== RUN   TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers
+=== RUN   TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/invalid_code
+    baseline_wechat_login_contract_test.go:60: app contract method=POST route=/auth/login status=401 expected=401
+    baseline_wechat_login_contract_test.go:60: HTTP contract rejected response: POST /auth/login status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/provider_busy
+    baseline_wechat_login_contract_test.go:60: app contract method=POST route=/auth/login status=401 expected=502
+    baseline_wechat_login_contract_test.go:60: app HTTP status: POST /auth/login got=401 want=502
+=== RUN   TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/http_unavailable
+    baseline_wechat_login_contract_test.go:60: app contract method=POST route=/auth/login status=500 expected=502
+    baseline_wechat_login_contract_test.go:60: app HTTP status: POST /auth/login got=500 want=502
+=== RUN   TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/http_bad_request_with_invalid_code
+    baseline_wechat_login_contract_test.go:60: app contract method=POST route=/auth/login status=401 expected=502
+    baseline_wechat_login_contract_test.go:60: app HTTP status: POST /auth/login got=401 want=502
+=== RUN   TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/malformed_response
+    baseline_wechat_login_contract_test.go:60: app contract method=POST route=/auth/login status=401 expected=502
+    baseline_wechat_login_contract_test.go:60: app HTTP status: POST /auth/login got=401 want=502
+=== RUN   TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/missing_openid
+    baseline_wechat_login_contract_test.go:60: app contract method=POST route=/auth/login status=401 expected=502
+    baseline_wechat_login_contract_test.go:60: app HTTP status: POST /auth/login got=401 want=502
+=== RUN   TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/transport_unavailable
+    baseline_wechat_login_contract_test.go:60: app contract method=POST route=/auth/login status=401 expected=502
+    baseline_wechat_login_contract_test.go:60: app HTTP status: POST /auth/login got=401 want=502
+--- FAIL: TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers (4.59s)
+    --- FAIL: TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/invalid_code (0.74s)
+    --- FAIL: TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/provider_busy (0.76s)
+    --- FAIL: TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/http_unavailable (0.56s)
+    --- FAIL: TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/http_bad_request_with_invalid_code (0.60s)
+    --- FAIL: TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/malformed_response (0.78s)
+    --- FAIL: TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/missing_openid (0.55s)
+    --- FAIL: TestBaselineWechatLoginClassifiesRealUpstreamFailuresWithoutProvisioningUsers/transport_unavailable (0.60s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	4.628s
+FAIL

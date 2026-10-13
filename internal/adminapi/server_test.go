@@ -44,25 +44,33 @@ func (fakeProductCatalog) DefaultTenantID(context.Context) (int64, error) { retu
 func (fakeProductCatalog) CreateProduct(context.Context, int64, string) (domain.Product, error) {
 	return domain.Product{ID: 1, TenantID: 7, Name: "water-quality"}, nil
 }
+
 func (fakeProductCatalog) ListProducts(context.Context, int64) ([]domain.Product, error) {
 	return []domain.Product{{ID: 1, TenantID: 7, Name: "water-quality"}}, nil
 }
+
 func (fakeProductCatalog) CreateProductModel(context.Context, int64, int64, int, []domain.ModelField) (domain.ProductModel, error) {
 	return domain.ProductModel{ID: 1, ProductID: 1, Version: 1}, nil
 }
+
 func (fakeProductCatalog) ListProductModels(context.Context, int64, int64) ([]domain.ProductModel, error) {
 	return []domain.ProductModel{{ID: 1, ProductID: 1, Version: 1}}, nil
 }
+
 func (fakeProductCatalog) PublishProductModel(context.Context, int64, int64, int) error { return nil }
+
 func (fakeProductCatalog) GetProductModel(context.Context, int64, int64, int) (domain.ProductModel, error) {
 	return domain.ProductModel{ID: 1, ProductID: 1, Version: 1}, nil
 }
+
 func (fakeProductCatalog) AssignDeviceProduct(context.Context, int64, string, int64, int) error {
 	return nil
 }
+
 func (fakeProductCatalog) AssignDeviceProductByActor(context.Context, int64, string, int64, int, int64) error {
 	return nil
 }
+
 func (fakeProductCatalog) DeviceAssignment(context.Context, int64, string) (domain.ProductModel, error) {
 	return domain.ProductModel{ID: 1, ProductID: 1, Version: 1}, nil
 }
@@ -71,7 +79,7 @@ func (f *fakeStore) FindAdminByLogin(_ context.Context, login string) (*domain.U
 	if f.admin != nil && *f.admin.Username == login {
 		return f.admin, nil
 	}
-	return nil, domain.ErrUnknownMetric // any error → 401
+	return nil, domain.ErrNotFound
 }
 
 func (f *fakeStore) AdminTokenVersion(_ context.Context, _ int64) (int, error)       { return 0, nil }
@@ -131,6 +139,7 @@ func (f *fakeStore) DeleteDevice(_ context.Context, no string) error {
 	delete(f.devices, no)
 	return nil
 }
+
 func (f *fakeStore) RestoreDevice(_ context.Context, no string) error {
 	if f.restoreErr != nil {
 		return f.restoreErr
@@ -198,6 +207,7 @@ func (f *fakeStore) Stats(_ context.Context) (domain.Stats, error) { return f.st
 func (f *fakeStore) LicenseStatus(context.Context) (license.Status, error) {
 	return f.licenseStatus, f.licenseErr
 }
+
 func (f *fakeStore) ImportLicenseRaw(_ context.Context, _ []byte, envelope license.Envelope, _ int64) error {
 	if f.importErr != nil {
 		return f.importErr
@@ -205,10 +215,12 @@ func (f *fakeStore) ImportLicenseRaw(_ context.Context, _ []byte, envelope licen
 	f.imports = append(f.imports, envelope)
 	return nil
 }
+
 func (f *fakeStore) RecordLicenseRejection(_ context.Context, raw []byte, _ int64, _ string) error {
 	f.rejections = append(f.rejections, append([]byte(nil), raw...))
 	return nil
 }
+
 func (f *fakeStore) RecordLicenseRejectionDigest(context.Context, string, int64, string) error {
 	return nil
 }

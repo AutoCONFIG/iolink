@@ -24,8 +24,10 @@ func TestWechatLoginTracesSafeHTTPOutcomes(t *testing.T) {
 		timeout   bool
 	}{
 		{name: "success", status: 200, body: `{"openid":"private-open-id","session_key":"private-session-key"}`},
-		{name: "provider failure", status: 400, body: `{"errcode":40029,"errmsg":"private-provider-message"}`, errorCode: "provider_error"},
-		{name: "malformed response", status: 503, body: `private-body`, errorCode: "response_decode"},
+		{name: "provider failure", status: 400, body: `{"errcode":40029,"errmsg":"private-provider-message"}`, errorCode: "upstream_status"},
+		{name: "malformed response", status: 503, body: `private-body`, errorCode: "upstream_status"},
+		{name: "invalid credential", status: 200, body: `{"errcode":40029,"errmsg":"private-provider-message"}`, errorCode: "provider_error"},
+		{name: "malformed success response", status: 200, body: `private-body`, errorCode: "response_decode"},
 		{name: "timeout", status: 0, errorCode: "deadline_exceeded", timeout: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

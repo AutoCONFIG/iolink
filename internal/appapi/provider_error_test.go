@@ -88,7 +88,7 @@ func TestBaselineHTTPProviderFailuresUseSafeInternalError(t *testing.T) {
 		{"pond_list_devices", "GET", "/ponds", func(d *Deps) { d.Devices = failingDeviceList{} }},
 		{"pond_detail_devices", "GET", "/ponds/1", func(d *Deps) { d.Devices = failingDeviceList{} }},
 		{"pond_detail_alarms", "GET", "/ponds/1", func(d *Deps) { d.Alarms = &failingAlarmList{} }},
-		{"device_list_ponds", "GET", "/devices", func(d *Deps) { d.Ponds = &failingPondList{} }},
+		{"device_list_ponds", "GET", "/devices?pond_id=1", func(d *Deps) { d.Ponds = &failingPondDetail{} }},
 		{"device_list_devices", "GET", "/devices", func(d *Deps) { d.Devices = failingDeviceList{} }},
 		{"history_query", "GET", "/water/history?device_no=private-device&metric=ph", func(d *Deps) { d.Telemetry = failingHistory{} }},
 		{"history_capability", "GET", "/water/history?device_no=private-device&metric=ph", func(d *Deps) { d.Telemetry = missingScopedHistory{fakeTelemetry{}} }},
@@ -179,7 +179,7 @@ func exerciseProviderFailure(t *testing.T, tc providerHTTPCase) {
 		}
 		if record.Stage == "http_provider" && record.Level == "ERROR" {
 			expectedError := `"*errors.errorString"`
-			if tc.name == "history_capability" {
+			if tc.name == "history_capability" || tc.name == "device_page_capability" {
 				expectedError = ""
 			}
 			if requestID == "" || record.RequestID != requestID || string(record.Error) != expectedError {

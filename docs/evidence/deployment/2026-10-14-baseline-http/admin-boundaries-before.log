@@ -1,0 +1,93 @@
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}
+    baseline_admin_contract_helpers_test.go:137: PUT /farms/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}
+    baseline_admin_contract_helpers_test.go:137: DELETE /farms/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /farms/{id} status=404 issues=[{response_selection []}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}
+    baseline_admin_contract_helpers_test.go:137: PUT /ponds/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}
+    baseline_admin_contract_helpers_test.go:137: DELETE /ponds/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /ponds/{id} status=404 issues=[{response_selection []}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}
+    baseline_admin_contract_helpers_test.go:137: PUT /alarm-rules/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}
+    baseline_admin_contract_helpers_test.go:137: DELETE /alarm-rules/{id} status=204 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm
+    baseline_admin_contract_helpers_test.go:137: POST /alarms/{id}/confirm status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}
+    baseline_admin_contract_helpers_test.go:137: PUT /farms/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}
+    baseline_admin_contract_helpers_test.go:137: DELETE /farms/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /farms/{id} status=404 issues=[{response_selection []}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}
+    baseline_admin_contract_helpers_test.go:137: PUT /ponds/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}
+    baseline_admin_contract_helpers_test.go:137: DELETE /ponds/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /ponds/{id} status=404 issues=[{response_selection []}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}
+    baseline_admin_contract_helpers_test.go:137: PUT /alarm-rules/{id} status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}
+    baseline_admin_contract_helpers_test.go:137: DELETE /alarm-rules/{id} status=204 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm
+    baseline_admin_contract_helpers_test.go:137: POST /alarms/{id}/confirm status=404 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries//devices?pond_id=
+    baseline_admin_contract_helpers_test.go:148: GET /devices status=200 want=400
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries//devices?pond_id=/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries//devices?page=9223372036854775807&page_size=200
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries//devices?page=9223372036854775807&page_size=200/response_contract
+--- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries (5.76s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id} (0.26s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id} (0.25s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id} (0.28s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id} (0.26s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id} (0.25s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id} (0.27s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm (0.29s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm/response_contract (0.29s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id} (0.29s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}/response_contract (0.29s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id} (0.26s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id} (0.25s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id} (0.24s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id} (0.26s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id} (0.42s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}/response_contract (0.42s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm (0.39s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm/response_contract (0.39s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries//devices?pond_id= (0.30s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries//devices?pond_id=/response_contract (0.29s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries//devices?page=9223372036854775807&page_size=200 (0.27s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries//devices?page=9223372036854775807&page_size=200/response_contract (0.26s)
+=== RUN   TestBaselineAdminDeviceDetailPreservesDatabaseFailure
+    baseline_admin_contract_helpers_test.go:156: GET /devices/{device_no} status=404 want=500
+=== RUN   TestBaselineAdminDeviceDetailPreservesDatabaseFailure/response_contract
+--- FAIL: TestBaselineAdminDeviceDetailPreservesDatabaseFailure (2.18s)
+    --- PASS: TestBaselineAdminDeviceDetailPreservesDatabaseFailure/response_contract (0.24s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	8.030s
+FAIL

@@ -95,13 +95,13 @@ func (s *Server) pondLatest(ctx context.Context, pondID int64, devs []iolinkcont
 
 func (s *Server) getPond(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	p, err := s.deps.Ponds.GetByUser(c.Request.Context(), id, uid(c))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
+		s.resourceFailure(c, err)
 		return
 	}
 	devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
@@ -127,52 +127,11 @@ func (s *Server) getPond(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"pond_id": p.ID, "pond_name": p.Name, "status": status, "device_count": len(devs), "latest": latest})
 }
 
-func (s *Server) listDevices(c *gin.Context) {
-	pondID := int64(0)
-	if raw := c.Query("pond_id"); raw != "" {
-		var err error
-		pondID, err = strconv.ParseInt(raw, 10, 64)
-		if err != nil || pondID < 1 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pond_id"})
-			return
-		}
-	}
-	ponds, err := s.deps.Ponds.ListByUser(c.Request.Context(), uid(c))
-	if err != nil {
-		s.providerFailure(c, err)
-		return
-	}
-	out := make([]gin.H, 0)
-	foundPond := pondID == 0
-	for _, p := range ponds {
-		if pondID != 0 && p.ID != pondID {
-			continue
-		}
-		foundPond = true
-		devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
-		if err != nil {
-			s.providerFailure(c, err)
-			return
-		}
-		for _, d := range devs {
-			out = append(out, gin.H{
-				"id": d.ID, "device_no": d.DeviceNo, "pond_id": d.PondID,
-				"name": d.Name, "model": d.Model, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval,
-			})
-		}
-	}
-	if !foundPond {
-		c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
-		return
-	}
-	c.JSON(http.StatusOK, out)
-}
-
 func (s *Server) getDevice(c *gin.Context) {
 	no := c.Param("device_no")
 	d, err := s.deps.Devices.GetByDeviceNoForUser(c.Request.Context(), no, uid(c))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+		s.resourceFailure(c, err)
 		return
 	}
 	resp := gin.H{
@@ -191,19 +150,24 @@ func (s *Server) getDevice(c *gin.Context) {
 }
 
 func (s *Server) waterLatest(c *gin.Context) {
-	no := c.Query("device_no")
+	values, err := parseQueryInput(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	no := values.Get("device_no")
 	if no == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "device_no required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if _, err := s.deps.Devices.GetByDeviceNoForUser(c.Request.Context(), no, uid(c)); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "no data"})
+		s.resourceFailure(c, err)
 		return
 	}
 	rd, err := s.deps.Telemetry.Latest(c.Request.Context(), no)
 	if err != nil {
 		if errors.Is(err, iolinkcontractsdomain.ErrInvalidProductModel) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported_product"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 		if errors.Is(err, iolinkcontractsdomain.ErrNotFound) {
@@ -224,30 +188,39 @@ func (s *Server) latestFailure(c *gin.Context, err error) {
 }
 
 func (s *Server) waterHistory(c *gin.Context) {
-	no := c.Query("device_no")
-	metric := c.Query("metric")
+	values, err := parseQueryInput(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	no := values.Get("device_no")
+	metric := values.Get("metric")
 	if no == "" || metric == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "device_no and metric required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	_, currentOwner := s.deps.Devices.GetByDeviceNoForUser(c.Request.Context(), no, uid(c))
+	if currentOwner != nil && !errors.Is(currentOwner, iolinkcontractsdomain.ErrNotFound) {
+		s.providerFailure(c, currentOwner)
+		return
+	}
 	_, scopedHistory := s.deps.Telemetry.(iolinkcontractsdomain.UserTelemetryRepo)
 	if currentOwner != nil && !scopedHistory {
-		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 		return
 	}
 	if !iolinkcontractsdomain.ValidMetric(metric) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid metric"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
-	maxPoints, err := strconv.Atoi(c.DefaultQuery("max_points", "200"))
+	maxPoints, err := strconv.Atoi(queryValueOrDefault(values, "max_points", "200"))
 	if err != nil || maxPoints < 1 || maxPoints > 200 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid max_points"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
-	from, to, err := historyWindow(c.DefaultQuery("range", "today"), time.Now())
+	from, to, err := historyWindow(queryValueOrDefault(values, "range", "today"), time.Now())
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid range"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	scoped, ok := s.deps.Telemetry.(iolinkcontractsdomain.UserTelemetryRepo)
@@ -258,14 +231,14 @@ func (s *Server) waterHistory(c *gin.Context) {
 	points, err := scoped.HistoryForUser(c.Request.Context(), no, uid(c), metric, from, to, maxPoints)
 	if err != nil {
 		if errors.Is(err, iolinkcontractsdomain.ErrInvalidProductModel) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported_product"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 		s.providerFailure(c, err)
 		return
 	}
 	if currentOwner != nil && len(points) == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 		return
 	}
 	if points == nil {
@@ -291,24 +264,29 @@ func historyWindow(name string, now time.Time) (time.Time, time.Time, error) {
 }
 
 func (s *Server) listAlarms(c *gin.Context) {
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "50"))
-	if err != nil || limit < 1 || limit > 200 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid limit"})
-		return
-	}
-	offset, err := strconv.Atoi(c.DefaultQuery("offset", "0"))
-	if err != nil || offset < 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid offset"})
-		return
-	}
-	level := c.Query("level")
-	if level != "" && level != string(iolinkcontractsdomain.AlarmCritical) && level != string(iolinkcontractsdomain.AlarmWarning) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid level"})
-		return
-	}
-	onlyUnconfirmed, err := strconv.ParseBool(c.DefaultQuery("only_unconfirmed", "false"))
+	values, err := parseQueryInput(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid only_unconfirmed"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	limit, err := strconv.Atoi(queryValueOrDefault(values, "limit", "50"))
+	if err != nil || limit < 1 || limit > 200 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	offset, err := strconv.Atoi(queryValueOrDefault(values, "offset", "0"))
+	if err != nil || offset < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	level := values.Get("level")
+	if level != "" && level != string(iolinkcontractsdomain.AlarmCritical) && level != string(iolinkcontractsdomain.AlarmWarning) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	onlyUnconfirmed, err := strconv.ParseBool(queryValueOrDefault(values, "only_unconfirmed", "false"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	var alarms []iolinkcontractsdomain.Alarm
@@ -349,13 +327,13 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 		return
 	}
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := s.deps.Alarms.ConfirmByUser(c.Request.Context(), id, uid(c)); err != nil {
 		if errors.Is(err, iolinkcontractsdomain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "alarm not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)

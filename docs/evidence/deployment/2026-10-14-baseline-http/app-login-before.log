@@ -1,0 +1,53 @@
+-test.shuffle 1791909994644508633
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/extra_field
+    baseline_app_contract_test.go:247: invalid login created a user
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/wrong_field_case
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=401 expected=400
+    baseline_app_contract_test.go:249: app HTTP status: POST /auth/login got=401 want=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/duplicate_field
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=401 expected=400
+    baseline_app_contract_test.go:249: app HTTP status: POST /auth/login got=401 want=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/trailing_object
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=401 expected=400
+    baseline_app_contract_test.go:249: app HTTP status: POST /auth/login got=401 want=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/trailing_garbage
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=401 expected=400
+    baseline_app_contract_test.go:249: app HTTP status: POST /auth/login got=401 want=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/missing_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+    baseline_app_contract_test.go:251: invalid login did not return the safe error code
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/empty_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+    baseline_app_contract_test.go:251: invalid login did not return the safe error code
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/null_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+    baseline_app_contract_test.go:251: invalid login did not return the safe error code
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/number_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+    baseline_app_contract_test.go:251: invalid login did not return the safe error code
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/array_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+    baseline_app_contract_test.go:251: invalid login did not return the safe error code
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/null_body
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+    baseline_app_contract_test.go:251: invalid login did not return the safe error code
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/array_body
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+    baseline_app_contract_test.go:251: invalid login did not return the safe error code
+--- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers (2.13s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/extra_field (0.00s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/wrong_field_case (0.00s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/duplicate_field (0.00s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/trailing_object (0.00s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/trailing_garbage (0.00s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/missing_code (0.22s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/empty_code (0.21s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/null_code (0.22s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/number_code (0.21s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/array_code (0.21s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/null_body (0.21s)
+    --- FAIL: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/array_body (0.22s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	2.169s
+FAIL

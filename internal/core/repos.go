@@ -67,6 +67,9 @@ func (r *pondRepo) GetByUser(ctx context.Context, id, userID int64) (domain.Pond
 		args = append(args, tenantID)
 	}
 	err := r.pool.QueryRow(ctx, q, args...).Scan(&p.ID, &p.FarmID, &p.Name, &p.AreaMu, &p.CreatedAt)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.Pond{}, domain.ErrNotFound
+	}
 	return p, err
 }
 
@@ -109,6 +112,9 @@ func (r *deviceRepo) GetByDeviceNoForUser(ctx context.Context, no string, userID
 		args = append(args, tenantID)
 	}
 	err := r.pool.QueryRow(ctx, q, args...).Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.Device{}, domain.ErrNotFound
+	}
 	return d, err
 }
 

@@ -89,8 +89,22 @@ func TestAppResourceHTTPWhenRoleDeterminesFarmScope(t *testing.T) {
 					status, raw := appScopeHTTP(t, server, appScopeRequest{http.MethodGet, path, "", token})
 					// Then: the response contains exactly the farms permitted by the live tenant role.
 					var rows []json.RawMessage
-					if err := json.Unmarshal(raw, &rows); err != nil || status != 200 || len(rows) != wantCount {
-						t.Fatalf("role=%s status=%d rows=%d want=%d error=%v", role, status, len(rows), wantCount, err)
+					var decodeErr error
+					if path == "/api/v1/devices" {
+						var page struct {
+							List  []json.RawMessage `json:"list"`
+							Total int               `json:"total"`
+						}
+						decodeErr = json.Unmarshal(raw, &page)
+						rows = page.List
+						if page.Total != wantCount {
+							t.Errorf("role=%s total=%d want=%d", role, page.Total, wantCount)
+						}
+					} else {
+						decodeErr = json.Unmarshal(raw, &rows)
+					}
+					if decodeErr != nil || status != 200 || len(rows) != wantCount {
+						t.Fatalf("role=%s status=%d rows=%d want=%d error=%v", role, status, len(rows), wantCount, decodeErr)
 					}
 				})
 			}

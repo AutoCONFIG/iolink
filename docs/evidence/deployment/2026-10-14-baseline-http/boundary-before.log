@@ -1,0 +1,103 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.venv/contracts/bin/python
+cachedir: .pytest_cache
+rootdir: /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink
+collecting ... collected 26 items / 22 deselected / 4 selected
+
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[nested-nan] PASSED [ 25%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[nested-positive-infinity] PASSED [ 50%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[nested-negative-infinity] PASSED [ 75%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[absent-body-with-private-data] FAILED [100%]
+
+=================================== FAILURES ===================================
+_ test_cli_exit_and_diagnostics_when_input_valid_or_private[absent-body-with-private-data] _
+
+payload = '{"spec": "app", "method": "POST", "route": "/alarms/{id}/confirm", "status": 204, "content_type": "application/json; charset=utf-8", "has_body": false, "body": {"private-provider-password-JWT-xyz": "private-provider-password-JWT-xyz"}}'
+exit_code = 1
+
+    @pytest.mark.parametrize(
+        ("payload", "exit_code"),
+        [
+            (error_response().model_dump_json(), 0),
+            (
+                error_response()
+                .model_copy(update={"body": {"error": "internal_error", SECRET: SECRET}})
+                .model_dump_json(),
+                1,
+            ),
+            (error_response().model_copy(update={"spec": SECRET}).model_dump_json(), 1),
+            (json.dumps({**error_response().model_dump(), "status": True}), 1),
+            (json.dumps({**error_response().model_dump(), "has_body": "true"}), 1),
+            ('{"body": "' + SECRET, 1),
+            *[
+                (
+                    json.dumps(
+                        {
+                            **error_response().model_dump(),
+                            "spec": "admin",
+                            "method": "POST",
+                            "route": "/login",
+                            "status": 200,
+                            "body": {
+                                "token": SECRET,
+                                "expires_in": 1,
+                                "platform_admin": True,
+                                "extra": {"nested": [number]},
+                            },
+                        }
+                    ),
+                    1,
+                )
+                for number in (float("nan"), float("inf"), float("-inf"))
+            ],
+            (
+                json.dumps(
+                    {
+                        **error_response().model_dump(),
+                        "method": "POST",
+                        "route": "/alarms/{id}/confirm",
+                        "status": 204,
+                        "has_body": False,
+                        "body": {SECRET: SECRET},
+                    }
+                ),
+                1,
+            ),
+        ],
+        ids=[
+            "valid-500",
+            "extra-private-field",
+            "unknown-spec",
+            "boolean-status",
+            "string-has-body",
+            "malformed-json",
+            "nested-nan",
+            "nested-positive-infinity",
+            "nested-negative-infinity",
+            "absent-body-with-private-data",
+        ],
+    )
+    def test_cli_exit_and_diagnostics_when_input_valid_or_private(
+        payload: str, exit_code: int
+    ) -> None:
+        # Given
+        invocation = [sys.executable, str(SCRIPT)]
+        # When
+        completed = subprocess.run(
+            invocation,
+            input=payload,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=False,
+        )
+        # Then
+        result = Result.model_validate_json(completed.stdout)
+>       assert completed.returncode == exit_code
+E       assert 0 == 1
+E        +  where 0 = CompletedProcess(args=['/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.venv/contracts/bin/python', '/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py'], returncode=0, stdout='{"valid":true,"issues":[]}\n', stderr='').returncode
+
+scripts/test_validate_http_response.py:235: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[absent-body-with-private-data]
+================== 1 failed, 3 passed, 22 deselected in 1.15s ==================

@@ -80,7 +80,7 @@ func TestLatestHTTPDistinguishesMissingShadowFromProviderFailure(t *testing.T) {
 					return
 				}
 				if want == http.StatusBadRequest {
-					if string(body) != `{"error":"unsupported_product"}` {
+					if string(body) != `{"error":"invalid_request"}` {
 						t.Fatalf("unsupported body=%s", body)
 					}
 					return

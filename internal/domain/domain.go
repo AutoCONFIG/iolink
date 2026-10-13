@@ -186,6 +186,10 @@ type DeviceRepo interface {
 	UpdateStatus(ctx context.Context, deviceNo string, s DeviceStatus) error
 }
 
+type UserDevicePageRepo interface {
+	ListPageByUser(ctx context.Context, userID int64, query DeviceListQuery) (DevicePage, error)
+}
+
 type TelemetryRepo interface {
 	// Latest returns the most recent reading per metric for a device.
 	// ErrNotFound denotes an absent shadow; provider failures remain errors.

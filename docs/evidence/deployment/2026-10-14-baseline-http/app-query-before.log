@@ -1,0 +1,22 @@
+-test.shuffle 1791911630614542703
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_malformed_query_escape
+    baseline_app_contract_test.go:159: app contract method=GET route=/devices status=200 expected=400
+    baseline_app_contract_test.go:159: app HTTP status: GET /devices got=200 want=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_malformed_query_escape
+    baseline_app_contract_test.go:159: app contract method=GET route=/water/history status=200 expected=400
+    baseline_app_contract_test.go:159: app HTTP status: GET /water/history got=200 want=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_malformed_query_escape
+    baseline_app_contract_test.go:159: app contract method=GET route=/alarms status=200 expected=400
+    baseline_app_contract_test.go:159: app HTTP status: GET /alarms got=200 want=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/latest_malformed_query_escape
+    baseline_app_contract_test.go:159: app contract method=GET route=/water/latest status=200 expected=400
+    baseline_app_contract_test.go:159: app HTTP status: GET /water/latest got=200 want=400
+--- FAIL: TestBaselineAppContractRejectionsWithRealPostgres (0.61s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/device_malformed_query_escape (0.00s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/history_malformed_query_escape (0.00s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/alarm_malformed_query_escape (0.00s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/latest_malformed_query_escape (0.00s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	0.645s
+FAIL

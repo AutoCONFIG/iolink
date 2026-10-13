@@ -18,6 +18,8 @@ M0–M5目标契约已放docs/api，但当前handler仍有差异，不能声称�
 
 统一入口为 `make verify`（全部Go包build/vet/test）；静态契约用 `make docs-tools && make verify-contracts`。接口测试需本机临时端口权限。真实数据库测试设置 `IOLINK_TEST_PG_DSN` 指向专用隔离Timescale实例，测试自动创建/删除自己命名的数据库，角色须有CREATEDB权限；`make integration` 拒绝未提供DSN，普通 `make verify` 未提供DSN会跳过这些用例。CI的Go任务提供该变量，远程执行结果另行取证。
 
+既有35操作的真实响应测试还使用contracts Python环境读取当前OpenAPI：首次先运行 `make docs-tools`，再执行带DSN的 `make verify` / `make integration`。默认 `.venv/contracts/bin/python`；导出源码快照等隔离路径可设置 `IOLINK_CONTRACT_PYTHON` 指向已准备的绝对路径。缺少依赖直接失败，不跳过契约检查；真实响应只通过stdin传递，测试诊断仅打印方法、路由模板、状态和schema关键词/位置。
+
 M0可运行 `scripts/smoke_m0.py`，所需环境和二进制见脚本头部；该脚本仅在指定测试容器中创建并删除随机命名数据库。它证明当前装配链路，不替代全部目标HTTP契约验收。
 
 ## 证据和复审

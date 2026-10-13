@@ -19,21 +19,36 @@ type loginReq struct {
 
 func (s *Server) login(c *gin.Context) {
 	var req loginReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "username", "password"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	u, err := s.deps.Store.FindAdminByLogin(c.Request.Context(), req.Username)
-	if err != nil || u.PasswordHash == nil || !platform.CheckPassword(*u.PasswordHash, req.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+	if err != nil {
+		if errors.Is(err, domain.ErrNotFound) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		} else {
+			s.providerFailure(c, err)
+		}
+		return
+	}
+	if u == nil {
+		s.providerUnavailable(c)
+		return
+	}
+	if u.PasswordHash == nil || !platform.CheckPassword(*u.PasswordHash, req.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 	if c.GetBool("user_login") && u.Authority == "ADMIN" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "business user required"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	if platform.IsLegacyPassword(*u.PasswordHash) {
-		_ = s.deps.Store.UpgradeAdminPassword(c.Request.Context(), u.ID, platform.HashPassword(req.Password))
+		if err := s.deps.Store.UpgradeAdminPassword(c.Request.Context(), u.ID, platform.HashPassword(req.Password)); err != nil {
+			s.providerFailure(c, err)
+			return
+		}
 	}
 	version, err := s.deps.Store.AdminTokenVersion(c.Request.Context(), u.ID)
 	if err != nil {
@@ -58,14 +73,14 @@ func (s *Server) login(c *gin.Context) {
 			}
 			claims["tenant_role"] = role
 		} else if errors.Is(tenantErr, domain.ErrInactiveTenant) && u.Authority != "ADMIN" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant membership inactive"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		} else if tenantErr != nil && !errors.Is(tenantErr, domain.ErrNotFound) && !errors.Is(tenantErr, domain.ErrInactiveTenant) {
 			s.providerFailure(c, tenantErr)
 			return
 		}
 	} else if u.Authority != "ADMIN" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant store unavailable"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(key)
@@ -174,21 +189,21 @@ func (s *Server) authRequired(c *gin.Context) {
 
 func (s *Server) tenantRequired(c *gin.Context) {
 	if _, scopedStore := s.deps.Store.(adminTenantStore); !scopedStore {
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "tenant store unavailable"})
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	if _, ok := domain.TenantID(c.Request.Context()); !ok {
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "tenant context required"})
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	if s.deps.Policy == nil {
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "tenant policy unavailable"})
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	resource, action := tenantPermission(c.FullPath(), c.Request.Method)
 	allowed, err := s.deps.Policy.Allow(domain.TenantRole(c.Request.Context()), resource, action)
 	if err != nil || !allowed {
-		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "tenant action forbidden"})
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	c.Next()

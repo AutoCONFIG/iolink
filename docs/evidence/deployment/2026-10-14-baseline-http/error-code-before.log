@@ -1,0 +1,455 @@
+-test.shuffle 1791911303955356190
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /login status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity/response_contract
+--- FAIL: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure (4.66s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input (0.26s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input/response_contract (0.26s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01 (0.27s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01/response_contract (0.27s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02 (0.26s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02/response_contract (0.26s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03 (0.26s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03/response_contract (0.26s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04 (0.26s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04/response_contract (0.26s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05 (0.27s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity (0.26s)
+        --- FAIL: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity/response_contract (0.26s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure (0.27s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure/response_contract (0.26s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity (0.44s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity/response_contract (0.27s)
+=== RUN   TestBaselineAdminContractRejectedRequests
+=== RUN   TestBaselineAdminContractRejectedRequests/401_missing_token
+=== RUN   TestBaselineAdminContractRejectedRequests/401_missing_token/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: GET /stats status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/400_malformed
+=== RUN   TestBaselineAdminContractRejectedRequests/400_malformed/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_unknown_field
+=== RUN   TestBaselineAdminContractRejectedRequests/400_unknown_field/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_trailing_json
+=== RUN   TestBaselineAdminContractRejectedRequests/400_trailing_json/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_omitted
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_omitted/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_zero
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_zero/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_farm_update_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_farm_update_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_area_negative
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_area_negative/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_update_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_update_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_interval_zero
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_interval_zero/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_interval_null
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_interval_null/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_move_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_move_unknown/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /devices/{device_no}/pond status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_enabled_null
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_enabled_null/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_update_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_update_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_password_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_password_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_batch_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_batch_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_batch_zero_id
+=== RUN   TestBaselineAdminContractRejectedRequests/400_batch_zero_id/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_transfer
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_transfer/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_farm
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_farm/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /farms/{id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_device
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_device/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_farm
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_farm/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /farms/{id} status=409 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_pond
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_pond/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /ponds/{id} status=409 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/400_duplicate_batch
+=== RUN   TestBaselineAdminContractRejectedRequests/400_duplicate_batch/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /alarms/batch-confirm status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_GET
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_GET/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_PUT
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_PUT/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /farms/{id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/viewer_fixture_rule
+=== RUN   TestBaselineAdminContractRejectedRequests/viewer_fixture_rule/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/farms
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/farms/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /farms status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /farms/{id} status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/farms/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/farms/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /farms/{id} status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/owner
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/owner/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /farms/{id}/owner status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/ponds
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/ponds/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /ponds status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/ponds/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/ponds/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /ponds/{id} status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/ponds/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/ponds/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /ponds/{id} status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/devices
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/devices/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/devices/{device_no}/pond
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/devices/{device_no}/pond/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /devices/{device_no}/pond status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/devices/{device_no}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/devices/{device_no}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /devices/{device_no} status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarm-rules
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarm-rules/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /alarm-rules status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/alarm-rules/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/alarm-rules/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /alarm-rules/{id} status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/alarm-rules/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/alarm-rules/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /alarm-rules/{id} status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/{id}/confirm
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/{id}/confirm/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /alarms/{id}/confirm status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/batch-confirm
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/batch-confirm/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /alarms/batch-confirm status=403 issues=[{enum [properties error enum]}]
+--- FAIL: TestBaselineAdminContractRejectedRequests (14.35s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/401_missing_token (0.26s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/401_missing_token/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_malformed (0.32s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_malformed/response_contract (0.32s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_unknown_field (0.34s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_unknown_field/response_contract (0.34s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_trailing_json (0.29s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_trailing_json/response_contract (0.29s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_omitted (0.36s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_omitted/response_contract (0.35s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_zero (0.29s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_zero/response_contract (0.29s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_farm_update_unknown (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_farm_update_unknown/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_unknown (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_unknown/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_unknown (0.31s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_unknown/response_contract (0.31s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_area_negative (0.33s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_area_negative/response_contract (0.31s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_update_unknown (0.29s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_update_unknown/response_contract (0.28s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_device_unknown (0.29s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_device_unknown/response_contract (0.28s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_device_interval_zero (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_device_interval_zero/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_device_interval_null (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_device_interval_null/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/400_move_unknown (0.25s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/400_move_unknown/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_unknown (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_unknown/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_enabled_null (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_enabled_null/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_update_unknown (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_update_unknown/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_password_unknown (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_password_unknown/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_batch_unknown (0.28s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_batch_unknown/response_contract (0.28s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_batch_zero_id (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_batch_zero_id/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_transfer (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_transfer/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/404_missing_farm (0.26s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/404_missing_farm/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_device (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_device/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/409_bound_farm (0.31s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/409_bound_farm/response_contract (0.31s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/409_bound_pond (0.26s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/409_bound_pond/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/400_duplicate_batch (0.29s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/400_duplicate_batch/response_contract (0.29s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_GET (0.28s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_GET/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/404_foreign_PUT (0.26s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/404_foreign_PUT/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/viewer_fixture_rule (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/viewer_fixture_rule/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/farms (0.25s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/farms/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id} (0.24s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/farms/{id} (0.24s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/farms/{id}/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/owner (0.25s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/owner/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/ponds (0.26s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/ponds/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/ponds/{id} (0.24s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/ponds/{id}/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/ponds/{id} (0.25s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/ponds/{id}/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/devices (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/devices/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/devices/{device_no}/pond (0.26s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/devices/{device_no}/pond/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/devices/{device_no} (0.25s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/devices/{device_no}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarm-rules (0.25s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarm-rules/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/alarm-rules/{id} (0.24s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/alarm-rules/{id}/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/alarm-rules/{id} (0.25s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/alarm-rules/{id}/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/{id}/confirm (0.24s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/{id}/confirm/response_contract (0.23s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/batch-confirm (0.28s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/batch-confirm/response_contract (0.28s)
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /farms/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /farms/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /ponds/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /ponds/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /alarm-rules/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /alarm-rules/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /alarms/{id}/confirm status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /farms/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /farms/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /ponds/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /ponds/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: PUT /alarm-rules/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: DELETE /alarm-rules/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: POST /alarms/{id}/confirm status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/empty_pond_filter
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/empty_pond_filter/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: GET /devices status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/overflow_page
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/overflow_page/response_contract
+    baseline_admin_contract_helpers_test.go:100: HTTP contract rejected response: GET /devices status=400 issues=[{enum [properties error enum]}]
+--- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries (5.90s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id} (0.26s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id} (0.27s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id} (0.27s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id} (0.27s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id} (0.25s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id} (0.26s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm (0.25s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id} (0.26s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id} (0.25s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id} (0.25s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id} (0.26s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id} (0.25s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id} (0.26s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm (0.26s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/empty_pond_filter (0.27s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/empty_pond_filter/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/overflow_page (0.25s)
+        --- FAIL: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/overflow_page/response_contract (0.25s)
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_credentials
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /ponds status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/invalid_credentials
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /devices status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /ponds/{id} status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /devices/{device_no} status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_latest
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /water/latest status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_history
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /water/history status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_alarms
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /alarms status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_summary
+    baseline_app_contract_test.go:155: app contract method=GET route=/stats/summary status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /stats/summary status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=401 expected=401
+    baseline_app_contract_test.go:155: HTTP contract rejected response: POST /alarms/{id}/confirm status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_login
+    baseline_app_contract_test.go:155: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /ponds/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/zero_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /ponds/{id} status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_latest
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_history
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=404 expected=404
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /water/history status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_latest_parameter
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /water/latest status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_metric
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /water/history status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_range
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /water/history status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /water/history status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_pond_parameter
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_page_lower_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_page_size_upper_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_status
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_limit
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /alarms status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_offset
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /alarms status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_level
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: GET /alarms status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: POST /alarms/{id}/confirm status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/zero_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=400 expected=400
+    baseline_app_contract_test.go:155: HTTP contract rejected response: POST /alarms/{id}/confirm status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=404 expected=404
+    baseline_app_contract_test.go:155: HTTP contract rejected response: POST /alarms/{id}/confirm status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=404 expected=404
+    baseline_app_contract_test.go:155: HTTP contract rejected response: POST /alarms/{id}/confirm status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/viewer_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=403 expected=403
+--- FAIL: TestBaselineAppContractRejectionsWithRealPostgres (9.03s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/missing_credentials (0.22s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/invalid_credentials (0.21s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_pond (0.21s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_device (0.22s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_latest (0.22s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_history (0.22s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_alarms (0.22s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_summary (0.29s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_confirm (0.23s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/malformed_login (0.23s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/malformed_pond (0.25s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/zero_pond (0.23s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_pond (0.26s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_pond (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_device (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_device (0.23s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_latest (0.24s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/foreign_history (0.23s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/missing_latest_parameter (0.24s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/history_metric (0.23s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/history_range (0.25s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/history_bound (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_pond_parameter (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_page_lower_bound (0.23s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_page_size_upper_bound (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_status (0.23s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/alarm_limit (0.23s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/alarm_offset (0.23s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/alarm_level (0.23s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/malformed_confirm (0.24s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/zero_confirm (0.22s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/missing_confirm (0.26s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/foreign_confirm (0.24s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/viewer_confirm (0.24s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	34.032s
+FAIL

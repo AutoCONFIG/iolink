@@ -1,0 +1,15 @@
+# git.hyhy.fun/rsplab/iolink/internal/core
+internal/web/embed.go:8:12: pattern all:dist: no matching files found
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core [setup failed]
+-test.shuffle 1791910202757092502
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_lookup
+    login_provider_test.go:31: status=401 body={"error":"invalid credentials"}
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_legacy_upgrade
+    login_provider_test.go:31: status=200 body={"expires_in":3600,"platform_admin":false,"token":"<test-token-redacted>"}
+--- FAIL: TestBaselineLoginProviderFailuresUseSafeDiagnostics (0.52s)
+    --- FAIL: TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_lookup (0.18s)
+    --- FAIL: TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_legacy_upgrade (0.35s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/adminapi	0.585s
+FAIL

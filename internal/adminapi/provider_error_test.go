@@ -122,7 +122,7 @@ func exerciseAdminProviderFailure(t *testing.T, tc adminProviderHTTPCase) {
 	}
 	// Then: only the stable contract leaves HTTP and one correlated safe diagnostic is kept.
 	if resp.StatusCode != 500 || string(response) != `{"error":"internal_error"}` {
-		t.Fatalf("status=%d body=%s", resp.StatusCode, response)
+		t.Fatalf("unexpected provider failure response: status=%d", resp.StatusCode)
 	}
 	logs, err := os.ReadFile(filepath.Join(dir, "test", "iolinkd.jsonl"))
 	if err != nil {

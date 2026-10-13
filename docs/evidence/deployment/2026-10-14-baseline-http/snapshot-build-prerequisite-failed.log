@@ -1,0 +1,2 @@
+frontend build missing: web/dist/index.html (run make web-verify first)
+make: *** [Makefile:9: embed-front] Error 1

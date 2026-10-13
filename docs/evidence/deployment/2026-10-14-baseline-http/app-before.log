@@ -1,0 +1,239 @@
+-test.shuffle 1791909459805894037
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/login
+    baseline_app_contract_test.go:14: app contract method=POST route=/auth/login status=200 expected=200
+    baseline_app_contract_test.go:14: HTTP contract rejected response: POST /auth/login status=200 issues=[{additionalProperties [properties user additionalProperties]}]
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/ponds
+    baseline_app_contract_test.go:33: app contract method=GET route=/ponds status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/pond_detail
+    baseline_app_contract_test.go:33: app contract method=GET route=/ponds/{id} status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/devices
+    baseline_app_contract_test.go:33: app contract method=GET route=/devices status=200 expected=200
+    baseline_app_contract_test.go:33: HTTP contract rejected response: GET /devices status=200 issues=[{type [type]}]
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/device_detail
+    baseline_app_contract_test.go:33: app contract method=GET route=/devices/{device_no} status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/latest
+    baseline_app_contract_test.go:33: app contract method=GET route=/water/latest status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/history
+    baseline_app_contract_test.go:33: app contract method=GET route=/water/history status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/alarms
+    baseline_app_contract_test.go:33: app contract method=GET route=/alarms status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/summary
+    baseline_app_contract_test.go:33: app contract method=GET route=/stats/summary status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/confirm
+    baseline_app_contract_test.go:33: app contract method=POST route=/alarms/{id}/confirm status=204 expected=204
+--- FAIL: TestBaselineAppContractPositiveMatrixWithRealPostgres (2.74s)
+    --- FAIL: TestBaselineAppContractPositiveMatrixWithRealPostgres/login (0.21s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/ponds (0.22s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/pond_detail (0.21s)
+    --- FAIL: TestBaselineAppContractPositiveMatrixWithRealPostgres/devices (0.20s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/device_detail (0.24s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/latest (0.21s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/history (0.20s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/alarms (0.20s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/summary (0.21s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/confirm (0.20s)
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_credentials
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/invalid_credentials
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_latest
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_history
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_alarms
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_summary
+    baseline_app_contract_test.go:155: app contract method=GET route=/stats/summary status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_login
+    baseline_app_contract_test.go:155: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/zero_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=404 expected=400
+    baseline_app_contract_test.go:155: app HTTP status: GET /ponds/{id} got=404 want=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_latest
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_history
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_latest_parameter
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_metric
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_range
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_pond_parameter
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_page_lower_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=200 expected=400
+    baseline_app_contract_test.go:155: app HTTP status: GET /devices got=200 want=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_page_size_upper_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=200 expected=400
+    baseline_app_contract_test.go:155: app HTTP status: GET /devices got=200 want=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_status
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=200 expected=400
+    baseline_app_contract_test.go:155: app HTTP status: GET /devices got=200 want=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_limit
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_offset
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_level
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/zero_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=404 expected=400
+    baseline_app_contract_test.go:155: app HTTP status: POST /alarms/{id}/confirm got=404 want=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/viewer_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=403 expected=403
+    baseline_app_contract_test.go:155: HTTP contract rejected response: POST /alarms/{id}/confirm status=403 issues=[{response_selection []}]
+--- FAIL: TestBaselineAppContractRejectionsWithRealPostgres (6.41s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_credentials (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/invalid_credentials (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_pond (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_device (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_latest (0.19s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_history (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_alarms (0.19s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_summary (0.19s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_confirm (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/malformed_login (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/malformed_pond (0.20s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/zero_pond (0.00s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_pond (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_pond (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_device (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_device (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_latest (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_history (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_latest_parameter (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/history_metric (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/history_range (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/history_bound (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_pond_parameter (0.20s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/device_page_lower_bound (0.00s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/device_page_size_upper_bound (0.00s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/device_status (0.00s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/alarm_limit (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/alarm_offset (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/alarm_level (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/malformed_confirm (0.20s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/zero_confirm (0.01s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_confirm (0.19s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_confirm (0.20s)
+    --- FAIL: TestBaselineAppContractRejectionsWithRealPostgres/viewer_confirm (0.20s)
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_ponds
+    baseline_app_contract_test.go:82: app contract method=GET route=/ponds status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_devices
+    baseline_app_contract_test.go:82: app contract method=GET route=/devices status=200 expected=200
+    baseline_app_contract_test.go:82: HTTP contract rejected response: GET /devices status=200 issues=[{type [type]}]
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_alarms
+    baseline_app_contract_test.go:82: app contract method=GET route=/alarms status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/zero_summary
+    baseline_app_contract_test.go:82: app contract method=GET route=/stats/summary status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/null_shadow
+    baseline_app_contract_test.go:82: app contract method=GET route=/water/latest status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/null_device_latest
+    baseline_app_contract_test.go:82: app contract method=GET route=/devices/{device_no} status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_pond
+    baseline_app_contract_test.go:82: app contract method=GET route=/ponds/{id} status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_history
+    baseline_app_contract_test.go:82: app contract method=GET route=/water/history status=200 expected=200
+--- FAIL: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres (2.24s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_ponds (0.21s)
+    --- FAIL: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_devices (0.20s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_alarms (0.21s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/zero_summary (0.20s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/null_shadow (0.21s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/null_device_latest (0.21s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_pond (0.20s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_history (0.20s)
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/alarms
+    baseline_app_contract_test.go:182: app contract method=GET route=/alarms status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/POST_/alarms/{id}/confirm
+    baseline_app_contract_test.go:182: app contract method=POST route=/alarms/{id}/confirm status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/history
+    baseline_app_contract_test.go:182: app contract method=GET route=/water/history status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/latest
+    baseline_app_contract_test.go:182: app contract method=GET route=/water/latest status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/devices
+    baseline_app_contract_test.go:182: app contract method=GET route=/devices status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/devices/{device_no}
+    baseline_app_contract_test.go:182: app contract method=GET route=/devices/{device_no} status=404 expected=500
+    baseline_app_contract_test.go:182: app HTTP status: GET /devices/{device_no} got=404 want=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/latest#01
+    baseline_app_contract_test.go:182: app contract method=GET route=/water/latest status=404 expected=500
+    baseline_app_contract_test.go:182: app HTTP status: GET /water/latest got=404 want=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/history#01
+    baseline_app_contract_test.go:182: app contract method=GET route=/water/history status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/ponds
+    baseline_app_contract_test.go:182: app contract method=GET route=/ponds status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/ponds/{id}
+    baseline_app_contract_test.go:182: app contract method=GET route=/ponds/{id} status=404 expected=500
+    baseline_app_contract_test.go:182: app HTTP status: GET /ponds/{id} got=404 want=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/stats/summary
+    baseline_app_contract_test.go:182: app contract method=GET route=/stats/summary status=500 expected=500
+--- FAIL: TestBaselineAppContractProviderFailureWithRealPostgres (2.48s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/alarms (0.21s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/POST_/alarms/{id}/confirm (0.21s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/history (0.21s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/latest (0.22s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/devices (0.21s)
+    --- FAIL: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/devices/{device_no} (0.00s)
+    --- FAIL: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/latest#01 (0.00s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/history#01 (0.22s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/ponds (0.22s)
+    --- FAIL: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/ponds/{id} (0.00s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/stats/summary (0.21s)
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/default_hides_disabled
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+    baseline_app_contract_test.go:211: HTTP contract rejected response: GET /devices status=200 issues=[{type [type]}]
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/search_excludes_nonmatch
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+    baseline_app_contract_test.go:211: HTTP contract rejected response: GET /devices status=200 issues=[{type [type]}]
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/online_excludes_offline
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+    baseline_app_contract_test.go:211: HTTP contract rejected response: GET /devices status=200 issues=[{type [type]}]
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/disabled_filter
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+    baseline_app_contract_test.go:211: HTTP contract rejected response: GET /devices status=200 issues=[{type [type]}]
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/all_includes_disabled
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+    baseline_app_contract_test.go:211: HTTP contract rejected response: GET /devices status=200 issues=[{type [type]}]
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/page_beyond_result
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+    baseline_app_contract_test.go:211: HTTP contract rejected response: GET /devices status=200 issues=[{type [type]}]
+--- FAIL: TestBaselineAppContractDeviceFiltersWithRealPostgres (1.89s)
+    --- FAIL: TestBaselineAppContractDeviceFiltersWithRealPostgres/default_hides_disabled (0.22s)
+    --- FAIL: TestBaselineAppContractDeviceFiltersWithRealPostgres/search_excludes_nonmatch (0.20s)
+    --- FAIL: TestBaselineAppContractDeviceFiltersWithRealPostgres/online_excludes_offline (0.21s)
+    --- FAIL: TestBaselineAppContractDeviceFiltersWithRealPostgres/disabled_filter (0.20s)
+    --- FAIL: TestBaselineAppContractDeviceFiltersWithRealPostgres/all_includes_disabled (0.21s)
+    --- FAIL: TestBaselineAppContractDeviceFiltersWithRealPostgres/page_beyond_result (0.20s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	15.804s
+FAIL

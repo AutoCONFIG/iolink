@@ -1,0 +1,52 @@
+-test.shuffle 1791910174636118718
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_lookup
+    login_provider_test.go:31: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:49:34.796470235+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"2WG5PXBSKEYDYPEMS6R3K43ZOE"}
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_legacy_upgrade
+    login_provider_test.go:31: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:49:35.103453563+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"LSBBTK564FJX5XAWONYX4OEJ4U"}
+--- PASS: TestBaselineLoginProviderFailuresUseSafeDiagnostics (0.47s)
+    --- PASS: TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_lookup (0.16s)
+    --- PASS: TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_legacy_upgrade (0.31s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	1.530s
+-test.shuffle 1791910174638530807
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity/response_contract
+--- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure (3.59s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input (0.24s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01 (0.23s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01/response_contract (0.23s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02 (0.25s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02/response_contract (0.25s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03 (0.24s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04 (0.24s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05 (0.24s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity (0.24s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure (0.25s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity (0.40s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity/response_contract (0.23s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	4.673s

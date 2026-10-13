@@ -1,0 +1,16 @@
+/media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:15:29 - error: Type of "resolve" is partially unknown
+    Type of "resolve" is "(value: Unknown, doc: Unknown) -> (Unknown | dict[Unknown, Unknown | dict[Unknown, Unknown] | list[Unknown]] | list[Unknown])" (reportUnknownVariableType)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:17:38 - error: Type of "OAS30ReadValidator" is unknown (reportUnknownVariableType)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:17:58 - error: Type of "OAS30Validator" is Any (reportAny)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:50:14 - error: Pattern will never be matched for subject type "Never" (reportUnnecessaryComparison)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:121:14 - error: Pattern will never be matched for subject type "Never" (reportUnnecessaryComparison)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:149:9 - error: Type of "validator" is unknown (reportUnknownVariableType)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:150:36 - error: Type of "FORMAT_CHECKER" is Any (reportAny)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:154:49 - error: Type of "validator" is unknown (reportUnknownMemberType)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:156:27 - error: Type of "absolute_schema_path" is unknown (reportUnknownMemberType)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:156:27 - error: Argument type is unknown
+    Argument corresponds to parameter "iterable" in function "__new__" (reportUnknownArgumentType)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:159:17 - error: Type of "error" is unknown (reportUnknownVariableType)
+  /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/scripts/validate_http_response.py:159:26 - error: Type of "iter_errors" is unknown (reportUnknownMemberType)
+12 errors, 0 warnings, 0 notes

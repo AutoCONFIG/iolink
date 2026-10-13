@@ -117,12 +117,12 @@ type tenantSwitchRequest struct {
 func (s *Server) listTenants(c *gin.Context) {
 	store, ok := s.deps.Users.(tenantMembershipStore)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant membership unavailable"})
+		s.providerUnavailable(c)
 		return
 	}
 	tenants, err := store.ListUserTenants(c.Request.Context(), uid(c))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, tenants)
@@ -136,12 +136,12 @@ func (s *Server) switchTenant(c *gin.Context) {
 	}
 	store, ok := s.deps.Users.(tenantMembershipStore)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant membership unavailable"})
+		s.providerUnavailable(c)
 		return
 	}
 	tenants, err := store.ListUserTenants(c.Request.Context(), uid(c))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	found := false
@@ -152,16 +152,16 @@ func (s *Server) switchTenant(c *gin.Context) {
 		}
 	}
 	if !found {
-		c.JSON(http.StatusNotFound, gin.H{"error": "tenant not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 		return
 	}
 	token, err := s.signTokenForTenant(c.Request.Context(), uid(c), req.TenantID)
 	if err != nil {
 		if errors.Is(err, iolinkcontractsdomain.ErrInactiveTenant) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant membership inactive"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "token issue failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, loginResp{Token: token, ExpiresIn: int(s.cfg.JWT.Seconds())})
@@ -177,13 +177,18 @@ func (s *Server) Run() error {
 // ---- auth ----
 
 type loginReq struct {
-	Code string `json:"code" binding:"required"`
+	Code string `json:"code"`
 }
 
 type loginResp struct {
-	Token     string                      `json:"token"`
-	ExpiresIn int                         `json:"expires_in"`
-	User      *iolinkcontractsdomain.User `json:"user"`
+	Token     string     `json:"token"`
+	ExpiresIn int        `json:"expires_in"`
+	User      *loginUser `json:"user,omitempty"`
+}
+
+type loginUser struct {
+	ID       int64  `json:"id"`
+	Nickname string `json:"nickname"`
 }
 
 var errWechatCodeInvalid = errors.New("wechat code invalid")
@@ -191,14 +196,18 @@ var errWechatCodeInvalid = errors.New("wechat code invalid")
 // login exchanges a wx.login code for a JWT. The WeChat code2session call is
 // injected via WechatExchanger so it can be faked in tests / swapped later.
 func (s *Server) login(c *gin.Context) {
-	var req loginReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	req, err := decodeLoginRequest(c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	openID, err := s.wx(c.Request.Context(), req.Code)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "wechat login failed"})
+		if errors.Is(err, errWechatCodeInvalid) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
+		c.JSON(http.StatusBadGateway, gin.H{"error": "upstream_error"})
 		return
 	}
 	u, err := s.deps.Users.EnsureUser(c.Request.Context(), openID)
@@ -209,13 +218,13 @@ func (s *Server) login(c *gin.Context) {
 	token, err := s.signToken(c.Request.Context(), u.ID)
 	if err != nil {
 		if errors.Is(err, iolinkcontractsdomain.ErrInactiveTenant) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant membership inactive"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
 		s.providerFailure(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, loginResp{Token: token, ExpiresIn: int(s.cfg.JWT.Seconds()), User: u})
+	c.JSON(http.StatusOK, loginResp{Token: token, ExpiresIn: int(s.cfg.JWT.Seconds()), User: &loginUser{ID: u.ID, Nickname: u.Nickname}})
 }
 
 // WechatExchanger is the dev stub (accepts nothing). Overridden by real

@@ -1,0 +1,940 @@
+-test.shuffle 1791910691685863236
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/empty_pond_filter
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/empty_pond_filter/response_contract
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/overflow_page
+=== RUN   TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/overflow_page/response_contract
+--- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries (6.52s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id} (0.28s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/farms/{id}/response_contract (0.27s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id} (0.31s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/farms/{id}/response_contract (0.30s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id} (0.31s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/ponds/{id}/response_contract (0.31s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id} (0.28s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/ponds/{id}/response_contract (0.27s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id} (0.28s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_PUT_/alarm-rules/{id}/response_contract (0.28s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id} (0.30s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_DELETE_/alarm-rules/{id}/response_contract (0.29s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm (0.28s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/0_POST_/alarms/{id}/confirm/response_contract (0.27s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id} (0.27s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/farms/{id}/response_contract (0.27s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id} (0.32s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/farms/{id}/response_contract (0.31s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id} (0.34s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/ponds/{id}/response_contract (0.33s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id} (0.28s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/ponds/{id}/response_contract (0.28s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id} (0.30s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_PUT_/alarm-rules/{id}/response_contract (0.29s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id} (0.31s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_DELETE_/alarm-rules/{id}/response_contract (0.30s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm (0.30s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/-1_POST_/alarms/{id}/confirm/response_contract (0.30s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/empty_pond_filter (0.29s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/empty_pond_filter/response_contract (0.29s)
+    --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/overflow_page (0.32s)
+        --- PASS: TestBaselineAdminRejectsNonpositiveResourceIDsAndInvalidQueries/overflow_page/response_contract (0.32s)
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/default_hides_disabled
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/search_excludes_nonmatch
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/online_excludes_offline
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/disabled_filter
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/all_includes_disabled
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+=== RUN   TestBaselineAppContractDeviceFiltersWithRealPostgres/page_beyond_result
+    baseline_app_contract_test.go:211: app contract method=GET route=/devices status=200 expected=200
+--- PASS: TestBaselineAppContractDeviceFiltersWithRealPostgres (4.02s)
+    --- PASS: TestBaselineAppContractDeviceFiltersWithRealPostgres/default_hides_disabled (0.26s)
+    --- PASS: TestBaselineAppContractDeviceFiltersWithRealPostgres/search_excludes_nonmatch (0.23s)
+    --- PASS: TestBaselineAppContractDeviceFiltersWithRealPostgres/online_excludes_offline (0.24s)
+    --- PASS: TestBaselineAppContractDeviceFiltersWithRealPostgres/disabled_filter (0.23s)
+    --- PASS: TestBaselineAppContractDeviceFiltersWithRealPostgres/all_includes_disabled (0.25s)
+    --- PASS: TestBaselineAppContractDeviceFiltersWithRealPostgres/page_beyond_result (0.25s)
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_ponds
+    baseline_app_contract_test.go:82: app contract method=GET route=/ponds status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_devices
+    baseline_app_contract_test.go:82: app contract method=GET route=/devices status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_alarms
+    baseline_app_contract_test.go:82: app contract method=GET route=/alarms status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/zero_summary
+    baseline_app_contract_test.go:82: app contract method=GET route=/stats/summary status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/null_shadow
+    baseline_app_contract_test.go:82: app contract method=GET route=/water/latest status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/null_device_latest
+    baseline_app_contract_test.go:82: app contract method=GET route=/devices/{device_no} status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_pond
+    baseline_app_contract_test.go:82: app contract method=GET route=/ponds/{id} status=200 expected=200
+=== RUN   TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_history
+    baseline_app_contract_test.go:82: app contract method=GET route=/water/history status=200 expected=200
+--- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres (3.64s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_ponds (0.21s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_devices (0.21s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_alarms (0.20s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/zero_summary (0.19s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/null_shadow (0.23s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/null_device_latest (0.23s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_pond (0.21s)
+    --- PASS: TestBaselineAppContractEmptyAndNullableResponsesWithRealPostgres/empty_history (0.21s)
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_credentials
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/invalid_credentials
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_latest
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_history
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_alarms
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_summary
+    baseline_app_contract_test.go:155: app contract method=GET route=/stats/summary status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=401 expected=401
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_login
+    baseline_app_contract_test.go:155: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/zero_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_pond
+    baseline_app_contract_test.go:155: app contract method=GET route=/ponds/{id} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_device
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices/{device_no} status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_latest
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_history
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_latest_parameter
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/latest status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_metric
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_range
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/history_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/water/history status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_pond_parameter
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_page_lower_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_page_size_upper_bound
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/device_status
+    baseline_app_contract_test.go:155: app contract method=GET route=/devices status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_limit
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_offset
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/alarm_level
+    baseline_app_contract_test.go:155: app contract method=GET route=/alarms status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/malformed_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/zero_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=400 expected=400
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/missing_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/foreign_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=404 expected=404
+=== RUN   TestBaselineAppContractRejectionsWithRealPostgres/viewer_confirm
+    baseline_app_contract_test.go:155: app contract method=POST route=/alarms/{id}/confirm status=403 expected=403
+--- PASS: TestBaselineAppContractRejectionsWithRealPostgres (9.95s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_credentials (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/invalid_credentials (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_pond (0.24s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_device (0.31s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_latest (0.23s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_history (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_alarms (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_summary (0.24s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/unauthorized_confirm (0.31s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/malformed_login (0.23s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/malformed_pond (0.26s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/zero_pond (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_pond (0.26s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_pond (0.24s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_device (0.30s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_device (0.27s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_latest (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_history (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_latest_parameter (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/history_metric (0.23s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/history_range (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/history_bound (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_pond_parameter (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_page_lower_bound (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_page_size_upper_bound (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/device_status (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/alarm_limit (0.22s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/alarm_offset (0.28s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/alarm_level (0.26s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/malformed_confirm (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/zero_confirm (0.20s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/missing_confirm (0.21s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/foreign_confirm (0.25s)
+    --- PASS: TestBaselineAppContractRejectionsWithRealPostgres/viewer_confirm (0.21s)
+=== RUN   TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned
+=== RUN   TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned/omitted
+=== RUN   TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned/omitted/response_contract
+=== RUN   TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned/null
+=== RUN   TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned/null/response_contract
+--- PASS: TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned (2.53s)
+    --- PASS: TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned/omitted (0.25s)
+        --- PASS: TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned/omitted/response_contract (0.24s)
+    --- PASS: TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned/null (0.27s)
+        --- PASS: TestBaselineAdminFarmOwnerOmissionAndNullCreateUnassigned/null/response_contract (0.25s)
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/extra_field
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/wrong_field_case
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/duplicate_field
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/trailing_object
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/trailing_garbage
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/missing_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/empty_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/null_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/number_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/array_code
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/null_body
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+=== RUN   TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/array_body
+    baseline_app_contract_test.go:249: app contract method=POST route=/auth/login status=400 expected=400
+--- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers (3.83s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/extra_field (0.21s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/wrong_field_case (0.24s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/duplicate_field (0.21s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/trailing_object (0.21s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/trailing_garbage (0.20s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/missing_code (0.20s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/empty_code (0.20s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/null_code (0.20s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/number_code (0.20s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/array_code (0.20s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/null_body (0.24s)
+    --- PASS: TestBaselineAppContractLoginRejectsInvalidJSONWithoutCreatingUsers/array_body (0.21s)
+=== RUN   TestBaselineHTTPProviderErrorsWithRealPostgres
+=== RUN   TestBaselineHTTPProviderErrorsWithRealPostgres/farms
+=== RUN   TestBaselineHTTPProviderErrorsWithRealPostgres/alarms
+=== RUN   TestBaselineHTTPProviderErrorsWithRealPostgres/alarm_rules
+--- PASS: TestBaselineHTTPProviderErrorsWithRealPostgres (3.20s)
+    --- PASS: TestBaselineHTTPProviderErrorsWithRealPostgres/farms (0.02s)
+    --- PASS: TestBaselineHTTPProviderErrorsWithRealPostgres/alarms (0.01s)
+    --- PASS: TestBaselineHTTPProviderErrorsWithRealPostgres/alarm_rules (0.01s)
+=== RUN   TestBaselineAdminDeviceDetailPreservesDatabaseFailure
+=== RUN   TestBaselineAdminDeviceDetailPreservesDatabaseFailure/response_contract
+--- PASS: TestBaselineAdminDeviceDetailPreservesDatabaseFailure (1.99s)
+    --- PASS: TestBaselineAdminDeviceDetailPreservesDatabaseFailure/response_contract (0.28s)
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/alarms
+    baseline_app_contract_test.go:182: app contract method=GET route=/alarms status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/POST_/alarms/{id}/confirm
+    baseline_app_contract_test.go:182: app contract method=POST route=/alarms/{id}/confirm status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/history
+    baseline_app_contract_test.go:182: app contract method=GET route=/water/history status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/latest
+    baseline_app_contract_test.go:182: app contract method=GET route=/water/latest status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/devices
+    baseline_app_contract_test.go:182: app contract method=GET route=/devices status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/devices/{device_no}
+    baseline_app_contract_test.go:182: app contract method=GET route=/devices/{device_no} status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/latest#01
+    baseline_app_contract_test.go:182: app contract method=GET route=/water/latest status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/history#01
+    baseline_app_contract_test.go:182: app contract method=GET route=/water/history status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/ponds
+    baseline_app_contract_test.go:182: app contract method=GET route=/ponds status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/ponds/{id}
+    baseline_app_contract_test.go:182: app contract method=GET route=/ponds/{id} status=500 expected=500
+=== RUN   TestBaselineAppContractProviderFailureWithRealPostgres/GET_/stats/summary
+    baseline_app_contract_test.go:182: app contract method=GET route=/stats/summary status=500 expected=500
+--- PASS: TestBaselineAppContractProviderFailureWithRealPostgres (3.98s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/alarms (0.28s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/POST_/alarms/{id}/confirm (0.23s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/history (0.26s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/latest (0.29s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/devices (0.25s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/devices/{device_no} (0.24s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/latest#01 (0.24s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/water/history#01 (0.26s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/ponds (0.22s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/ponds/{id} (0.25s)
+    --- PASS: TestBaselineAppContractProviderFailureWithRealPostgres/GET_/stats/summary (0.27s)
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/create_rule
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/create_rule/response_contract
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/missing_resource
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/missing_resource/response_contract
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/valid_batch
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/valid_batch/response_contract
+--- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource (4.62s)
+    --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/create_rule (0.25s)
+        --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/create_rule/response_contract (0.24s)
+    --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/missing_resource (0.25s)
+        --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/missing_resource/response_contract (0.24s)
+    --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/valid_batch (0.30s)
+        --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/valid_batch/response_contract (0.26s)
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure/response_contract
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity
+=== RUN   TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity/response_contract
+--- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure (5.36s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input (0.28s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input/response_contract (0.28s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01 (0.24s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#01/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02 (0.25s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#02/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03 (0.27s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#03/response_contract (0.27s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04 (0.26s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#04/response_contract (0.26s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05 (0.24s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/invalid_input#05/response_contract (0.24s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity (0.27s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/unknown_identity/response_contract (0.27s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure (0.28s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/real_storage_failure/response_contract (0.26s)
+    --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity (0.41s)
+        --- PASS: TestBaselineAdminLoginRejectsInvalidInputAndClassifiesStorageFailure/recovered_identity/response_contract (0.26s)
+=== RUN   TestBaselineAdminContractRejectedRequests
+=== RUN   TestBaselineAdminContractRejectedRequests/401_missing_token
+=== RUN   TestBaselineAdminContractRejectedRequests/401_missing_token/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_malformed
+=== RUN   TestBaselineAdminContractRejectedRequests/400_malformed/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_unknown_field
+=== RUN   TestBaselineAdminContractRejectedRequests/400_unknown_field/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_trailing_json
+=== RUN   TestBaselineAdminContractRejectedRequests/400_trailing_json/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_omitted
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_omitted/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_zero
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_zero/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_farm_update_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_farm_update_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_owner_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_area_negative
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_area_negative/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_update_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_update_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_interval_zero
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_interval_zero/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_interval_null
+=== RUN   TestBaselineAdminContractRejectedRequests/400_device_interval_null/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_move_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_move_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_enabled_null
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_enabled_null/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_update_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_rule_update_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_password_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_password_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_batch_unknown
+=== RUN   TestBaselineAdminContractRejectedRequests/400_batch_unknown/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_batch_zero_id
+=== RUN   TestBaselineAdminContractRejectedRequests/400_batch_zero_id/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_transfer
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_transfer/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_farm
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_farm/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_device
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_device/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_farm
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_farm/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_pond
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_pond/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_duplicate_batch
+=== RUN   TestBaselineAdminContractRejectedRequests/400_duplicate_batch/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_GET
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_GET/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_PUT
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_PUT/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/viewer_fixture_rule
+=== RUN   TestBaselineAdminContractRejectedRequests/viewer_fixture_rule/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/farms
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/farms/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/farms/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/farms/{id}/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/owner
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/owner/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/ponds
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/ponds/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/ponds/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/ponds/{id}/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/ponds/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/ponds/{id}/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/devices
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/devices/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/devices/{device_no}/pond
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/devices/{device_no}/pond/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/devices/{device_no}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/devices/{device_no}/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarm-rules
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarm-rules/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/alarm-rules/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/alarm-rules/{id}
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/alarm-rules/{id}/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/{id}/confirm
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/{id}/confirm/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/batch-confirm
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/batch-confirm/response_contract
+--- PASS: TestBaselineAdminContractRejectedRequests (14.06s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/401_missing_token (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/401_missing_token/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_malformed (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_malformed/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_unknown_field (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_unknown_field/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_trailing_json (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_trailing_json/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_omitted (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_omitted/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_zero (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_zero/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_farm_update_unknown (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_farm_update_unknown/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_unknown (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_owner_unknown/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_unknown (0.28s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_unknown/response_contract (0.28s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_area_negative (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_area_negative/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_update_unknown (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_update_unknown/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_device_unknown (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_device_unknown/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_device_interval_zero (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_device_interval_zero/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_device_interval_null (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_device_interval_null/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_move_unknown (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_move_unknown/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_unknown (0.29s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_unknown/response_contract (0.28s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_enabled_null (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_enabled_null/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_update_unknown (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_rule_update_unknown/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_password_unknown (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_password_unknown/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_batch_unknown (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_batch_unknown/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_batch_zero_id (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_batch_zero_id/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_transfer (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_transfer/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_farm (0.29s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_farm/response_contract (0.29s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_device (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_device/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/409_bound_farm (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/409_bound_farm/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/409_bound_pond (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/409_bound_pond/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_duplicate_batch (0.30s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_duplicate_batch/response_contract (0.30s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_GET (0.36s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_GET/response_contract (0.35s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_PUT (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_PUT/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/viewer_fixture_rule (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/viewer_fixture_rule/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/farms (0.28s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/farms/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id} (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/farms/{id} (0.28s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/farms/{id}/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/owner (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/farms/{id}/owner/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/ponds (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/ponds/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/ponds/{id} (0.33s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/ponds/{id}/response_contract (0.31s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/ponds/{id} (0.39s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/ponds/{id}/response_contract (0.38s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/devices (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/devices/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/devices/{device_no}/pond (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/devices/{device_no}/pond/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/devices/{device_no} (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/devices/{device_no}/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarm-rules (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarm-rules/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/alarm-rules/{id} (0.28s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_PUT_/alarm-rules/{id}/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/alarm-rules/{id} (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_DELETE_/alarm-rules/{id}/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/{id}/confirm (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/{id}/confirm/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/batch-confirm (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/403_viewer_POST_/alarms/batch-confirm/response_contract (0.24s)
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/login
+    baseline_app_contract_test.go:14: app contract method=POST route=/auth/login status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/ponds
+    baseline_app_contract_test.go:33: app contract method=GET route=/ponds status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/pond_detail
+    baseline_app_contract_test.go:33: app contract method=GET route=/ponds/{id} status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/devices
+    baseline_app_contract_test.go:33: app contract method=GET route=/devices status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/device_detail
+    baseline_app_contract_test.go:33: app contract method=GET route=/devices/{device_no} status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/latest
+    baseline_app_contract_test.go:33: app contract method=GET route=/water/latest status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/history
+    baseline_app_contract_test.go:33: app contract method=GET route=/water/history status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/alarms
+    baseline_app_contract_test.go:33: app contract method=GET route=/alarms status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/summary
+    baseline_app_contract_test.go:33: app contract method=GET route=/stats/summary status=200 expected=200
+=== RUN   TestBaselineAppContractPositiveMatrixWithRealPostgres/confirm
+    baseline_app_contract_test.go:33: app contract method=POST route=/alarms/{id}/confirm status=204 expected=204
+--- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres (3.29s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/login (0.21s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/ponds (0.24s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/pond_detail (0.24s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/devices (0.22s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/device_detail (0.23s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/latest (0.23s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/history (0.25s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/alarms (0.24s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/summary (0.24s)
+    --- PASS: TestBaselineAppContractPositiveMatrixWithRealPostgres/confirm (0.22s)
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/create_disabled
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/create_disabled/response_contract
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/enable_by_default
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/enable_by_default/response_contract
+--- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled (2.44s)
+    --- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/create_disabled (0.27s)
+        --- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/create_disabled/response_contract (0.26s)
+    --- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/enable_by_default (0.27s)
+        --- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/enable_by_default/response_contract (0.26s)
+=== RUN   TestBaselineAdminContractPositiveMatrix
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_login
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_login/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_users
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_users/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_farms
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_farms/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_farms
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_farms/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_farm
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_farm/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_farm_owner
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_farm_owner/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_ponds
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_ponds/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_pond
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_pond/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_ponds
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_ponds/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_devices
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_devices/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_devices
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_devices/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_device
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_device/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_device_pond
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_device_pond/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_alarm_rules
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_alarm_rules/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_alarm_rules
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_alarm_rules/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_alarm_rule
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_alarm_rule/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_alarms
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_alarms/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_alarm_confirm
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_alarm_confirm/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_batch_confirm
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_batch_confirm/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_stats
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_stats/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_alarm_rule
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_alarm_rule/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_device
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_device/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_pond
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_pond/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_farm
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_farm/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_password
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_password/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_stats_revoked_token
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_stats_revoked_token/response_contract
+--- PASS: TestBaselineAdminContractPositiveMatrix (9.10s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_login (0.40s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_login/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_users (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_users/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_farms (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_farms/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_farms (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_farms/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_farm (0.28s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_farm/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_farm_owner (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_farm_owner/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_ponds (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_ponds/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_pond (0.28s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_pond/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_ponds (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_ponds/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_devices (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_devices/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_devices (0.28s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_devices/response_contract (0.28s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_device (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_device/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_device_pond (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_device_pond/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_alarm_rules (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_alarm_rules/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_alarm_rules (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_alarm_rules/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_alarm_rule (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_alarm_rule/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_alarms (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_alarms/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_alarm_confirm (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_alarm_confirm/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_batch_confirm (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_batch_confirm/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_stats (0.28s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_stats/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_alarm_rule (0.24s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_alarm_rule/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_device (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_device/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_pond (0.29s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_pond/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_farm (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_farm/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_password (0.57s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_password/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_stats_revoked_token (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_stats_revoked_token/response_contract (0.26s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	79.619s
+-test.shuffle 1791910691680010907
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:12.022292292+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"WCVTF7L6MSV4P2HUD5YKT2VQ7I"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_create
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:12.30167103+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"XGSBJGWDI3KOQZFSEUAS6NILNT"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_update
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:12.590804957+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"JPPID7XNF6CX6FYSBJRH5KEVID"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_delete
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:12.898879357+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"A3AQSGWGJRJC4EQFZ54JH22FSL"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_owner
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:13.192723814+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"VCPM7QBUALYNOO3YLRUIE3W2CS"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_owner_actor
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:13.484274697+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"CPZUTWK3XCQPJY6ZN6ZVDS2ASZ"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/user_search
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:13.792521823+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"F54JTE5PK3KIVEGMTH4JJXWQTB"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:14.089712271+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"RDX4A45D6IZ2HGAJBAN7XGGYNI"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_farm_check
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:14.371099459+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"CWNESPNI3ZY6WYFBHRIYYDCOAQ"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_alarm_enrichment
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:14.660288769+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"PN5SY6TRW3QKRZXTQBZDETI55A"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_create
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:14.946351121+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"UTJNNPSMXZBE45AXBJQROCFPKS"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_update
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:15.22342982+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"ZKHHBN6XIE5IIDX7KKHTU42XFO"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_delete
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:15.517851529+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"44HW5GVHM3U2OZZPSNHSW4RLDB"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_register
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:15.8377132+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"QUT5YS6VFFH3QEAQC34J74XT62"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:16.159999722+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"MLIZB6VSHBGQV5XZT63WVSEN4X"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_move
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:16.446148937+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"YHRVR2Z3K446IAFG4N6ZJ3YQY7"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_delete
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:16.745284273+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"3DW4XSPJNSSAARHHD667TVV52F"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_restore
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:17.049584522+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"UAMQQCWR5GCJXCEI3BHRGENEW2"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:17.345630091+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"GU6U6YYXGKABCW64CXCFZDLBWE"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_create
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:17.644166038+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"4AJI5V6WZNZDELZDH7XQYS3WNC"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_update
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:17.962403763+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"JKB3VED7CI7VRB7Q6EJIWFNR7Q"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_delete
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:18.255715691+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"SIBYBSSYZBXCVATL5EY3MA6VEK"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:18.539829489+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"75TRGAZJ6NUVI4AWLQICBTKNJQ"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_confirm
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:18.821556687+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"7SXNVTVM2N4SPSWO7OBZBGEKCZ"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_confirm_actor
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:19.101968118+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"5CZD5L5JYDUXL4VFI4GKJB5GBL"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_batch
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:19.390924717+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"IFXOXFLD7PBLD3ZJIZCV7MAP3G"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_batch_actor
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:19.704881783+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"DLBEFTWMCJZ5I2URQQNU5SMH5W"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/stats
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:19.983875351+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"QGTG6HCCMZ5LVPMAUFKNLBUCUP"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/password
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:20.283206342+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"ENUWTFN2JHRXLXLUYSLEQFPXTM"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_version
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:20.590554791+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"ORY673VEWKGU2Y5MP3AFQ3K4DC"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_tenant
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:20.885275601+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"MBPVFDMGKLOOHFVDE64IWDFSBV"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_membership
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:21.174515757+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"X4NMSCKLTG7I4C4SU43QOGGOEK"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_role
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:21.472735177+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"4ZQNQ4W3EBNXV75LXMB7Z3BJD6"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/member_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:21.766680784+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"Z32PSZQ3PXK3ZGW5JWRNAP2OMY"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/member_set
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:22.064960026+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"CW4OPMQE5ATIAUQGNUJUNA4KGX"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/missing_member_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:22.363104282+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"DQQRIXSFSOE2ONBEC3PBBPYWAN"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/missing_member_set
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:22.660988995+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"C3LGCDXHFY6AZMOVUQKWDZTCPA"}
+--- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError (10.98s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_list (0.34s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_create (0.28s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_update (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_delete (0.31s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_owner (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_owner_actor (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/user_search (0.31s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_list (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_farm_check (0.28s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_alarm_enrichment (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_create (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_update (0.28s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_delete (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_register (0.32s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_list (0.32s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_move (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_delete (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_restore (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_list (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_create (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_update (0.32s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_delete (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_list (0.28s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_confirm (0.28s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_confirm_actor (0.28s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_batch (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_batch_actor (0.31s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/stats (0.28s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/password (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_version (0.31s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_tenant (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_membership (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_role (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/member_list (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/member_set (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/missing_member_list (0.30s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/missing_member_set (0.30s)
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/valid
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/owner_omitted
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/owner_null
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/owner_positive
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/unknown
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/duplicate
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/wrong_case
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/trailing_object
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/trailing_invalid
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/array
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/null_object
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/null_name
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/null_location
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/missing_name
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/owner_zero
+=== RUN   TestBaselineJSONRejectsAmbiguousObjects/owner_string
+--- PASS: TestBaselineJSONRejectsAmbiguousObjects (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/valid (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/owner_omitted (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/owner_null (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/owner_positive (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/unknown (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/duplicate (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/wrong_case (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/trailing_object (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/trailing_invalid (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/array (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/null_object (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/null_name (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/null_location (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/missing_name (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/owner_zero (0.00s)
+    --- PASS: TestBaselineJSONRejectsAmbiguousObjects/owner_string (0.00s)
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_lookup
+    login_provider_test.go:31: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:22.810695025+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"6MFOXOBILMBMAI3VU7WMRTXG44"}
+=== RUN   TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_legacy_upgrade
+    login_provider_test.go:31: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:23.116016594+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"DFDLRAMYFB7KRLCU3MI3UWS2GK"}
+--- PASS: TestBaselineLoginProviderFailuresUseSafeDiagnostics (0.45s)
+    --- PASS: TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_lookup (0.15s)
+    --- PASS: TestBaselineLoginProviderFailuresUseSafeDiagnostics/login_legacy_upgrade (0.31s)
+=== RUN   TestBaselineOwnerReplacementDistinguishesOmittedAndNull
+=== RUN   TestBaselineOwnerReplacementDistinguishesOmittedAndNull/omitted
+=== RUN   TestBaselineOwnerReplacementDistinguishesOmittedAndNull/null
+=== RUN   TestBaselineOwnerReplacementDistinguishesOmittedAndNull/positive
+--- PASS: TestBaselineOwnerReplacementDistinguishesOmittedAndNull (0.00s)
+    --- PASS: TestBaselineOwnerReplacementDistinguishesOmittedAndNull/omitted (0.00s)
+    --- PASS: TestBaselineOwnerReplacementDistinguishesOmittedAndNull/null (0.00s)
+    --- PASS: TestBaselineOwnerReplacementDistinguishesOmittedAndNull/positive (0.00s)
+=== RUN   TestBaselineRuleEnabledHonorsFalseAndDefault
+--- PASS: TestBaselineRuleEnabledHonorsFalseAndDefault (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	12.505s
+-test.shuffle 1791910691678355014
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.682010122+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"NELBSNXFLPPNOPL66C4INWS5IH"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.684706891+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"NXG3DM4O7QTDSRGRQPA6OGBAA4"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.687695304+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"ZR35QHP7SDT5H4CD2G6ZKDH6UJ"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.689941097+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"UI6MNDXHLNWLSFAU2V7TJU4JGS"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.692300375+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"46TDS2ZEZG4IF53I7YVXL4MQKI"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_ponds
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.694532533+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"77YPVFNRHDHJOJDCFDKXKUAEWT"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.697042617+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"RNEUXSOVMWJS334SNT2537OGU7"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/history_query
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.699318918+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"M4IB5RRICXCM3LDOYZRQTNJRWR"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/history_capability
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.701333723+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"ICP5QXOOPNDAIPJ5O6ESAXAFC7"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_list
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.703225684+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"TB5NDE6XQXU5T6W6H2TYMBOQP3"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_filtered
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.705779652+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"3S56Z5XOQDPFCDTDUBIJQL2RH5"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarm_confirm
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.707851265+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"6G5CRYVKWJWMXM2A4JG2S4TE3Q"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_ponds
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.709853976+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"LJON4E774H4H4DPWJF4STBDF5J"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.711725569+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"D345QB5ZLWIFTR66RBRSSUMM2X"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.714064489+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"3UW5PAEIBJBWJP4DJZLS3CVMDJ"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_user
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.71539762+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"TSGCUZ7TAYCSEJ2DEUBXDIHWGM"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_tenant
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.716623657+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"YHLO4F6PI5VYDWXJNQCBOIK3CF"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_version
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.71794249+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"JHBNLITCUR4SC3NGTKSHRSCBFE"}
+--- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError (0.04s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_ponds (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/history_query (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/history_capability (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_list (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_filtered (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarm_confirm (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_ponds (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_user (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_tenant (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_version (0.00s)
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/device_page_capability
+    device_list_test.go:78: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.720526415+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"JS6T4KK5MXPWBTGC4GI277ECZS"}
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/pond_lookup
+    device_list_test.go:78: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.723253442+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"NSRZWBZXOWZ7XQGWCA6PMPRXAL"}
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/device_lookup
+    device_list_test.go:78: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.725450382+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"IPPV4RYCQZDOHPKOSEJ7QJQUK5"}
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/latest_owner_lookup
+    device_list_test.go:78: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.727673753+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"ZLAR734AHECPIVSXPUT37MRD6M"}
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/history_owner_lookup
+    device_list_test.go:78: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:58:11.730092965+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"STW6NPN7CDHYT2RFHGNIBMJWSN"}
+--- PASS: TestResourceLookupProviderFailuresUseSafeInternalError (0.01s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/device_page_capability (0.00s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/pond_lookup (0.00s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/device_lookup (0.00s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/latest_owner_lookup (0.00s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/history_owner_lookup (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.084s

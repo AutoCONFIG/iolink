@@ -3,6 +3,7 @@ package adminapi
 import (
 	"context"
 	"crypto/rand"
+	"encoding/json"
 	"errors"
 	"math/big"
 	"net/http"
@@ -25,10 +26,10 @@ type farmReq struct {
 type farmCreateReq struct {
 	Name     string `json:"name" binding:"required"`
 	Location string `json:"location"`
-	OwnerID  *int64 `json:"owner_id"`
+	OwnerID  *int64 `json:"owner_id" binding:"omitempty,min=1"`
 }
 type ownerReq struct {
-	OwnerID *int64 `json:"owner_id"`
+	OwnerID json.RawMessage `json:"owner_id" binding:"required"`
 }
 
 type farmMemberRequest struct {
@@ -40,7 +41,7 @@ type farmMemberRequest struct {
 func (s *Server) listFarmMembers(c *gin.Context) {
 	role := domain.TenantRole(c.Request.Context())
 	if role != "owner" && role != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "tenant admin required"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	store, ok := s.deps.Store.(FarmMembershipStore)
@@ -50,16 +51,16 @@ func (s *Server) listFarmMembers(c *gin.Context) {
 	}
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad farm id"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	items, err := store.ListFarmMembers(c.Request.Context(), id)
 	if errors.Is(err, domain.ErrForbidden) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "farm members forbidden"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	if errors.Is(err, domain.ErrNotFound) {
-		c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 		return
 	}
 	if err != nil {
@@ -77,12 +78,12 @@ func (s *Server) setFarmMember(c *gin.Context) {
 	}
 	farmID, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad farm id"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad user id"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	var req farmMemberRequest
@@ -100,11 +101,11 @@ func (s *Server) setFarmMember(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "farm or user not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		if errors.Is(err, domain.ErrInvalidProductModel) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid role"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -126,19 +127,22 @@ func page(c *gin.Context) (int, int, error) {
 }
 
 func (s *Server) listUsers(c *gin.Context) {
+	if !validBaselineQuery(c) {
+		return
+	}
 	role := domain.TenantRole(c.Request.Context())
 	if role != "owner" && role != "admin" {
-		c.JSON(http.StatusForbidden, gin.H{"error": "tenant admin required"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	query := c.Query("query")
 	if query == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "query required"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	limit, offset, err := page(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pagination"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	users, err := s.deps.Store.SearchUsers(c.Request.Context(), query, limit, offset)
@@ -154,6 +158,9 @@ func (s *Server) listUsers(c *gin.Context) {
 }
 
 func (s *Server) listFarms(c *gin.Context) {
+	if !validBaselineQuery(c) {
+		return
+	}
 	farms, err := s.deps.Store.ListFarms(c.Request.Context())
 	if err != nil {
 		s.providerFailure(c, err)
@@ -161,7 +168,7 @@ func (s *Server) listFarms(c *gin.Context) {
 	}
 	limit, offset, err := page(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pagination"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if offset >= len(farms) {
@@ -181,8 +188,8 @@ func (s *Server) listFarms(c *gin.Context) {
 
 func (s *Server) createFarm(c *gin.Context) {
 	var req farmCreateReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "name", "location", "owner_id"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	f, err := s.deps.Store.CreateFarm(c.Request.Context(), req.OwnerID, req.Name, req.Location)
@@ -192,7 +199,7 @@ func (s *Server) createFarm(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "owner not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -203,21 +210,26 @@ func (s *Server) createFarm(c *gin.Context) {
 
 func (s *Server) setFarmOwner(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	var req ownerReq
-	if err = c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err = bindBaselineJSON(c, &req, "owner_id"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	var ownerID *int64
+	if err = json.Unmarshal(req.OwnerID, &ownerID); err != nil || (ownerID != nil && *ownerID < 1) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if scoped, ok := s.deps.Store.(interface {
 		SetFarmOwnerByActor(context.Context, int64, *int64, int64) error
 	}); ok {
-		err = scoped.SetFarmOwnerByActor(c.Request.Context(), id, req.OwnerID, aid(c))
+		err = scoped.SetFarmOwnerByActor(c.Request.Context(), id, ownerID, aid(c))
 	} else {
-		err = s.deps.Store.SetFarmOwner(c.Request.Context(), id, req.OwnerID)
+		err = s.deps.Store.SetFarmOwner(c.Request.Context(), id, ownerID)
 	}
 	if err != nil {
 		if errors.Is(err, domain.ErrForbidden) {
@@ -225,7 +237,7 @@ func (s *Server) setFarmOwner(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "farm or user not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -236,13 +248,13 @@ func (s *Server) setFarmOwner(c *gin.Context) {
 
 func (s *Server) updateFarm(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	var req farmReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "name", "location"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := s.deps.Store.UpdateFarm(c.Request.Context(), id, req.Name, req.Location); err != nil {
@@ -251,7 +263,7 @@ func (s *Server) updateFarm(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -262,8 +274,8 @@ func (s *Server) updateFarm(c *gin.Context) {
 
 func (s *Server) deleteFarm(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := s.deps.Store.DeleteFarm(c.Request.Context(), id); err != nil {
@@ -272,11 +284,11 @@ func (s *Server) deleteFarm(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrFarmHasPonds) {
-			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -288,13 +300,16 @@ func (s *Server) deleteFarm(c *gin.Context) {
 // ---- ponds ----
 
 type pondReq struct {
-	FarmID int64   `json:"farm_id" binding:"required"`
+	FarmID int64   `json:"farm_id" binding:"required,min=1"`
 	Name   string  `json:"name" binding:"required"`
-	AreaMu float64 `json:"area_mu"`
+	AreaMu float64 `json:"area_mu" binding:"min=0"`
 }
 
 // listPonds enriches ponds with status (worst open alarm) and freshest reading.
 func (s *Server) listPonds(c *gin.Context) {
+	if !validBaselineQuery(c) {
+		return
+	}
 	ponds, err := s.deps.Store.ListPonds(c.Request.Context())
 	if err != nil {
 		s.providerFailure(c, err)
@@ -303,7 +318,7 @@ func (s *Server) listPonds(c *gin.Context) {
 	if raw := c.Query("farm_id"); raw != "" {
 		farmID, parseErr := strconv.ParseInt(raw, 10, 64)
 		if parseErr != nil || farmID < 1 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid farm_id"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 		if checker, ok := s.deps.Store.(interface {
@@ -315,7 +330,7 @@ func (s *Server) listPonds(c *gin.Context) {
 				return
 			}
 			if !exists {
-				c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
+				c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 				return
 			}
 		}
@@ -354,7 +369,7 @@ func (s *Server) listPonds(c *gin.Context) {
 	}
 	limit, offset, err := page(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pagination"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if offset >= len(out) {
@@ -388,8 +403,8 @@ func pondWorstLevel(alarms []domain.Alarm) map[int64]domain.AlarmLevel {
 
 func (s *Server) createPond(c *gin.Context) {
 	var req pondReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "farm_id", "name", "area_mu"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	p, err := s.deps.Store.CreatePond(c.Request.Context(), req.FarmID, req.Name, req.AreaMu)
@@ -399,33 +414,47 @@ func (s *Server) createPond(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
 		return
 	}
-	c.JSON(http.StatusOK, p)
+	c.JSON(http.StatusOK, gin.H{
+		"id": p.ID, "farm_id": p.FarmID, "name": p.Name, "area_mu": p.AreaMu,
+		"created_at": p.CreatedAt, "status": "normal", "device_count": 0, "latest": nil,
+	})
 }
 
 func (s *Server) updatePond(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	var req pondReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "farm_id", "name", "area_mu"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
-	if err := s.deps.Store.UpdatePond(c.Request.Context(), id, req.Name, req.AreaMu); err != nil {
+	store, ok := s.deps.Store.(interface {
+		UpdatePondInFarm(context.Context, int64, int64, string, float64) error
+	})
+	if !ok {
+		s.providerUnavailable(c)
+		return
+	}
+	if err := store.UpdatePondInFarm(c.Request.Context(), id, req.FarmID, req.Name, req.AreaMu); err != nil {
+		if errors.Is(err, domain.ErrInvalidRange) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+			return
+		}
 		if errors.Is(err, domain.ErrForbidden) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -436,8 +465,8 @@ func (s *Server) updatePond(c *gin.Context) {
 
 func (s *Server) deletePond(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := s.deps.Store.DeletePond(c.Request.Context(), id); err != nil {
@@ -446,11 +475,11 @@ func (s *Server) deletePond(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrPondHasDevices) || errors.Is(err, domain.ErrConflict) {
-			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -462,31 +491,35 @@ func (s *Server) deletePond(c *gin.Context) {
 // ---- devices ----
 
 type registerDeviceReq struct {
-	PondID         int64  `json:"pond_id" binding:"required"`
+	PondID         int64  `json:"pond_id" binding:"required,min=1"`
 	Name           string `json:"name"`
 	Model          string `json:"model"`
-	ReportInterval int    `json:"report_interval"`
+	ReportInterval *int   `json:"report_interval" binding:"omitempty,oneof=60 300"`
 }
 
 // registerDevice responds with the device secret exactly once.
 func (s *Server) registerDevice(c *gin.Context) {
 	var req registerDeviceReq
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := bindBaselineJSON(c, &req, "pond_id", "name", "model", "report_interval"); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
-	dev, secret, err := s.deps.Store.RegisterDevice(c.Request.Context(), req.PondID, req.Name, req.Model, req.ReportInterval)
+	interval := 0
+	if req.ReportInterval != nil {
+		interval = *req.ReportInterval
+	}
+	dev, secret, err := s.deps.Store.RegisterDevice(c.Request.Context(), req.PondID, req.Name, req.Model, interval)
 	if err != nil {
 		if errors.Is(err, domain.ErrForbidden) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
 		if errors.Is(err, domain.ErrInvalidRange) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "report_interval must be 60 or 300"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		if errors.Is(err, license.ErrRequired) {
@@ -545,21 +578,24 @@ func (s *Server) registerDevice(c *gin.Context) {
 }
 
 func (s *Server) listDevices(c *gin.Context) {
+	if !validBaselineQuery(c) {
+		return
+	}
 	pageNumber, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || pageNumber < 1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid page"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	pageSize, err := strconv.Atoi(c.DefaultQuery("page_size", "20"))
 	if err != nil || pageSize < 1 || pageSize > 200 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid page_size"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	pondID := int64(0)
-	if raw := c.Query("pond_id"); raw != "" {
+	if raw, present := c.GetQuery("pond_id"); present {
 		pondID, err = strconv.ParseInt(raw, 10, 64)
 		if err != nil || pondID < 1 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pond_id"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 	}
@@ -568,17 +604,17 @@ func (s *Server) listDevices(c *gin.Context) {
 		status = "active"
 	}
 	if status == "" || (status != "active" && status != "all" && status != "online" && status != "offline" && status != "disabled") {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	search := c.Query("name")
 	if utf8.RuneCountInString(search) > 128 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid name"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	maxInt := int(^uint(0) >> 1)
 	if pageNumber-1 > maxInt/pageSize {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid page"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	query := domain.DeviceListQuery{PondID: pondID, Status: status, Search: search, Limit: pageSize, Offset: (pageNumber - 1) * pageSize}
@@ -600,8 +636,12 @@ func (s *Server) listDevices(c *gin.Context) {
 
 func (s *Server) getDevice(c *gin.Context) {
 	d, err := s.deps.Store.GetDevice(c.Request.Context(), c.Param("device_no"))
+	if errors.Is(err, domain.ErrNotFound) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
+		return
+	}
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+		s.providerFailure(c, err)
 		return
 	}
 	item := gin.H{"id": d.ID, "device_no": d.DeviceNo, "mqtt_username": d.MqttUsername, "pond_id": d.PondID, "model": d.Model, "name": d.Name, "status": string(d.Status), "last_seen_at": d.LastSeenAt, "created_at": d.CreatedAt, "disabled_at": d.DisabledAt, "report_interval": d.ReportInterval, "latest": nil}
@@ -633,8 +673,8 @@ func (s *Server) moveDevice(c *gin.Context) {
 	pondID := struct {
 		PondID int64 `json:"pond_id"`
 	}{}
-	if c.ShouldBindJSON(&pondID) != nil || pondID.PondID < 1 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "pond_id required"})
+	if bindBaselineJSON(c, &pondID, "pond_id") != nil || pondID.PondID < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := s.deps.Store.MoveDevice(c.Request.Context(), c.Param("device_no"), pondID.PondID); err != nil {
@@ -643,11 +683,11 @@ func (s *Server) moveDevice(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "device or pond not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		if errors.Is(err, domain.ErrConflict) {
-			c.JSON(http.StatusConflict, gin.H{"error": "device disabled"})
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -664,7 +704,7 @@ func (s *Server) deleteDevice(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -712,18 +752,26 @@ func (s *Server) restoreDevice(c *gin.Context) {
 // ---- alarm rules ----
 
 type ruleReq struct {
-	PondID int64    `json:"pond_id" binding:"required"`
-	Metric string   `json:"metric" binding:"required"`
-	Min    *float64 `json:"min_value"`
-	Max    *float64 `json:"max_value"`
-	Level  string   `json:"level" binding:"required,oneof=critical warning"`
+	PondID  int64    `json:"pond_id" binding:"required,min=1"`
+	Metric  string   `json:"metric" binding:"required"`
+	Min     *float64 `json:"min_value"`
+	Max     *float64 `json:"max_value"`
+	Level   string   `json:"level" binding:"required,oneof=critical warning"`
+	Enabled *bool    `json:"enabled"`
 }
 
 func (r ruleReq) toDomain() domain.AlarmRule {
-	return domain.AlarmRule{PondID: r.PondID, Metric: r.Metric, Min: r.Min, Max: r.Max, Level: domain.AlarmLevel(r.Level), Enabled: true}
+	enabled := true
+	if r.Enabled != nil {
+		enabled = *r.Enabled
+	}
+	return domain.AlarmRule{PondID: r.PondID, Metric: r.Metric, Min: r.Min, Max: r.Max, Level: domain.AlarmLevel(r.Level), Enabled: enabled}
 }
 
 func (s *Server) listRules(c *gin.Context) {
+	if !validBaselineQuery(c) {
+		return
+	}
 	rules, err := s.deps.Store.ListRules(c.Request.Context())
 	if err != nil {
 		s.providerFailure(c, err)
@@ -733,13 +781,13 @@ func (s *Server) listRules(c *gin.Context) {
 	if raw := c.Query("pond_id"); raw != "" {
 		pondID, err = strconv.ParseInt(raw, 10, 64)
 		if err != nil || pondID < 1 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pond_id"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 	}
 	limit, offset, err := page(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pagination"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	filtered := make([]domain.AlarmRule, 0, len(rules))
@@ -766,12 +814,12 @@ func (s *Server) listRules(c *gin.Context) {
 
 func (s *Server) createRule(c *gin.Context) {
 	var req ruleReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "pond_id", "metric", "min_value", "max_value", "level", "enabled"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if !validRuleRequest(req) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid metric or thresholds"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	rule, err := s.deps.Store.CreateRule(c.Request.Context(), req.toDomain())
@@ -781,11 +829,11 @@ func (s *Server) createRule(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrConflict) {
-			c.JSON(http.StatusConflict, gin.H{"error": "rule already exists"})
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -796,17 +844,17 @@ func (s *Server) createRule(c *gin.Context) {
 
 func (s *Server) updateRule(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	var req ruleReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "pond_id", "metric", "min_value", "max_value", "level", "enabled"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if !validRuleRequest(req) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid metric or thresholds"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	rule := req.toDomain()
@@ -817,11 +865,11 @@ func (s *Server) updateRule(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrConflict) {
-			c.JSON(http.StatusConflict, gin.H{"error": "rule already exists"})
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "rule not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -832,8 +880,8 @@ func (s *Server) updateRule(c *gin.Context) {
 
 func (s *Server) deleteRule(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := s.deps.Store.DeleteRule(c.Request.Context(), id); err != nil {
@@ -854,19 +902,22 @@ func (s *Server) deleteRule(c *gin.Context) {
 // ---- alarms ----
 
 func (s *Server) listAlarms(c *gin.Context) {
+	if !validBaselineQuery(c) {
+		return
+	}
 	limit, offset, err := page(c)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid pagination"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	level := c.Query("level")
 	if level != "" && level != string(domain.AlarmCritical) && level != string(domain.AlarmWarning) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid level"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	only, parseErr := strconv.ParseBool(c.DefaultQuery("only_unconfirmed", "false"))
 	if parseErr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid only_unconfirmed"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	alarms, err := s.deps.Store.ListAllAlarms(c.Request.Context(), 0)
@@ -901,8 +952,8 @@ func (s *Server) listAlarms(c *gin.Context) {
 
 func (s *Server) confirmAlarm(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "bad id"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	confirm := func() error { return s.deps.Store.ConfirmAlarm(c.Request.Context(), id) }
@@ -913,7 +964,7 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 		}); ok {
 			confirm = func() error { return scoped.ConfirmAlarmByActor(c.Request.Context(), id, aid(c)) }
 		} else {
-			c.JSON(http.StatusForbidden, gin.H{"error": "alarm authorization unavailable"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
 	}
@@ -923,7 +974,7 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "alarm not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -933,23 +984,23 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 }
 
 type batchConfirmReq struct {
-	IDs []int64 `json:"ids" binding:"required,min=1"`
+	IDs []int64 `json:"ids" binding:"required,min=1,max=200,dive,min=1"`
 }
 
 func (s *Server) batchConfirm(c *gin.Context) {
 	var req batchConfirmReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "ids"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if len(req.IDs) > 200 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "too many ids"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	seen := make(map[int64]struct{}, len(req.IDs))
 	for _, id := range req.IDs {
 		if _, ok := seen[id]; ok {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "duplicate id"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 		seen[id] = struct{}{}
@@ -962,26 +1013,26 @@ func (s *Server) batchConfirm(c *gin.Context) {
 		}); ok {
 			confirm = func() (int64, error) { return scoped.BatchConfirmByActor(c.Request.Context(), req.IDs, aid(c)) }
 		} else {
-			c.JSON(http.StatusForbidden, gin.H{"error": "alarm authorization unavailable"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
 	}
 	n, err := confirm()
 	if err != nil {
 		if errors.Is(err, domain.ErrForbidden) {
-			c.JSON(http.StatusForbidden, gin.H{"error": "alarm forbidden"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
 		if errors.Is(err, domain.ErrInvalidRange) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "ids required"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
 		if errors.Is(err, domain.ErrNotFound) {
-			c.JSON(http.StatusNotFound, gin.H{"error": "alarm not found"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
 		if errors.Is(err, domain.ErrConflict) {
-			c.JSON(http.StatusConflict, gin.H{"error": "batch confirmation not atomic"})
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 			return
 		}
 		s.providerFailure(c, err)
@@ -1010,13 +1061,13 @@ type changePasswordReq struct {
 
 func (s *Server) changePassword(c *gin.Context) {
 	var req changePasswordReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := bindBaselineJSON(c, &req, "old_password", "new_password"); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := s.deps.Store.ChangeAdminPassword(c.Request.Context(), aid(c), req.OldPassword, req.NewPassword); err != nil {
 		if errors.Is(err, domain.ErrOldPasswordMismatch) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
 		s.providerFailure(c, err)

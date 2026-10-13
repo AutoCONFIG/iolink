@@ -5,6 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log/slog"
+	"strings"
+	"sync"
+	"testing"
+	"time"
+
 	"git.hyhy.fun/rsplab/iolink/internal/core"
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/event"
@@ -12,12 +19,6 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/testdb"
 	"github.com/jackc/pgx/v5/pgxpool"
 	dto "github.com/prometheus/client_model/go"
-	"io"
-	"log/slog"
-	"strings"
-	"sync"
-	"testing"
-	"time"
 )
 
 func setup(t *testing.T) (*core.Service, *pgxpool.Pool) {
@@ -36,12 +37,14 @@ func setup(t *testing.T) (*core.Service, *pgxpool.Pool) {
 	installTestLicense(t, p, s, 100)
 	return s, p
 }
+
 func execute(t *testing.T, p *pgxpool.Pool, q string, args ...any) {
 	t.Helper()
 	if _, err := p.Exec(context.Background(), q, args...); err != nil {
 		t.Fatal(err)
 	}
 }
+
 func count(t *testing.T, p *pgxpool.Pool, q string) int {
 	t.Helper()
 	var n int
@@ -50,9 +53,11 @@ func count(t *testing.T, p *pgxpool.Pool, q string) int {
 	}
 	return n
 }
+
 func sample(ts time.Time, id string, props map[string]float64) event.Event {
 	return event.Event{Kind: event.KindProperties, DeviceNo: "one", Ts: ts, MessageID: id, Properties: props}
 }
+
 func TestTelemetryShadowDedupAndPondSnapshot(t *testing.T) {
 	s, p := setup(t)
 	ctx := context.Background()
@@ -126,12 +131,13 @@ func TestTelemetryShadowDedupAndPondSnapshot(t *testing.T) {
 		t.Fatal("historical pond overwritten")
 	}
 }
+
 func TestAlarmThresholdConcurrencyConfirmationAndMove(t *testing.T) {
 	s, p := setup(t)
 	ctx := context.Background()
 	min, max := 4.0, 8.0
 	for _, pond := range []int64{1, 2} {
-		if _, err := s.CreateRule(ctx, domain.AlarmRule{PondID: pond, Metric: "dissolved_oxygen", Min: &min, Max: &max, Level: domain.AlarmCritical}); err != nil {
+		if _, err := s.CreateRule(ctx, domain.AlarmRule{Enabled: true, PondID: pond, Metric: "dissolved_oxygen", Min: &min, Max: &max, Level: domain.AlarmCritical}); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -190,11 +196,12 @@ func TestAlarmThresholdConcurrencyConfirmationAndMove(t *testing.T) {
 		t.Fatal("confirmed alarm prevents new one")
 	}
 }
+
 func TestUserAlarmConfirmationIsIdempotent(t *testing.T) {
 	s, p := setup(t)
 	ctx := context.Background()
 	min := 4.0
-	if _, err := s.CreateRule(ctx, domain.AlarmRule{PondID: 1, Metric: "dissolved_oxygen", Min: &min, Level: domain.AlarmCritical}); err != nil {
+	if _, err := s.CreateRule(ctx, domain.AlarmRule{Enabled: true, PondID: 1, Metric: "dissolved_oxygen", Min: &min, Level: domain.AlarmCritical}); err != nil {
 		t.Fatal(err)
 	}
 	if err := s.HandleEvent(sample(time.Now().UTC(), "user-confirm", map[string]float64{"dissolved_oxygen": 3})); err != nil {
@@ -214,11 +221,12 @@ func TestUserAlarmConfirmationIsIdempotent(t *testing.T) {
 		t.Fatalf("foreign confirmation error = %v, want not found", err)
 	}
 }
+
 func TestRollbackAcrossReadingShadowAlarmOutbox(t *testing.T) {
 	s, p := setup(t)
 	ctx := context.Background()
 	max := 25.0
-	if _, err := s.CreateRule(ctx, domain.AlarmRule{PondID: 1, Metric: "temperature", Max: &max, Level: domain.AlarmWarning}); err != nil {
+	if _, err := s.CreateRule(ctx, domain.AlarmRule{Enabled: true, PondID: 1, Metric: "temperature", Max: &max, Level: domain.AlarmWarning}); err != nil {
 		t.Fatal(err)
 	}
 	execute(t, p, `CREATE FUNCTION fail_outbox() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'injected failure'; END $$; CREATE TRIGGER test_fail BEFORE INSERT ON notification_outbox FOR EACH ROW EXECUTE FUNCTION fail_outbox()`)
@@ -239,6 +247,7 @@ func TestRollbackAcrossReadingShadowAlarmOutbox(t *testing.T) {
 		t.Fatal("retry failed")
 	}
 }
+
 func TestHistoryBoundedAndInvalidRules(t *testing.T) {
 	s, p := setup(t)
 	ctx := context.Background()
@@ -267,10 +276,11 @@ func TestHistoryBoundedAndInvalidRules(t *testing.T) {
 		t.Fatal(err)
 	}
 	min, max := 8.0, 4.0
-	if _, err = s.CreateRule(ctx, domain.AlarmRule{PondID: 1, Metric: "ph", Min: &min, Max: &max, Level: domain.AlarmWarning}); err != domain.ErrInvalidRule {
+	if _, err = s.CreateRule(ctx, domain.AlarmRule{Enabled: true, PondID: 1, Metric: "ph", Min: &min, Max: &max, Level: domain.AlarmWarning}); err != domain.ErrInvalidRule {
 		t.Fatal("inverted rule accepted", err)
 	}
 }
+
 func TestAuthenticationStatusAndRestart(t *testing.T) {
 	s, p := setup(t)
 	ctx := context.Background()
@@ -378,7 +388,7 @@ func TestSingleAndDoubleThresholdRules(t *testing.T) {
 	} {
 		t.Run(tt.name, func(t *testing.T) {
 			s, p := setup(t)
-			if _, err := s.CreateRule(context.Background(), domain.AlarmRule{PondID: 1, Metric: "dissolved_oxygen", Min: tt.min, Max: tt.max, Level: domain.AlarmWarning}); err != nil {
+			if _, err := s.CreateRule(context.Background(), domain.AlarmRule{Enabled: true, PondID: 1, Metric: "dissolved_oxygen", Min: tt.min, Max: tt.max, Level: domain.AlarmWarning}); err != nil {
 				t.Fatal(err)
 			}
 			if err := s.HandleEvent(sample(time.Now(), "", map[string]float64{"temperature": 25})); err != nil {

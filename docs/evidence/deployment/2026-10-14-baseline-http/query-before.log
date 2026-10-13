@@ -1,0 +1,35 @@
+-test.shuffle 1791911682514395208
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//users
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//users/response_contract
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//farms
+    baseline_query_contract_test.go:15: GET /farms status=200 want=400
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//farms/response_contract
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//ponds
+    baseline_query_contract_test.go:15: GET /ponds status=200 want=400
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//ponds/response_contract
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//devices
+    baseline_query_contract_test.go:15: GET /devices status=200 want=400
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//devices/response_contract
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//alarm-rules
+    baseline_query_contract_test.go:15: GET /alarm-rules status=200 want=400
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//alarm-rules/response_contract
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//alarms
+    baseline_query_contract_test.go:15: GET /alarms status=200 want=400
+=== RUN   TestBaselineAdminRejectsMalformedQueryEncoding//alarms/response_contract
+--- FAIL: TestBaselineAdminRejectsMalformedQueryEncoding (2.86s)
+    --- PASS: TestBaselineAdminRejectsMalformedQueryEncoding//users (0.25s)
+        --- PASS: TestBaselineAdminRejectsMalformedQueryEncoding//users/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsMalformedQueryEncoding//farms (0.25s)
+        --- PASS: TestBaselineAdminRejectsMalformedQueryEncoding//farms/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminRejectsMalformedQueryEncoding//ponds (0.26s)
+        --- PASS: TestBaselineAdminRejectsMalformedQueryEncoding//ponds/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminRejectsMalformedQueryEncoding//devices (0.24s)
+        --- PASS: TestBaselineAdminRejectsMalformedQueryEncoding//devices/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminRejectsMalformedQueryEncoding//alarm-rules (0.24s)
+        --- PASS: TestBaselineAdminRejectsMalformedQueryEncoding//alarm-rules/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminRejectsMalformedQueryEncoding//alarms (0.25s)
+        --- PASS: TestBaselineAdminRejectsMalformedQueryEncoding//alarms/response_contract (0.25s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	2.918s
+FAIL

@@ -1,0 +1,16 @@
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/create_disabled
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/create_disabled/response_contract
+=== NAME  TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled
+    baseline_admin_contract_test.go:140: disabled rule was persisted enabled
+    baseline_admin_contract_test.go:146: disabled rule triggered an alarm
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/enable_by_default
+=== RUN   TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/enable_by_default/response_contract
+--- FAIL: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled (1.64s)
+    --- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/create_disabled (0.29s)
+        --- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/create_disabled/response_contract (0.28s)
+    --- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/enable_by_default (0.28s)
+        --- PASS: TestBaselineAdminDisabledRuleRemainsInactiveUntilEnabled/enable_by_default/response_contract (0.28s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.713s
+FAIL

@@ -74,6 +74,10 @@ func (failpondUpdate) UpdatePond(context.Context, int64, string, float64) error 
 	return poisonAdminProviderError
 }
 
+func (failpondUpdate) UpdatePondInFarm(context.Context, int64, int64, string, float64) error {
+	return poisonAdminProviderError
+}
+
 type failpondDelete struct{ *fakeStore }
 
 func (failpondDelete) DeletePond(context.Context, int64) error { return poisonAdminProviderError }

@@ -5,15 +5,16 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"git.hyhy.fun/rsplab/iolink/internal/access"
-	"git.hyhy.fun/rsplab/iolink/internal/domain"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"io"
 	"log/slog"
 	"net"
 	"strings"
 	"testing"
 	"time"
+
+	"git.hyhy.fun/rsplab/iolink/internal/access"
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 )
 
 func mqttString(s string) []byte {
@@ -21,6 +22,7 @@ func mqttString(s string) []byte {
 	binary.BigEndian.PutUint16(b, uint16(len(s)))
 	return append(b, s...)
 }
+
 func mqttPacket(kind byte, body []byte) []byte {
 	out := []byte{kind}
 	n := len(body)
@@ -37,6 +39,7 @@ func mqttPacket(kind byte, body []byte) []byte {
 	}
 	return append(out, body...)
 }
+
 func readMQTT(c net.Conn) (byte, []byte, error) {
 	one := make([]byte, 1)
 	if _, err := io.ReadFull(c, one); err != nil {
@@ -58,6 +61,7 @@ func readMQTT(c net.Conn) (byte, []byte, error) {
 	}
 	return 0, nil, fmt.Errorf("bad packet")
 }
+
 func rawConnect(t *testing.T, addr string, version byte, will bool) (net.Conn, byte) {
 	t.Helper()
 	c, err := net.DialTimeout("tcp", addr, 2*time.Second)
@@ -93,10 +97,11 @@ func rawConnect(t *testing.T, addr string, version byte, will bool) (net.Conn, b
 	}
 	return c, response[1]
 }
+
 func TestRealMQTTAuthenticationACLAndPersistence(t *testing.T) {
 	svc, pool := setup(t)
 	max := 26.0
-	if _, err := svc.CreateRule(context.Background(), domain.AlarmRule{PondID: 1, Metric: "temperature", Max: &max, Level: domain.AlarmWarning}); err != nil {
+	if _, err := svc.CreateRule(context.Background(), domain.AlarmRule{Enabled: true, PondID: 1, Metric: "temperature", Max: &max, Level: domain.AlarmWarning}); err != nil {
 		t.Fatal(err)
 	}
 	listener, err := net.Listen("tcp", "127.0.0.1:0")

@@ -84,6 +84,10 @@ func RealWechatExchangerContext(cfg WechatConfig, logger *slog.Logger) func(cont
 		}
 		status = resp.StatusCode
 		defer resp.Body.Close()
+		if status < http.StatusOK || status >= http.StatusMultipleChoices {
+			errorCode = "upstream_status"
+			return "", fmt.Errorf("wechat HTTP status: %d", status)
+		}
 		var ws wechatSession
 		if err := json.NewDecoder(resp.Body).Decode(&ws); err != nil {
 			errorCode = "response_decode"
@@ -91,7 +95,10 @@ func RealWechatExchangerContext(cfg WechatConfig, logger *slog.Logger) func(cont
 		}
 		if ws.ErrCode != 0 || ws.OpenID == "" {
 			errorCode = "provider_error"
-			return "", fmt.Errorf("wechat code2session: code=%d msg=%s", ws.ErrCode, ws.ErrMsg)
+			if ws.ErrCode == 40029 {
+				return "", fmt.Errorf("wechat credential rejected: %w", errWechatCodeInvalid)
+			}
+			return "", fmt.Errorf("wechat code2session: code=%d", ws.ErrCode)
 		}
 		return ws.OpenID, nil
 	}

@@ -1,0 +1,202 @@
+=== RUN   TestBaselineAdminContractPositiveMatrix
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_login
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_login/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_users
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_users/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_farms
+    baseline_admin_contract_test.go:18: POST /farms status=500 want=200
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_farms/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_farms
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_farms/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_farm
+    baseline_admin_contract_test.go:18: PUT /farms/{id} status=404 want=204
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_farm/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_farm_owner
+    baseline_admin_contract_test.go:18: PUT /farms/{id}/owner status=404 want=204
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_farm_owner/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_ponds
+    baseline_admin_contract_test.go:18: POST /ponds status=400 want=200
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_ponds/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_pond
+    baseline_admin_contract_test.go:18: PUT /ponds/{id} status=400 want=204
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_pond/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_ponds
+    baseline_admin_contract_test.go:18: GET /ponds status=400 want=200
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_ponds/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_devices
+    baseline_admin_contract_test.go:18: POST /devices status=400 want=200
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_devices/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_devices
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_devices/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_device
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_device/response_contract
+    baseline_admin_contract_helpers_test.go:99: HTTP contract rejected response: GET /devices/{device_no} status=200 issues=[{required [required]} {required [required]} {required [required]} {required [required]} {required [required]} {required [required]} {required [required]} {required [required]} {required [required]} {required [required]} {required [required]} {required [required]} {additionalProperties [additionalProperties]}]
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_device_pond
+    baseline_admin_contract_test.go:18: PUT /devices/{device_no}/pond status=404 want=204
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_device_pond/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_alarm_rules
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_alarm_rules/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_alarm_rules
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_alarm_rules/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_alarm_rule
+=== RUN   TestBaselineAdminContractPositiveMatrix/PUT_alarm_rule/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_alarms
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_alarms/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_alarm_confirm
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_alarm_confirm/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_batch_confirm
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_batch_confirm/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_stats
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_stats/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_alarm_rule
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_alarm_rule/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_device
+    baseline_admin_contract_test.go:18: DELETE /devices/{device_no} status=404 want=204
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_device/response_contract
+    baseline_admin_contract_helpers_test.go:99: HTTP contract response is not JSON: DELETE /devices/{device_no} status=404
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_pond
+    baseline_admin_contract_test.go:18: DELETE /ponds/{id} status=404 want=204
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_pond/response_contract
+    baseline_admin_contract_helpers_test.go:99: HTTP contract rejected response: DELETE /ponds/{id} status=404 issues=[{response_selection []}]
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_farm
+    baseline_admin_contract_test.go:18: DELETE /farms/{id} status=404 want=204
+=== RUN   TestBaselineAdminContractPositiveMatrix/DELETE_farm/response_contract
+    baseline_admin_contract_helpers_test.go:99: HTTP contract rejected response: DELETE /farms/{id} status=404 issues=[{response_selection []}]
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_password
+=== RUN   TestBaselineAdminContractPositiveMatrix/POST_password/response_contract
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_stats_revoked_token
+=== RUN   TestBaselineAdminContractPositiveMatrix/GET_stats_revoked_token/response_contract
+--- FAIL: TestBaselineAdminContractPositiveMatrix (8.73s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_login (0.42s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_login/response_contract (0.27s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_users (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_users/response_contract (0.26s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/POST_farms (0.28s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_farms/response_contract (0.28s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_farms (0.29s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_farms/response_contract (0.29s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/PUT_farm (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_farm/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/PUT_farm_owner (0.29s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_farm_owner/response_contract (0.29s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/POST_ponds (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_ponds/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/PUT_pond (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_pond/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/GET_ponds (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_ponds/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/POST_devices (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_devices/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_devices (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_devices/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/GET_device (0.27s)
+        --- FAIL: TestBaselineAdminContractPositiveMatrix/GET_device/response_contract (0.27s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/PUT_device_pond (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_device_pond/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_alarm_rules (0.27s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_alarm_rules/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_alarm_rules (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_alarm_rules/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_alarm_rule (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/PUT_alarm_rule/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_alarms (0.24s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_alarms/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_alarm_confirm (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_alarm_confirm/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_batch_confirm (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_batch_confirm/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_stats (0.25s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_stats/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_alarm_rule (0.24s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/DELETE_alarm_rule/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/DELETE_device (0.00s)
+        --- FAIL: TestBaselineAdminContractPositiveMatrix/DELETE_device/response_contract (0.00s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/DELETE_pond (0.25s)
+        --- FAIL: TestBaselineAdminContractPositiveMatrix/DELETE_pond/response_contract (0.25s)
+    --- FAIL: TestBaselineAdminContractPositiveMatrix/DELETE_farm (0.24s)
+        --- FAIL: TestBaselineAdminContractPositiveMatrix/DELETE_farm/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/POST_password (0.53s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/POST_password/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractPositiveMatrix/GET_stats_revoked_token (0.26s)
+        --- PASS: TestBaselineAdminContractPositiveMatrix/GET_stats_revoked_token/response_contract (0.26s)
+=== RUN   TestBaselineAdminContractRejectedRequests
+=== RUN   TestBaselineAdminContractRejectedRequests/401_missing_token
+=== RUN   TestBaselineAdminContractRejectedRequests/401_missing_token/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_malformed
+=== RUN   TestBaselineAdminContractRejectedRequests/400_malformed/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_unknown_field
+    baseline_admin_contract_test.go:92: POST /farms status=200 want=400
+=== RUN   TestBaselineAdminContractRejectedRequests/400_unknown_field/response_contract
+=== NAME  TestBaselineAdminContractRejectedRequests/400_unknown_field
+    baseline_admin_contract_test.go:94: rejected request persisted a farm
+=== RUN   TestBaselineAdminContractRejectedRequests/400_trailing_json
+    baseline_admin_contract_test.go:92: POST /farms status=200 want=400
+=== RUN   TestBaselineAdminContractRejectedRequests/400_trailing_json/response_contract
+=== NAME  TestBaselineAdminContractRejectedRequests/400_trailing_json
+    baseline_admin_contract_test.go:94: rejected request persisted a farm
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_transfer
+    baseline_admin_contract_test.go:92: PUT /ponds/{id} status=204 want=400
+=== RUN   TestBaselineAdminContractRejectedRequests/400_pond_transfer/response_contract
+=== NAME  TestBaselineAdminContractRejectedRequests/400_pond_transfer
+    baseline_admin_contract_test.go:97: rejected request modified the original pond
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_farm
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_farm/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_device
+=== RUN   TestBaselineAdminContractRejectedRequests/404_missing_device/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_farm
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_farm/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_pond
+=== RUN   TestBaselineAdminContractRejectedRequests/409_bound_pond/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/400_duplicate_batch
+=== RUN   TestBaselineAdminContractRejectedRequests/400_duplicate_batch/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_GET
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_GET/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_PUT
+=== RUN   TestBaselineAdminContractRejectedRequests/404_foreign_PUT/response_contract
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_write
+=== RUN   TestBaselineAdminContractRejectedRequests/403_viewer_write/response_contract
+    baseline_admin_contract_helpers_test.go:99: HTTP contract rejected response: POST /farms status=403 issues=[{response_selection []}]
+--- FAIL: TestBaselineAdminContractRejectedRequests (4.67s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/401_missing_token (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/401_missing_token/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_malformed (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_malformed/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/400_unknown_field (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_unknown_field/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/400_trailing_json (0.27s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_trailing_json/response_contract (0.24s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/400_pond_transfer (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_pond_transfer/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_farm (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_farm/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_device (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_missing_device/response_contract (0.24s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/409_bound_farm (0.25s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/409_bound_farm/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/409_bound_pond (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/409_bound_pond/response_contract (0.25s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/400_duplicate_batch (0.28s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/400_duplicate_batch/response_contract (0.28s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_GET (0.26s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_GET/response_contract (0.26s)
+    --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_PUT (0.24s)
+        --- PASS: TestBaselineAdminContractRejectedRequests/404_foreign_PUT/response_contract (0.23s)
+    --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_write (0.24s)
+        --- FAIL: TestBaselineAdminContractRejectedRequests/403_viewer_write/response_contract (0.24s)
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/create_rule
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/create_rule/response_contract
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/missing_resource
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/missing_resource/response_contract
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/valid_batch
+=== RUN   TestBaselineAdminBatchConfirmationRollsBackMissingResource/valid_batch/response_contract
+--- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource (2.60s)
+    --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/create_rule (0.25s)
+        --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/create_rule/response_contract (0.24s)
+    --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/missing_resource (0.26s)
+        --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/missing_resource/response_contract (0.26s)
+    --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/valid_batch (0.25s)
+        --- PASS: TestBaselineAdminBatchConfirmationRollsBackMissingResource/valid_batch/response_contract (0.25s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	16.083s
+FAIL

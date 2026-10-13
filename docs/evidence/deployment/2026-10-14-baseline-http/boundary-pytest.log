@@ -1,0 +1,37 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/.venv/contracts/bin/python
+cachedir: .pytest_cache
+rootdir: /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink
+collecting ... collected 29 items
+
+scripts/test_validate_http_response.py::test_input_accepts_finite_json_without_rejecting_strings[1.5] PASSED [  3%]
+scripts/test_validate_http_response.py::test_input_accepts_finite_json_without_rejecting_strings[body1] PASSED [  6%]
+scripts/test_validate_http_response.py::test_input_accepts_finite_json_without_rejecting_strings[body2] PASSED [ 10%]
+scripts/test_validate_http_response.py::test_valid_internal_error_when_contract_response_exists[admin] PASSED [ 13%]
+scripts/test_validate_http_response.py::test_valid_internal_error_when_contract_response_exists[app] PASSED [ 17%]
+scripts/test_validate_http_response.py::test_error_response_rejected_when_schema_violated[body0-required] PASSED [ 20%]
+scripts/test_validate_http_response.py::test_error_response_rejected_when_schema_violated[body1-additionalProperties] PASSED [ 24%]
+scripts/test_validate_http_response.py::test_error_response_rejected_when_schema_violated[body2-type] PASSED [ 27%]
+scripts/test_validate_http_response.py::test_error_response_rejected_when_schema_violated[body3-type] PASSED [ 31%]
+scripts/test_validate_http_response.py::test_latest_null_requires_present_json_body[True] PASSED [ 34%]
+scripts/test_validate_http_response.py::test_latest_null_requires_present_json_body[False] PASSED [ 37%]
+scripts/test_validate_http_response.py::test_latest_rejected_when_timestamp_format_invalid PASSED [ 41%]
+scripts/test_validate_http_response.py::test_generic_error_string_accepted_when_schema_has_no_enum PASSED [ 44%]
+scripts/test_validate_http_response.py::test_no_content_response_rejects_even_json_null_body[True] PASSED [ 48%]
+scripts/test_validate_http_response.py::test_no_content_response_rejects_even_json_null_body[False] PASSED [ 51%]
+scripts/test_validate_http_response.py::test_response_rejected_when_selection_or_media_invalid[content_type-private-provider-password-JWT-xyz-content_type] PASSED [ 55%]
+scripts/test_validate_http_response.py::test_response_rejected_when_selection_or_media_invalid[status-418-response_selection] PASSED [ 58%]
+scripts/test_validate_http_response.py::test_response_rejected_when_selection_or_media_invalid[route-/water/latest?secret=private-provider-password-JWT-xyz-response_selection] PASSED [ 62%]
+scripts/test_validate_http_response.py::test_response_rejected_when_selection_or_media_invalid[method-DELETE-response_selection] PASSED [ 65%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[valid-500] PASSED [ 68%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[extra-private-field] PASSED [ 72%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[unknown-spec] PASSED [ 75%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[boolean-status] PASSED [ 79%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[string-has-body] PASSED [ 82%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[malformed-json] PASSED [ 86%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[nested-nan] PASSED [ 89%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[nested-positive-infinity] PASSED [ 93%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[nested-negative-infinity] PASSED [ 96%]
+scripts/test_validate_http_response.py::test_cli_exit_and_diagnostics_when_input_valid_or_private[absent-body-with-private-data] PASSED [100%]
+
+============================== 29 passed in 3.00s ==============================

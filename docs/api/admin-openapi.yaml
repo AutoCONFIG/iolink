@@ -304,6 +304,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
       parameters:
@@ -371,8 +373,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -396,6 +398,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -427,6 +431,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '409':
           $ref: '#/components/responses/Conflict'
         '500':
@@ -446,6 +452,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -553,6 +561,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -576,6 +586,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -600,6 +612,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '409':
           $ref: '#/components/responses/Conflict'
         '500':
@@ -806,6 +820,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
       parameters:
@@ -854,6 +870,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -918,6 +936,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -941,6 +961,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -965,6 +987,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalError'
       parameters:
@@ -1020,6 +1044,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1050,6 +1076,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
@@ -1323,43 +1351,71 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required: [error]
+            properties:
+              error: { type: string, enum: [invalid_request] }
+            additionalProperties: false
     Unauthorized:
       description: 凭据缺失/过期/错误、错误 token 类型或权限主体失效；error=unauthorized
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required: [error]
+            properties:
+              error: { type: string, enum: [unauthorized] }
+            additionalProperties: false
     Forbidden:
       description: 当前租户角色或平台范围不允许该操作；error=forbidden
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required: [error]
+            properties:
+              error: { type: string, enum: [forbidden] }
+            additionalProperties: false
     NotFound:
       description: 资源不存在或当前主体无权访问；统一 error=not_found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required: [error]
+            properties:
+              error: { type: string, enum: [not_found] }
+            additionalProperties: false
     Conflict:
       description: 关联依赖阻止删除等状态冲突；error=conflict
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required: [error]
+            properties:
+              error: { type: string, enum: [conflict] }
+            additionalProperties: false
     InternalError:
       description: 内部故障；error=internal_error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required: [error]
+            properties:
+              error: { type: string, enum: [internal_error] }
+            additionalProperties: false
     UpstreamError:
       description: 微信上游故障；error=upstream_error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            type: object
+            required: [error]
+            properties:
+              error: { type: string, enum: [upstream_error] }
+            additionalProperties: false
   schemas:
     Error:
       type: object

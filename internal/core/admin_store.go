@@ -46,6 +46,9 @@ func (s *Service) FindAdminByLogin(ctx context.Context, login string) (*domain.U
 	u := &domain.User{}
 	err := s.pool.QueryRow(ctx, q, login).
 		Scan(&u.ID, &u.Username, &u.OpenID, &u.PasswordHash, &u.Authority)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, domain.ErrNotFound
+	}
 	if err != nil {
 		return nil, fmt.Errorf("admin by login: %w", err)
 	}
@@ -114,7 +117,7 @@ func (s *Service) CreateFarm(ctx context.Context, ownerID *int64, name, location
 			WHERE tm.user_id=$1 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())`
 		membershipArgs := []any{*ownerID}
 		if tenantID > 0 {
-			membershipQ = `SELECT count(*), $2 FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.user_id=$1 AND tm.tenant_id=$2 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())`
+			membershipQ = `SELECT count(*), $2::bigint FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.user_id=$1 AND tm.tenant_id=$2 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())`
 			membershipArgs = append(membershipArgs, tenantID)
 		}
 		if err := tx.QueryRow(ctx, membershipQ, membershipArgs...).Scan(&memberships, &tenantID); err != nil {
@@ -547,11 +550,37 @@ func (s *Service) CreatePond(ctx context.Context, farmID int64, name string, are
 }
 
 func (s *Service) UpdatePond(ctx context.Context, id int64, name string, areaMu float64) error {
+	return s.updatePond(ctx, id, nil, name, areaMu)
+}
+
+func (s *Service) UpdatePondInFarm(ctx context.Context, id, farmID int64, name string, areaMu float64) error {
+	return s.updatePond(ctx, id, &farmID, name, areaMu)
+}
+
+func (s *Service) updatePond(ctx context.Context, id int64, expectedFarm *int64, name string, areaMu float64) error {
 	tx, err := s.beginTenantWrite(ctx, "ponds")
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback(ctx)
+	if expectedFarm != nil {
+		lookup := `SELECT p.farm_id FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1`
+		lookupArgs := []any{id}
+		if tenantID, scoped := domain.TenantID(ctx); scoped {
+			lookup += ` AND f.tenant_id=$2`
+			lookupArgs = append(lookupArgs, tenantID)
+		}
+		lookup += ` FOR UPDATE OF p`
+		var farmID int64
+		if err := tx.QueryRow(ctx, lookup, lookupArgs...).Scan(&farmID); errors.Is(err, pgx.ErrNoRows) {
+			return domain.ErrNotFound
+		} else if err != nil {
+			return err
+		}
+		if farmID != *expectedFarm {
+			return domain.ErrInvalidRange
+		}
+	}
 	q := `UPDATE ponds p SET name=$2, area_mu=$3 FROM farms f WHERE p.farm_id=f.id AND p.id=$1`
 	args := []any{id, name, areaMu}
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
@@ -877,6 +906,9 @@ func (s *Service) GetDevice(ctx context.Context, deviceNo string) (domain.Device
 	q += clause
 	args = append(args, scopedArgs...)
 	err := s.pool.QueryRow(ctx, q, args...).Scan(&d.ID, &d.PondID, &d.DeviceNo, &d.MqttUsername, &d.Name, &d.Model, &d.Status, &d.LastSeenAt, &d.CreatedAt, &d.DisabledAt, &d.ReportInterval)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return domain.Device{}, domain.ErrNotFound
+	}
 	return d, err
 }
 
@@ -990,13 +1022,13 @@ func (s *Service) CreateRule(ctx context.Context, rule domain.AlarmRule) (domain
 	if err := validateRule(rule); err != nil {
 		return domain.AlarmRule{}, err
 	}
-	q := `INSERT INTO alarm_rules (pond_id, metric, min_value, max_value, level)
-	      VALUES ($1,$2,$3,$4,$5) RETURNING ` + ruleCols
+	q := `INSERT INTO alarm_rules (pond_id, metric, min_value, max_value, level, enabled)
+	      VALUES ($1,$2,$3,$4,$5,$6) RETURNING ` + ruleCols
 	if tenantID, scoped := domain.TenantID(ctx); scoped {
-		q = `INSERT INTO alarm_rules (pond_id, metric, min_value, max_value, level)
-			SELECT $1,$2,$3,$4,$5 WHERE EXISTS (SELECT 1 FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND f.tenant_id=$6)
+		q = `INSERT INTO alarm_rules (pond_id, metric, min_value, max_value, level, enabled)
+			SELECT $1,$2,$3,$4,$5,$6 WHERE EXISTS (SELECT 1 FROM ponds p JOIN farms f ON f.id=p.farm_id WHERE p.id=$1 AND f.tenant_id=$7)
 			RETURNING ` + ruleCols
-		r, err := scanRule(tx.QueryRow(ctx, q, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level), tenantID))
+		r, err := scanRule(tx.QueryRow(ctx, q, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level), rule.Enabled, tenantID))
 		if err != nil {
 			return domain.AlarmRule{}, normalizeDBError(err)
 		}
@@ -1005,7 +1037,7 @@ func (s *Service) CreateRule(ctx context.Context, rule domain.AlarmRule) (domain
 		}
 		return r, nil
 	}
-	r, err := scanRule(tx.QueryRow(ctx, q, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level)))
+	r, err := scanRule(tx.QueryRow(ctx, q, rule.PondID, rule.Metric, rule.Min, rule.Max, string(rule.Level), rule.Enabled))
 	if err != nil {
 		return domain.AlarmRule{}, normalizeDBError(err)
 	}
