@@ -70,7 +70,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | S3 | Redis 类缓存引入调研 | 待完成已调研 | 仅形成候选用途、窄 port、故障语义和验证门槛；当前未引入 Redis 依赖、容器或生产配置；[调研记录](research/redis-cache-evaluation.md)；不阻塞 M6d |
 | D12/D13/D15/D16/D17 | 平台owner边界、遥测角色、支持到期时区/精度、租户管理员资源范围 | 已完成已核验 | 已纳入 M6b `0335438` 同候选批准；[gate](evidence/rebuild/gates/M6b.json)明确列出 fixed_defects；旧计划未勾需同步 |
 | D14 | M6b证据归档与同快照批准绑定 | 已完成待核验 | gate和批准文件已存在，但manifest及旧表仍不同步；纳入 V1，完成对账后关闭 |
-| D18 | 新组织创建接口严格JSON单对象校验 | 待完成已调研 | 本次代码审阅MEDIUM、非阻断：POST /tenants 尚未严格拒绝额外字段和尾随JSON；权限校验有效，无授权绕过；[审阅](evidence/deployment/2026-10-08-platform-console/code-review.md)，不宣称全部实时handler契约通过 |
+| D18 | 新组织创建接口严格JSON单对象校验 | 已完成已核验 | 提交 `eed35d5` / tree `8e85609` 两位未参与编辑者同最终快照 APPROVE，发布v0.0.33。仅允许name:string单对象，额外字段、尾随JSON与非法形状返回400且无组织/审计写入；保留正常创建、403/409与事务回滚。原生服务curl、真实HTTP/Timescale race、全库33测试包build/vet/race、96 operations / 568契约fixtures通过；审阅后测试输入加强，旧handler和移除闭合key校验均使最终用例失败；[证据与双审](evidence/deployment/2026-10-13-tenant-json/README.md)。测试容器/卷已清理，浏览器与外部验收仍另列，不宣称全部实时handler契约通过 |
 | D01–D11 | 历史构建/迁移/API/报警/通知/运维缺陷登记 | 已完成待核验 | 多项已有阶段修复与批准；逐项核对最终关闭证据，适用外部部分保留阻塞；不沿用旧表来推断当前代码缺陷 |
 | F1 | 全量范围、Rxx归属、provider与证据追溯审计 | 待完成未调研 | TODO 13最终发布快照审计，现有manifest检查不代替该轮核验 |
 | F2 | 最终架构/代码质量、安全与依赖边界审计 | 待完成未调研 | TODO 13，待全部功能完成后冻结候选执行 |

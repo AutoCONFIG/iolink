@@ -1,0 +1,8 @@
+Final tree: 8e856090c601c4900b9b6a60b68363868ff1f319
+Baseline: d0bef4a4fa0b8212c964e819940d24c1ff5c93a2
+Frozen export: /tmp/iolink-d18-20261013/final
+Tracked blobs checked: 1101
+Skipped gitlinks: web
+Mismatch count: 0
+internal/adminapi/tenant_admin.go: pure LOC=238
+internal/core/platform_console_test.go: pure LOC=211
