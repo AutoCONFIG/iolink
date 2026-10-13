@@ -1,0 +1,38 @@
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+    key_open_contract_database_test.go:50: GET /open/v1/ponds status=401 want=500
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+    key_open_contract_database_test.go:58: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+    key_open_contract_database_test.go:50: GET /open/v1/ponds status=401 want=500
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+    key_open_contract_database_test.go:58: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+    key_open_contract_database_test.go:50: GET /open/v1/ponds status=401 want=500
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+    key_open_contract_database_test.go:58: SQL failure has no correlated safe diagnostic
+--- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed (4.14s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth (1.39s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract#01 (0.18s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth (1.33s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract#01 (0.17s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth (1.42s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract#01 (0.17s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	4.214s
+FAIL

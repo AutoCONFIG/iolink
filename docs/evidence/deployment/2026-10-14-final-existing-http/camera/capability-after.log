@@ -1,0 +1,235 @@
+-test.shuffle 1791917275096853126
+=== RUN   TestCameraContractReadRolesAndWriteRejections
+=== RUN   TestCameraContractReadRolesAndWriteRejections/owner
+    camera_contract_test.go:86: camera method=GET route=/user/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:86: camera method=GET route=/api/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+=== RUN   TestCameraContractReadRolesAndWriteRejections/admin
+    camera_contract_test.go:86: camera method=GET route=/user/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:86: camera method=GET route=/api/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+=== RUN   TestCameraContractReadRolesAndWriteRejections/member
+    camera_contract_test.go:86: camera method=GET route=/user/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:86: camera method=GET route=/api/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:114: camera method=POST route=/user/v1/cameras status=403 expected=403
+    camera_contract_test.go:114: camera method=PUT route=/user/v1/cameras/{camera_id} status=403 expected=403
+    camera_contract_test.go:114: camera method=DELETE route=/user/v1/cameras/{camera_id} status=403 expected=403
+=== RUN   TestCameraContractReadRolesAndWriteRejections/viewer
+    camera_contract_test.go:86: camera method=GET route=/user/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:86: camera method=GET route=/api/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:114: camera method=POST route=/user/v1/cameras status=403 expected=403
+    camera_contract_test.go:114: camera method=PUT route=/user/v1/cameras/{camera_id} status=403 expected=403
+    camera_contract_test.go:114: camera method=DELETE route=/user/v1/cameras/{camera_id} status=403 expected=403
+=== RUN   TestCameraContractReadRolesAndWriteRejections/support
+    camera_contract_test.go:86: camera method=GET route=/user/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:86: camera method=GET route=/api/v1/cameras status=200 expected=200
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:102: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:114: camera method=POST route=/user/v1/cameras status=403 expected=403
+    camera_contract_test.go:114: camera method=PUT route=/user/v1/cameras/{camera_id} status=403 expected=403
+    camera_contract_test.go:114: camera method=DELETE route=/user/v1/cameras/{camera_id} status=403 expected=403
+--- PASS: TestCameraContractReadRolesAndWriteRejections (16.47s)
+    --- PASS: TestCameraContractReadRolesAndWriteRejections/owner (2.17s)
+    --- PASS: TestCameraContractReadRolesAndWriteRejections/admin (2.03s)
+    --- PASS: TestCameraContractReadRolesAndWriteRejections/member (3.02s)
+    --- PASS: TestCameraContractReadRolesAndWriteRejections/viewer (3.25s)
+    --- PASS: TestCameraContractReadRolesAndWriteRejections/support (3.16s)
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?limit=0
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?limit=101
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?after_id=0
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?limit=%zz
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?limit=1&limit=2
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?unknown=1
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras/0
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras/{camera_id} status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras/invalid
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras/{camera_id} status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras/101?limit=1
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras/{camera_id} status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?after_id=9999
+    camera_contract_test.go:140: camera method=GET route=/user/v1/cameras status=200 expected=200
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?limit=0
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?limit=101
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?after_id=0
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?limit=%zz
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?limit=1&limit=2
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?unknown=1
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras/0
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras/{camera_id} status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras/invalid
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras/{camera_id} status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras/101?limit=1
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras/{camera_id} status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?after_id=9999
+    camera_contract_test.go:140: camera method=GET route=/api/v1/cameras status=200 expected=200
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body
+    camera_contract_test.go:152: camera method=POST route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#01
+    camera_contract_test.go:152: camera method=POST route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#02
+    camera_contract_test.go:152: camera method=POST route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#03
+    camera_contract_test.go:152: camera method=POST route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#04
+    camera_contract_test.go:152: camera method=POST route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#05
+    camera_contract_test.go:152: camera method=POST route=/user/v1/cameras status=400 expected=400
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/foreign_PUT
+    camera_contract_test.go:162: camera method=PUT route=/user/v1/cameras/{camera_id} status=404 expected=404
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/foreign_DELETE
+    camera_contract_test.go:162: camera method=DELETE route=/user/v1/cameras/{camera_id} status=404 expected=404
+=== RUN   TestCameraContractRejectsMalformedQueryInputAndForeignWrites/foreign_POST
+    camera_contract_test.go:162: camera method=POST route=/user/v1/cameras status=404 expected=404
+--- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites (9.86s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?limit=0 (0.28s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?limit=101 (0.25s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?after_id=0 (0.25s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?limit=%zz (0.26s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?limit=1&limit=2 (0.25s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?unknown=1 (0.28s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras/0 (0.28s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras/invalid (0.27s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras/101?limit=1 (0.28s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//user/v1/cameras?after_id=9999 (0.27s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?limit=0 (0.26s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?limit=101 (0.26s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?after_id=0 (0.26s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?limit=%zz (0.25s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?limit=1&limit=2 (0.26s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?unknown=1 (0.25s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras/0 (0.26s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras/invalid (0.24s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras/101?limit=1 (0.26s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites//api/v1/cameras?after_id=9999 (0.27s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body (0.25s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#01 (0.24s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#02 (0.25s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#03 (0.23s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#04 (0.24s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/invalid_body#05 (0.23s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/foreign_PUT (0.23s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/foreign_DELETE (0.23s)
+    --- PASS: TestCameraContractRejectsMalformedQueryInputAndForeignWrites/foreign_POST (0.23s)
+=== RUN   TestCameraContractCurrentReadDisableAndUnavailableConfiguration
+=== RUN   TestCameraContractCurrentReadDisableAndUnavailableConfiguration/GET/user/v1/cameras
+    camera_contract_test.go:33: camera method=GET route=/user/v1/cameras status=200 expected=200
+=== RUN   TestCameraContractCurrentReadDisableAndUnavailableConfiguration/GET/user/v1/cameras/{camera_id}
+    camera_contract_test.go:33: camera method=GET route=/user/v1/cameras/{camera_id} status=200 expected=200
+=== RUN   TestCameraContractCurrentReadDisableAndUnavailableConfiguration/GET/api/v1/cameras
+    camera_contract_test.go:33: camera method=GET route=/api/v1/cameras status=200 expected=200
+=== RUN   TestCameraContractCurrentReadDisableAndUnavailableConfiguration/GET/api/v1/cameras/{camera_id}
+    camera_contract_test.go:33: camera method=GET route=/api/v1/cameras/{camera_id} status=200 expected=200
+=== RUN   TestCameraContractCurrentReadDisableAndUnavailableConfiguration/POST/user/v1/cameras
+    camera_contract_test.go:33: camera method=POST route=/user/v1/cameras status=503 expected=503
+=== RUN   TestCameraContractCurrentReadDisableAndUnavailableConfiguration/PUT/user/v1/cameras/{camera_id}
+    camera_contract_test.go:33: camera method=PUT route=/user/v1/cameras/{camera_id} status=503 expected=503
+=== RUN   TestCameraContractCurrentReadDisableAndUnavailableConfiguration/disable_invalidates_existing_metadata_atomically
+    camera_contract_test.go:52: camera method=DELETE route=/user/v1/cameras/{camera_id} status=204 expected=204
+    camera_contract_test.go:57: camera method=DELETE route=/user/v1/cameras/{camera_id} status=204 expected=204
+    camera_contract_test.go:67: camera method=GET route=/user/v1/cameras/{camera_id} status=404 expected=404
+    camera_contract_test.go:67: camera method=GET route=/api/v1/cameras/{camera_id} status=404 expected=404
+--- PASS: TestCameraContractCurrentReadDisableAndUnavailableConfiguration (5.89s)
+    --- PASS: TestCameraContractCurrentReadDisableAndUnavailableConfiguration/GET/user/v1/cameras (0.24s)
+    --- PASS: TestCameraContractCurrentReadDisableAndUnavailableConfiguration/GET/user/v1/cameras/{camera_id} (0.24s)
+    --- PASS: TestCameraContractCurrentReadDisableAndUnavailableConfiguration/GET/api/v1/cameras (0.24s)
+    --- PASS: TestCameraContractCurrentReadDisableAndUnavailableConfiguration/GET/api/v1/cameras/{camera_id} (0.23s)
+    --- PASS: TestCameraContractCurrentReadDisableAndUnavailableConfiguration/POST/user/v1/cameras (0.25s)
+    --- PASS: TestCameraContractCurrentReadDisableAndUnavailableConfiguration/PUT/user/v1/cameras/{camera_id} (0.26s)
+    --- PASS: TestCameraContractCurrentReadDisableAndUnavailableConfiguration/disable_invalidates_existing_metadata_atomically (0.93s)
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras
+    camera_contract_errors_test.go:42: camera method=GET route=/user/v1/cameras status=500 expected=500
+    camera_contract_errors_test.go:68: status=500 code=internal_error safe_class=present correlation=matched business_state=unchanged
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras/{camera_id}
+    camera_contract_errors_test.go:42: camera method=GET route=/user/v1/cameras/{camera_id} status=500 expected=500
+    camera_contract_errors_test.go:68: status=500 code=internal_error safe_class=present correlation=matched business_state=unchanged
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasDELETE/user/v1/cameras/{camera_id}
+    camera_contract_errors_test.go:42: camera method=DELETE route=/user/v1/cameras/{camera_id} status=500 expected=500
+    camera_contract_errors_test.go:68: status=500 code=internal_error safe_class=present correlation=matched business_state=unchanged
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/api/v1/cameras
+    camera_contract_errors_test.go:42: camera method=GET route=/api/v1/cameras status=500 expected=500
+    camera_contract_errors_test.go:68: status=500 code=internal_error safe_class=present correlation=matched business_state=unchanged
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/api/v1/cameras/{camera_id}
+    camera_contract_errors_test.go:42: camera method=GET route=/api/v1/cameras/{camera_id} status=500 expected=500
+    camera_contract_errors_test.go:68: status=500 code=internal_error safe_class=present correlation=matched business_state=unchanged
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/jobsDELETE/user/v1/cameras/{camera_id}
+    camera_contract_errors_test.go:42: camera method=DELETE route=/user/v1/cameras/{camera_id} status=500 expected=500
+    camera_contract_errors_test.go:68: status=500 code=internal_error safe_class=present correlation=matched business_state=unchanged
+--- PASS: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback (14.50s)
+    --- PASS: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras (3.69s)
+    --- PASS: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras/{camera_id} (2.45s)
+    --- PASS: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasDELETE/user/v1/cameras/{camera_id} (2.19s)
+    --- PASS: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/api/v1/cameras (2.02s)
+    --- PASS: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/api/v1/cameras/{camera_id} (2.09s)
+    --- PASS: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/jobsDELETE/user/v1/cameras/{camera_id} (2.05s)
+=== RUN   TestCameraContractMissingOrExpiredIdentityCannotMutate
+=== RUN   TestCameraContractMissingOrExpiredIdentityCannotMutate/missing_/user/v1/camerasGET
+    camera_contract_errors_test.go:88: camera method=GET route=/user/v1/cameras status=401 expected=401
+=== RUN   TestCameraContractMissingOrExpiredIdentityCannotMutate/missing_/api/v1/camerasGET
+    camera_contract_errors_test.go:88: camera method=GET route=/api/v1/cameras status=401 expected=401
+=== RUN   TestCameraContractMissingOrExpiredIdentityCannotMutate/missing_/user/v1/camerasPOST
+    camera_contract_errors_test.go:88: camera method=POST route=/user/v1/cameras status=401 expected=401
+=== RUN   TestCameraContractMissingOrExpiredIdentityCannotMutate/missing_/user/v1/cameras/{camera_id}DELETE
+    camera_contract_errors_test.go:88: camera method=DELETE route=/user/v1/cameras/{camera_id} status=401 expected=401
+=== RUN   TestCameraContractMissingOrExpiredIdentityCannotMutate/expired_/user/v1
+    camera_contract_errors_test.go:103: camera method=GET route=/user/v1/cameras status=401 expected=401
+=== RUN   TestCameraContractMissingOrExpiredIdentityCannotMutate/expired_/api/v1
+    camera_contract_errors_test.go:103: camera method=GET route=/api/v1/cameras status=401 expected=401
+=== NAME  TestCameraContractMissingOrExpiredIdentityCannotMutate
+    camera_contract_errors_test.go:112: camera method=GET route=/user/v1/cameras status=403 expected=403
+--- PASS: TestCameraContractMissingOrExpiredIdentityCannotMutate (4.74s)
+    --- PASS: TestCameraContractMissingOrExpiredIdentityCannotMutate/missing_/user/v1/camerasGET (0.22s)
+    --- PASS: TestCameraContractMissingOrExpiredIdentityCannotMutate/missing_/api/v1/camerasGET (0.21s)
+    --- PASS: TestCameraContractMissingOrExpiredIdentityCannotMutate/missing_/user/v1/camerasPOST (0.22s)
+    --- PASS: TestCameraContractMissingOrExpiredIdentityCannotMutate/missing_/user/v1/cameras/{camera_id}DELETE (0.21s)
+    --- PASS: TestCameraContractMissingOrExpiredIdentityCannotMutate/expired_/user/v1 (0.22s)
+    --- PASS: TestCameraContractMissingOrExpiredIdentityCannotMutate/expired_/api/v1 (0.24s)
+=== RUN   TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError
+=== RUN   TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError//user/v1/cameras
+    camera_contract_capability_test.go:24: camera method=GET route=/user/v1/cameras status=503 expected=503
+=== RUN   TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError//api/v1/cameras
+    camera_contract_capability_test.go:24: camera method=GET route=/api/v1/cameras status=503 expected=503
+--- PASS: TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError (4.20s)
+    --- PASS: TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError//user/v1/cameras (2.33s)
+    --- PASS: TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError//api/v1/cameras (1.87s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	56.750s

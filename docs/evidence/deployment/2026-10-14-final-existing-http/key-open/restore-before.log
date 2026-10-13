@@ -1,0 +1,34 @@
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/foreign
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/foreign/response_contract
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/missing
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/missing/response_contract
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/read_only
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/read_only/response_contract
+--- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly (2.77s)
+    --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/foreign (0.43s)
+        --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/foreign/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/missing (0.43s)
+        --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/missing/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/read_only (0.44s)
+        --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/read_only/response_contract (0.24s)
+=== RUN   TestKeyOpenContractRestoreAuditFailureRollsBackAndDiagnoses
+    key_open_contract_restore_test.go:46: POST /devices/{device_no}/restore status=204 want=500
+=== RUN   TestKeyOpenContractRestoreAuditFailureRollsBackAndDiagnoses/response_contract
+=== NAME  TestKeyOpenContractRestoreAuditFailureRollsBackAndDiagnoses
+    key_open_contract_restore_test.go:46: HTTP contract rejected response: POST /devices/{device_no}/restore status=500 issues=[{response_selection []}]
+--- FAIL: TestKeyOpenContractRestoreAuditFailureRollsBackAndDiagnoses (1.66s)
+    --- PASS: TestKeyOpenContractRestoreAuditFailureRollsBackAndDiagnoses/response_contract (0.24s)
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first/response_contract
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat/response_contract
+--- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence (2.26s)
+    --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first (0.46s)
+        --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first/response_contract (0.26s)
+    --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat (0.44s)
+        --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat/response_contract (0.24s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	6.760s
+FAIL

@@ -50,6 +50,10 @@ func (s *Server) Routes() http.Handler {
 }
 
 func (s *Server) authenticate(c *gin.Context) {
+	if s.deps.Auth == nil || s.deps.Resources == nil {
+		s.unavailable(c)
+		return
+	}
 	body, err := io.ReadAll(http.MaxBytesReader(c.Writer, c.Request.Body, 4<<20))
 	if err != nil {
 		var oversized *http.MaxBytesError
@@ -57,7 +61,7 @@ func (s *Server) authenticate(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "body_too_large"})
 			return
 		}
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	c.Request.Body = io.NopCloser(bytes.NewReader(body))
@@ -65,6 +69,10 @@ func (s *Server) authenticate(c *gin.Context) {
 		KeyID: c.GetHeader("X-Key-Id"), Timestamp: parseInt64(c.GetHeader("X-Timestamp")), Nonce: c.GetHeader("X-Nonce"), Signature: c.GetHeader("X-Signature"), Method: c.Request.Method, Path: c.Request.URL.EscapedPath(), Query: c.Request.URL.RawQuery, Body: body,
 	}, time.Now().UTC())
 	if err != nil {
+		if errors.Is(err, domain.ErrOpenUnavailable) {
+			s.unavailable(c)
+			return
+		}
 		var rate interface{ RetryAfterValue() int }
 		if errors.As(err, &rate) {
 			c.Header("Retry-After", strconv.Itoa(rate.RetryAfterValue()))
@@ -75,14 +83,15 @@ func (s *Server) authenticate(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "feature_unavailable"})
 			return
 		}
-		if errors.Is(err, domain.ErrNotFound) {
-			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "not_found"})
+		if errors.Is(err, domain.ErrOpenUnauthorized) || errors.Is(err, domain.ErrOpenReplay) {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Set("open_principal", principal)
+	c.Request = c.Request.WithContext(domain.WithTenantID(c.Request.Context(), principal.TenantID))
 	c.Next()
 }
 
@@ -108,7 +117,7 @@ func (s *Server) listPonds(c *gin.Context) {
 	}
 	items, err := s.deps.Resources.ListOpenPonds(c.Request.Context(), p.TenantID, p.Resources)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, items)
@@ -121,13 +130,13 @@ func (s *Server) getPond(c *gin.Context) {
 		return
 	}
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
+	if err != nil || id < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	items, err := s.deps.Resources.ListOpenPonds(c.Request.Context(), p.TenantID, p.Resources)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	for _, item := range items {
@@ -147,7 +156,7 @@ func (s *Server) listDevices(c *gin.Context) {
 	}
 	items, err := s.deps.Resources.ListOpenDevices(c.Request.Context(), p.TenantID, p.Resources)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, items)
@@ -161,7 +170,7 @@ func (s *Server) getDevice(c *gin.Context) {
 	}
 	items, err := s.deps.Resources.ListOpenDevices(c.Request.Context(), p.TenantID, p.Resources)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	for _, item := range items {
@@ -181,7 +190,7 @@ func (s *Server) listAlarms(c *gin.Context) {
 	}
 	items, err := s.deps.Resources.ListOpenAlarms(c.Request.Context(), p.TenantID, p.Resources)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "query_failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, items)

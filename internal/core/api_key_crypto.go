@@ -8,6 +8,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+
+	"git.hyhy.fun/rsplab/iolink/internal/domain"
 )
 
 func (s *Service) rootSecret() []byte { return append([]byte(nil), s.apiKeyRoot...) }
@@ -22,7 +24,7 @@ func randomKeyID() (string, error) {
 
 func encryptAPISecret(root, secret []byte) ([]byte, []byte, error) {
 	if len(root) < 32 {
-		return nil, nil, errors.New("api key encryption key unavailable")
+		return nil, nil, domain.ErrOpenUnavailable
 	}
 	key := sha256.Sum256(append(append([]byte{}, root...), []byte(":api-key")...))
 	block, err := aes.NewCipher(key[:])
@@ -42,7 +44,7 @@ func encryptAPISecret(root, secret []byte) ([]byte, []byte, error) {
 
 func decryptAPISecret(root, ciphertext, nonce []byte) ([]byte, error) {
 	if len(root) < 32 {
-		return nil, errors.New("api key encryption key unavailable")
+		return nil, domain.ErrOpenUnavailable
 	}
 	key := sha256.Sum256(append(append([]byte{}, root...), []byte(":api-key")...))
 	block, err := aes.NewCipher(key[:])

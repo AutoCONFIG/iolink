@@ -1,0 +1,17 @@
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=503 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/signed_auth
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/signed_auth/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds status=503 issues=[{response_selection []}]
+--- FAIL: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites (2.21s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/response_contract (0.25s)
+    --- FAIL: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue (0.26s)
+        --- FAIL: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue/response_contract (0.25s)
+    --- FAIL: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/signed_auth (0.25s)
+        --- FAIL: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/signed_auth/response_contract (0.25s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	2.342s
+FAIL

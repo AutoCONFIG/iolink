@@ -1,0 +1,30 @@
+-test.shuffle 1791916270052439627
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras
+    camera_contract_errors_test.go:42: camera method=GET route=/user/v1/cameras status=500 expected=500
+    camera_contract_errors_test.go:66: camera provider failure had no correlated safe-class diagnostic
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras/{camera_id}
+    camera_contract_errors_test.go:42: camera method=GET route=/user/v1/cameras/{camera_id} status=500 expected=500
+    camera_contract_errors_test.go:66: camera provider failure had no correlated safe-class diagnostic
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasDELETE/user/v1/cameras/{camera_id}
+    camera_contract_errors_test.go:42: camera method=DELETE route=/user/v1/cameras/{camera_id} status=500 expected=500
+    camera_contract_errors_test.go:66: camera provider failure had no correlated safe-class diagnostic
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/api/v1/cameras
+    camera_contract_errors_test.go:42: camera method=GET route=/api/v1/cameras status=500 expected=500
+    camera_contract_errors_test.go:66: camera provider failure had no correlated safe-class diagnostic
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/api/v1/cameras/{camera_id}
+    camera_contract_errors_test.go:42: camera method=GET route=/api/v1/cameras/{camera_id} status=500 expected=500
+    camera_contract_errors_test.go:66: camera provider failure had no correlated safe-class diagnostic
+=== RUN   TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/jobsDELETE/user/v1/cameras/{camera_id}
+    camera_contract_errors_test.go:42: camera method=DELETE route=/user/v1/cameras/{camera_id} status=500 expected=500
+    camera_contract_errors_test.go:66: camera provider failure had no correlated safe-class diagnostic
+--- FAIL: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback (9.02s)
+    --- FAIL: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras (1.80s)
+    --- FAIL: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras/{camera_id} (1.52s)
+    --- FAIL: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasDELETE/user/v1/cameras/{camera_id} (1.36s)
+    --- FAIL: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/api/v1/cameras (1.33s)
+    --- FAIL: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/api/v1/cameras/{camera_id} (1.51s)
+    --- FAIL: TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/jobsDELETE/user/v1/cameras/{camera_id} (1.50s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	9.101s
+FAIL

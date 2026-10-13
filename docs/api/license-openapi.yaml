@@ -53,6 +53,7 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '503': { $ref: '#/components/responses/Unavailable' }
+        '500': { $ref: '#/components/responses/InternalError' }
 components:
   securitySchemes:
     BearerAuth: { type: http, scheme: bearer }

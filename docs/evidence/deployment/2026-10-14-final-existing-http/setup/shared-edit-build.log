@@ -1,0 +1,4 @@
+# git.hyhy.fun/rsplab/iolink/internal/core_test [git.hyhy.fun/rsplab/iolink/internal/core.test]
+internal/core/camera_contract_helpers_test.go:69:84: undefined: sinkPathForCamera
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core [build failed]
+FAIL

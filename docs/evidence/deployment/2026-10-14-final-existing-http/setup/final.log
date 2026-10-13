@@ -1,0 +1,84 @@
+-test.shuffle 1791916206468861166
+=== RUN   TestSetupContractsStorageFailuresStayClosed
+--- PASS: TestSetupContractsStorageFailuresStayClosed (1.61s)
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/missing_key
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/cross_origin
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_media
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/unknown_field
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_field_case
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/duplicate_field
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/trailing_JSON
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/null_password
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/missing_password
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_value_type
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/invalid_UTF8
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/array_root
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/null_root
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/short_password
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/username_whitespace
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/oversize
+--- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning (14.49s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/missing_key (0.89s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/cross_origin (0.82s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_media (0.85s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/unknown_field (0.82s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_field_case (0.77s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/duplicate_field (0.76s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/trailing_JSON (0.76s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/null_password (0.85s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/missing_password (0.75s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_value_type (0.84s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/invalid_UTF8 (0.95s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/array_root (0.95s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/null_root (1.00s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/short_password (1.18s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/username_whitespace (1.14s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/oversize (1.17s)
+=== RUN   TestSetupContractsAcrossRealHTTPInitialization
+--- PASS: TestSetupContractsAcrossRealHTTPInitialization (1.94s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	19.132s
+-test.shuffle 1791916206460323553
+=== RUN   TestBootstrapWhenHTTPSProxyOriginThenInitialized
+--- PASS: TestBootstrapWhenHTTPSProxyOriginThenInitialized (0.97s)
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/missing_key
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/wrong_key
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/cross_origin
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/origin_port
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/origin_userinfo
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/origin_path
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/origin_query
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/origin_fragment
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/invalid_json
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/unknown_field
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/trailing_json
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/empty_fields
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/short_password
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts/oversize
+--- PASS: TestBootstrapWhenInvalidThenNoAccounts (0.67s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/missing_key (0.01s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/wrong_key (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/cross_origin (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/origin_port (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/origin_userinfo (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/origin_path (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/origin_query (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/origin_fragment (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/invalid_json (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/unknown_field (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/trailing_json (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/empty_fields (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/short_password (0.00s)
+    --- PASS: TestBootstrapWhenInvalidThenNoAccounts/oversize (0.00s)
+=== RUN   TestBootstrapWhenFreshThenInitialized
+--- PASS: TestBootstrapWhenFreshThenInitialized (0.86s)
+=== RUN   TestBootstrapWhenDatabaseUnavailableThenFailsClosed
+--- PASS: TestBootstrapWhenDatabaseUnavailableThenFailsClosed (0.82s)
+=== RUN   TestBootstrapWhenConcurrentThenSingleAdministrator
+--- PASS: TestBootstrapWhenConcurrentThenSingleAdministrator (0.85s)
+=== RUN   TestBootstrapWhenAuditFailsThenRollsBack
+--- PASS: TestBootstrapWhenAuditFailsThenRollsBack (0.82s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	6.069s

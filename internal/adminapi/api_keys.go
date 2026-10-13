@@ -1,9 +1,7 @@
 package adminapi
 
 import (
-	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 	"strings"
 
@@ -21,7 +19,7 @@ type apiKeyCreateRequest struct {
 
 func (s *Server) apiKeyStore(c *gin.Context) (APIKeyAdminStore, bool) {
 	if s.deps.APIKeys == nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "api key management unavailable"})
+		s.organizationUnavailable(c)
 		return nil, false
 	}
 	return s.deps.APIKeys, true
@@ -30,7 +28,7 @@ func (s *Server) apiKeyStore(c *gin.Context) (APIKeyAdminStore, bool) {
 func (s *Server) apiKeyTenant(c *gin.Context) (int64, bool) {
 	tenantID, ok := domain.TenantID(c.Request.Context())
 	if !ok {
-		c.JSON(http.StatusForbidden, gin.H{"error": "tenant context required"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return 0, false
 	}
 	return tenantID, true
@@ -38,17 +36,31 @@ func (s *Server) apiKeyTenant(c *gin.Context) (int64, bool) {
 
 func apiKeyError(c *gin.Context, err error) {
 	switch {
+	case errors.Is(err, domain.ErrOpenUnavailable):
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "unavailable"})
 	case errors.Is(err, license.ErrUnavailable) || errors.Is(err, license.ErrRequired) || errors.Is(err, license.ErrFeatureDenied) || errors.Is(err, license.ErrClockError):
-		c.JSON(http.StatusForbidden, gin.H{"error": "feature_unavailable"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 	case errors.Is(err, domain.ErrForbidden):
 		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 	case errors.Is(err, domain.ErrNotFound):
-		c.JSON(http.StatusNotFound, gin.H{"error": "api key not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 	case errors.Is(err, domain.ErrInvalidAPIKey):
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 	default:
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
 	}
+}
+
+func (s *Server) apiKeyFailure(c *gin.Context, err error) {
+	if errors.Is(err, domain.ErrOpenUnavailable) {
+		s.organizationUnavailable(c)
+		return
+	}
+	if errors.Is(err, license.ErrUnavailable) || errors.Is(err, license.ErrRequired) || errors.Is(err, license.ErrFeatureDenied) || errors.Is(err, license.ErrClockError) || errors.Is(err, domain.ErrForbidden) || errors.Is(err, domain.ErrNotFound) || errors.Is(err, domain.ErrInvalidAPIKey) {
+		apiKeyError(c, err)
+		return
+	}
+	s.providerFailure(c, err)
 }
 
 func (s *Server) listAPIKeys(c *gin.Context) {
@@ -62,7 +74,7 @@ func (s *Server) listAPIKeys(c *gin.Context) {
 	}
 	keys, err := store.ListAPIKeys(c.Request.Context(), tenantID, aid(c))
 	if err != nil {
-		apiKeyError(c, err)
+		s.apiKeyFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, keys)
@@ -79,7 +91,7 @@ func (s *Server) listAPIKeyAudit(c *gin.Context) {
 	}
 	items, err := store.ListAPIKeyAuditEvents(c.Request.Context(), tenantID, aid(c), 100)
 	if err != nil {
-		apiKeyError(c, err)
+		s.apiKeyFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, items)
@@ -94,22 +106,15 @@ func (s *Server) createAPIKey(c *gin.Context) {
 	if !ok {
 		return
 	}
-	var req apiKeyCreateRequest
-	decoder := json.NewDecoder(http.MaxBytesReader(c.Writer, c.Request.Body, 1<<20))
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
-		return
-	}
-	var trailing json.RawMessage
-	if err := decoder.Decode(&trailing); !errors.Is(err, io.EOF) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid api key request"})
+	req, err := parseAPIKeyBody(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	resources := domain.APIKeyResourceScope{FarmIDs: req.Resources.FarmIDs, PondIDs: req.Resources.PondIDs, DeviceNos: req.Resources.DeviceNos}
 	key, secret, err := store.IssueAPIKey(c.Request.Context(), tenantID, strings.TrimSpace(req.Name), req.Scopes, resources, aid(c))
 	if err != nil {
-		apiKeyError(c, err)
+		s.apiKeyFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"key": key, "secret": secret})
@@ -126,7 +131,7 @@ func (s *Server) rotateAPIKey(c *gin.Context) {
 	}
 	key, secret, err := store.RotateAPIKey(c.Request.Context(), tenantID, aid(c), c.Param("key_id"))
 	if err != nil {
-		apiKeyError(c, err)
+		s.apiKeyFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"key": key, "secret": secret})
@@ -142,7 +147,7 @@ func (s *Server) revokeAPIKey(c *gin.Context) {
 		return
 	}
 	if err := store.RevokeAPIKey(c.Request.Context(), tenantID, aid(c), c.Param("key_id")); err != nil {
-		apiKeyError(c, err)
+		s.apiKeyFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)

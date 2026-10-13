@@ -16,6 +16,8 @@ paths:
         '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
   /open/v1/ponds/{id}:
     get:
       summary: Get an authorized pond; inaccessible resources return 404
@@ -23,11 +25,14 @@ paths:
         - {name: id, in: path, required: true, schema: {type: integer, format: int64, minimum: 1}}
       responses:
         '200': {description: Pond, content: {application/json: {schema: {$ref: '#/components/schemas/Pond'}}}}
+        '400': {$ref: '#/components/responses/BadRequest'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
         '404': {$ref: '#/components/responses/NotFound'}
         '413': {$ref: '#/components/responses/TooLarge'}
         '429': {$ref: '#/components/responses/RateLimited'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
   /open/v1/devices/{device_no}:
     get:
       summary: Get an authorized device; inaccessible resources return 404
@@ -40,6 +45,8 @@ paths:
         '404': {$ref: '#/components/responses/NotFound'}
         '413': {$ref: '#/components/responses/TooLarge'}
         '429': {$ref: '#/components/responses/RateLimited'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
   /open/v1/devices:
     get:
       summary: List devices in the API key resource set
@@ -48,6 +55,8 @@ paths:
         '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
   /open/v1/alarms:
     get:
       summary: List alarms in the API key resource set
@@ -56,8 +65,31 @@ paths:
         '401': {description: "Invalid signature, timestamp, or nonce", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '403': {description: "Scope or feature unavailable", content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '429': {description: "Rate limit exceeded", headers: {Retry-After: {schema: {type: integer}}}, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
 components:
   responses:
+    BadRequest:
+      description: Invalid request parameter
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+    InternalError:
+      description: Internal provider failure; no database or credential details are returned
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error]
+            properties: {error: {type: string, enum: [internal_error]}}
+            additionalProperties: false
+    Unavailable:
+      description: Required Open API capability unavailable
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error]
+            properties: {error: {type: string, enum: [unavailable]}}
+            additionalProperties: false
     Unauthorized:
       description: Invalid signature, timestamp, nonce, revoked key or inactive tenant
       content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}

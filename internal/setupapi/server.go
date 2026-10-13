@@ -6,7 +6,6 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"errors"
-	"io"
 	"log/slog"
 	"mime"
 	"net/http"
@@ -96,17 +95,8 @@ func (s *Server) initialize(w http.ResponseWriter, r *http.Request) {
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 4096)
 	defer r.Body.Close()
-	var input struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	d := json.NewDecoder(r.Body)
-	d.DisallowUnknownFields()
-	if err := d.Decode(&input); err != nil {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "初始化参数无效"})
-		return
-	}
-	if err := d.Decode(&struct{}{}); err != io.EOF {
+	input, err := decodeSetupInput(r.Body)
+	if err != nil {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "初始化参数无效"})
 		return
 	}

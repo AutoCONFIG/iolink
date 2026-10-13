@@ -21,8 +21,8 @@ import (
 )
 
 var (
-	ErrOpenUnauthorized = errors.New("open api authentication failed")
-	ErrOpenReplay       = errors.New("open api nonce replay")
+	ErrOpenUnauthorized = domain.ErrOpenUnauthorized
+	ErrOpenReplay       = domain.ErrOpenReplay
 )
 
 type OpenRateLimitError struct{ RetryAfter int }
@@ -87,7 +87,10 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 	if err := s.RequireLicenseFeature(ctx, "openapi"); err != nil {
 		return domain.OpenPrincipal{}, err
 	}
-	if len(s.apiKeyRoot) < 32 || req.KeyID == "" || req.Timestamp == 0 || len(req.Nonce) < 16 || req.Signature == "" {
+	if len(s.apiKeyRoot) < 32 {
+		return domain.OpenPrincipal{}, domain.ErrOpenUnavailable
+	}
+	if req.KeyID == "" || req.Timestamp == 0 || len(req.Nonce) < 16 || req.Signature == "" {
 		return domain.OpenPrincipal{}, ErrOpenUnauthorized
 	}
 	path, err := CanonicalOpenPath(req.Path)
@@ -125,7 +128,13 @@ func (s *Service) AuthenticateOpen(ctx context.Context, req domain.OpenRequest, 
 		return domain.OpenPrincipal{}, fmt.Errorf("load open api key: %w", err)
 	}
 	var active bool
-	if err := tx.QueryRow(ctx, `SELECT active FROM tenants WHERE id=$1`, tenantID).Scan(&active); err != nil || !active {
+	if err := tx.QueryRow(ctx, `SELECT active FROM tenants WHERE id=$1`, tenantID).Scan(&active); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return domain.OpenPrincipal{}, ErrOpenUnauthorized
+		}
+		return domain.OpenPrincipal{}, fmt.Errorf("load open tenant: %w", err)
+	}
+	if !active {
 		return domain.OpenPrincipal{}, ErrOpenUnauthorized
 	}
 	secret, err := decryptAPISecret(s.apiKeyRoot, encrypted, nonce)

@@ -1,0 +1,14 @@
+-test.shuffle 1791917195140331186
+=== RUN   TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError
+=== RUN   TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError//user/v1/cameras
+    camera_contract_capability_test.go:24: camera method=GET route=/user/v1/cameras status=503 expected=503
+    camera_contract_capability_test.go:41: absent capability diagnostic fabricated an error
+=== RUN   TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError//api/v1/cameras
+    camera_contract_capability_test.go:24: camera method=GET route=/api/v1/cameras status=503 expected=503
+    camera_contract_capability_test.go:41: absent capability diagnostic fabricated an error
+--- FAIL: TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError (6.85s)
+    --- FAIL: TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError//user/v1/cameras (3.63s)
+    --- FAIL: TestCameraContractAbsentProviderLogsCapabilityWithoutFabricatedError//api/v1/cameras (3.21s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	6.918s
+FAIL

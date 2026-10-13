@@ -19,6 +19,37 @@ SCRIPT: Final = Path(__file__).with_name("validate_http_response.py")
 SECRET: Final = "private-provider-password-JWT-xyz"
 
 
+@pytest.mark.parametrize(
+    ("spec", "route", "status", "body"),
+    [
+        ("license", "/license", 401, {"error": "unauthorized"}),
+        ("open", "/open/v1/ponds", 401, {"error": "unauthorized"}),
+        ("setup", "/status", 503, {"error": "unavailable"}),
+        (
+            "video",
+            "/user/v1/cameras",
+            401,
+            {"code": "unauthorized", "message": "unauthorized"},
+        ),
+    ],
+)
+def test_fixed_additional_contracts_validate_real_error_shapes(
+    spec: str, route: str, status: int, body: dict[str, JsonValue]
+) -> None:
+    payload = {
+        "spec": spec,
+        "method": "GET",
+        "route": route,
+        "status": status,
+        "content_type": "application/json",
+        "has_body": True,
+        "body": body,
+    }
+    result = validate_response(ResponseInput.model_validate(payload))
+    assert result.valid
+    assert result.issues == ()
+
+
 def error_response() -> ResponseInput:
     return ResponseInput(
         spec="app",

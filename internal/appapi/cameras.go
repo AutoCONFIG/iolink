@@ -3,6 +3,7 @@ package appapi
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -76,6 +77,20 @@ func cameraError(c *gin.Context, err error) {
 	c.JSON(status, gin.H{"code": code, "message": code})
 }
 
+func (s *Server) cameraFailure(c *gin.Context, err error) {
+	if errors.Is(err, camera.ErrUnavailable) {
+		if s.log != nil {
+			s.log.ErrorContext(c.Request.Context(), "HTTP camera capability unavailable", slog.String("stage", "http_provider"))
+		}
+		cameraError(c, err)
+		return
+	}
+	if !errors.Is(err, camera.ErrInvalid) && !errors.Is(err, domain.ErrForbidden) && !errors.Is(err, domain.ErrNotFound) && !errors.Is(err, domain.ErrConflict) && s.log != nil {
+		s.log.ErrorContext(c.Request.Context(), "HTTP camera provider operation failed", slog.String("stage", "http_provider"), slog.Any("err", err))
+	}
+	cameraError(c, err)
+}
+
 func cameraID(c *gin.Context) (int64, error) {
 	id, err := strconv.ParseInt(c.Param("camera_id"), 10, 64)
 	if err != nil || id < 1 {
@@ -117,16 +132,16 @@ func cameraPage(c *gin.Context, list bool) (camera.Page, error) {
 func (s *Server) listCameras(c *gin.Context) {
 	page, err := cameraPage(c, true)
 	if err != nil {
-		cameraError(c, err)
+		s.cameraFailure(c, err)
 		return
 	}
 	if s.deps.Cameras == nil {
-		cameraError(c, camera.ErrUnavailable)
+		s.cameraFailure(c, camera.ErrUnavailable)
 		return
 	}
 	result, err := s.deps.Cameras.List(c.Request.Context(), page)
 	if err != nil {
-		cameraError(c, err)
+		s.cameraFailure(c, err)
 		return
 	}
 	if result.Items == nil {
@@ -138,20 +153,20 @@ func (s *Server) listCameras(c *gin.Context) {
 func (s *Server) getCamera(c *gin.Context) {
 	id, err := cameraID(c)
 	if err != nil {
-		cameraError(c, err)
+		s.cameraFailure(c, err)
 		return
 	}
 	if _, err = cameraPage(c, false); err != nil {
-		cameraError(c, err)
+		s.cameraFailure(c, err)
 		return
 	}
 	if s.deps.Cameras == nil {
-		cameraError(c, camera.ErrUnavailable)
+		s.cameraFailure(c, camera.ErrUnavailable)
 		return
 	}
 	result, err := s.deps.Cameras.Get(c.Request.Context(), id)
 	if err != nil {
-		cameraError(c, err)
+		s.cameraFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, result)

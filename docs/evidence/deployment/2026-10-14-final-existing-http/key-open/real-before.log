@@ -1,0 +1,210 @@
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name
+    key_open_contract_boundary_test.go:29: POST /api-keys status=201 want=400
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name/response_contract
+=== NAME  TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name
+    key_open_contract_boundary_test.go:31: invalid issuance left key/audit state
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys status=400 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case
+    key_open_contract_boundary_test.go:29: POST /api-keys status=201 want=400
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case/response_contract
+=== NAME  TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case
+    key_open_contract_boundary_test.go:31: invalid issuance left key/audit state
+--- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites (3.75s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown (0.24s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown/response_contract (0.24s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing (0.23s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name (0.24s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes (0.23s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources (0.23s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array (0.24s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource (0.24s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource (0.23s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested (0.23s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name (0.24s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes (0.24s)
+        --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case (0.24s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case/response_contract (0.23s)
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/response_contract
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys/{key_id}/rotate status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: POST /api-keys/{key_id}/revoke status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner/response_contract
+--- FAIL: TestKeyOpenContractForeignManagementAndMembershipRevocation (1.88s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate (0.24s)
+        --- FAIL: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke (0.24s)
+        --- FAIL: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner (0.23s)
+        --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner/response_contract (0.23s)
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0
+    key_open_contract_boundary_test.go:67: GET /open/v1/ponds/{id} status=404 want=400
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1
+    key_open_contract_boundary_test.go:67: GET /open/v1/ponds/{id} status=404 want=400
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer
+    key_open_contract_boundary_test.go:67: GET /open/v1/ponds/{id} status=404 want=400
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8#01
+--- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState (2.06s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0 (0.18s)
+        --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0/response_contract (0.17s)
+    --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1 (0.18s)
+        --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1/response_contract (0.17s)
+    --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer (0.18s)
+        --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8 (0.18s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8#01 (0.18s)
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_api_keys
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_api_keys/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/GET_api_keys
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/GET_api_keys/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/{id}
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/{id}/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/{device_no}
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/{device_no}/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/alarms
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/alarms/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_rotate
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_rotate/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/old_key_revoked
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/old_key_revoked/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/new_key_accepted
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/new_key_accepted/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_revoke
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_revoke/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/new_key_revoked
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/new_key_revoked/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/GET_audit
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/GET_audit/response_contract
+--- PASS: TestKeyOpenContractManagementAndFiveSignedReads (3.62s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_api_keys (0.24s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_api_keys/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/GET_api_keys (0.24s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/GET_api_keys/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/{id} (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/{id}/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/{device_no} (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/{device_no}/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/alarms (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/alarms/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_rotate (0.24s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_rotate/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/old_key_revoked (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/old_key_revoked/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/new_key_accepted (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/new_key_accepted/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_revoke (0.24s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_revoke/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/new_key_revoked (0.17s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/new_key_revoked/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/GET_audit (0.24s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/GET_audit/response_contract (0.23s)
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first/response_contract
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat/response_contract
+--- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence (1.70s)
+    --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first (0.41s)
+        --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat (0.40s)
+        --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat/response_contract (0.23s)
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_0
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_0/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_1
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_1/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_2
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_2/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_3
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_3/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_first
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_first/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_replay
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_replay/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/rate_limit
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/rate_limit/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/throttled_nonce_replay
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/throttled_nonce_replay/response_contract
+--- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate (2.64s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_0 (0.18s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_0/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_1 (0.19s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_1/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_2 (0.18s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_2/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_3 (0.18s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_3/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_first (0.18s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_first/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_replay (0.18s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_replay/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/rate_limit (0.17s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/rate_limit/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/throttled_nonce_replay (0.18s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/throttled_nonce_replay/response_contract (0.17s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	15.718s
+FAIL

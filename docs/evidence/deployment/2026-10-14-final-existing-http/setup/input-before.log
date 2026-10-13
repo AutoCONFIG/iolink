@@ -1,0 +1,32 @@
+-test.shuffle 1791915163255268747
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/missing_key
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/cross_origin
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_media
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/unknown_field
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_field_case
+    setup_contract_http_test.go:44: setup POST /initialize status=204 want=400
+    setup_contract_http_test.go:46: rejected setup request provisioned identity
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/duplicate_field
+    setup_contract_http_test.go:44: setup POST /initialize status=204 want=400
+    setup_contract_http_test.go:46: rejected setup request provisioned identity
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/trailing_JSON
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/null_password
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/oversize
+--- FAIL: TestSetupContractsRejectInvalidRequestsWithoutProvisioning (7.11s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/missing_key (0.86s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/cross_origin (0.66s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_media (0.72s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/unknown_field (0.90s)
+    --- FAIL: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/wrong_field_case (1.16s)
+    --- FAIL: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/duplicate_field (0.85s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/trailing_JSON (0.65s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/null_password (0.67s)
+    --- PASS: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/oversize (0.64s)
+=== RUN   TestSetupContractsStorageFailuresStayClosed
+--- PASS: TestSetupContractsStorageFailuresStayClosed (1.39s)
+=== RUN   TestSetupContractsAcrossRealHTTPInitialization
+--- PASS: TestSetupContractsAcrossRealHTTPInitialization (1.62s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	10.204s
+FAIL

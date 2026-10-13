@@ -6,7 +6,12 @@ import (
 	"time"
 )
 
-var ErrInvalidAPIKey = errors.New("invalid api key input")
+var (
+	ErrInvalidAPIKey    = errors.New("invalid api key input")
+	ErrOpenUnauthorized = errors.New("open api authentication failed")
+	ErrOpenReplay       = errors.New("open api nonce replay")
+	ErrOpenUnavailable  = errors.New("open api capability unavailable")
+)
 
 type APIKeyResourceScope struct {
 	FarmIDs   []int64  `json:"farm_ids,omitempty"`

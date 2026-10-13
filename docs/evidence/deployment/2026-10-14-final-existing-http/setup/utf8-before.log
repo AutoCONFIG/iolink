@@ -1,0 +1,9 @@
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning
+=== RUN   TestSetupContractsRejectInvalidRequestsWithoutProvisioning/invalid_UTF8
+    setup_contract_http_test.go:51: setup POST /initialize status=204 want=400
+    setup_contract_http_test.go:53: rejected setup request provisioned identity
+--- FAIL: TestSetupContractsRejectInvalidRequestsWithoutProvisioning (1.12s)
+    --- FAIL: TestSetupContractsRejectInvalidRequestsWithoutProvisioning/invalid_UTF8 (1.12s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.168s
+FAIL

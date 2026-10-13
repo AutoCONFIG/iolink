@@ -57,7 +57,7 @@ class ResponseInput(BaseModel):
     model_config: ClassVar[ConfigDict] = ConfigDict(
         frozen=True, extra="forbid", strict=True, allow_inf_nan=False
     )
-    spec: Literal["admin", "app"]
+    spec: Literal["admin", "app", "license", "open", "setup", "video"]
     method: Literal["GET", "POST", "PUT", "DELETE"]
     route: str
     status: StrictInt = Field(ge=100, le=599)
@@ -118,6 +118,14 @@ def validate_response(value: ResponseInput) -> Result:
             filename = "admin-openapi.yaml"
         case "app":
             filename = "openapi.yaml"
+        case "license":
+            filename = "license-openapi.yaml"
+        case "open":
+            filename = "open-openapi.yaml"
+        case "setup":
+            filename = "setup-openapi.yaml"
+        case "video":
+            filename = "video-openapi.yaml"
         case unreachable:
             assert_never(unreachable)
     try:

@@ -1,0 +1,103 @@
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+    key_open_contract_database_test.go:42: GET /open/v1/ponds status=401 want=500
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+    key_open_contract_database_test.go:42: GET /open/v1/ponds status=401 want=500
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+    key_open_contract_database_test.go:42: GET /open/v1/ponds status=401 want=500
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract#01
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds status=500 issues=[{response_selection []}]
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query
+    key_open_contract_database_test.go:42: GET /open/v1/devices/{device_no} status=401 want=500
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract#01
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract#01
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/alarms status=500 issues=[{response_selection []}]
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query
+    key_open_contract_database_test.go:50: SQL failure has no correlated safe diagnostic
+--- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed (15.44s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list (1.44s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract (0.24s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract#01 (0.24s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit (1.37s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract#01 (0.23s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit (1.42s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract#01 (0.23s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit (1.59s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract#01 (0.23s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit (1.43s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract#01 (0.23s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth (1.37s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract (0.24s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract#01 (0.19s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth (1.33s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract#01 (0.18s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth (1.34s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract#01 (0.17s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query (1.42s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract (0.23s)
+        --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract#01 (0.17s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query (1.38s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract#01 (0.19s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query (1.35s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract (0.23s)
+        --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract#01 (0.18s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	15.500s
+FAIL

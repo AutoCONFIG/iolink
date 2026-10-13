@@ -1,0 +1,10 @@
+=== RUN   TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses
+=== RUN   TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses/response_contract
+    key_open_contract_fixture_test.go:128: HTTP contract rejected response: POST /devices/{device_no}/restore status=500 issues=[{response_selection []}]
+=== NAME  TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses
+    key_open_contract_restore_test.go:46: HTTP contract rejected response: POST /devices/{device_no}/restore status=500 issues=[{response_selection []}]
+--- FAIL: TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses (2.05s)
+    --- FAIL: TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses/response_contract (0.26s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	2.112s
+FAIL

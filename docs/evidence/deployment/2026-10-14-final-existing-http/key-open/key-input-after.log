@@ -1,0 +1,68 @@
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case/response_contract
+--- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites (3.87s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown (0.24s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing (0.25s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name (0.23s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes (0.24s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources (0.23s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array (0.23s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource (0.24s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource (0.24s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested (0.23s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name (0.23s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes (0.24s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case (0.23s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case/response_contract (0.23s)
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/response_contract
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate/response_contract
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke/response_contract
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner/response_contract
+--- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation (1.85s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate (0.23s)
+        --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke (0.24s)
+        --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner (0.23s)
+        --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner/response_contract (0.23s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	6.797s

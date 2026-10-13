@@ -1,0 +1,17 @@
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue
+    key_open_contract_capability_test.go:12: POST /api-keys status=500 want=503
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/signed_auth
+    key_open_contract_capability_test.go:12: GET /open/v1/ponds status=401 want=503
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/signed_auth/response_contract
+--- FAIL: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites (1.61s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue (0.24s)
+        --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue/response_contract (0.23s)
+    --- FAIL: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/signed_auth (0.18s)
+        --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/signed_auth/response_contract (0.17s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.667s
+FAIL

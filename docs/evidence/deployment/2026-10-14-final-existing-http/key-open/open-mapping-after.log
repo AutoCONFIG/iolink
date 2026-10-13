@@ -1,0 +1,122 @@
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds/{id} status=400 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds/{id} status=400 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer/response_contract
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds/{id} status=400 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8#01
+--- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState (2.26s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/response_contract (0.24s)
+    --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0 (0.19s)
+        --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0/response_contract (0.18s)
+    --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1 (0.18s)
+        --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1/response_contract (0.17s)
+    --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer (0.20s)
+        --- FAIL: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer/response_contract (0.19s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8 (0.19s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8#01 (0.20s)
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract#01
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds status=500 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract#01
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds status=500 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract#01
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds status=500 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract#01
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/ponds status=500 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract#01
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/devices/{device_no} status=500 issues=[{response_selection []}]
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query
+    key_open_contract_database_test.go:48: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract#01
+    key_open_contract_fixture_test.go:122: HTTP contract rejected response: GET /open/v1/alarms status=500 issues=[{response_selection []}]
+--- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed (17.25s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list (1.46s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract (0.24s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract#01 (0.24s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit (1.51s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract (0.25s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract#01 (0.24s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit (1.47s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract (0.24s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract#01 (0.24s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit (1.75s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract (0.28s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract#01 (0.28s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit (1.60s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract (0.24s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract#01 (0.24s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth (1.46s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract (0.24s)
+        --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract#01 (0.18s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth (1.56s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract (0.27s)
+        --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract#01 (0.20s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth (1.61s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract (0.26s)
+        --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract#01 (0.21s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query (1.73s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract (0.30s)
+        --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract#01 (0.20s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query (1.63s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract (0.24s)
+        --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract#01 (0.20s)
+    --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query (1.49s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract (0.27s)
+        --- FAIL: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract#01 (0.19s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	19.590s
+FAIL
