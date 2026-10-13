@@ -1,0 +1,186 @@
+-test.shuffle 1791908209632655084
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.969477045+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"HJAY5FBDF6AFH3UC54WOH4OGY3"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_create
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:50.260556766+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"DLVUOPIXBWPNTFPDJBGUTZ4NZW"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_update
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:50.886116547+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"37WE5GA2AK27PTPWOFHDB7XCCY"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_delete
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:51.321353657+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"26Z7GN7DOUWVKV522SKIWMSQ63"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_owner
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:51.614731553+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"FDGNRSFEVJSV2ROY43CZ7B4GD2"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_owner_actor
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:51.907787943+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"6CKJCQLSXBWOBBXNHGG3LYIXEY"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/user_search
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:52.202483728+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"2D4PFKHYN2UT5IB6WFX6WQVJ3U"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:52.55707045+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"UXHDNKOIZZRPCF4MQOZY6BANFM"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_farm_check
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:52.963895199+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"F2HDNONFDOSDANH2DN4AGAGPZL"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_alarm_enrichment
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:53.312178571+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"45BI366Z2AU4RO4M2AYMK5O5H6"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_create
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:53.80387412+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"7F4ED4CNBLXT7CILGPRD73443W"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_update
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:54.350903732+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"BY22G4C3RRH3TN4ETTN3T4ZO75"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_delete
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:54.996011929+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"E5DPFTF3ZCCCIVVRZLKD4YAAEB"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_register
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:55.577170121+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"KNO6VIRFV425BUMJA6FRSGYNWO"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:56.143328007+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"ADNQ5FNYL4DL7FMYY3Y6R3SLIU"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_move
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:56.710877593+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"IUOBZQYWCRDNJQCVD6XLN6RLYL"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_delete
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:57.164614327+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"SNXFYQCEGYSKMNIR36J5ULU3FL"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_restore
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:57.53431397+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"DLKCJGK6JF4TZILL2DIMOSZQGG"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:57.859418908+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"Y2V5RF7L5LLBM3TFLZ4VG2X4ZD"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_create
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:58.181114064+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"KJ4VYMH7ZJWX2X77JJIM7U7LH7"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_update
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:58.497970523+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"FVLLRL2RJAZM3ZG3YKN2I7JLPZ"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_delete
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:58.855489665+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"TB44B7Z4ZDEPKRR3CTYFAMBPHK"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:59.186248638+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"IC5FUJQATA6M3EZQRELCP4K5UZ"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_confirm
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:59.545023473+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"I36RY5ACP3I2OJV2TTUWQZMSCP"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_confirm_actor
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:59.86697782+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"J26XZZ6NMALKERSB3WNRFYEHRQ"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_batch
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:00.180169562+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"VYCEUATN3WYSHVKGEMYG5TNOSC"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_batch_actor
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:00.488433808+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"QZO3L67QCAVFB3Y2PW2XBHU36K"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/stats
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:00.851691336+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"PCHR5SJEZV3KAYJ5T7TV7ZZ4QO"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/password
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:01.221872293+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"5WZTTFDGFOOPFVUSYRGM2TKWJV"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_version
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:01.566524577+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"ARCK5OZVHTRZPILSZXEBEVKR46"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_tenant
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:01.905974859+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"VWITUK4BDSJJVXUUQNDBJPZDXA"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_membership
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:02.227250015+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"CT533RLLEJQZZTNNPDEZUWNPID"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_role
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:02.614007879+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"MWR7MOUGVECTE6VHRSP7ZX4DKD"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/member_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:02.973981085+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"AKFKTMQFS2VK57Y7QXVWCU3YR7"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/member_set
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:03.339123253+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"NDSHO6VPTFJNL742UNZJCCVTJC"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/missing_member_list
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:03.70317941+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"H2ZKQMM25YLPN4N5WI4762JCGG"}
+=== RUN   TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/missing_member_set
+    provider_error_test.go:67: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:17:04.070447937+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"DWRPRMPX7JENZG42ZS5M6G5EAR"}
+--- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError (14.44s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_list (0.34s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_create (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_update (0.63s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_delete (0.43s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_owner (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/farm_owner_actor (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/user_search (0.29s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_list (0.35s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_farm_check (0.41s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_alarm_enrichment (0.35s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_create (0.49s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_update (0.55s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/pond_delete (0.65s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_register (0.58s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_list (0.57s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_move (0.57s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_delete (0.45s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/device_restore (0.37s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_list (0.33s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_create (0.32s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_update (0.32s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/rule_delete (0.36s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_list (0.33s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_confirm (0.36s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_confirm_actor (0.32s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_batch (0.31s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/alarm_batch_actor (0.31s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/stats (0.36s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/password (0.37s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_version (0.34s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_tenant (0.34s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_membership (0.32s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/login_role (0.39s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/member_list (0.36s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/member_set (0.37s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/missing_member_list (0.36s)
+    --- PASS: TestBaselineAdminHTTPProviderFailuresUseSafeInternalError/missing_member_set (0.37s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	15.527s
+-test.shuffle 1791908209628002816
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.631710708+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"WM56KYQSZFLCCZVHHOU3MZGBW3"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.635129587+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"NVF63HXDSJC5PLMJ2N5LJ7JE43"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.637761897+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"YXGT4T7TZ2ACGWTBHOKKCRLFCH"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.641536925+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"CZHAIOAXZSRKZOVO3ZODP6EMOQ"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.65278736+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"JZ4FNTF75ZXDY45NGDQCG6Z26Q"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_ponds
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.655670391+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"L4U47DBFA3MYKVW6D3J3V5FSHT"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.658416985+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"J4CYMFE32LGXPQU3NIZM633U4U"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/history_query
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.660768667+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"NAGFGBVMZHXKA2U7X46SOQ3W4U"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/history_capability
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.665711331+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"6WZXN4VQRATNQJDP2QQB36EJ2Z"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_list
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.668065919+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"HMWASE6E642FRBNPXADE2UL5HP"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_filtered
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.670307854+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"PL5EOEEHI7FLJ7ZQV4U36LZWQ2"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarm_confirm
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.672877947+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"MRXFR4N5AIPW6XSCTLUF4BGPNO"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_ponds
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.677335479+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"BEVZVM7QR377QYBHPGAY5IFNUX"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.67931994+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"3JZ2T4RYHG47FHICYUQ2SPXNIK"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.681381216+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"VPYCN35Z7OCDLF4UZLF2WVZ7DK"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_user
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.682767423+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"NX7Z3FUF3TXNYDNYXPKSJBYIFS"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_tenant
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.683908208+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"IAL5TC2IUUGUMQWF6LZYKNRPPI"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_version
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T00:16:49.685033233+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"RSW5T343ISCGFQEPSXWV7CHNJ4"}
+--- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError (0.06s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_devices (0.01s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_ponds (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/history_query (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/history_capability (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_list (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_filtered (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarm_confirm (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_ponds (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_user (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_tenant (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_version (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.103s
+-test.shuffle 1791908209811939290
+=== RUN   TestBaselineHTTPProviderErrorsWithRealPostgres
+=== RUN   TestBaselineHTTPProviderErrorsWithRealPostgres/farms
+=== RUN   TestBaselineHTTPProviderErrorsWithRealPostgres/alarms
+=== RUN   TestBaselineHTTPProviderErrorsWithRealPostgres/alarm_rules
+--- PASS: TestBaselineHTTPProviderErrorsWithRealPostgres (1.48s)
+    --- PASS: TestBaselineHTTPProviderErrorsWithRealPostgres/farms (0.01s)
+    --- PASS: TestBaselineHTTPProviderErrorsWithRealPostgres/alarms (0.01s)
+    --- PASS: TestBaselineHTTPProviderErrorsWithRealPostgres/alarm_rules (0.01s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	2.545s
