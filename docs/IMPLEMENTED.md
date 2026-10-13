@@ -8,7 +8,7 @@
 M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、web `66c52624f6d97c9dd7fe29b05b64b3db39c4a72d` 的阶段证据保留。
 外部微信、硬件、生产 License 和客户安装仍按 `external_blocked` 记录。
 
-当前处于已有功能验证阶段：S2a/S2b诊断增强与回归、D18输入边界已分别发布v0.0.31–v0.0.33；V1历史证据正在逐项核对。主阶段13/20的软件范围计数没有因证据整理增加。
+当前处于已有功能验证阶段：S2a/S2b诊断增强与回归、D18输入边界已分别发布v0.0.31–v0.0.33；V1b只读门禁修复发布v0.0.34，S8最新读数完整性/故障响应发布v0.0.35；V1当前源补证及范围对账继续。主阶段13/20的软件范围计数没有因证据整理增加。
 
 本节是对已有证据的状态整理，不是重新运行验收。下方旧表、计划勾选和历史证据
 中的待审措辞存在滞后；有冲突时使用本节列出的范围和最终收据定位，不将旧勾选
@@ -57,6 +57,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | S5 | 首启平台管理员、手工组织授权、平台/用户双看板 | 已完成已核验 | 根源码 `2c8a6a9` / web `1327ff1` 同快照两位独立审阅者 APPROVE，无阻断；首启只创建 ADMIN，不创建业务组织/USER/成员；用户注册后由平台管理员手工授权，看板按身份与资源权限分开。真实 Timescale、空成员契约回归、CLI 账号/密码、前端58测试与构建见[证据与双审](evidence/deployment/2026-10-08-platform-console/README.md)；浏览器由用户验收；License仍为实例级；非阻断严格JSON限制登记D18 |
 | S6 | 平台管理与业务用户 HTTP 接口分层 | 已完成已核验 | 根快照 `2e7205d` / web `953335e` 获两位未参与编辑的独立审阅者 APPROVE：[代码审阅](evidence/deployment/2026-10-09-user-api-split/code-review.md)、[门审收据](evidence/deployment/2026-10-09-user-api-split/gate-review.md)，手工 QA 是额外证据。已发布 v0.0.14；随后在 `cf7727f` 修复产品与物模型 GET 对 member/viewer/support 的错误403，修复快照也获[代码审阅](evidence/deployment/2026-10-09-product-role-fix/code-review.md)与[门审](evidence/deployment/2026-10-09-product-role-fix/gate-review.md) APPROVE。根路由新增 `/user/v1`，仅挂载普通登录/注册、当前组织、成员与租户业务资源；平台 License、平台统计、平台用户和组织生命周期仅挂载 `/admin/v1`，旧 `/admin/v1` 业务路径保留兼容。Web 业务请求使用 user client，平台请求使用 admin client；隔离 Timescale、Go race、前端 58 测试/类型检查/构建、契约检查均通过。浏览器视觉、微信、硬件、公网 TLS 仍按 external_blocked/用户验收记录 |
 | S7 | 租户业务页面写入口与 RBAC 对齐 | 已完成已核验 | web `f62f66347f6bd7d7e5dbd3ec3a6e7a83fbf13350` 获两位未参与编辑的独立审阅者同快照 APPROVE；只读角色隐藏养殖场/池塘/设备/规则管理入口，产品回车绑定有权限保护，报警确认保留 owner/admin/member/support 能力。67 单测、类型检查/生产构建、10 权限场景与 5 原有页面场景通过，旧版回归如预期失败；门审独立重跑权限场景和非缓存后端两包测试通过；[证据与双审](evidence/tenant-permission-ui/2026-10-11/README.md)。发布目标 v0.0.18；现场视觉和自动更新由用户验收。本轮未修改后端、数据库或主阶段完成数量 |
+| S8 | 池塘最新读数全量设备聚合与存储错误响应 | 已完成已核验 | 提交 `e1c7b50` / tree `8edf585` 两位未参与编辑者同最终快照APPROVE；发布v0.0.35。[证据与双审](evidence/deployment/2026-10-13-latest-readings/README.md)。管理侧遍历全部池塘设备分页，201台与双端最新值实测一致；只将缺失shadow/不适用产品视为null，真实provider故障返回契约500/internal_error、写关联脱敏dump，不返回部分陈旧读数。原缺陷测试先失败；最终真实Timescale/HTTP、全库33测试包build/vet/race和96 operations / 568契约fixtures通过。保留既有权限及成功响应；R10/R17/R22完整验收不因局部修复整体升级，浏览器由用户验收 |
 | S1 | 服务器/开发两份 Compose、latest-pg16 | 已完成已核验 | 用户免双审；隔离构建/首启/重启通过；[证据](evidence/deployment/2026-10-03-compose/) |
 | S2 | JSON日志转储、轮转、关联ID、脱敏及健康状态 | 已完成已核验 | 双审都批准 `1bc74b8`，验证 source `e1b78e1`；[证据](evidence/deployment/2026-10-03-logging/README.md)、`code-review.md`及 `.omo/evidence/logging-gate-review.md`；下方旧“待双审”已过时 |
 | S2a | Debug dump 多阶段关联、下游诊断、版本目录与定时保留 | 已完成已核验 | 实现提交 `a7335a2`、tree `2bd5fd8` 获两位未参与编辑者同快照 APPROVE；发布 v0.0.31。HTTP/MQTT/数据库、License准入与通知/微信安全关联诊断，`logs/{version}`，默认启动及每6小时按记录时间清除6小时前数据；文件保存 debug、stderr 独立级别。真实 Timescale/MQTT、本地微信HTTP、文件/并发/失败边界与实际服务启动通过；[证据与双审](evidence/deployment/2026-10-13-debug-dump/README.md)。全库 build/vet通过，race仍有既有 gbcatalog 固定日期的11项失败，未称全库全绿；专属测试容器已清理。外部微信/硬件及 License交付专项仍未验收，M7a/M8进度不变 |

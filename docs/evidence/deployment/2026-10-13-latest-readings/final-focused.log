@@ -1,0 +1,101 @@
+-test.shuffle 1791904679752557457
+=== RUN   TestPondLatestIncludesDevicesBeyondFirstPage
+--- PASS: TestPondLatestIncludesDevicesBeyondFirstPage (0.00s)
+=== RUN   TestLatestHandlersDistinguishAbsenceFromProviderFailure
+=== RUN   TestLatestHandlersDistinguishAbsenceFromProviderFailure/no_shadow/ponds
+=== RUN   TestLatestHandlersDistinguishAbsenceFromProviderFailure/no_shadow/device
+=== RUN   TestLatestHandlersDistinguishAbsenceFromProviderFailure/generic_product/ponds
+=== RUN   TestLatestHandlersDistinguishAbsenceFromProviderFailure/generic_product/device
+=== RUN   TestLatestHandlersDistinguishAbsenceFromProviderFailure/provider_failure/ponds
+=== RUN   TestLatestHandlersDistinguishAbsenceFromProviderFailure/provider_failure/device
+--- PASS: TestLatestHandlersDistinguishAbsenceFromProviderFailure (0.00s)
+    --- PASS: TestLatestHandlersDistinguishAbsenceFromProviderFailure/no_shadow/ponds (0.00s)
+    --- PASS: TestLatestHandlersDistinguishAbsenceFromProviderFailure/no_shadow/device (0.00s)
+    --- PASS: TestLatestHandlersDistinguishAbsenceFromProviderFailure/generic_product/ponds (0.00s)
+    --- PASS: TestLatestHandlersDistinguishAbsenceFromProviderFailure/generic_product/device (0.00s)
+    --- PASS: TestLatestHandlersDistinguishAbsenceFromProviderFailure/provider_failure/ponds (0.00s)
+    --- PASS: TestLatestHandlersDistinguishAbsenceFromProviderFailure/provider_failure/device (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	1.046s
+-test.shuffle 1791904679744915217
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/present
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/wrapped_missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/unsupported
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/provider_failure
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-13T23:17:59.753535899+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"*fmt.wrapError","request_id":"DUU3HF2QVP2ZL7NTJRBGN6RIKP"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/provider_timeout
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-13T23:17:59.75473116+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"deadline_exceeded","request_id":"YIV5PV4JJTKGGURFLLMPZI2WVN"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/present
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/wrapped_missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/unsupported
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/provider_failure
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-13T23:17:59.760382572+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"*fmt.wrapError","request_id":"UIBIK4QH3YQ2WRDAHU5G2JN3D4"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/provider_timeout
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-13T23:17:59.761444061+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"deadline_exceeded","request_id":"VBJL3GYODNQBR2SF34H76JIPVO"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/present
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/wrapped_missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/unsupported
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/provider_failure
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-13T23:17:59.766854699+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"*errors.errorString","request_id":"Z62VWZT4W3A46HISD6MZ6CVHKB"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/provider_timeout
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-13T23:17:59.767919985+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"deadline_exceeded","request_id":"22A54LMYCPI373MSGQNGOJC65R"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/present
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/wrapped_missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/unsupported
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/provider_failure
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-13T23:17:59.773308191+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"*errors.errorString","request_id":"IEE3WBD7YPWFZ7HZT4LHRDVALK"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/provider_timeout
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-13T23:17:59.774158402+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"deadline_exceeded","request_id":"A3W6I7J4L2ZG5ZJVXDYPHVHRI6"}
+--- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure (0.03s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/present (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/wrapped_missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/unsupported (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/provider_failure (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/provider_timeout (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/present (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/wrapped_missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/unsupported (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/provider_failure (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/provider_timeout (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/present (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/wrapped_missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/unsupported (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/provider_failure (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/provider_timeout (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/present (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/wrapped_missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/unsupported (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/provider_failure (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/provider_timeout (0.00s)
+=== RUN   TestPondLatestReturnsNullWhenPondHasNoDevices
+=== RUN   TestPondLatestReturnsNullWhenPondHasNoDevices//ponds
+=== RUN   TestPondLatestReturnsNullWhenPondHasNoDevices//ponds/1
+--- PASS: TestPondLatestReturnsNullWhenPondHasNoDevices (0.00s)
+    --- PASS: TestPondLatestReturnsNullWhenPondHasNoDevices//ponds (0.00s)
+    --- PASS: TestPondLatestReturnsNullWhenPondHasNoDevices//ponds/1 (0.00s)
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/outage=false
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/outage=true
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/1/outage=false
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/1/outage=true
+--- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage (0.00s)
+    --- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/outage=false (0.00s)
+    --- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/outage=true (0.00s)
+    --- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/1/outage=false (0.00s)
+    --- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/1/outage=true (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.069s
+-test.shuffle 1791904680372921992
+=== RUN   TestLatestReadingHTTPWithLargePondAndDatabaseFailure
+--- PASS: TestLatestReadingHTTPWithLargePondAndDatabaseFailure (1.12s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	2.188s
