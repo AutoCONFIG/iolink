@@ -8,6 +8,10 @@ gate_scope:
   M6b: [R36, R37]
   M6c: [R38, R39, R40]
   M6d: [R41, R42]
+gate_parts:
+  M6b:
+    scope: [R36.a, R37.a]
+    receipt: docs/evidence/rebuild/gates/M6b.json
 provider_operations:
   - {id: R01, provider: go-toolchain, operation: reproducible_build, required_level: L3, status: not_run, command: "make verify", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}
   - {id: R02, provider: embedded-http, operation: contract_validation, required_level: L3, status: not_run, command: "make verify-contracts", evidence_path: docs/evidence/rebuild/foundation-guidance.txt}

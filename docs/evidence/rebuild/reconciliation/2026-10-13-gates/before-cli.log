@@ -1,0 +1,108 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+______ test_gate_emits_json_only_when_recorded_evidence_passes[M6a-ids0] _______
+
+manifests = {'acceptance-map': {'schema_version': 1, 'source': 'docs/ACCEPTANCE.md', 'status_semantics': 'not_run means complete v...and durable semantics specified', 'L3': 'implemented software path with contract and integration evidence', ...}, ...}}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x75ae3e1a7e10>
+capsys = <_pytest.capture.CaptureFixture object at 0x75ae3e1c16a0>, gate = 'M6a'
+ids = ['R34', 'R35']
+
+    @pytest.mark.parametrize(("gate", "ids"), [("M6a", ["R34", "R35"]), ("M6c", ["R38", "R39", "R40"])])
+    def test_gate_emits_json_only_when_recorded_evidence_passes(manifests, monkeypatch, capsys, gate, ids):
+        # Given: every scoped requirement with actual recorded evidence.
+        evidence = checker.ROOT / "docs/evidence/acceptance"
+        for item in manifests["acceptance-map"]["requirements"]:
+            if item["wave"] == gate:
+                item["software_status"] = "passed"
+                path = evidence / item["id"]
+                path.mkdir(parents=True, exist_ok=True)
+                (path / "result.txt").write_text("independent acceptance result", encoding="utf-8")
+        assert validate(manifests) == []
+        monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", gate])
+        # When: the valid gate runs.
+        result = checker.main()
+        # Then: the CLI returns machine-readable evidence.
+        output = capsys.readouterr()
+        assert result == 0
+        assert f'"gate": "{gate}"' in output.out
+        assert all(f'"{rid}"' in output.out for rid in ids)
+        assert output.err == ""
+>       assert not (checker.ROOT / "docs/evidence/rebuild/gates" / f"{gate}.json").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = ((PosixPath('/tmp/pytest-of-yun/pytest-1/test_gate_emits_json_only_when0') / 'docs/evidence/rebuild/gates') / 'M6a.json').exists
+E        +      where PosixPath('/tmp/pytest-of-yun/pytest-1/test_gate_emits_json_only_when0') = checker.ROOT
+
+scripts/test_check_architecture_manifests.py:127: AssertionError
+______ test_gate_emits_json_only_when_recorded_evidence_passes[M6c-ids1] _______
+
+manifests = {'acceptance-map': {'schema_version': 1, 'source': 'docs/ACCEPTANCE.md', 'status_semantics': 'not_run means complete v...and durable semantics specified', 'L3': 'implemented software path with contract and integration evidence', ...}, ...}}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x75ae3e1a7820>
+capsys = <_pytest.capture.CaptureFixture object at 0x75ae3e00a710>, gate = 'M6c'
+ids = ['R38', 'R39', 'R40']
+
+    @pytest.mark.parametrize(("gate", "ids"), [("M6a", ["R34", "R35"]), ("M6c", ["R38", "R39", "R40"])])
+    def test_gate_emits_json_only_when_recorded_evidence_passes(manifests, monkeypatch, capsys, gate, ids):
+        # Given: every scoped requirement with actual recorded evidence.
+        evidence = checker.ROOT / "docs/evidence/acceptance"
+        for item in manifests["acceptance-map"]["requirements"]:
+            if item["wave"] == gate:
+                item["software_status"] = "passed"
+                path = evidence / item["id"]
+                path.mkdir(parents=True, exist_ok=True)
+                (path / "result.txt").write_text("independent acceptance result", encoding="utf-8")
+        assert validate(manifests) == []
+        monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", gate])
+        # When: the valid gate runs.
+        result = checker.main()
+        # Then: the CLI returns machine-readable evidence.
+        output = capsys.readouterr()
+        assert result == 0
+        assert f'"gate": "{gate}"' in output.out
+        assert all(f'"{rid}"' in output.out for rid in ids)
+        assert output.err == ""
+>       assert not (checker.ROOT / "docs/evidence/rebuild/gates" / f"{gate}.json").exists()
+E       AssertionError: assert not True
+E        +  where True = exists()
+E        +    where exists = ((PosixPath('/tmp/pytest-of-yun/pytest-1/test_gate_emits_json_only_when1') / 'docs/evidence/rebuild/gates') / 'M6c.json').exists
+E        +      where PosixPath('/tmp/pytest-of-yun/pytest-1/test_gate_emits_json_only_when1') = checker.ROOT
+
+scripts/test_check_architecture_manifests.py:127: AssertionError
+_________________ test_gate_preserves_existing_review_bindings _________________
+
+manifests = {'acceptance-map': {'schema_version': 1, 'source': 'docs/ACCEPTANCE.md', 'status_semantics': 'not_run means complete v...and durable semantics specified', 'L3': 'implemented software path with contract and integration evidence', ...}, ...}}
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x75ae3e0f9a30>
+capsys = <_pytest.capture.CaptureFixture object at 0x75ae3e008050>
+
+    def test_gate_preserves_existing_review_bindings(manifests, monkeypatch, capsys):
+        assert validate(manifests) == []
+        receipt = checker.ROOT / "docs/evidence/rebuild/gates/M6a.json"
+        receipt.parent.mkdir(parents=True)
+        payload = {
+            "gate": "M6a",
+            "requirements": ["R34", "R35"],
+            "evidence": {
+                "R34": "docs/evidence/acceptance/R34/",
+                "R35": "docs/evidence/acceptance/R35/",
+            },
+            "candidate": "b" * 40,
+            "reviews": ["code-review.md", "gate-review.md"],
+            "custom_metadata": {"retained": True},
+        }
+        receipt.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+        original = receipt.read_bytes()
+        monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", "M6a"])
+        assert checker.main() == 0
+        assert json.loads(capsys.readouterr().out)["gate"] == "M6a"
+>       assert receipt.read_bytes() == original
+E       assert b'{\n  "gate"...5/"\n  }\n}\n' == b'{"gate": "M...ed": true}}\n'
+E         
+E         At index 1 diff: b'\n' != b'"'
+E         Use -v to get more diff
+
+scripts/test_check_architecture_manifests.py:150: AssertionError
+=========================== short test summary info ============================
+FAILED scripts/test_check_architecture_manifests.py::test_gate_emits_json_only_when_recorded_evidence_passes[M6a-ids0]
+FAILED scripts/test_check_architecture_manifests.py::test_gate_emits_json_only_when_recorded_evidence_passes[M6c-ids1]
+FAILED scripts/test_check_architecture_manifests.py::test_gate_preserves_existing_review_bindings
+3 failed, 28 deselected in 0.73s

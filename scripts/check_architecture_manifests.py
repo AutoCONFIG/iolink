@@ -4,10 +4,15 @@
 from argparse import ArgumentParser
 import json, re, sys
 from pathlib import Path
+from typing import Final, Literal, assert_never
 
 import yaml
+from pydantic import TypeAdapter, ValidationError
+
+from architecture_gate import GateFailure, GateSuccess, PartialProfile, evaluate_gate
 
 ROOT = Path(__file__).resolve().parents[1]
+PART_PROFILES: Final = TypeAdapter(dict[Literal["M6b"], PartialProfile])
 IDS = {f"R{i:02}" for i in range(1, 56)}
 WAVES = {"M0", "M1", "M2", "M3", "M4", "M5", *(f"M6{part}" for part in "abcd"), *(f"M7{part}" for part in "ab"), *(f"M8{part}" for part in "abcd")}
 ACCEPTANCE_WAVES = (
@@ -168,6 +173,10 @@ def validate_manifests() -> list[str]:
     scope = acceptance.get("gate_scope")
     expected_scope = {"M0": ["R01", "R03", "R04"], "M5": ["R28", "R29", "R30", "R31", "R32", "R33"], "M6a": ["R34", "R35"], "M6b": ["R36", "R37"], "M6c": ["R38", "R39", "R40"], "M6d": ["R41", "R42"]}
     if not isinstance(scope, dict) or scope != expected_scope: errors.append("acceptance-map.yaml: gate_scope must match PLAN.md stage exit requirements")
+    try:
+        PART_PROFILES.validate_python(acceptance.get("gate_parts", {}))
+    except ValidationError:
+        errors.append("acceptance-map.yaml: gate_parts must declare only the supported M6b .a receipt scope")
 
     operation_matrix = acceptance.get("provider_operations")
     if not isinstance(operation_matrix, list):
@@ -360,16 +369,28 @@ def main() -> int:
         acceptance = yaml.safe_load((ROOT / "docs/architecture/acceptance-map.yaml").read_text(encoding="utf-8"))
         scoped = acceptance["gate_scope"][args.gate]
         requirements = {item["id"]: item for item in acceptance["requirements"]}
-        blocked = [f"{rid}: software_status={requirements[rid]['software_status']}" for rid in scoped if requirements[rid]["software_status"] != "passed"]
-        if blocked:
-            print(f"ERROR: {args.gate} gate blocked: " + "; ".join(blocked), file=sys.stderr)
+        try:
+            profiles = PART_PROFILES.validate_python(acceptance.get("gate_parts", {}))
+        except ValidationError:
+            print("ERROR: invalid gate_parts profile", file=sys.stderr)
             return 1
-        result = {"gate": args.gate, "requirements": scoped, "evidence": {rid: requirements[rid]["evidence"] for rid in scoped}}
-        gate_path = ROOT / "docs/evidence/rebuild/gates" / f"{args.gate}.json"
-        gate_path.parent.mkdir(parents=True, exist_ok=True)
-        gate_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        print(json.dumps(result, ensure_ascii=False))
-        return 0
+        result = evaluate_gate(
+            ROOT,
+            args.gate,
+            tuple(scoped),
+            {rid: requirements[rid]["software_status"] for rid in scoped},
+            {rid: requirements[rid]["evidence"] for rid in scoped},
+            profiles.get(args.gate),
+        )
+        match result:
+            case GateFailure(errors=gate_errors):
+                print(f"ERROR: {args.gate} gate blocked: " + "; ".join(gate_errors), file=sys.stderr)
+                return 1
+            case GateSuccess():
+                print(json.dumps(result.model_dump(mode="json", exclude_none=True), ensure_ascii=False))
+                return 0
+            case unreachable:
+                assert_never(unreachable)
     print("architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS")
     return 0
 

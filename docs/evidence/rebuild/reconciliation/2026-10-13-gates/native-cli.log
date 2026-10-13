@@ -1,0 +1,14 @@
+before {'docs/evidence/rebuild/gates/M5.json': 'dff1ac63f8ddbc27609683ddcdd57a45a8166654f3e4b5d2d11fa5cb8abef791', 'docs/evidence/rebuild/gates/M6a.json': 'b54fdad7962bfd417b1e262bae7fcf72d57b9709ca64ecd01f45b3f9b41b818d', 'docs/evidence/rebuild/gates/M6b.json': 'f50485eb28ace70efa16ccff4c4ecef09c4c1f6cb992ab44a4a88de011bd0778', 'docs/evidence/rebuild/gates/M6c.json': 'c5b087f075c462283af4898cdab6e9a4f2c9779e5940aee1343969423f3a9c96', 'docs/evidence/rebuild/gates/M6d.json': '5ec1dc82b68f8a1d6895c5cedcb2a0a66cbf471dc5c2a3deb1af690fbe9bc15e', 'docs/architecture/acceptance-map.yaml': '3991b1477771e306622d1b564c7f3cb7732b0dce96f2fe5c4935054c79290ea9'}
+exit 0 stdout architecture manifests: 55 requirements, owners, providers, references, and AGENTS.md scope PASS
+ stderr 
+exit 0 stdout {"gate": "M5", "requirements": ["R28", "R29", "R30", "R31", "R32", "R33"], "scope": ["R28", "R29", "R30", "R31", "R32", "R33"], "evidence": {"R28": "docs/evidence/acceptance/R28/", "R29": "docs/evidence/acceptance/R29/", "R30": "docs/evidence/acceptance/R30/", "R31": "docs/evidence/acceptance/R31/", "R32": "docs/evidence/acceptance/R32/", "R33": "docs/evidence/acceptance/R33/"}, "reviews": []}
+ stderr 
+exit 0 stdout {"gate": "M6a", "requirements": ["R34", "R35"], "scope": ["R34", "R35"], "evidence": {"R34": "docs/evidence/acceptance/R34/", "R35": "docs/evidence/acceptance/R35/"}, "reviews": []}
+ stderr 
+exit 0 stdout {"gate": "M6b", "requirements": ["R36", "R37"], "scope": ["R36.a", "R37.a"], "evidence": {"R36": "docs/evidence/acceptance/R36/", "R37": "docs/evidence/acceptance/R37/"}, "receipt": "docs/evidence/rebuild/gates/M6b.json", "candidate": "03354381b5954087d82d0d3f807cad9993b94b8d", "verified_source": "ef6510ffa5e43fd9796352ae324e09dfc3820c68", "web_commit": "e84092326d9979e066c611e2be8eb6b9736e09f3", "reviews": ["docs/evidence/acceptance/R37/2026-10-04-version-revocation/code-review-approve.md", "docs/evidence/acceptance/R37/2026-10-04-version-revocation/gate-review-approve.md"]}
+ stderr 
+exit 0 stdout {"gate": "M6c", "requirements": ["R38", "R39", "R40"], "scope": ["R38", "R39", "R40"], "evidence": {"R38": "docs/evidence/acceptance/R38/", "R39": "docs/evidence/acceptance/R39/", "R40": "docs/evidence/acceptance/R40/"}, "reviews": []}
+ stderr 
+exit 0 stdout {"gate": "M6d", "requirements": ["R41", "R42"], "scope": ["R41", "R42"], "evidence": {"R41": "docs/evidence/acceptance/R41/", "R42": "docs/evidence/acceptance/R42/"}, "reviews": []}
+ stderr 
+unchanged True

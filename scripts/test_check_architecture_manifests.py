@@ -1,4 +1,5 @@
 import importlib.util
+import json
 from pathlib import Path
 import sys
 
@@ -123,6 +124,72 @@ def test_gate_emits_json_only_when_recorded_evidence_passes(manifests, monkeypat
     assert f'"gate": "{gate}"' in output.out
     assert all(f'"{rid}"' in output.out for rid in ids)
     assert output.err == ""
+    assert not (checker.ROOT / "docs/evidence/rebuild/gates" / f"{gate}.json").exists()
+
+
+def test_gate_preserves_existing_review_bindings(manifests, monkeypatch, capsys):
+    assert validate(manifests) == []
+    receipt = checker.ROOT / "docs/evidence/rebuild/gates/M6a.json"
+    receipt.parent.mkdir(parents=True)
+    payload = {
+        "gate": "M6a",
+        "requirements": ["R34", "R35"],
+        "evidence": {
+            "R34": "docs/evidence/acceptance/R34/",
+            "R35": "docs/evidence/acceptance/R35/",
+        },
+        "candidate": "b" * 40,
+        "reviews": ["code-review.md", "gate-review.md"],
+        "custom_metadata": {"retained": True},
+    }
+    receipt.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+    original = receipt.read_bytes()
+    monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", "M6a"])
+    assert checker.main() == 0
+    assert json.loads(capsys.readouterr().out)["gate"] == "M6a"
+    assert receipt.read_bytes() == original
+
+
+@pytest.mark.parametrize("profile", [
+    {"M6c": {"scope": ["R36.a", "R37.a"], "receipt": "docs/evidence/rebuild/gates/M6b.json"}},
+    {"M6b": {"scope": ["R36.a", "R37.b"], "receipt": "docs/evidence/rebuild/gates/M6b.json"}},
+    {"M6b": {"scope": ["R36.a", "R37.a"], "receipt": "../outside.json"}},
+])
+def test_cli_rejects_invalid_partial_profile(manifests, monkeypatch, capsys, profile):
+    manifests["acceptance-map"]["gate_parts"] = profile
+    assert any("gate_parts" in error for error in validate(manifests))
+    monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", "M6b"])
+    assert checker.main() == 1
+    output = capsys.readouterr()
+    assert output.out == ""
+    assert "gate_parts" in output.err
+
+
+def test_cli_partial_gate_requires_existing_receipt(manifests, monkeypatch, capsys):
+    assert validate(manifests) == []
+    monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", "M6b"])
+    assert checker.main() == 1
+    output = capsys.readouterr()
+    assert output.out == ""
+    assert "missing or empty evidence" in output.err
+    assert not (checker.ROOT / "docs/evidence/rebuild/gates/M6b.json").exists()
+
+
+def test_cli_preserves_historical_bundle_receipt(manifests, monkeypatch, capsys):
+    assert validate(manifests) == []
+    receipt = checker.ROOT / "docs/evidence/rebuild/gates/M6d.json"
+    receipt.parent.mkdir(parents=True)
+    source = PROJECT / "docs/evidence/rebuild/gates/M6d.json"
+    receipt.write_bytes(source.read_bytes())
+    payload = json.loads(receipt.read_bytes())
+    bundle = checker.ROOT / payload["evidence"]
+    bundle.parent.mkdir(parents=True, exist_ok=True)
+    bundle.write_text("recorded bundle", encoding="utf-8")
+    original = receipt.read_bytes()
+    monkeypatch.setattr(sys, "argv", [str(SCRIPT), "--gate", "M6d"])
+    assert checker.main() == 0
+    assert json.loads(capsys.readouterr().out)["scope"] == ["R41", "R42"]
+    assert receipt.read_bytes() == original
 
 
 def test_rejects_duplicate_provider_operation(manifests):
