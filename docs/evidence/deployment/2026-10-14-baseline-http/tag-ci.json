@@ -1,0 +1,10 @@
+{
+  "tag": "v0.0.37",
+  "head_sha": "d4d7e02beab788de3e3698b83dd91e4ef4ccc10e",
+  "run_id": 38441080734,
+  "url": "https://github.com/AutoCONFIG/iolink/actions/runs/38441080734",
+  "conclusion": "success",
+  "jobs": {"build-image": "success", "build": "skipped", "integration": "skipped"},
+  "observed_date": "2026-10-14",
+  "scope": "image publication only; skipped jobs are not test passes"
+}
