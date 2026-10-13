@@ -45,7 +45,7 @@ func (s *Server) listFarmMembers(c *gin.Context) {
 	}
 	store, ok := s.deps.Store.(FarmMembershipStore)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "farm membership unavailable"})
+		s.providerUnavailable(c)
 		return
 	}
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -63,7 +63,7 @@ func (s *Server) listFarmMembers(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "farm member query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, items)
@@ -72,7 +72,7 @@ func (s *Server) listFarmMembers(c *gin.Context) {
 func (s *Server) setFarmMember(c *gin.Context) {
 	store, ok := s.deps.Store.(FarmMembershipStore)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "farm membership unavailable"})
+		s.providerUnavailable(c)
 		return
 	}
 	farmID, err := strconv.ParseInt(c.Param("id"), 10, 64)
@@ -107,7 +107,7 @@ func (s *Server) setFarmMember(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid role"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "farm member update failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -143,7 +143,7 @@ func (s *Server) listUsers(c *gin.Context) {
 	}
 	users, err := s.deps.Store.SearchUsers(c.Request.Context(), query, limit, offset)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "user search failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	out := make([]gin.H, 0, len(users))
@@ -156,7 +156,7 @@ func (s *Server) listUsers(c *gin.Context) {
 func (s *Server) listFarms(c *gin.Context) {
 	farms, err := s.deps.Store.ListFarms(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	limit, offset, err := page(c)
@@ -195,7 +195,7 @@ func (s *Server) createFarm(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "owner not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, f)
@@ -228,7 +228,7 @@ func (s *Server) setFarmOwner(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "farm or user not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "owner update failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -254,7 +254,7 @@ func (s *Server) updateFarm(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -279,7 +279,7 @@ func (s *Server) deleteFarm(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -297,7 +297,7 @@ type pondReq struct {
 func (s *Server) listPonds(c *gin.Context) {
 	ponds, err := s.deps.Store.ListPonds(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	if raw := c.Query("farm_id"); raw != "" {
@@ -311,7 +311,7 @@ func (s *Server) listPonds(c *gin.Context) {
 		}); ok {
 			exists, checkErr := checker.FarmExists(c.Request.Context(), farmID)
 			if checkErr != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "farm query failed"})
+				s.providerFailure(c, checkErr)
 				return
 			}
 			if !exists {
@@ -329,7 +329,7 @@ func (s *Server) listPonds(c *gin.Context) {
 	}
 	alarms, err := s.deps.Store.ListAllAlarms(c.Request.Context(), 0)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "alarm query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	worst := pondWorstLevel(alarms)
@@ -402,7 +402,7 @@ func (s *Server) createPond(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "farm not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, p)
@@ -428,7 +428,7 @@ func (s *Server) updatePond(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -453,7 +453,7 @@ func (s *Server) deletePond(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -505,7 +505,7 @@ func (s *Server) registerDevice(c *gin.Context) {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+		s.providerFailure(c, err)
 		return
 	}
 	// Suggested transport Client ID for the ThingsPanel-style copy-paste
@@ -523,12 +523,12 @@ func (s *Server) registerDevice(c *gin.Context) {
 	}
 	head, err := digits(8)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+		s.providerFailure(c, err)
 		return
 	}
 	tail, err := digits(3)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -585,7 +585,7 @@ func (s *Server) listDevices(c *gin.Context) {
 	query.IncludeDisabled = status == "all" || status == "disabled"
 	result, err := s.deps.Store.ListDevicesPage(c.Request.Context(), query)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	if result.Items == nil {
@@ -650,7 +650,7 @@ func (s *Server) moveDevice(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": "device disabled"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "move failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -667,7 +667,7 @@ func (s *Server) deleteDevice(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "device not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -703,7 +703,7 @@ func (s *Server) restoreDevice(c *gin.Context) {
 			c.JSON(http.StatusServiceUnavailable, gin.H{"error": "license_unavailable"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -726,7 +726,7 @@ func (r ruleReq) toDomain() domain.AlarmRule {
 func (s *Server) listRules(c *gin.Context) {
 	rules, err := s.deps.Store.ListRules(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	pondID := int64(0)
@@ -788,7 +788,7 @@ func (s *Server) createRule(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "pond not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, rule)
@@ -824,7 +824,7 @@ func (s *Server) updateRule(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "rule not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -845,7 +845,7 @@ func (s *Server) deleteRule(c *gin.Context) {
 			c.Status(http.StatusNoContent)
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -871,7 +871,7 @@ func (s *Server) listAlarms(c *gin.Context) {
 	}
 	alarms, err := s.deps.Store.ListAllAlarms(c.Request.Context(), 0)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	filtered := make([]domain.Alarm, 0, len(alarms))
@@ -926,7 +926,7 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "alarm not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -984,7 +984,7 @@ func (s *Server) batchConfirm(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": "batch confirmation not atomic"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"confirmed": n})
@@ -995,7 +995,7 @@ func (s *Server) batchConfirm(c *gin.Context) {
 func (s *Server) stats(c *gin.Context) {
 	st, err := s.deps.Store.Stats(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, st)
@@ -1019,7 +1019,7 @@ func (s *Server) changePassword(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)

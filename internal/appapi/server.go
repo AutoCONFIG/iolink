@@ -203,7 +203,7 @@ func (s *Server) login(c *gin.Context) {
 	}
 	u, err := s.deps.Users.EnsureUser(c.Request.Context(), openID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	token, err := s.signToken(c.Request.Context(), u.ID)
@@ -212,7 +212,7 @@ func (s *Server) login(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant membership inactive"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, loginResp{Token: token, ExpiresIn: int(s.cfg.JWT.Seconds()), User: u})

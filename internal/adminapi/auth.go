@@ -2,13 +2,14 @@ package adminapi
 
 import (
 	"errors"
+	"net/http"
+	"strings"
+	"time"
+
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/platform"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"net/http"
-	"strings"
-	"time"
 )
 
 type loginReq struct {
@@ -36,7 +37,7 @@ func (s *Server) login(c *gin.Context) {
 	}
 	version, err := s.deps.Store.AdminTokenVersion(c.Request.Context(), u.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "login unavailable"})
+		s.providerFailure(c, err)
 		return
 	}
 	key := platform.DeriveAdminKey(s.cfg.SecretKey)
@@ -45,14 +46,14 @@ func (s *Server) login(c *gin.Context) {
 		if tenantID, tenantErr := tenants.DefaultTenantForUser(c.Request.Context(), u.ID); tenantErr == nil && tenantID > 0 {
 			membershipVersion, versionErr := tenants.TenantMembershipVersion(c.Request.Context(), u.ID, tenantID)
 			if versionErr != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant unavailable"})
+				s.providerFailure(c, versionErr)
 				return
 			}
 			claims["tenant_id"] = tenantID
 			claims["tenant_ver"] = membershipVersion
 			role, roleErr := tenants.TenantRole(c.Request.Context(), u.ID, tenantID)
 			if roleErr != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant role unavailable"})
+				s.providerFailure(c, roleErr)
 				return
 			}
 			claims["tenant_role"] = role
@@ -60,7 +61,7 @@ func (s *Server) login(c *gin.Context) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "tenant membership inactive"})
 			return
 		} else if tenantErr != nil && !errors.Is(tenantErr, domain.ErrNotFound) && !errors.Is(tenantErr, domain.ErrInactiveTenant) {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant unavailable"})
+			s.providerFailure(c, tenantErr)
 			return
 		}
 	} else if u.Authority != "ADMIN" {
@@ -69,7 +70,7 @@ func (s *Server) login(c *gin.Context) {
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(key)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"token": token, "expires_in": int(s.cfg.JWT.Seconds()), "platform_admin": u.Authority == "ADMIN"})

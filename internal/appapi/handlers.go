@@ -23,12 +23,12 @@ import (
 func (s *Server) listPonds(c *gin.Context) {
 	ponds, err := s.deps.Ponds.ListByUser(c.Request.Context(), uid(c))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 0)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "alarm query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	worst := pondWorstLevel(alarms)
@@ -41,7 +41,7 @@ func (s *Server) listPonds(c *gin.Context) {
 		}
 		devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+			s.providerFailure(c, err)
 			return
 		}
 		item["device_count"] = len(devs)
@@ -106,12 +106,12 @@ func (s *Server) getPond(c *gin.Context) {
 	}
 	devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 0)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "alarm query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	status := "normal"
@@ -139,7 +139,7 @@ func (s *Server) listDevices(c *gin.Context) {
 	}
 	ponds, err := s.deps.Ponds.ListByUser(c.Request.Context(), uid(c))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	out := make([]gin.H, 0)
@@ -151,7 +151,7 @@ func (s *Server) listDevices(c *gin.Context) {
 		foundPond = true
 		devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+			s.providerFailure(c, err)
 			return
 		}
 		for _, d := range devs {
@@ -252,7 +252,7 @@ func (s *Server) waterHistory(c *gin.Context) {
 	}
 	scoped, ok := s.deps.Telemetry.(iolinkcontractsdomain.UserTelemetryRepo)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "history authorization unavailable"})
+		s.providerUnavailable(c)
 		return
 	}
 	points, err := scoped.HistoryForUser(c.Request.Context(), no, uid(c), metric, from, to, maxPoints)
@@ -261,7 +261,7 @@ func (s *Server) waterHistory(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported_product"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "history query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	if currentOwner != nil && len(points) == 0 {
@@ -336,7 +336,7 @@ func (s *Server) listAlarms(c *gin.Context) {
 		}
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, alarmsJSON(alarms))
@@ -358,7 +358,7 @@ func (s *Server) confirmAlarm(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "alarm not found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	c.Status(http.StatusNoContent)
@@ -403,7 +403,7 @@ func alarmsJSON(in []iolinkcontractsdomain.Alarm) []gin.H {
 func (s *Server) statsSummary(c *gin.Context) {
 	ponds, err := s.deps.Ponds.ListByUser(c.Request.Context(), uid(c))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		s.providerFailure(c, err)
 		return
 	}
 	online, offline := 0, 0
@@ -411,7 +411,7 @@ func (s *Server) statsSummary(c *gin.Context) {
 	for _, p := range ponds {
 		devs, err := s.deps.Devices.ListByPond(c.Request.Context(), p.ID)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "device query failed"})
+			s.providerFailure(c, err)
 			return
 		}
 		for _, d := range devs {
@@ -428,7 +428,7 @@ func (s *Server) statsSummary(c *gin.Context) {
 	}
 	alarms, err := s.deps.Alarms.ListByUser(c.Request.Context(), uid(c), 0)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "alarm query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	openByPond := map[int64]iolinkcontractsdomain.AlarmLevel{}
