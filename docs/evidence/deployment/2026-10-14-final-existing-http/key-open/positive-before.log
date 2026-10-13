@@ -1,0 +1,12 @@
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads
+    key_open_contract_success_test.go:11: ERROR: cannot insert multiple commands into a prepared statement (SQLSTATE 42601)
+--- FAIL: TestKeyOpenContractManagementAndFiveSignedReads (0.86s)
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence
+    key_open_contract_success_test.go:77: ERROR: cannot insert multiple commands into a prepared statement (SQLSTATE 42601)
+--- FAIL: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence (0.89s)
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate
+    key_open_contract_success_test.go:91: ERROR: cannot insert multiple commands into a prepared statement (SQLSTATE 42601)
+--- FAIL: TestKeyOpenContractScopeOwnershipReplayAndRate (1.61s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	3.422s
+FAIL

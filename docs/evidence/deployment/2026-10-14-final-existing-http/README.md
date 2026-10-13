@@ -16,6 +16,16 @@
 
 专属容器 `iolink-http-contract-pg-20261013`、网络 `iolink-http-contract-20261013`、卷 `iolink-http-contract-data-20261013`，均label `iolink.task=http-contract-20261013`，PG16.15/Timescale2.30.2，loopback33127。测试各自创建和删除数据库。真实响应仅经stdin传入固定本地六份OpenAPI验证器，不归档body或将敏感响应写入argv。
 
-命令使用 `GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated-DSN> IOLINK_CONTRACT_PYTHON=<main-repo>/.venv/contracts/bin/python go test -race -shuffle=on -count=1` 配合各日志选择器。最终必须在排除AGENTS与playback草稿的完整冻结源执行 `make verify`、Python及静态契约，并由两位未参与编辑者对同一候选明确通过后登记完成。本记录当前尚未代表最终双审或发布。
+命令使用 `GIN_MODE=release IOLINK_TEST_PG_DSN=<isolated-DSN> IOLINK_CONTRACT_PYTHON=<main-repo>/.venv/contracts/bin/python go test -race -shuffle=on -count=1` 配合各日志选择器。
+
+## 最终闭环
+
+实现提交 `95025f0` / tree `bbfb29c41c31549899655750e171ef2c25a6d0eb`；两位未参与编辑者独立确认1,437 tracked blobs匹配冻结导出，并明确APPROVE/WATCH：[代码审阅](reviews/final/code-review.md)、[门审](reviews/final/gate-review.md)。首轮4a59拒绝收据保留在reviews/initial，不计为通过。AGENTS、playback及后续APIKey名称计数修复没有进入本候选。
+
+精确源码完整build/vet/race：session56771终端exit0、33测试包/core471.529s；本批20顶层专项无SKIP、core264.801s；Python114、静态96/621与ruff检查通过。命令、旧并行超时失败和最终独立完整成功均见[回归记录](verification-runs.md)，不延长默认超时或隐藏失败。仅关闭本批命名矩阵，不代表穷尽全部输入/故障组合、R02或外部验收。发布v0.0.39，主软件范围计数不增加。
+
+当前契约操作范围：原35、本批前23、本批20，共78个不同目标操作；restore两份schema重复校验，计为79个spec-operation。相对于96个契约操作，2个License操作按用户安排留到专项、15个GB/media/playback操作未挂载或未发布另列。摄像头2个配置写操作核验的是当前503拒绝，未宣称创建/替换成功或真实视频可用。
+
+专属容器/卷/网络仍由紧接着的APIKey名称边界核验使用，待相关测试和双审全部结束统一核对归属清理。后续真实128字符名称边界作为单独修复，不把本候选未测试的边界写成已通过。
 
 摄像头生产装配缺少Availability，配置写入只可证明503/fail closed/no-write；受控本地签名License仅为到达已实现接口的依赖，不是交付License专项通过。真实视频/微信/设备、浏览器、长期容量及大恢复继续保留原有外部限制。

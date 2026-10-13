@@ -1,0 +1,637 @@
+go build ./...
+go vet ./...
+go test -race -shuffle=on ./... -count=1
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	34.747s
+ok  	git.hyhy.fun/rsplab/iolink/cmd/license-sign	3.046s
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-once	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-sim	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/offline-sbom	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/tp-spike-pub	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.112s
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	38.754s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.556s
+ok  	git.hyhy.fun/rsplab/iolink/internal/authorization	1.074s
+ok  	git.hyhy.fun/rsplab/iolink/internal/camera	1.050s
+ok  	git.hyhy.fun/rsplab/iolink/internal/camerapg	120.965s
+-test.shuffle 1791916950301708681
+2026/10/14 02:42:44 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=271 tenant_id=0 actor_id=0
+2026/10/14 02:42:44 WARN http request route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=8 tenant_id=9401 actor_id=9402
+2026/10/14 02:42:47 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=311 tenant_id=0 actor_id=0
+2026/10/14 02:42:47 WARN http request route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=56 tenant_id=9401 actor_id=9402
+2026/10/14 02:42:51 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=207 tenant_id=0 actor_id=0
+2026/10/14 02:42:51 WARN http request route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=12 tenant_id=9401 actor_id=9402
+2026/10/14 02:42:53 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=184 tenant_id=0 actor_id=0
+2026/10/14 02:42:53 WARN http request route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=6 tenant_id=9401 actor_id=9402
+2026/10/14 02:42:55 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=284 tenant_id=0 actor_id=0
+2026/10/14 02:42:55 WARN http request route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=6 tenant_id=9401 actor_id=9402
+2026/10/14 02:42:57 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=194 tenant_id=0 actor_id=0
+2026/10/14 02:42:57 WARN http request route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=9 tenant_id=9401 actor_id=9402
+2026/10/14 02:43:00 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=238 tenant_id=0 actor_id=0
+2026/10/14 02:43:00 WARN http request route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=11 tenant_id=9401 actor_id=9402
+2026/10/14 02:43:03 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=215 tenant_id=0 actor_id=0
+2026/10/14 02:43:03 WARN http request route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=8 tenant_id=9401 actor_id=9402
+2026/10/14 02:43:05 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=261 tenant_id=0 actor_id=0
+2026/10/14 02:43:05 WARN http request route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=9 tenant_id=9401 actor_id=9402
+2026/10/14 02:43:07 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=206 tenant_id=0 actor_id=0
+2026/10/14 02:43:07 WARN http request route=/admin/v1/alarms/:id/confirm method=POST status=404 duration_ms=11 tenant_id=9401 actor_id=9402
+2026/10/14 02:43:32 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=159 tenant_id=0 actor_id=0
+2026/10/14 02:43:32 INFO http request route=/admin/v1/farms method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/ponds method=GET status=200 duration_ms=7 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/devices method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/stats method=GET status=200 duration_ms=3 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=8 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=6 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=150 tenant_id=0 actor_id=0
+2026/10/14 02:43:32 INFO http request route=/admin/v1/farms method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/ponds method=GET status=200 duration_ms=7 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/devices method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/stats method=GET status=200 duration_ms=3 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/alarms/batch-confirm method=POST status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=146 tenant_id=0 actor_id=0
+2026/10/14 02:43:32 INFO http request route=/admin/v1/farms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/ponds method=GET status=200 duration_ms=4 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/devices method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/alarms method=GET status=200 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/stats method=GET status=200 duration_ms=2 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/devices/:device_no method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/devices/:device_no/product method=GET status=404 duration_ms=1 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/farms/:id/members method=GET status=403 duration_ms=0 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 WARN http request route=/admin/v1/alarms/batch-confirm method=POST status=404 duration_ms=3 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=6 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=13 tenant_id=801 actor_id=802
+2026/10/14 02:43:32 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=143 tenant_id=0 actor_id=0
+2026/10/14 02:43:32 INFO http request route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=8 tenant_id=801 actor_id=802
+2026/10/14 02:43:33 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=143 tenant_id=0 actor_id=0
+2026/10/14 02:43:33 INFO http request route=/admin/v1/alarms/batch-confirm method=POST status=200 duration_ms=6 tenant_id=801 actor_id=802
+2026/10/14 02:44:22 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=146 tenant_id=0 actor_id=0
+2026/10/14 02:44:22 WARN http request route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/14 02:44:23 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=187 tenant_id=0 actor_id=0
+2026/10/14 02:44:23 WARN http request route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/14 02:44:25 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=149 tenant_id=0 actor_id=0
+2026/10/14 02:44:25 WARN http request route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/14 02:44:26 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=184 tenant_id=0 actor_id=0
+2026/10/14 02:44:26 WARN http request route=/admin/v1/tenants/:id/members/:user_id method=PUT status=403 duration_ms=12 tenant_id=9401 actor_id=9402
+2026/10/14 02:45:26 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=10 tenant_id=8101 actor_id=0
+2026/10/14 02:45:26 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/14 02:46:34 INFO http request route=/open/v1/devices method=GET status=200 duration_ms=10 tenant_id=8301 actor_id=0
+2026/10/14 02:46:34 INFO http request route=/open/v1/alarms method=GET status=200 duration_ms=7 tenant_id=8301 actor_id=0
+2026/10/14 02:46:59 WARN http request route=/admin/v1/farms method=GET status=401 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=152 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 WARN http request route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 WARN http request route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=146 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 WARN http request route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 WARN http request route=/admin/v1/farms method=GET status=401 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=192 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 WARN http request route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 WARN http request route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=182 tenant_id=0 actor_id=0
+2026/10/14 02:46:59 WARN http request route=/admin/v1/farms method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 02:47:10 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=155 tenant_id=0 actor_id=0
+2026/10/14 02:47:10 WARN http request route=/admin/v1/products method=POST status=403 duration_ms=7 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:12 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=156 tenant_id=0 actor_id=0
+2026/10/14 02:47:12 WARN http request route=/admin/v1/products method=POST status=403 duration_ms=6 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:14 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=230 tenant_id=0 actor_id=0
+2026/10/14 02:47:14 WARN http request route=/admin/v1/products method=POST status=403 duration_ms=6 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:16 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=318 tenant_id=0 actor_id=0
+2026/10/14 02:47:16 WARN http request route=/admin/v1/products method=POST status=403 duration_ms=6 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:18 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=434 tenant_id=0 actor_id=0
+2026/10/14 02:47:18 WARN http request route=/admin/v1/products method=POST status=403 duration_ms=6 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:20 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=294 tenant_id=0 actor_id=0
+2026/10/14 02:47:20 WARN http request route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=15 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:22 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=147 tenant_id=0 actor_id=0
+2026/10/14 02:47:22 WARN http request route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=13 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:24 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=159 tenant_id=0 actor_id=0
+2026/10/14 02:47:24 WARN http request route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=7 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:26 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=159 tenant_id=0 actor_id=0
+2026/10/14 02:47:26 WARN http request route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=9 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:27 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=152 tenant_id=0 actor_id=0
+2026/10/14 02:47:27 WARN http request route=/admin/v1/products/:product_id/models method=POST status=403 duration_ms=12 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:29 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=168 tenant_id=0 actor_id=0
+2026/10/14 02:47:29 WARN http request route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:30 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=148 tenant_id=0 actor_id=0
+2026/10/14 02:47:30 WARN http request route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:32 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=153 tenant_id=0 actor_id=0
+2026/10/14 02:47:32 WARN http request route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=4 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:34 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=151 tenant_id=0 actor_id=0
+2026/10/14 02:47:34 WARN http request route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:35 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=150 tenant_id=0 actor_id=0
+2026/10/14 02:47:35 WARN http request route=/admin/v1/products/:product_id/models/:version/publish method=POST status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:37 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=142 tenant_id=0 actor_id=0
+2026/10/14 02:47:37 WARN http request route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:38 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=154 tenant_id=0 actor_id=0
+2026/10/14 02:47:38 WARN http request route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=6 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:40 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=151 tenant_id=0 actor_id=0
+2026/10/14 02:47:40 WARN http request route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=6 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:42 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=153 tenant_id=0 actor_id=0
+2026/10/14 02:47:42 WARN http request route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:43 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=164 tenant_id=0 actor_id=0
+2026/10/14 02:47:43 WARN http request route=/admin/v1/devices/:device_no/product method=PUT status=403 duration_ms=5 tenant_id=9401 actor_id=9402
+2026/10/14 02:47:52 WARN http request route=/open/v1/ponds method=GET status=429 duration_ms=11 tenant_id=0 actor_id=0
+2026/10/14 02:47:53 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=8 tenant_id=0 actor_id=0
+2026/10/14 02:47:53 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=9 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=12 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/devices method=GET status=200 duration_ms=11 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/alarms method=GET status=200 duration_ms=11 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=8 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=9 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=11 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=10 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=10 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/devices method=GET status=200 duration_ms=9 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/alarms method=GET status=200 duration_ms=10 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=9 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=9 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=9 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=9 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=10 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/devices method=GET status=200 duration_ms=10 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 INFO http request route=/open/v1/alarms method=GET status=200 duration_ms=12 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=9 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=11 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=11 tenant_id=8301 actor_id=0
+2026/10/14 02:48:55 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=10 tenant_id=8301 actor_id=0
+2026/10/14 02:49:22 WARN http request route=/open/v1/ponds method=GET status=403 duration_ms=6 tenant_id=8301 actor_id=0
+2026/10/14 02:49:22 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/14 02:49:23 WARN http request route=/open/v1/ponds method=GET status=403 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/14 02:49:24 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=7 tenant_id=8301 actor_id=0
+2026/10/14 02:49:24 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/14 02:49:25 WARN http request route=/open/v1/ponds method=GET status=429 duration_ms=5 tenant_id=0 actor_id=0
+2026/10/14 02:49:53 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=181 tenant_id=0 actor_id=0
+2026/10/14 02:49:53 INFO http request route=/admin/v1/password method=POST status=204 duration_ms=284 tenant_id=0 actor_id=0
+2026/10/14 02:49:53 WARN http request route=/admin/v1/stats method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+panic: test timed out after 10m0s
+	running tests:
+		TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback (1s)
+		TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback/video_camerasGET/user/v1/cameras (1s)
+
+goroutine 32242 [running]:
+testing.(*M).startAlarm.func1()
+	/home/yun/.local/go/src/testing/testing.go:2802 +0x605
+created by time.goFunc
+	/home/yun/.local/go/src/time/sleep.go:215 +0x45
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0xc00015c248, {0x18fa1df, 0x41}, 0x1ac7408)
+	/home/yun/.local/go/src/testing/testing.go:2109 +0xb3e
+testing.runTests.func1(0xc00015c248)
+	/home/yun/.local/go/src/testing/testing.go:2585 +0x85
+testing.tRunner(0xc00015c248, 0xc000495ad0)
+	/home/yun/.local/go/src/testing/testing.go:2036 +0x21d
+testing.runTests({0x18cb45f, 0x1a}, {0x18e16c7, 0x28}, 0xc0003c4048, {0x2571040, 0x8f, 0x8f}, {0xc2abbd5b91fd550c, 0x8bb51185a4, ...})
+	/home/yun/.local/go/src/testing/testing.go:2583 +0x9ea
+testing.(*M).Run(0xc0005368c0)
+	/home/yun/.local/go/src/testing/testing.go:2443 +0xf4c
+main.main()
+	_testmain.go:332 +0x165
+
+goroutine 12621 [chan receive, 5 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 12635
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 31745 [chan receive]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 31744
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 3138 [chan receive, 8 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 3104
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 100 [chan receive, 9 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 118
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 27729 [chan receive, 1 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 27782
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 26786 [chan receive, 2 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 26784
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 32238 [select]:
+github.com/jackc/pgx/v5/pgxpool.(*Pool).backgroundHealthCheck(0xc0000fea80)
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgxpool/pool.go:433 +0x1c9
+github.com/jackc/pgx/v5/pgxpool.NewWithConfig.func3()
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgxpool/pool.go:286 +0x8f
+created by github.com/jackc/pgx/v5/pgxpool.NewWithConfig in goroutine 32233
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgxpool/pool.go:283 +0xa5d
+
+goroutine 5990 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 6022
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 6725 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 6717
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 21540 [chan receive, 3 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 21466
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 5038 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 5067
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 15891 [chan receive, 4 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 15909
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 27451 [chan receive, 1 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 27448
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 16357 [chan receive, 4 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 16356
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 27032 [chan receive, 1 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 27142
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 1381 [chan receive, 9 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 1378
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 4903 [chan receive, 8 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 4902
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 28825 [chan receive, 1 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 28783
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 2658 [chan receive, 8 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 2625
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 12756 [chan receive, 5 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 12739
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 25758 [chan receive, 2 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 25757
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 5268 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 5267
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 3668 [chan receive, 8 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 3667
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 30133 [chan receive]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 30167
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 20845 [chan receive, 3 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 20844
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 5649 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 5653
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 10425 [chan receive, 6 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 10573
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 28469 [chan receive, 1 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 28468
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 5818 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 5793
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 12549 [chan receive, 5 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 12594
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 5460 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 5425
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 10395 [chan receive, 6 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 10393
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 29453 [chan receive, 1 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 29452
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 6232 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 6229
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 7020 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 7019
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 32232 [chan receive]:
+testing.(*T).Run(0xc000496488, {0xc0004ae360, 0x20}, 0xc000638780)
+	/home/yun/.local/go/src/testing/testing.go:2109 +0xb3e
+git.hyhy.fun/rsplab/iolink/internal/core_test.TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback(0xc000496488)
+	/tmp/iolink-final-existing-http-20261014/internal/core/camera_contract_errors_test.go:22 +0x125
+testing.tRunner(0xc000496488, 0x1ac7408)
+	/home/yun/.local/go/src/testing/testing.go:2036 +0x21d
+created by testing.(*T).Run in goroutine 1
+	/home/yun/.local/go/src/testing/testing.go:2101 +0xb13
+
+goroutine 26455 [chan receive, 2 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 26454
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 21164 [chan receive, 3 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 21162
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 16151 [chan receive, 4 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 16150
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 28116 [chan receive, 1 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 28115
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 13240 [chan receive, 5 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 13314
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 31141 [chan receive]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 31140
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 30808 [chan receive]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 30807
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 6813 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 6908
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 6395 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 6394
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 6190 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 6512
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 12068 [chan receive, 5 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 12067
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 7386 [chan receive, 7 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 7410
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 24961 [chan receive, 2 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 24960
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 11696 [chan receive, 5 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 11835
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 12845 [chan receive, 5 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 12828
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 26120 [chan receive, 2 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 26119
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 32233 [IO wait]:
+internal/poll.runtime_pollWait(0x7f07d805ca00, 0x72)
+	/home/yun/.local/go/src/runtime/netpoll.go:351 +0x85
+internal/poll.(*pollDesc).wait(0xc0009a83a0, 0x72, 0x0)
+	/home/yun/.local/go/src/internal/poll/fd_poll_runtime.go:84 +0xb1
+internal/poll.(*pollDesc).waitRead(...)
+	/home/yun/.local/go/src/internal/poll/fd_poll_runtime.go:89
+internal/poll.(*FD).Read(0xc0009a8380, {0xc00098a000, 0x2000, 0x2000})
+	/home/yun/.local/go/src/internal/poll/fd_unix.go:165 +0x499
+net.(*netFD).Read(0xc0009a8380, {0xc00098a000, 0x2000, 0x2000})
+	/home/yun/.local/go/src/net/fd_posix.go:68 +0x4b
+net.(*conn).Read(0xc0002fc408, {0xc00098a000, 0x2000, 0x2000})
+	/home/yun/.local/go/src/net/net.go:196 +0xad
+github.com/jackc/pgx/v5/pgconn/internal/bgreader.(*BGReader).Read(0xc000324200, {0xc00098a000, 0x2000, 0x2000})
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgconn/internal/bgreader/bgreader.go:100 +0x1db
+io.ReadAtLeast({0x1ad72a0, 0xc000324200}, {0xc00098a000, 0x2000, 0x2000}, 0x5)
+	/home/yun/.local/go/src/io/io.go:335 +0xd1
+github.com/jackc/pgx/v5/pgproto3.(*chunkReader).Next(0xc00075c660, 0x5)
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgproto3/chunkreader.go:80 +0x82f
+github.com/jackc/pgx/v5/pgproto3.(*Frontend).Receive(0xc000830908)
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgproto3/frontend.go:308 +0x85
+github.com/jackc/pgx/v5/pgconn.(*PgConn).peekMessage(0xc000830488)
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgconn/pgconn.go:559 +0x1e5
+github.com/jackc/pgx/v5/pgconn.(*PgConn).receiveMessage(0xc000830488)
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgconn/pgconn.go:579 +0x3c
+github.com/jackc/pgx/v5/pgconn.(*MultiResultReader).receiveMessage(0xc0008305a0)
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgconn/pgconn.go:1445 +0x4e
+github.com/jackc/pgx/v5/pgconn.(*MultiResultReader).NextResult(0xc0008305a0)
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgconn/pgconn.go:1469 +0x7d
+github.com/jackc/pgx/v5.(*Conn).execSimpleProtocol(0xc000568a20, {0x1ae3590, 0x259b3c0}, {0xc0000fb200, 0x46a}, {0x0, 0x0, 0x0})
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/conn.go:562 +0x151
+github.com/jackc/pgx/v5.(*Conn).exec(0xc000568a20, {0x1ae3590, 0x259b3c0}, {0xc0000fb200, 0x46a}, {0x0, 0x0, 0x0})
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/conn.go:547 +0x9bc
+github.com/jackc/pgx/v5.(*Conn).Exec(0xc000568a20, {0x1ae3590, 0x259b3c0}, {0xc0000fb200, 0x46a}, {0x0, 0x0, 0x0})
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/conn.go:466 +0x1f0
+github.com/jackc/pgx/v5.(*dbTx).Exec(0xc00075c840, {0x1ae3590, 0x259b3c0}, {0xc0000fb200, 0x46a}, {0x0, 0x0, 0x0})
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/tx.go:231 +0xf5
+github.com/jackc/pgx/v5/pgxpool.(*Tx).Exec(0xc0003c48a0, {0x1ae3590, 0x259b3c0}, {0xc0000fb200, 0x46a}, {0x0, 0x0, 0x0})
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgxpool/tx.go:70 +0xaf
+git.hyhy.fun/rsplab/iolink/internal/migrate.apply({0x1ae3590, 0x259b3c0}, 0xc0000fea80, {0xc0005c0408, 0x10, 0x12}, 0x0)
+	/tmp/iolink-final-existing-http-20261014/internal/migrate/migrate.go:131 +0xd2e
+git.hyhy.fun/rsplab/iolink/internal/migrate.Up({0x1ae3590, 0x259b3c0}, 0xc0000fea80)
+	/tmp/iolink-final-existing-http-20261014/internal/migrate/migrate.go:75 +0x75
+git.hyhy.fun/rsplab/iolink/internal/core_test.setup(0xc0004966c8)
+	/tmp/iolink-final-existing-http-20261014/internal/core/ingestion_test.go:28 +0x70
+git.hyhy.fun/rsplab/iolink/internal/core_test.newCameraContractFixture(0xc0004966c8)
+	/tmp/iolink-final-existing-http-20261014/internal/core/camera_contract_helpers_test.go:42 +0x72
+git.hyhy.fun/rsplab/iolink/internal/core_test.TestCameraContractProviderFailureHasSafeCorrelatedDumpAndRollback.func1(0xc0004966c8)
+	/tmp/iolink-final-existing-http-20261014/internal/core/camera_contract_errors_test.go:24 +0x47
+testing.tRunner(0xc0004966c8, 0xc000638780)
+	/home/yun/.local/go/src/testing/testing.go:2036 +0x21d
+created by testing.(*T).Run in goroutine 32232
+	/home/yun/.local/go/src/testing/testing.go:2101 +0xb13
+
+goroutine 29788 [chan receive]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 29787
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 31494 [chan receive]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 31493
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 27399 [chan receive, 1 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 29157
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 32234 [select]:
+github.com/jackc/pgx/v5/pgxpool.(*Pool).backgroundHealthCheck(0xc0000fe900)
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgxpool/pool.go:433 +0x1c9
+github.com/jackc/pgx/v5/pgxpool.NewWithConfig.func3()
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgxpool/pool.go:286 +0x8f
+created by github.com/jackc/pgx/v5/pgxpool.NewWithConfig in goroutine 32233
+	/home/yun/go/pkg/mod/github.com/jackc/pgx/v5@v5.7.5/pgxpool/pool.go:283 +0xa5d
+
+goroutine 30404 [chan receive]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 30471
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+
+goroutine 24075 [chan receive, 2 minutes]:
+gopkg.in/natefinch/lumberjack%2ev2.(*Logger).millRun(...)
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:379
+created by gopkg.in/natefinch/lumberjack%2ev2.(*Logger).mill.func1 in goroutine 24121
+	/home/yun/go/pkg/mod/gopkg.in/natefinch/lumberjack.v2@v2.2.1/lumberjack.go:390 +0xe6
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	600.127s
+ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.078s
+?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/gb	2.287s
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalog	1.043s
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalogpg	20.052s
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbpg	12.126s
+ok  	git.hyhy.fun/rsplab/iolink/internal/ingestion	3.110s
+ok  	git.hyhy.fun/rsplab/iolink/internal/license	83.099s
+?   	git.hyhy.fun/rsplab/iolink/internal/media	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/rtp	1.069s
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/rtsp	1.055s
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/zlm	1.041s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediahttp	1.137s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediajobs	1.059s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediapg	51.735s
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	36.742s
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	20.985s
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	3.401s
+ok  	git.hyhy.fun/rsplab/iolink/internal/openapi	1.527s
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.046s
+ok  	git.hyhy.fun/rsplab/iolink/internal/persistence	2.792s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	3.280s
+ok  	git.hyhy.fun/rsplab/iolink/internal/playback	1.038s
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	16.703s
+?   	git.hyhy.fun/rsplab/iolink/internal/testdb	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	1.058s
+?   	git.hyhy.fun/rsplab/iolink/internal/web	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.270s
+?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]
+FAIL
+make: *** [Makefile:25: verify] Error 1
