@@ -1,0 +1,550 @@
+-test.shuffle 1791923075219405199
+=== RUN   TestM6dPublishedVector_authenticatesWithProductionVerifier
+--- PASS: TestM6dPublishedVector_authenticatesWithProductionVerifier (0.55s)
+=== RUN   TestM6dAdministration_rejectsStaleMembershipWithoutPartialWrite
+--- PASS: TestM6dAdministration_rejectsStaleMembershipWithoutPartialWrite (0.75s)
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer/response_contract
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8
+=== RUN   TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8#01
+--- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState (2.11s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0 (0.18s)
+        --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_0/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1 (0.18s)
+        --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_-1/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer (0.18s)
+        --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_pond_id_not-an-integer/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8 (0.18s)
+    --- PASS: TestKeyOpenContractSignedInputBoundsAndNonceState/invalid_query_8#01 (0.18s)
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_detail
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_detail/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_detail
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_detail/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_list
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_list/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_list
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_list/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract#01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract
+=== NAME  TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query
+    key_open_contract_database_test.go:50: injected relation failure SQLSTATE=42P01
+=== RUN   TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract#01
+--- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed (17.83s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list (1.37s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_list/response_contract#01 (0.23s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit (1.41s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_audit/response_contract#01 (0.23s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit (1.45s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract (0.24s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_issue_audit/response_contract#01 (0.24s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit (1.40s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract (0.24s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_rotate_audit/response_contract#01 (0.22s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit (1.51s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/key_revoke_audit/response_contract#01 (0.23s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth (1.36s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_key_auth/response_contract#01 (0.18s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth (1.28s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_tenant_auth/response_contract#01 (0.18s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth (1.35s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_nonce_auth/response_contract#01 (0.18s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query (1.31s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract (0.24s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_query/response_contract#01 (0.17s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_detail (1.34s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_detail/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_pond_detail/response_contract#01 (0.17s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_list (1.33s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_list/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_list/response_contract#01 (0.18s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query (1.32s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract (0.23s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_device_query/response_contract#01 (0.17s)
+    --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query (1.39s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract (0.25s)
+        --- PASS: TestKeyOpenContractDatabaseFailuresAreInternalAtomicAndDiagnosed/open_alarm_query/response_contract#01 (0.19s)
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes/response_contract
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case
+=== RUN   TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case/response_contract
+--- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites (4.29s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown (0.27s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown/response_contract (0.26s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing (0.25s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/trailing/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name (0.25s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_name/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes (0.26s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_scopes/response_contract (0.26s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources (0.25s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resources/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array (0.25s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/null_resource_array/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource (0.26s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/zero_resource/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource (0.25s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/foreign_resource/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested (0.28s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/unknown_nested/response_contract (0.28s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name (0.34s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_name/response_contract (0.33s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes (0.34s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/duplicate_scopes/response_contract (0.34s)
+    --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case (0.29s)
+        --- PASS: TestKeyOpenContractInvalidIssuanceHasNoKeyOrAuditWrites/wrong_case/response_contract (0.29s)
+=== RUN   TestM6dRestart_preservesConsumedNonceAndRateState
+2026/10/14 04:25:01 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=6 tenant_id=8301 actor_id=0
+2026/10/14 04:25:01 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=3 tenant_id=0 actor_id=0
+2026/10/14 04:25:01 WARN http request route=/open/v1/ponds method=GET status=429 duration_ms=4 tenant_id=0 actor_id=0
+--- PASS: TestM6dRestart_preservesConsumedNonceAndRateState (0.66s)
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/devices
+2026/10/14 04:25:02 INFO http request route=/open/v1/devices method=GET status=200 duration_ms=7 tenant_id=8301 actor_id=0
+=== RUN   TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/alarms
+2026/10/14 04:25:02 INFO http request route=/open/v1/alarms method=GET status=200 duration_ms=5 tenant_id=8301 actor_id=0
+--- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms (0.74s)
+    --- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/devices (0.01s)
+    --- PASS: TestM6dDeviceResourceHTTP_filtersDevicesAndAlarms//open/v1/alarms (0.01s)
+=== RUN   TestM6dResourceValidation_rejectsInvalidAndForeignWithoutWrites
+--- PASS: TestM6dResourceValidation_rejectsInvalidAndForeignWithoutWrites (0.67s)
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_0
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_0/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_1
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_1/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_2
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_2/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_3
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_3/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_first
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_first/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_replay
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_replay/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/rate_limit
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/rate_limit/response_contract
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/throttled_nonce_replay
+=== RUN   TestKeyOpenContractScopeOwnershipReplayAndRate/throttled_nonce_replay/response_contract
+--- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate (3.36s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/response_contract (0.26s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_0 (0.22s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_0/response_contract (0.21s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_1 (0.25s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_1/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_2 (0.24s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_2/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_3 (0.31s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/hidden_resource_3/response_contract (0.30s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_first (0.21s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_first/response_contract (0.21s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_replay (0.23s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/nonce_replay/response_contract (0.22s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/rate_limit (0.22s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/rate_limit/response_contract (0.22s)
+    --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/throttled_nonce_replay (0.22s)
+        --- PASS: TestKeyOpenContractScopeOwnershipReplayAndRate/throttled_nonce_replay/response_contract (0.21s)
+=== RUN   TestM6dIssueAndAuthenticateOpenKey
+2026/10/14 04:25:06 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=4 tenant_id=8101 actor_id=0
+2026/10/14 04:25:06 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+--- PASS: TestM6dIssueAndAuthenticateOpenKey (0.62s)
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/GET/api-keys
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/GET/api-keys/response_contract
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/response_contract
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/{key_id}/rotate
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/{key_id}/rotate/response_contract
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/{key_id}/revoke
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/{key_id}/revoke/response_contract
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/GET/api-keys/audit
+=== RUN   TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/GET/api-keys/audit/response_contract
+--- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites (2.30s)
+    --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/GET/api-keys (0.26s)
+        --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/GET/api-keys/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys (0.25s)
+        --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/{key_id}/rotate (0.24s)
+        --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/{key_id}/rotate/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/{key_id}/revoke (0.26s)
+        --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/POST/api-keys/{key_id}/revoke/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/GET/api-keys/audit (0.24s)
+        --- PASS: TestKeyOpenContractMissingKeyManagementPortRejectsWithoutWrites/GET/api-keys/audit/response_contract (0.24s)
+=== RUN   TestM6dBodyDigest_rejectsOnlyChangedBodyAndPreservesNonce
+2026/10/14 04:25:09 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/14 04:25:09 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=11 tenant_id=8301 actor_id=0
+--- PASS: TestM6dBodyDigest_rejectsOnlyChangedBodyAndPreservesNonce (0.57s)
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_api_keys
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_api_keys/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/GET_api_keys
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/GET_api_keys/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/{id}
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/{id}/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/{device_no}
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/{device_no}/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/alarms
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads//open/v1/alarms/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_rotate
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_rotate/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/old_key_revoked
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/old_key_revoked/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/new_key_accepted
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/new_key_accepted/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_revoke
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/POST_revoke/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/new_key_revoked
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/new_key_revoked/response_contract
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/GET_audit
+=== RUN   TestKeyOpenContractManagementAndFiveSignedReads/GET_audit/response_contract
+--- PASS: TestKeyOpenContractManagementAndFiveSignedReads (3.68s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_api_keys (0.25s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_api_keys/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/GET_api_keys (0.26s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/GET_api_keys/response_contract (0.25s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/{id} (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/ponds/{id}/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/{device_no} (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/devices/{device_no}/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/alarms (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads//open/v1/alarms/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_rotate (0.25s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_rotate/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/old_key_revoked (0.19s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/old_key_revoked/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/new_key_accepted (0.18s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/new_key_accepted/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_revoke (0.25s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/POST_revoke/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/new_key_revoked (0.20s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/new_key_revoked/response_contract (0.20s)
+    --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/GET_audit (0.25s)
+        --- PASS: TestKeyOpenContractManagementAndFiveSignedReads/GET_audit/response_contract (0.25s)
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/past_bound
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/future_bound
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/now
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/too_old
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/too_new
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/zero
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/negative
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/minimum
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/maximum
+=== RUN   TestM6dTimestampWindow_signedBoundsAndExtremes/overflow_delta
+--- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes (0.53s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/past_bound (0.01s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/future_bound (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/now (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/too_old (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/too_new (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/zero (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/negative (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/minimum (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/maximum (0.00s)
+    --- PASS: TestM6dTimestampWindow_signedBoundsAndExtremes/overflow_delta (0.00s)
+=== RUN   TestM6dBrowser_realManagementFlow
+    m6d_browser_test.go:25: set IOLINK_M6D_BROWSER=1 after a production frontend build
+--- SKIP: TestM6dBrowser_realManagementFlow (0.00s)
+=== RUN   TestM6dConfiguredRate_initialBurstRotationAndHTTPRetry
+2026/10/14 04:25:14 WARN http request route=/open/v1/ponds method=GET status=429 duration_ms=4 tenant_id=0 actor_id=0
+--- PASS: TestM6dConfiguredRate_initialBurstRotationAndHTTPRetry (0.59s)
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/foreign
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/foreign/response_contract
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/missing
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/missing/response_contract
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/read_only
+=== RUN   TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/read_only/response_contract
+--- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly (2.26s)
+    --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/foreign (0.41s)
+        --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/foreign/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/missing (0.41s)
+        --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/missing/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/read_only (0.40s)
+        --- PASS: TestKeyOpenContractRestoreRejectsForeignMissingAndReadOnly/read_only/response_contract (0.23s)
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first/response_contract
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat
+=== RUN   TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat/response_contract
+--- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence (1.71s)
+    --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first (0.42s)
+        --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/first/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat (0.40s)
+        --- PASS: TestKeyOpenContractRestoreOnePhysicalOperationAndIdempotence/repeat/response_contract (0.23s)
+=== RUN   TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses
+=== RUN   TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses/response_contract
+--- PASS: TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses (1.34s)
+    --- PASS: TestKeyOpenContractRestoreLateStorageFailureRollsBackAndDiagnoses/response_contract (0.23s)
+=== RUN   TestM6dConcurrentNonceAndRateLimit
+--- PASS: TestM6dConcurrentNonceAndRateLimit (0.57s)
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128
+    api_key_name_contract_test.go:42: POST /api-keys characters=128 bytes=128 status=201 key_delta=1 issued_audit_delta=1
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128
+    api_key_name_contract_test.go:42: POST /api-keys characters=128 bytes=384 status=201 key_delta=1 issued_audit_delta=1
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129
+    api_key_name_contract_test.go:42: POST /api-keys characters=129 bytes=129 status=400 key_delta=0 issued_audit_delta=0
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129
+    api_key_name_contract_test.go:42: POST /api-keys characters=129 bytes=387 status=400 key_delta=0 issued_audit_delta=0
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys
+    api_key_name_contract_test.go:85: GET /api-keys status=200 one_time_secret_absent=true
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit
+    api_key_name_contract_test.go:85: GET /api-keys/audit status=200 one_time_secret_absent=true
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity
+    api_key_name_contract_test.go:101: diagnostic_dump_credentials_and_request_name_absent=true
+--- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity (2.40s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128 (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128/response_contract (0.23s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128 (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128/response_contract (0.23s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129 (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129/response_contract (0.23s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129 (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129/response_contract (0.23s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/response_contract (0.23s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit/response_contract (0.23s)
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/scope
+2026/10/14 04:25:23 WARN http request route=/open/v1/ponds method=GET status=403 duration_ms=4 tenant_id=8301 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/inactive_tenant
+2026/10/14 04:25:23 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/missing_feature
+2026/10/14 04:25:24 WARN http request route=/open/v1/ponds method=GET status=403 duration_ms=2 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/replay
+2026/10/14 04:25:24 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=8301 actor_id=0
+2026/10/14 04:25:24 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+=== RUN   TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/exhausted_rate
+2026/10/14 04:25:25 WARN http request route=/open/v1/ponds method=GET status=429 duration_ms=5 tenant_id=0 actor_id=0
+--- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays (2.73s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/scope (0.49s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/inactive_tenant (0.52s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/missing_feature (0.58s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/replay (0.52s)
+    --- PASS: TestM6dSignedHTTP_rejectsScopeTenantFeatureAndReplays/exhausted_rate (0.62s)
+=== RUN   TestM6dRotation_rejectsChangedResourceOwnershipWithoutWrites
+--- PASS: TestM6dRotation_rejectsChangedResourceOwnershipWithoutWrites (0.51s)
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/response_contract
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate/response_contract
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke/response_contract
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner
+=== RUN   TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner/response_contract
+--- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation (1.88s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/response_contract (0.24s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate (0.24s)
+        --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_rotate/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke (0.23s)
+        --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/foreign_revoke/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner (0.24s)
+        --- PASS: TestKeyOpenContractForeignManagementAndMembershipRevocation/revoked_owner/response_contract (0.23s)
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds
+2026/10/14 04:25:28 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=5 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices
+2026/10/14 04:25:28 INFO http request route=/open/v1/devices method=GET status=200 duration_ms=4 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/alarms
+2026/10/14 04:25:28 INFO http request route=/open/v1/alarms method=GET status=200 duration_ms=4 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8302
+2026/10/14 04:25:28 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8303
+2026/10/14 04:25:28 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-hidden
+2026/10/14 04:25:28 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-foreign
+2026/10/14 04:25:28 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds
+2026/10/14 04:25:28 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices
+2026/10/14 04:25:28 INFO http request route=/open/v1/devices method=GET status=200 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/alarms
+2026/10/14 04:25:28 INFO http request route=/open/v1/alarms method=GET status=200 duration_ms=4 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8302
+2026/10/14 04:25:28 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8303
+2026/10/14 04:25:28 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-hidden
+2026/10/14 04:25:28 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=4 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-foreign
+2026/10/14 04:25:28 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds
+2026/10/14 04:25:28 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices
+2026/10/14 04:25:28 INFO http request route=/open/v1/devices method=GET status=200 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/alarms
+2026/10/14 04:25:28 INFO http request route=/open/v1/alarms method=GET status=200 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8302
+2026/10/14 04:25:28 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8303
+2026/10/14 04:25:28 WARN http request route=/open/v1/ponds/:id method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-hidden
+2026/10/14 04:25:28 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+=== RUN   TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-foreign
+2026/10/14 04:25:28 WARN http request route=/open/v1/devices/:device_no method=GET status=404 duration_ms=3 tenant_id=8301 actor_id=0
+--- PASS: TestM6dResourceHTTP_filtersListsAndDetails (0.67s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/alarms (0.01s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8302 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/ponds/8303 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-hidden (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/farm/open/v1/devices/m6d-foreign (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/alarms (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8302 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/ponds/8303 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-hidden (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/pond/open/v1/devices/m6d-foreign (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/alarms (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8302 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/ponds/8303 (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-hidden (0.00s)
+    --- PASS: TestM6dResourceHTTP_filtersListsAndDetails/device/open/v1/devices/m6d-foreign (0.00s)
+=== RUN   TestM6dThrottle_preservesNonceAndLeavesTokenUnconsumed
+2026/10/14 04:25:29 WARN http request route=/open/v1/ponds method=GET status=429 duration_ms=4 tenant_id=0 actor_id=0
+2026/10/14 04:25:29 WARN http request route=/open/v1/ponds method=GET status=401 duration_ms=2 tenant_id=0 actor_id=0
+2026/10/14 04:25:29 INFO http request route=/open/v1/ponds method=GET status=200 duration_ms=4 tenant_id=8301 actor_id=0
+--- PASS: TestM6dThrottle_preservesNonceAndLeavesTokenUnconsumed (0.53s)
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/ponds
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/ponds/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/ponds/{id}
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/ponds/{id}/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/devices
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/devices/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/devices/{device_no}
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/devices/{device_no}/response_contract
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/alarms
+=== RUN   TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/alarms/response_contract
+--- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites (2.31s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue (0.24s)
+        --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites/issue/response_contract (0.23s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/ponds (0.18s)
+        --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/ponds/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/ponds/{id} (0.18s)
+        --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/ponds/{id}/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/devices (0.18s)
+        --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/devices/response_contract (0.17s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/devices/{device_no} (0.18s)
+        --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/devices/{device_no}/response_contract (0.18s)
+    --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/alarms (0.18s)
+        --- PASS: TestKeyOpenContractMissingVaultFailsUnavailableWithoutWrites//open/v1/alarms/response_contract (0.18s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	57.233s
