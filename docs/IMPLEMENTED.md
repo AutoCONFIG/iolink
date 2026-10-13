@@ -64,6 +64,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | S4 | 空库自动建表、Web 首启初始化和业务 API 门禁 | 已完成已核验 | 根源码 `360bc87` / web `b340cae` 同候选两位独立审阅者 APPROVE；真实隔离 Timescale、并发/回滚/非法输入、Go 全库、契约、前端 52 测试/类型检查/构建及 Docker 首启通过，修订后实际 Vite 代理已核验；web 已推送远端；浏览器由用户验收；[证据与双审](evidence/deployment/2026-10-08-web-setup/README.md) |
 | V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 正在进行 | [首批对账](evidence/rebuild/reconciliation/2026-10-13/README.md)已核对TODO3、D01–D11、M6b `.a`，归档历史收据并保留源绑定缺口；TODO3/M5候选摘要补证、子项门禁语义及其余Rxx旧表仍待核验，不批量改passed |
 | V1a | 首批历史收据归档、范围说明和陈旧状态引用校正 | 已完成已核验 | 文档提交 `5dedd0f` / tree `751f8ff` 获两位未参与编辑者同快照 APPROVE；[核对与双审](evidence/rebuild/reconciliation/2026-10-13/README.md)。8份原文归档、92本地引用、55需求静态检查及96 operations / 568契约fixtures核对通过；仅对账文档，未重新验收业务代码。R36/R37整体仍not_run；TODO3/M5源绑定缺口与门禁子项语义问题保留，V1/D14未整体关闭 |
+| V1b | 只读门禁、历史收据保护和M6b子项范围核对 | 已完成已核验 | 提交 `13a6d18` / tree `a5b3259` 两位未参与编辑者同快照 APPROVE；发布v0.0.34。[证据与双审](evidence/rebuild/reconciliation/2026-10-13-gates/README.md)。107 Python测试、全部六个实际门禁和96 operations / 568契约fixtures通过；CLI前后历史收据/清单字节不变，M6d证据包格式回归经双审发现并修复。M6b仅核对R36.a/R37.a及已有source/web/两审绑定，不重验业务或证明历史作者真实性；整体R36/R37及未来.b仍not_run；V1其余当前源码补证继续 |
 | V2 | 微信真实登录、订阅、通知及用户归属流程 | 已完成待核验 | 仅指已有服务端/适配器及接口演示软件；真实凭据、资质、用户/真机为 external_blocked；TODO 8软件演示完成不代替真实微信验收 |
 | V3 | 实际签发方License导入/续期与客户离线安装 | 已完成待核验 | 已有工具/软件链；真实签发方、干净断网x86_64客户主机30分钟安装及ARM64证据待提供 |
 | V4 | 公网TLS/网络暴露、100GiB恢复、发布中断、长时容量 | 已完成待核验 | 已有脚本/模板/软件烟测；真实主机、证书、恢复介质及24小时500设备/90天fixture演练为 external_blocked |
@@ -72,7 +73,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | X1 | R36.b/R37.b/R39.b 后续资源权限、执行撤权和License复验 | 待完成已调研 | 跨阶段规则已明确；Key/播放/命令/jobs/下载的真实入口按 M6d–M8d分别实现验收 |
 | S3 | Redis 类缓存引入调研 | 待完成已调研 | 仅形成候选用途、窄 port、故障语义和验证门槛；当前未引入 Redis 依赖、容器或生产配置；[调研记录](research/redis-cache-evaluation.md)；不阻塞 M6d |
 | D12/D13/D15/D16/D17 | 平台owner边界、遥测角色、支持到期时区/精度、租户管理员资源范围 | 已完成已核验 | 已纳入 M6b `0335438` 同候选批准；[gate](evidence/rebuild/gates/M6b.json)明确列出 fixed_defects；旧计划未勾需同步 |
-| D14 | M6b证据归档与同快照批准绑定 | 已完成待核验 | 已核对 `.a` 的source ef6510f/candidate0335438/web e840923与两审一致，并补齐旧README与manifest范围说明；整体R36/R37含未来 `.b` 仍not_run，现门禁CLI无法表达该分阶段范围且成功分支会重写gate元数据；工具语义与完整范围仍纳入V1，未整体关闭 |
+| D14 | M6b证据归档与同快照批准绑定 | 已完成已核验 | `.a` source ef6510f/candidate0335438/web e840923与两审一致；V1a补范围、V1b修复只读门禁并独立双审批准 `a5b3259`，历史字段保留且缺失/错配/拒绝/重复证据失败。D14的收据归档与工具缺陷关闭；整体R36/R37未来.b仍not_run，不把此缺陷关闭等同完整权限需求验收 |
 | D18 | 新组织创建接口严格JSON单对象校验 | 已完成已核验 | 提交 `eed35d5` / tree `8e85609` 两位未参与编辑者同最终快照 APPROVE，发布v0.0.33。仅允许name:string单对象，额外字段、尾随JSON与非法形状返回400且无组织/审计写入；保留正常创建、403/409与事务回滚。原生服务curl、真实HTTP/Timescale race、全库33测试包build/vet/race、96 operations / 568契约fixtures通过；审阅后测试输入加强，旧handler和移除闭合key校验均使最终用例失败；[证据与双审](evidence/deployment/2026-10-13-tenant-json/README.md)。测试容器/卷已清理，浏览器与外部验收仍另列，不宣称全部实时handler契约通过 |
 | D01–D11 | 历史构建/迁移/API/报警/通知/运维缺陷登记 | 正在进行 | 已逐项追溯M0/M1、TODO5/6/9软件证据，见V1a；D03–D07/D09已有后继软件收据，D08/D11的M5候选摘要缺口保留；D01 tag镜像CI已执行但远端测试job不计通过，D10/D11真实环境仍阻塞；不从旧“待M2”文字推断当前未实现 |
 | F1 | 全量范围、Rxx归属、provider与证据追溯审计 | 待完成未调研 | TODO 13最终发布快照审计，现有manifest检查不代替该轮核验 |

@@ -22,4 +22,8 @@ M6b由acceptance-map的结构化 `gate_parts` 明确评估R36.a/R37.a。必须�
 - `typecheck.log`：`uvx basedpyright --pythonpath .venv/contracts/bin/python --level error scripts/architecture_gate.py` exit0；首次检查发现Pydantic字段覆盖类型问题，已用共用基类消除。
 - `ruff.log`、`no-excuse.log`：新模块及其两测试文件的基础Ruff规则和编程技能静态规则通过；不声称全库Ruff ALL或旧无类型checker全量类型检查通过。
 
-初候选tree `48fba0f` 被两审发现M6d字符串证据包解析回归并拒绝；已补格式支持及真实CLI回归，最终冻结快照复跑、审阅及发布信息随后归档。V1仍含历史绑定和其他已有功能核验，外部微信、硬件、License交付、TLS/容量/恢复保留external_blocked，M7a/M8新功能按用户范围暂缓。
+初候选tree `48fba0f` 被两审发现M6d字符串证据包解析回归并拒绝；原文见两个before-bundle-fix报告。已补格式支持及真实CLI回归。
+
+最终实现提交 `13a6d18` / tree `a5b3259aca2cbacd7e0f4510545ddfd0b5501293`（导出 `/tmp/iolink-v1b-r2-20261013`）获两位未参与编辑者同快照APPROVE：[代码审阅](code-review.md)、[门审](gate-review.md)。`snapshot-final-tests.log`为冻结导出复跑107测试通过；两审各自复跑107测试及全部实际门禁，收据与清单哈希不变。发布v0.0.34，仅GitHub远端；外部验收不因tag而通过。临时导出在审阅后清理。
+
+V1仍含历史绑定和其他已有功能核验，外部微信、硬件、License交付、TLS/容量/恢复保留external_blocked，M7a/M8新功能按用户范围暂缓。
