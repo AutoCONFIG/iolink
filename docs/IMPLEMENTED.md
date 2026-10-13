@@ -57,6 +57,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | S7 | 租户业务页面写入口与 RBAC 对齐 | 已完成已核验 | web `f62f66347f6bd7d7e5dbd3ec3a6e7a83fbf13350` 获两位未参与编辑的独立审阅者同快照 APPROVE；只读角色隐藏养殖场/池塘/设备/规则管理入口，产品回车绑定有权限保护，报警确认保留 owner/admin/member/support 能力。67 单测、类型检查/生产构建、10 权限场景与 5 原有页面场景通过，旧版回归如预期失败；门审独立重跑权限场景和非缓存后端两包测试通过；[证据与双审](evidence/tenant-permission-ui/2026-10-11/README.md)。发布目标 v0.0.18；现场视觉和自动更新由用户验收。本轮未修改后端、数据库或主阶段完成数量 |
 | S1 | 服务器/开发两份 Compose、latest-pg16 | 已完成已核验 | 用户免双审；隔离构建/首启/重启通过；[证据](evidence/deployment/2026-10-03-compose/) |
 | S2 | JSON日志转储、轮转、关联ID、脱敏及健康状态 | 已完成已核验 | 双审都批准 `1bc74b8`，验证 source `e1b78e1`；[证据](evidence/deployment/2026-10-03-logging/README.md)、`code-review.md`及 `.omo/evidence/logging-gate-review.md`；下方旧“待双审”已过时 |
+| S2a | Debug dump 多阶段关联、下游诊断、版本目录与定时保留 | 正在进行 | HTTP/MQTT/数据库、License准入与通知/微信链路诊断，`logs/{version}`，默认每6小时按记录时间清除6小时前数据；文件始终保存 debug、stderr 独立级别。正在进行真实隔离 Timescale 链路、发布快照验证及同快照独立双审；[证据](evidence/deployment/2026-10-13-debug-dump/README.md)。不推进新业务功能；外部微信/硬件及 License交付专项仍未验收 |
 | S4 | 空库自动建表、Web 首启初始化和业务 API 门禁 | 已完成已核验 | 根源码 `360bc87` / web `b340cae` 同候选两位独立审阅者 APPROVE；真实隔离 Timescale、并发/回滚/非法输入、Go 全库、契约、前端 52 测试/类型检查/构建及 Docker 首启通过，修订后实际 Vite 代理已核验；web 已推送远端；浏览器由用户验收；[证据与双审](evidence/deployment/2026-10-08-web-setup/README.md) |
 | V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 已完成待核验 | 实现/历史批准已存在，文档同步尚未完整核对：TODO 3旧计划未勾、R36/R37及旧 Dxx逐项核对；TODO 8历史拒绝已由 `2b66812` 新同快照双审闭环；不得直接批量改 passed |
 | V2 | 微信真实登录、订阅、通知及用户归属流程 | 已完成待核验 | 仅指已有服务端/适配器及接口演示软件；真实凭据、资质、用户/真机为 external_blocked；TODO 8软件演示完成不代替真实微信验收 |

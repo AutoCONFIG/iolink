@@ -82,7 +82,7 @@ func TestConcurrentLoggingProducesCompleteJSONAndSurvivesReopen(t *testing.T) {
 	if err := sink.Close(); err != nil {
 		t.Fatal(err)
 	}
-	raw, err := os.ReadFile(filepath.Join(dir, "iolinkd.jsonl"))
+	raw, err := os.ReadFile(filepath.Join(dir, "dev", "iolinkd.jsonl"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -2,6 +2,7 @@ package observability
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
 	"errors"
 	"fmt"
@@ -9,6 +10,8 @@ import (
 	"net"
 	"os"
 )
+
+func NewIngestID() string { return rand.Text() }
 
 func safeAttr(_ []string, a slog.Attr) slog.Attr {
 	if a.Key == "err" || a.Key == "error" {
@@ -22,11 +25,34 @@ func safeAttr(_ []string, a slog.Attr) slog.Attr {
 		return slog.String("device_hash", fmt.Sprintf("%x", sum[:12]))
 	}
 	switch a.Key {
-	case slog.TimeKey, slog.LevelKey, slog.MessageKey, "request_id", "route", "method", "status", "duration_ms", "tenant_id", "actor_id", "stage", "outcome", "count", "fields", "kind", "field", "http", "mqtt", "addr":
+	case slog.TimeKey, slog.LevelKey, slog.MessageKey, "request_id", "ingest_id", "span_id", "route", "method", "stage", "outcome", "error_code", "operation":
 		return a
+	case "status", "duration_ms", "tenant_id", "actor_id", "count", "fields", "field_count", "accepted_count", "rejected_count", "qos":
+		if a.Value.Kind() == slog.KindInt64 || a.Value.Kind() == slog.KindUint64 {
+			return a
+		}
+	case "retain":
+		if a.Value.Kind() == slog.KindBool {
+			return a
+		}
+	case "kind":
+		switch a.Value.String() {
+		case "properties", "status_change", "ack":
+			return a
+		}
+	case "field":
+		switch a.Value.String() {
+		case "temperature", "dissolved_oxygen", "ph", "turbidity", "salinity", "battery", "signal":
+			return a
+		}
+	case "protocol":
+		if a.Value.String() == "mqtt" {
+			return a
+		}
 	default:
 		return slog.String(a.Key, "redacted")
 	}
+	return slog.String(a.Key, "redacted")
 }
 
 func errorClass(err error) string {

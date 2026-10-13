@@ -2,12 +2,15 @@ package notifications
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"log/slog"
 	"time"
 
 	"golang.org/x/sync/errgroup"
+
+	"git.hyhy.fun/rsplab/iolink/internal/observability"
 )
 
 var (
@@ -111,17 +114,24 @@ func NewWorker(cfg Config) (*Worker, error) {
 }
 
 func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
+	ctx = observability.ContextWithRequestID(ctx, rand.Text())
 	c, ok, err := w.cfg.Store.Claim(ctx, w.cfg.Now().UTC(), w.cfg.LeaseDuration, w.cfg.MaxAttempts)
 	if queue, ok := w.cfg.Store.(QueueDepthStore); ok {
 		if depth, depthErr := queue.QueueDepth(ctx); depthErr == nil {
 			MetricQueueDepth.Set(float64(depth))
 		}
 	}
-	if err != nil || !ok {
+	if err != nil {
+		w.cfg.Logger.WarnContext(ctx, "notification claim failed", "stage", "outbox", "operation", "claim", "outcome", "failed", "err", err)
 		return ok, err
 	}
+	if !ok {
+		return ok, err
+	}
+	w.cfg.Logger.DebugContext(ctx, "notification attempt", "stage", "outbox", "operation", "claim", "outcome", "claimed", "count", c.Attempts)
 	var sendErr error
 	started := time.Now()
+	w.cfg.Logger.DebugContext(ctx, "notification attempt", "stage", "notification", "operation", "send", "outcome", "started")
 	if c.Delivery.RecipientID == "" || w.cfg.Sender == nil {
 		sendErr = ErrDisabled
 	} else {
@@ -129,6 +139,7 @@ func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 		sendErr = w.cfg.Sender.Send(sendCtx, c.Delivery)
 		cancel()
 	}
+	w.cfg.Logger.DebugContext(ctx, "notification attempt", "stage", "notification", "operation", "send", "outcome", "completed", "duration_ms", time.Since(started).Milliseconds())
 	MetricDeliverySeconds.Observe(time.Since(started).Seconds())
 	now := w.cfg.Now().UTC()
 	result := Result{Status: "sent", NextAt: now}
@@ -157,11 +168,12 @@ func (w *Worker) RunOnce(ctx context.Context) (bool, error) {
 	}
 	finishCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
 	defer cancel()
+	w.cfg.Logger.DebugContext(finishCtx, "notification attempt", "stage", "outbox", "operation", "finish", "outcome", "started")
 	if err = w.cfg.Store.Finish(finishCtx, c, result, now); err != nil {
-		w.cfg.Logger.Debug("notification result persistence failed", "stage", "outbox", "err", err)
+		w.cfg.Logger.WarnContext(finishCtx, "notification result persistence failed", "stage", "outbox", "operation", "finish", "outcome", "failed", "err", err)
 		return true, err
 	}
-	w.cfg.Logger.Debug("notification attempt completed", "stage", "outbox", "outcome", result.Status, "duration_ms", time.Since(started).Milliseconds())
+	w.cfg.Logger.InfoContext(finishCtx, "notification attempt completed", "stage", "outbox", "operation", "finish", "outcome", result.Status, "duration_ms", time.Since(started).Milliseconds())
 	if sendErr != nil {
 		if w.cfg.OnFailure != nil {
 			w.cfg.OnFailure()

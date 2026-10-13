@@ -100,7 +100,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	}()
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
-	pool, err := platform.DB(ctx, cfg)
+	pool, err := platform.DB(ctx, cfg, log)
 	if err != nil {
 		return err
 	}
@@ -264,6 +264,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) (runErr error) {
 	}
 
 	notificationSender := wechat.NewSender(wechat.Config{
+		Logger: log,
 		AppID: cfg.WXAppID, Secret: cfg.WXSecret, TemplateID: cfg.WXTemplateID,
 		Page:         envOr("IOLINK_WX_PAGE", "pages/alarms/index"),
 		MessageField: envOr("IOLINK_WX_MESSAGE_FIELD", "thing1"),

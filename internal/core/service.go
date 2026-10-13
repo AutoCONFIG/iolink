@@ -16,6 +16,7 @@ import (
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/event"
 	"git.hyhy.fun/rsplab/iolink/internal/ingestion"
+	"git.hyhy.fun/rsplab/iolink/internal/observability"
 )
 
 // Service is the assembled core. cmd/iolinkd constructs it and hands the
@@ -57,24 +58,31 @@ func NewWithPolicy(ctx context.Context, pool *pgxpool.Pool, log *slog.Logger, po
 // HandleEvent implements event.Handler: validate, persist, evaluate alarms.
 func (s *Service) HandleEvent(e event.Event) (err error) {
 	started := time.Now()
+	if e.IngestID == "" {
+		e.IngestID = observability.NewIngestID()
+	}
+	ctx := observability.ContextWithIngestID(context.Background(), e.IngestID)
+	s.log.DebugContext(ctx, "event validation started", "stage", "core_validation", "outcome", "started", "kind", e.Kind, "field_count", len(e.Properties)+len(e.GenericProperties))
+	if validationErr := ingestion.Validate(e); validationErr != nil {
+		s.log.WarnContext(ctx, "event validation failed", "stage", "core_validation", "outcome", "rejected", "error_code", "invalid_event", "err", validationErr)
+		return validationErr
+	}
+	s.log.DebugContext(ctx, "event validation completed", "stage", "core_validation", "outcome", "accepted", "kind", e.Kind)
 	defer func() {
 		if err != nil {
-			s.log.Debug("device event rejected", "device", e.DeviceNo, "stage", "ingestion", "err", err, "duration_ms", time.Since(started).Milliseconds())
+			s.log.WarnContext(ctx, "device event rejected", "device", e.DeviceNo, "stage", "ingestion", "outcome", "failed", "err", err, "duration_ms", time.Since(started).Milliseconds())
 		} else {
-			s.log.Debug("device event persisted", "device", e.DeviceNo, "kind", e.Kind, "fields", len(e.Properties)+len(e.GenericProperties), "duration_ms", time.Since(started).Milliseconds())
+			s.log.DebugContext(ctx, "device event completed", "device", e.DeviceNo, "stage", "ingestion", "outcome", "completed", "kind", e.Kind, "field_count", len(e.Properties)+len(e.GenericProperties), "duration_ms", time.Since(started).Milliseconds())
 		}
 	}()
-	if err := ingestion.Validate(e); err != nil {
-		return err
-	}
 	switch e.Kind {
 	case event.KindProperties:
 		if e.GenericProperties != nil {
-			return s.storeGenericReading(e)
+			return s.storeGenericReading(ctx, e)
 		}
-		return s.storeReading(e)
+		return s.storeReading(ctx, e)
 	case event.KindStatusChange:
-		return s.storeStatus(e)
+		return s.storeStatus(ctx, e)
 	default:
 		s.log.Warn("unknown event kind", "kind", e.Kind)
 		return nil

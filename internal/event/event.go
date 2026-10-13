@@ -20,6 +20,7 @@ const (
 
 // Event is the single envelope access publishes for every upstream message.
 type Event struct {
+	IngestID  string
 	Kind      Kind
 	DeviceNo  string
 	ProductID int64

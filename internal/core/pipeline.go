@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"math"
+	"time"
+	"unicode/utf8"
+
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/event"
 	"git.hyhy.fun/rsplab/iolink/internal/ingestion"
 	"github.com/jackc/pgx/v5"
-	"math"
-	"time"
-	"unicode/utf8"
 )
 
-func (s *Service) storeReading(e event.Event) error {
+func (s *Service) storeReading(ctx context.Context, e event.Event) error {
 	if len(e.Properties) == 0 {
 		return nil
 	}
@@ -26,13 +27,13 @@ func (s *Service) storeReading(e event.Event) error {
 			return errors.New("invalid normalized metric")
 		}
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(context.WithoutCancel(ctx))
 	var pond, tenant, productID int64
 	var modelVersion int
 	var modelSchema []byte
@@ -57,6 +58,7 @@ func (s *Service) storeReading(e event.Event) error {
 			return err
 		}
 		if ct.RowsAffected() == 0 {
+			s.log.DebugContext(ctx, "event deduplicated", "stage", "deduplication", "outcome", "duplicate")
 			return tx.Commit(ctx)
 		}
 	}
@@ -116,12 +118,14 @@ func (s *Service) storeReading(e event.Event) error {
 	if err = tx.Commit(ctx); err != nil {
 		return err
 	}
+	s.log.DebugContext(ctx, "telemetry transaction committed", "stage", "persistence", "outcome", "committed", "count", len(alarms))
 	MetricTelemetryTotal.Inc()
 	for range alarms {
 		MetricAlarmsTotal.Inc()
 	}
 	return nil
 }
+
 func shadowUpsert(ctx context.Context, tx pgx.Tx, e event.Event, pond, tenant, productID int64, modelVersion int) error {
 	values := map[string]float64{}
 	stamps := map[string]time.Time{}
@@ -168,8 +172,9 @@ func shadowUpsert(ctx context.Context, tx pgx.Tx, e event.Event, pond, tenant, p
 	_, err = tx.Exec(ctx, `INSERT INTO device_shadows(device_no,last,signal,ts,pond_id,tenant_id,timestamps,model_version,product_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(device_no) DO UPDATE SET last=excluded.last,signal=excluded.signal,ts=excluded.ts,pond_id=excluded.pond_id,tenant_id=excluded.tenant_id,timestamps=excluded.timestamps,model_version=excluded.model_version,product_id=excluded.product_id`, e.DeviceNo, raw, signal, latest, pond, tenant, times, modelVersion, productID)
 	return err
 }
-func (s *Service) storeStatus(e event.Event) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+
+func (s *Service) storeStatus(ctx context.Context, e event.Event) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	status := "offline"
 	if e.Online {
@@ -179,7 +184,7 @@ func (s *Service) storeStatus(e event.Event) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(context.WithoutCancel(ctx))
 	var previous string
 	if err := tx.QueryRow(ctx, "SELECT d.status FROM devices d JOIN ponds p ON p.id=d.pond_id JOIN farms f ON f.id=p.farm_id JOIN tenants t ON t.id=f.tenant_id WHERE d.device_no=$1 AND d.disabled_at IS NULL AND t.active FOR UPDATE OF d", e.DeviceNo).Scan(&previous); err != nil {
 		return err

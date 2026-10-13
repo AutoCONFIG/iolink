@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"time"
 
+	"git.hyhy.fun/rsplab/iolink/internal/observability"
+
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -32,12 +34,15 @@ type Config struct {
 }
 
 // DB wraps the pgx pool shared by core (and appapi via core repositories).
-func DB(ctx context.Context, cfg Config) (*pgxpool.Pool, error) {
+func DB(ctx context.Context, cfg Config, logger *slog.Logger) (*pgxpool.Pool, error) {
 	pcfg, err := pgxpool.ParseConfig(cfg.PgDSN)
 	if err != nil {
 		return nil, errors.New("invalid database configuration")
 	}
 	pcfg.MaxConns = cfg.PgMaxConns
+	if logger != nil {
+		pcfg.ConnConfig.Tracer = observability.QueryTracer{Logger: logger}
+	}
 	pool, err := pgxpool.NewWithConfig(ctx, pcfg)
 	if err != nil {
 		return nil, errors.New("cannot create database pool")

@@ -2,11 +2,13 @@ package access
 
 import (
 	"encoding/json"
+	"unicode/utf8"
+
 	"git.hyhy.fun/rsplab/iolink/internal/ingestion"
+	"git.hyhy.fun/rsplab/iolink/internal/observability"
 	"git.hyhy.fun/rsplab/iolink/internal/wire"
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/packets"
-	"unicode/utf8"
 )
 
 type brokerHook struct {
@@ -23,7 +25,15 @@ func (h *brokerHook) Provides(b byte) bool {
 	}
 	return false
 }
-func (h *brokerHook) OnConnectAuthenticate(cl *mqtt.Client, pk packets.Packet) bool {
+
+func (h *brokerHook) OnConnectAuthenticate(cl *mqtt.Client, pk packets.Packet) (accepted bool) {
+	defer func() {
+		outcome := "rejected"
+		if accepted {
+			outcome = "accepted"
+		}
+		h.srv.log.Debug("mqtt authentication completed", "ingest_id", observability.NewIngestID(), "stage", "mqtt_authentication", "outcome", outcome)
+	}()
 	if cl == nil || pk.Connect.WillFlag {
 		return false
 	}
@@ -54,6 +64,7 @@ func (h *brokerHook) OnConnectAuthenticate(cl *mqtt.Client, pk packets.Packet) b
 	}
 	return true
 }
+
 func (h *brokerHook) OnACLCheck(cl *mqtt.Client, topic string, write bool) bool {
 	if cl == nil || !h.srv.isCurrent(cl) {
 		return false
@@ -61,13 +72,25 @@ func (h *brokerHook) OnACLCheck(cl *mqtt.Client, topic string, write bool) bool 
 	no, ok := h.srv.deviceFor(cl)
 	return ok && CheckACL(no, topic, write)
 }
+
 func (h *brokerHook) OnSessionEstablished(cl *mqtt.Client, pk packets.Packet) {
 	h.srv.connected(cl, string(pk.Connect.Password))
 }
 func (h *brokerHook) OnDisconnect(cl *mqtt.Client, _ error, _ bool) { h.srv.disconnected(cl) }
 func (h *brokerHook) OnPublish(cl *mqtt.Client, pk packets.Packet) (packets.Packet, error) {
-	reject := func(reason string) (packets.Packet, error) {
+	ingestID := observability.NewIngestID()
+	h.srv.log.Debug("mqtt message received", "ingest_id", ingestID, "stage", "mqtt_ingress", "outcome", "started", "protocol", "mqtt", "qos", pk.FixedHeader.Qos, "retain", pk.FixedHeader.Retain)
+	reject := func(reason string, cause ...error) (packets.Packet, error) {
 		MetricRejected.WithLabelValues(reason).Inc()
+		stage := "mqtt_validation"
+		if reason == "dispatch" {
+			stage = "mqtt_dispatch"
+		}
+		attrs := []any{"ingest_id", ingestID, "stage", stage, "outcome", "rejected", "error_code", reason}
+		if len(cause) > 0 {
+			attrs = append(attrs, "err", cause[0])
+		}
+		h.srv.log.Warn("mqtt message rejected", attrs...)
 		return pk, packets.ErrRejectPacket
 	}
 	if cl == nil || !h.srv.isCurrent(cl) {
@@ -94,18 +117,22 @@ func (h *brokerHook) OnPublish(cl *mqtt.Client, pk packets.Packet) (packets.Pack
 		}
 		kind, kindErr := h.srv.productKind(no)
 		if kindErr != nil {
-			return reject("dispatch")
+			return reject("dispatch", kindErr)
 		}
 		if kind == "generic" {
-			if err := h.srv.HandleGenericReport(no, raw); err != nil {
-				return reject("dispatch")
+			h.srv.log.Debug("mqtt dispatch started", "ingest_id", ingestID, "stage", "mqtt_dispatch", "outcome", "started", "kind", "properties")
+			if err := h.srv.handleGenericReport(no, raw, ingestID); err != nil {
+				return reject("dispatch", err)
 			}
+			h.srv.log.Debug("mqtt message dispatched", "ingest_id", ingestID, "stage", "mqtt_dispatch", "outcome", "accepted", "kind", "properties", "field_count", len(raw))
 			return pk, nil
 		}
+		dropped := 0
 		for key := range raw {
 			if _, _, ok := ingestion.MetricRange(key); !ok && key != "message_id" {
 				MetricRejected.WithLabelValues("unknown_field").Inc()
 				delete(raw, key)
+				dropped++
 			}
 		}
 		var r wire.Report
@@ -116,10 +143,11 @@ func (h *brokerHook) OnPublish(cl *mqtt.Client, pk packets.Packet) (packets.Pack
 		if json.Unmarshal(clean, &r) != nil {
 			return reject("type")
 		}
-		if err := h.srv.HandleReport(no, r); err != nil {
-			h.srv.log.Error("properties rejected", "device", no, "err", err)
-			return reject("dispatch")
+		h.srv.log.Debug("mqtt dispatch started", "ingest_id", ingestID, "stage", "mqtt_dispatch", "outcome", "started", "rejected_count", dropped)
+		if err := h.srv.handleReport(no, r, ingestID); err != nil {
+			return reject("dispatch", err)
 		}
+		h.srv.log.Debug("mqtt message dispatched", "ingest_id", ingestID, "stage", "mqtt_dispatch", "outcome", "accepted", "kind", "properties")
 	} else {
 		var ack struct {
 			ID    string `json:"id"`
@@ -129,7 +157,7 @@ func (h *brokerHook) OnPublish(cl *mqtt.Client, pk packets.Packet) (packets.Pack
 		if json.Unmarshal(pk.Payload, &ack) != nil || ack.ID == "" || len(ack.ID) > 128 || ack.OK == nil || (!*ack.OK && ack.Error == "") {
 			return reject("ack")
 		}
-		h.srv.log.Info("device ack accepted", "device", no) // never log arbitrary payload/credentials
+		h.srv.log.Debug("device ack accepted", "ingest_id", ingestID, "stage", "mqtt_dispatch", "outcome", "accepted", "kind", "ack") // never log arbitrary payload/credentials
 	}
 	return pk, nil
 }

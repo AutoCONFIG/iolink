@@ -64,7 +64,7 @@ docker compose stop iolinkd
 docker compose up -d --pull never --wait iolinkd
 ```
 
-数据库保存在项目的 `pgdata` 命名卷中，`docker compose down` 保留数据；`down -v` 会删除数据。内部 JSON 诊断日志保存在同目录的 `logs/iolinkd.jsonl`，容器内限制为20MB×5个备份，可通过 `IOLINK_LOG_LEVEL=debug|info|warn|error` 调整级别；日志目录和 Docker stdout/stderr 都有大小上限。默认仅监听 `127.0.0.1:8080/1883`，数据库不公开端口。测试机需从其他主机直接访问时，配置 `IOLINK_HTTP_BIND=0.0.0.0` / `IOLINK_MQTT_BIND=0.0.0.0` 并配置防火墙；公网部署按下节反代 TLS。
+数据库保存在项目的 `pgdata` 命名卷中，`docker compose down` 保留数据；`down -v` 会删除数据。内部 JSON 诊断日志保存在 `logs/{version}/iolinkd.jsonl`，例如 `logs/v0.0.31/iolinkd.jsonl`；每版本默认保留20MB活动文件和5个轮转备份。文件包含 debug 及以上记录，`IOLINK_LOG_LEVEL=debug|info|warn|error` 仅控制 stderr，默认 info。默认每6小时清除早于当前时间6小时的记录；可用 `IOLINK_LOG_RETENTION` 和 `IOLINK_LOG_CLEANUP_INTERVAL` 调整保留时长与清理间隔，具体边界见下方“可观察性与关卡”。Docker stdout/stderr 另有大小上限。默认仅监听 `127.0.0.1:8080/1883`，数据库不公开端口。测试机需从其他主机直接访问时，配置 `IOLINK_HTTP_BIND=0.0.0.0` / `IOLINK_MQTT_BIND=0.0.0.0` 并配置防火墙；公网部署按下节反代 TLS。
 
 `latest` 适合测试机追踪最新发布；正式发布和可复现验收应把 `IOLINKD_IMAGE` 固定为 tag 或 digest。该 Compose 不代表 TLS、容量、离线安装或 M6b 完整阶段验收已通过。
 
@@ -176,22 +176,27 @@ Timescale全库恢复准备/收尾及非并行限制参考[官方逻辑备份文
 
 ## 可观察性与关卡
 
-内部诊断日志输出 JSON 行，常驻服务写入 `deploy/logs/iolinkd.jsonl`，同时输出到 stderr。
-使用复制到服务器的文件时，日志目录是该 Compose 文件旁的 `logs/`。
-默认 `IOLINK_LOG_LEVEL=info`；排查内部采集/通知处理可临时设置 `debug` 并重建应用容器。
+内部诊断日志输出 JSON 行，常驻服务将 debug 及以上记录写入 `deploy/logs/{version}/iolinkd.jsonl`。
+使用复制到服务器的文件时，日志根目录是该 Compose 文件旁的 `logs/`，容器内为 `/var/log/iolink`。
+镜像构建时写入 `IOLINK_VERSION`，发布版本自动分目录；本地构建未设置时为 `dev`。
+`IOLINK_LOG_DIR` 可更改根目录。默认 `IOLINK_LOG_LEVEL=info` 仅控制 stderr 镜像输出，内部细节始终转储到文件。
 `IOLINK_LOG_MAX_MB` 为每个文件的MB上限（1–1024，默认20），
-`IOLINK_LOG_BACKUPS` 为轮转备份数量（1–20，默认5），默认总预算约120MB。
-备份由轮转库以时间戳命名；不要让其他进程或宿主 logrotate 同时轮转这些文件。
+`IOLINK_LOG_BACKUPS` 为每版本轮转备份数量（1–20，默认5），单版本默认预算约120MB。
+`IOLINK_LOG_RETENTION=6h` 为记录保留时长，`IOLINK_LOG_CLEANUP_INTERVAL=6h` 为清理间隔；两项均接受正的 Go duration（如 `30m`、`6h`）。启动时立即清理，随后按间隔扫描当前及旧版本目录的活动和轮转文件，逐条删除 `time < 清理时刻 - 保留时长` 的记录，边界时刻保留。因此定时清理之间记录可能存留接近“保留时长 + 清理间隔”；大小轮转可能更早删除记录。
+无有效时间戳或损坏的行保守保留；符号链接、无关文件和旧版根目录下的日志不参与清理。备份名为 `iolinkd-YYYY-MM-DDTHH-MM-SS.mmm.jsonl`。
+一个日志根目录只供一个常驻进程写入；不要让其他进程或宿主 logrotate 同时修改这些文件。
 迁移和管理员 CLI 仅输出 stderr，避免与常驻服务争用同一日志文件。
 
-日志文件权限为0600，Docker 默认以 root 写入，宿主读取使用 `sudo tail -f logs/iolinkd.jsonl`；
+日志文件权限为0600，Docker 默认以 root 写入，宿主读取使用 `sudo tail -f logs/v0.0.31/iolinkd.jsonl`（替换为当前版本）；
 不应将日志目录作为公开静态文件目录。每个 API 请求返回服务器生成的 `X-Request-ID`，
 日志记录路由模板、状态码、耗时和已验证的租户/用户ID；不记录请求 body、header、query
 或原始动态路径。设备标识使用稳定 hash 关联，SDK packet/payload、密码、JWT、微信凭据
 以及原始数据库错误值均不进入日志。错误记录保留安全类别和 PostgreSQL SQLSTATE。
 未知错误记录类型，结合路由、处理阶段和指标定位，不输出原始错误文本中的数据。
 
-日志目录无法创建/打开时拒绝启动；运行中写入失败会在 stderr 报告并使 `/readyz` 返回503，
+HTTP 入口、内部处理及数据库查询用同一个服务器生成的 `request_id`；MQTT 发布、校验、去重、物模型验证和事务完成用同一个 `ingest_id`。数据库每次查询另有 `span_id`，只记录结果、耗时和安全错误类别，不记录 SQL 或参数。设备准入记录 License 检查阶段；通知 worker 每次投递生成 `request_id`，关联 outbox 领取、微信 token 缓存/获取、订阅发送及结果落库。微信登录 code2session 继承入口请求 ID，下游只记录固定操作名、状态码和耗时，不记录 URL、用户标识或响应内容。客户端传入的请求 ID、MQTT client ID 和 message ID 不作为诊断关联 ID。
+
+日志目录无法创建/打开或启动清理失败时拒绝启动；运行中写入/清理失败会在 stderr 报告并使 `/readyz` 返回503，
 修复磁盘或目录后重启服务。只读目录、非法级别/轮转范围也会拒绝启动。
 日志功能不替代通知 outbox、业务审计表或数据库备份。
 

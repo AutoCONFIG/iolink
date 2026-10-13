@@ -3,7 +3,10 @@ package appapi
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
@@ -14,8 +17,10 @@ import (
 // WechatConfig holds mini-program credentials. Empty AppID keeps the stub
 // exchanger (dev); set both to enable real code2session.
 type WechatConfig struct {
-	AppID  string
-	Secret string
+	AppID      string
+	Secret     string
+	HTTP       *http.Client
+	SessionURL string
 }
 
 // wechatSession is the code2session response.
@@ -29,24 +34,63 @@ type wechatSession struct {
 // RealWechatExchanger returns an exchanger calling the official
 // jscode2session endpoint. Only wired when WechatConfig is complete.
 func RealWechatExchanger(cfg WechatConfig) func(string) (string, error) {
-	client := &http.Client{Timeout: 5 * time.Second}
+	exchange := RealWechatExchangerContext(cfg, nil)
 	return func(code string) (string, error) {
+		return exchange(context.Background(), code)
+	}
+}
+
+func RealWechatExchangerContext(cfg WechatConfig, logger *slog.Logger) func(context.Context, string) (string, error) {
+	client := cfg.HTTP
+	if client == nil {
+		client = &http.Client{Timeout: 5 * time.Second}
+	}
+	if cfg.SessionURL == "" {
+		cfg.SessionURL = "https://api.weixin.qq.com/sns/jscode2session"
+	}
+	if logger == nil {
+		logger = slog.New(slog.NewJSONHandler(io.Discard, nil))
+	}
+	return func(ctx context.Context, code string) (_ string, err error) {
+		started, status, errorCode := time.Now(), 0, ""
+		logger.DebugContext(ctx, "wechat downstream request", "stage", "wechat", "operation", "code2session", "outcome", "started")
+		defer func() {
+			outcome := "success"
+			if err != nil {
+				outcome = "failed"
+			}
+			logger.DebugContext(ctx, "wechat downstream request", "stage", "wechat", "operation", "code2session", "outcome", outcome, "status", status, "duration_ms", time.Since(started).Milliseconds(), "error_code", errorCode)
+		}()
 		q := url.Values{
 			"appid":      {cfg.AppID},
 			"secret":     {cfg.Secret},
 			"js_code":    {code},
 			"grant_type": {"authorization_code"},
 		}
-		resp, err := client.Get("https://api.weixin.qq.com/sns/jscode2session?" + q.Encode())
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, cfg.SessionURL+"?"+q.Encode(), nil)
 		if err != nil {
+			errorCode = "request_invalid"
+			return "", fmt.Errorf("wechat request: %w", err)
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			errorCode = "network_error"
+			if errors.Is(err, context.DeadlineExceeded) {
+				errorCode = "deadline_exceeded"
+			} else if errors.Is(err, context.Canceled) {
+				errorCode = "context_canceled"
+			}
 			return "", fmt.Errorf("wechat http: %w", err)
 		}
+		status = resp.StatusCode
 		defer resp.Body.Close()
 		var ws wechatSession
 		if err := json.NewDecoder(resp.Body).Decode(&ws); err != nil {
+			errorCode = "response_decode"
 			return "", fmt.Errorf("wechat decode: %w", err)
 		}
 		if ws.ErrCode != 0 || ws.OpenID == "" {
+			errorCode = "provider_error"
 			return "", fmt.Errorf("wechat code2session: code=%d msg=%s", ws.ErrCode, ws.ErrMsg)
 		}
 		return ws.OpenID, nil
@@ -56,7 +100,7 @@ func RealWechatExchanger(cfg WechatConfig) func(string) (string, error) {
 // SetWechatExchanger overrides the code->openid exchange (used by tests;
 // production config does this implicitly in New).
 func (s *Server) SetWechatExchanger(f func(code string) (openID string, err error)) {
-	s.wx = f
+	s.wx = func(_ context.Context, code string) (string, error) { return f(code) }
 }
 
 // usersRepo implements UserStore over the users table (wired by main via

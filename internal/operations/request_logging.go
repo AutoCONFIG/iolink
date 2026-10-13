@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
+	"git.hyhy.fun/rsplab/iolink/internal/observability"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,10 +18,12 @@ func RequestLogging(log *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		started := time.Now()
 		id := rand.Text()
+		c.Request = c.Request.WithContext(observability.ContextWithRequestID(c.Request.Context(), id))
 		c.Header("X-Request-ID", id)
+		log.DebugContext(c.Request.Context(), "http request started", "stage", "http", "route", routeName(c), "method", safeMethod(c.Request.Method), "outcome", "started")
 		defer func() {
 			if recover() != nil {
-				log.Error("http handler panic", "request_id", id, "route", routeName(c))
+				log.ErrorContext(c.Request.Context(), "http handler panic", "route", routeName(c))
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 			}
 			status := c.Writer.Status()
@@ -32,7 +35,7 @@ func RequestLogging(log *slog.Logger) gin.HandlerFunc {
 			}
 			tenant, _ := domain.TenantID(c.Request.Context())
 			actor, _ := domain.TenantUserID(c.Request.Context())
-			log.Log(c.Request.Context(), level, "http request", "request_id", id, "route", routeName(c), "method", safeMethod(c.Request.Method), "status", status, "duration_ms", time.Since(started).Milliseconds(), "tenant_id", tenant, "actor_id", actor)
+			log.Log(c.Request.Context(), level, "http request", "route", routeName(c), "method", safeMethod(c.Request.Method), "status", status, "duration_ms", time.Since(started).Milliseconds(), "tenant_id", tenant, "actor_id", actor)
 		}()
 		c.Next()
 	}
@@ -44,6 +47,7 @@ func routeName(c *gin.Context) string {
 	}
 	return "unmatched"
 }
+
 func safeMethod(method string) string {
 	switch method {
 	case "GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS":

@@ -33,6 +33,7 @@ func TestRequestLogsCorrelateWithoutUntrustedContent(t *testing.T) {
 			router := gin.New()
 			router.Use(RequestLogging(log))
 			router.POST("/devices/:device_no", func(c *gin.Context) {
+				log.InfoContext(c.Request.Context(), "handler stage", "stage", "handler")
 				if tc.panic {
 					panic("panic-secret")
 				}
@@ -63,6 +64,14 @@ func TestRequestLogsCorrelateWithoutUntrustedContent(t *testing.T) {
 			}
 			if record.RequestID == "" || record.RequestID != rec.Header().Get("X-Request-ID") || record.Status != tc.status {
 				t.Fatalf("missing correlation: %+v", record)
+			}
+			for _, line := range lines {
+				var stageRecord struct {
+					RequestID string `json:"request_id"`
+				}
+				if err := json.Unmarshal([]byte(line), &stageRecord); err != nil || stageRecord.RequestID != record.RequestID {
+					t.Fatalf("internal log lost correlation: %s", line)
+				}
 			}
 			if tc.status == 500 && record.Level != "ERROR" {
 				t.Fatal("failure log level", record.Level)

@@ -50,6 +50,8 @@ services:
       IOLINK_LOG_LEVEL: ${IOLINK_LOG_LEVEL:-info}
       IOLINK_LOG_MAX_MB: ${IOLINK_LOG_MAX_MB:-20}
       IOLINK_LOG_BACKUPS: ${IOLINK_LOG_BACKUPS:-5}
+      IOLINK_LOG_RETENTION: ${IOLINK_LOG_RETENTION:-6h}
+      IOLINK_LOG_CLEANUP_INTERVAL: ${IOLINK_LOG_CLEANUP_INTERVAL:-6h}
     healthcheck:
       test: ["CMD", "wget", "--spider", "--timeout=2", "http://127.0.0.1:8080/readyz"]
       interval: 10s

@@ -13,6 +13,7 @@ import (
 
 	"git.hyhy.fun/rsplab/iolink/internal/event"
 	"git.hyhy.fun/rsplab/iolink/internal/ingestion"
+	"git.hyhy.fun/rsplab/iolink/internal/observability"
 	"git.hyhy.fun/rsplab/iolink/internal/wire"
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/listeners"
@@ -20,6 +21,10 @@ import (
 )
 
 func (s *Server) HandleGenericReport(no string, raw map[string]json.RawMessage) error {
+	return s.handleGenericReport(no, raw, observability.NewIngestID())
+}
+
+func (s *Server) handleGenericReport(no string, raw map[string]json.RawMessage, ingestID string) error {
 	var messageID string
 	if value, ok := raw["message_id"]; ok {
 		if err := json.Unmarshal(value, &messageID); err != nil {
@@ -27,12 +32,12 @@ func (s *Server) HandleGenericReport(no string, raw map[string]json.RawMessage) 
 		}
 		delete(raw, "message_id")
 	}
-	e := event.Event{Kind: event.KindProperties, DeviceNo: no, MessageID: messageID, Ts: s.now().UTC(), GenericProperties: raw}
+	e := event.Event{IngestID: ingestID, Kind: event.KindProperties, DeviceNo: no, MessageID: messageID, Ts: s.now().UTC(), GenericProperties: raw}
 	if ss := s.lookup(no, false); ss != nil {
 		ss.mu.Lock()
 		if ss.client != nil {
 			ss.lastSeen = e.Ts
-			if err := s.transition(no, ss, true); err != nil {
+			if err := s.transitionWithIngestID(no, ss, true, ingestID); err != nil {
 				ss.mu.Unlock()
 				return err
 			}
@@ -120,6 +125,7 @@ func (s *Server) setDeviceFor(cl *mqtt.Client, no string) {
 	defer s.mu.Unlock()
 	s.deviceOf[cl] = no
 }
+
 func (s *Server) Serve() error {
 	if err := s.broker.AddHook(newBrokerHook(s), nil); err != nil {
 		return err
@@ -149,7 +155,11 @@ func (s *Server) CloseContext(ctx context.Context) error {
 }
 
 func (s *Server) HandleReport(no string, r wire.Report) error {
-	e := event.Event{Kind: event.KindProperties, DeviceNo: no, Ts: s.now().UTC(), Properties: map[string]float64{}}
+	return s.handleReport(no, r, observability.NewIngestID())
+}
+
+func (s *Server) handleReport(no string, r wire.Report, ingestID string) error {
+	e := event.Event{IngestID: ingestID, Kind: event.KindProperties, DeviceNo: no, Ts: s.now().UTC(), Properties: map[string]float64{}}
 	if r.MessageID != nil {
 		if !utf8.ValidString(*r.MessageID) || utf8.RuneCountInString(*r.MessageID) < 1 || utf8.RuneCountInString(*r.MessageID) > 128 {
 			return errors.New("invalid message_id")
@@ -169,7 +179,7 @@ func (s *Server) HandleReport(no string, r wire.Report) error {
 		if !ok || math.IsNaN(v) || math.IsInf(v, 0) || v < low || v > high {
 			delete(e.Properties, k)
 			MetricRejected.WithLabelValues("range").Inc()
-			s.log.Warn("field out of range", "device", no, "field", k)
+			s.log.Warn("field out of range", "device", no, "field", k, "ingest_id", ingestID, "stage", "mqtt_validation")
 		}
 	}
 	// Valid authenticated packets are heartbeats even when they contain no samples.
@@ -177,7 +187,7 @@ func (s *Server) HandleReport(no string, r wire.Report) error {
 		ss.mu.Lock()
 		if ss.client != nil {
 			ss.lastSeen = e.Ts
-			if err := s.transition(no, ss, true); err != nil {
+			if err := s.transitionWithIngestID(no, ss, true, ingestID); err != nil {
 				ss.mu.Unlock()
 				return err
 			}
@@ -196,10 +206,14 @@ func (s *Server) HandleReport(no string, r wire.Report) error {
 
 // All session transitions are synchronous and serialized: no lossy status queue.
 func (s *Server) transition(no string, ss *session, online bool) error {
+	return s.transitionWithIngestID(no, ss, online, observability.NewIngestID())
+}
+
+func (s *Server) transitionWithIngestID(no string, ss *session, online bool, ingestID string) error {
 	if ss.online == online && !online {
 		return nil
 	}
-	if err := s.handler.HandleEvent(event.Event{Kind: event.KindStatusChange, DeviceNo: no, Ts: s.now().UTC(), Online: online}); err != nil {
+	if err := s.handler.HandleEvent(event.Event{IngestID: ingestID, Kind: event.KindStatusChange, DeviceNo: no, Ts: s.now().UTC(), Online: online}); err != nil {
 		return err
 	}
 	ss.online = online
@@ -217,6 +231,7 @@ func (s *Server) lookup(no string, create bool) *session {
 	}
 	return ss
 }
+
 func (s *Server) connected(cl *mqtt.Client, password string) {
 	// Re-resolve at session establishment: the deviceOf mapping below drives
 	// every ACL decision for this connection, so it must not trust
@@ -279,6 +294,7 @@ func (s *Server) retireClient(old *mqtt.Client) {
 		old.Stop(packets.ErrSessionTakenOver)
 	}
 }
+
 func (s *Server) disconnected(cl *mqtt.Client) {
 	no, ok := s.deviceFor(cl)
 	s.mu.Lock()
@@ -301,6 +317,7 @@ func (s *Server) disconnected(cl *mqtt.Client) {
 		s.log.Error("offline persistence", "device", no, "err", err)
 	}
 }
+
 func (s *Server) isCurrent(cl *mqtt.Client) bool {
 	no, ok := s.deviceFor(cl)
 	if !ok {
@@ -323,6 +340,7 @@ func (s *Server) isCurrent(cl *mqtt.Client) bool {
 	}
 	return true
 }
+
 func (s *Server) sweep(now time.Time) {
 	s.mu.Lock()
 	snapshot := make(map[string]*session, len(s.sessions))
@@ -360,6 +378,7 @@ func (s *Server) sweep(now time.Time) {
 		})
 	}
 }
+
 func (s *Server) Run(ctx context.Context) {
 	t := time.NewTicker(time.Second)
 	defer t.Stop()

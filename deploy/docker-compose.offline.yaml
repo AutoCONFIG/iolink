@@ -33,6 +33,8 @@ services:
       IOLINK_REPORT_INTERVAL: ${IOLINK_REPORT_INTERVAL:-60}
       IOLINK_OFFLINE_GRACE: ${IOLINK_OFFLINE_GRACE:-3}
       IOLINK_LOG_DIR: /var/log/iolink
+      IOLINK_LOG_RETENTION: ${IOLINK_LOG_RETENTION:-6h}
+      IOLINK_LOG_CLEANUP_INTERVAL: ${IOLINK_LOG_CLEANUP_INTERVAL:-6h}
     volumes:
       - ./logs:/var/log/iolink
       - ../secrets:/run/iolink/secrets:ro

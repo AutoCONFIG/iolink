@@ -68,14 +68,14 @@ type tenantMembershipStore interface {
 type Server struct {
 	cfg  Config
 	deps Deps
-	wx   func(code string) (openID string, err error)
+	wx   func(context.Context, string) (string, error)
 	log  *slog.Logger
 }
 
 func New(cfg Config, deps Deps, log *slog.Logger) *Server {
-	s := &Server{cfg: cfg, deps: deps, wx: WechatExchanger, log: log}
+	s := &Server{cfg: cfg, deps: deps, wx: func(_ context.Context, code string) (string, error) { return WechatExchanger(code) }, log: log}
 	if cfg.Wechat.AppID != "" && cfg.Wechat.Secret != "" {
-		s.wx = RealWechatExchanger(cfg.Wechat)
+		s.wx = RealWechatExchangerContext(cfg.Wechat, log)
 	}
 	return s
 }
@@ -196,7 +196,7 @@ func (s *Server) login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	openID, err := s.wx(req.Code)
+	openID, err := s.wx(c.Request.Context(), req.Code)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wechat login failed"})
 		return

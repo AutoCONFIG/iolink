@@ -6,12 +6,13 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log/slog"
+	"time"
+
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/license"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"log/slog"
-	"time"
 )
 
 type LicenseRuntime struct {
@@ -96,19 +97,37 @@ func (s *Service) LicenseStatus(ctx context.Context) (license.Status, error) {
 	return status, nil
 }
 
-func (s *Service) checkDeviceAdmission(ctx context.Context, tx pgx.Tx) error {
+func (s *Service) checkDeviceAdmission(ctx context.Context, tx pgx.Tx) (resultErr error) {
+	operation := "verifier"
+	started := time.Now()
+	defer func() {
+		if s.log == nil {
+			return
+		}
+		outcome := "accepted"
+		attrs := []any{"stage", "license", "operation", operation, "duration_ms", time.Since(started).Milliseconds()}
+		if resultErr != nil {
+			outcome = "rejected"
+			attrs = append(attrs, "err", resultErr)
+		}
+		attrs = append(attrs, "outcome", outcome)
+		s.log.DebugContext(ctx, "device admission completed", attrs...)
+	}()
 	if s.license == nil {
 		return license.ErrUnavailable
 	}
 	if s.license.PublicKey == nil || s.license.KeyID == "" {
 		return license.ErrUnavailable
 	}
+	operation = "license_lock"
 	if err := lockLicenseState(ctx, tx); err != nil {
 		return err
 	}
+	operation = "license_clock"
 	if err := checkLicenseClock(ctx, tx); err != nil {
 		return err
 	}
+	operation = "license_state"
 	var deployment string
 	if err := tx.QueryRow(ctx, `SELECT deployment_id FROM deployment_config WHERE singleton=TRUE`).Scan(&deployment); err != nil {
 		return fmt.Errorf("license deployment: %w", err)
@@ -121,14 +140,17 @@ func (s *Service) checkDeviceAdmission(ctx context.Context, tx pgx.Tx) error {
 		}
 		return fmt.Errorf("license state: %w", err)
 	}
+	operation = "license_verification"
 	verified, err := license.Verify(license.Envelope{PayloadB64: base64.StdEncoding.EncodeToString(payloadRaw), SignatureB64: base64.StdEncoding.EncodeToString(signature)}, s.license.PublicKey)
 	if err != nil || verified.SHA256 != payloadSHA || verified.Payload.KeyID != s.license.KeyID {
 		return license.ErrRequired
 	}
+	operation = "license_validity"
 	state := license.Evaluate(verified.Payload, deployment, time.Now().UTC(), time.Time{}, false)
 	if state != license.StateValid && state != license.StatePermanent {
 		return license.ErrRequired
 	}
+	operation = "device_quota"
 	var used int64
 	if err := tx.QueryRow(ctx, `SELECT count(*) FROM devices WHERE disabled_at IS NULL`).Scan(&used); err != nil {
 		return fmt.Errorf("license device count: %w", err)

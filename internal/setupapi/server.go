@@ -55,7 +55,7 @@ func (s *Server) required(w http.ResponseWriter, r *http.Request) (bool, bool) {
 	defer cancel()
 	required, err := s.store.Required(ctx)
 	if err != nil {
-		s.logger.Error("bootstrap state unavailable", "stage", "setup", "err", err)
+		s.logger.ErrorContext(ctx, "bootstrap state unavailable", "stage", "setup", "err", err)
 		writeJSON(w, http.StatusServiceUnavailable, map[string]string{"error": "初始化状态暂不可用，请重试"})
 		return false, false
 	}
@@ -119,7 +119,7 @@ func (s *Server) initialize(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, domain.ErrBootstrapInitialized):
 			writeJSON(w, http.StatusConflict, map[string]string{"error": "系统已初始化，请登录"})
 		default:
-			s.logger.Error("bootstrap initialization failed", "stage", "setup", "err", err)
+			s.logger.ErrorContext(ctx, "bootstrap initialization failed", "stage", "setup", "err", err)
 			writeJSON(w, http.StatusServiceUnavailable, map[string]string{"error": "初始化失败，请检查数据库状态后重试"})
 		}
 		return

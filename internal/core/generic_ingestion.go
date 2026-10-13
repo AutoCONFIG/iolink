@@ -12,14 +12,14 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (s *Service) storeGenericReading(e event.Event) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (s *Service) storeGenericReading(ctx context.Context, e event.Event) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(context.WithoutCancel(ctx))
 	if e.MessageID != "" {
 		if _, err = tx.Exec(ctx, `DELETE FROM ingest_messages WHERE received_at <= now()-interval '24 hours'`); err != nil {
 			return err
@@ -29,6 +29,7 @@ func (s *Service) storeGenericReading(e event.Event) error {
 			return dedupErr
 		}
 		if ct.RowsAffected() == 0 {
+			s.log.DebugContext(ctx, "event deduplicated", "stage", "deduplication", "outcome", "duplicate")
 			return tx.Commit(ctx)
 		}
 	}
@@ -46,6 +47,7 @@ func (s *Service) storeGenericReading(e event.Event) error {
 		return err
 	}
 	accepted, rejected := domain.ValidateTelemetryProperties(schema.Fields, e.GenericProperties)
+	s.log.DebugContext(ctx, "model validation completed", "stage", "model_validation", "accepted_count", len(accepted), "rejected_count", len(rejected))
 	if len(rejected) > 0 || len(accepted) == 0 {
 		return domain.ErrInvalidProductModel
 	}
@@ -79,6 +81,7 @@ func (s *Service) storeGenericReading(e event.Event) error {
 	if err = tx.Commit(ctx); err != nil {
 		return err
 	}
+	s.log.DebugContext(ctx, "telemetry transaction committed", "stage", "persistence", "outcome", "committed", "count", len(alarms))
 	MetricTelemetryTotal.Inc()
 	for range alarms {
 		MetricAlarmsTotal.Inc()

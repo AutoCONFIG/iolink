@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"sync"
@@ -27,6 +28,7 @@ type Config struct {
 	TokenURL     string
 	SendURL      string
 	Now          func() time.Time
+	Logger       *slog.Logger
 }
 
 type Sender struct {
@@ -36,6 +38,7 @@ type Sender struct {
 	http                                *http.Client
 	tokenURL, sendURL                   string
 	now                                 func() time.Time
+	logger                              *slog.Logger
 	mu                                  sync.Mutex
 	token                               string
 	expires                             time.Time
@@ -66,7 +69,10 @@ func NewSender(cfg Config) *Sender {
 	if cfg.Now == nil {
 		cfg.Now = time.Now
 	}
-	return &Sender{appID: cfg.AppID, secret: cfg.Secret, templateID: cfg.TemplateID, page: cfg.Page, messageField: cfg.MessageField, valueField: cfg.ValueField, timeField: cfg.TimeField, invalidMapping: cfg.MessageField == cfg.ValueField || cfg.MessageField == cfg.TimeField || cfg.ValueField == cfg.TimeField, http: cfg.HTTP, tokenURL: cfg.TokenURL, sendURL: cfg.SendURL, now: cfg.Now}
+	if cfg.Logger == nil {
+		cfg.Logger = slog.New(slog.NewJSONHandler(io.Discard, nil))
+	}
+	return &Sender{appID: cfg.AppID, secret: cfg.Secret, templateID: cfg.TemplateID, page: cfg.Page, messageField: cfg.MessageField, valueField: cfg.ValueField, timeField: cfg.TimeField, invalidMapping: cfg.MessageField == cfg.ValueField || cfg.MessageField == cfg.TimeField || cfg.ValueField == cfg.TimeField, http: cfg.HTTP, tokenURL: cfg.TokenURL, sendURL: cfg.SendURL, now: cfg.Now, logger: cfg.Logger}
 }
 
 func (s *Sender) Send(ctx context.Context, d notifications.Delivery) error {
@@ -98,11 +104,14 @@ func (s *Sender) Send(ctx context.Context, d notifications.Delivery) error {
 
 var errTokenExpired = errors.New("wechat access token expired")
 
-func (s *Sender) accessToken(ctx context.Context) (string, error) {
+func (s *Sender) accessToken(ctx context.Context) (_ string, err error) {
+	trace := s.startTrace(ctx, "access_token")
+	defer func() { trace.complete(s.logger, err) }()
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	now := s.now()
 	if s.token != "" && now.Before(s.expires) {
+		trace.outcome = "cache_hit"
 		return s.token, nil
 	}
 	u := s.tokenURL + "?grant_type=client_credential&appid=" + urlQuery(s.appID) + "&secret=" + urlQuery(s.secret)
@@ -112,8 +121,10 @@ func (s *Sender) accessToken(ctx context.Context) (string, error) {
 	}
 	resp, err := s.http.Do(req)
 	if err != nil {
+		trace.errorCode = transportErrorCode(err)
 		return "", fmt.Errorf("%w: token request failed", notifications.ErrRetryable)
 	}
+	trace.status = resp.StatusCode
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return "", classifyHTTPStatus(resp.StatusCode)
@@ -152,7 +163,9 @@ func (s *Sender) invalidate(token string) {
 	}
 }
 
-func (s *Sender) sendWithToken(ctx context.Context, token string, d notifications.Delivery) error {
+func (s *Sender) sendWithToken(ctx context.Context, token string, d notifications.Delivery) (err error) {
+	trace := s.startTrace(ctx, "subscribe_send")
+	defer func() { trace.complete(s.logger, err) }()
 	payload := map[string]any{
 		"touser": d.RecipientID, "template_id": s.templateID, "page": s.page,
 		"data": map[string]any{
@@ -172,8 +185,10 @@ func (s *Sender) sendWithToken(ctx context.Context, token string, d notification
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := s.http.Do(req)
 	if err != nil {
+		trace.errorCode = transportErrorCode(err)
 		return fmt.Errorf("%w: send transport failed", notifications.ErrUnknown)
 	}
+	trace.status = resp.StatusCode
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		return classifyHTTPStatus(resp.StatusCode)

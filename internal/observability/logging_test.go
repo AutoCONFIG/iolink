@@ -22,15 +22,18 @@ func TestStructuredFileLoggingLevelsAndRedaction(t *testing.T) {
 	if err := sink.Close(); err != nil {
 		t.Fatal(err)
 	}
-	raw, err := os.ReadFile(filepath.Join(dir, "iolinkd.jsonl"))
+	raw, err := os.ReadFile(filepath.Join(dir, "dev", "iolinkd.jsonl"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	text := string(raw)
-	for _, forbidden := range []string{"hidden", "jwt-value", "pw-value", "pond-device-7", "payload-secret", "mqtt-secret", "client-secret"} {
+	for _, forbidden := range []string{"jwt-value", "pw-value", "pond-device-7", "payload-secret", "mqtt-secret", "client-secret"} {
 		if strings.Contains(text, forbidden) {
 			t.Fatalf("sensitive or debug value leaked: %q", forbidden)
 		}
+	}
+	if !strings.Contains(text, `"msg":"hidden"`) || strings.Contains(stderr.String(), `"msg":"hidden"`) {
+		t.Fatal("debug dump and console level are not independent")
 	}
 	if !strings.Contains(text, `"msg":"visible"`) || !strings.Contains(text, "device_hash") {
 		t.Fatalf("structured event missing: %s", text)
@@ -43,18 +46,27 @@ func TestStructuredFileLoggingRotates(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for i := 0; i < 30000; i++ {
-		logger.Debug("event", "fields", strings.Repeat("x", 100))
+	for i := 0; i < 40000; i++ {
+		logger.Debug("event", "count", i)
 	}
 	if err := sink.Close(); err != nil {
 		t.Fatal(err)
 	}
-	entries, err := os.ReadDir(dir)
+	entries, err := os.ReadDir(filepath.Join(dir, "dev"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(entries) < 2 {
-		t.Fatalf("rotation missing; files=%v", entries)
+	if len(entries) < 2 || len(entries) > 3 {
+		t.Fatalf("rotation missing or backup cap exceeded; files=%v", entries)
+	}
+	for _, entry := range entries {
+		if !diagnosticFile(entry.Name()) {
+			t.Fatal("unexpected rotated filename", entry.Name())
+		}
+		info, err := entry.Info()
+		if err != nil || info.Mode().Perm() != 0o600 {
+			t.Fatal("rotation permissions", info, err)
+		}
 	}
 }
 
