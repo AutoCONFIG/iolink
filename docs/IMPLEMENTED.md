@@ -63,7 +63,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | S2b | 既有GB目录日期测试修复与全库回归闭环 | 已完成已核验 | 提交 `69a7631`、tree `52c1266` 两位未参与编辑者同快照 APPROVE；发布 v0.0.32。旧固定日期夹具11项失败已复现，改为运行时起点后原断言11项全部通过；冻结快照真实专属 Timescale `make verify` build/vet/race通过（33个有测试包），目录PG存储7项无SKIP通过，96 operations / 568契约fixtures通过；[证据与双审](evidence/deployment/2026-10-13-gbcatalog-validation/README.md)。关闭S2a历史全库失败限制；专属测试容器与卷已清理。浏览器由用户验收，微信/硬件/License交付仍不计通过，M7a/M8进度不变 |
 | S4 | 空库自动建表、Web 首启初始化和业务 API 门禁 | 已完成已核验 | 根源码 `360bc87` / web `b340cae` 同候选两位独立审阅者 APPROVE；真实隔离 Timescale、并发/回滚/非法输入、Go 全库、契约、前端 52 测试/类型检查/构建及 Docker 首启通过，修订后实际 Vite 代理已核验；web 已推送远端；浏览器由用户验收；[证据与双审](evidence/deployment/2026-10-08-web-setup/README.md) |
 | V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 正在进行 | [首批对账](evidence/rebuild/reconciliation/2026-10-13/README.md)已核对TODO3、D01–D11、M6b `.a`，归档历史收据并保留源绑定缺口；TODO3/M5候选摘要补证、子项门禁语义及其余Rxx旧表仍待核验，不批量改passed |
-| V1a | 首批历史收据归档、范围说明和陈旧状态引用校正 | 已完成待核验 | 仅对账文档，未重新验收业务代码；M6b source/candidate/web及两审一致，R36/R37整体仍not_run以保留未来 `.b`；TODO3/M5缺少明确源绑定的部分如实登记；本轮冻结快照独立双审待收据归档 |
+| V1a | 首批历史收据归档、范围说明和陈旧状态引用校正 | 已完成已核验 | 文档提交 `5dedd0f` / tree `751f8ff` 获两位未参与编辑者同快照 APPROVE；[核对与双审](evidence/rebuild/reconciliation/2026-10-13/README.md)。8份原文归档、92本地引用、55需求静态检查及96 operations / 568契约fixtures核对通过；仅对账文档，未重新验收业务代码。R36/R37整体仍not_run；TODO3/M5源绑定缺口与门禁子项语义问题保留，V1/D14未整体关闭 |
 | V2 | 微信真实登录、订阅、通知及用户归属流程 | 已完成待核验 | 仅指已有服务端/适配器及接口演示软件；真实凭据、资质、用户/真机为 external_blocked；TODO 8软件演示完成不代替真实微信验收 |
 | V3 | 实际签发方License导入/续期与客户离线安装 | 已完成待核验 | 已有工具/软件链；真实签发方、干净断网x86_64客户主机30分钟安装及ARM64证据待提供 |
 | V4 | 公网TLS/网络暴露、100GiB恢复、发布中断、长时容量 | 已完成待核验 | 已有脚本/模板/软件烟测；真实主机、证书、恢复介质及24小时500设备/90天fixture演练为 external_blocked |
