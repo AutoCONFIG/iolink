@@ -1,12 +1,14 @@
 # 当前实现状态与证据
 
-## TODO 总览（2026-10-08 核对）
+## TODO 总览（主阶段统计沿用2026-10-08，补充对账2026-10-13）
 
 当前推进位置：**S7 权限页面已发布 v0.0.18；TODO 11a / M7a 的领域、凭据加密、013 存储与保留历史删除基础已发布 v0.0.19，摄像机管理已发布 v0.0.20，媒体/ZLM 安全边界与播放编排 seam 已发布 v0.0.21，HTTP/HLS 媒体接缝与 GB28181 协议核心已发布 v0.0.22，RTP/RTCP 端口对分配器已发布 v0.0.23，GB 目录刷新与 PostgreSQL 持久化已发布 v0.0.24，媒体作业 lease/CAS seam 已发布 v0.0.25，PostgreSQL 媒体播放持久化与停止/重试围栏已发布 v0.0.26，RTSP DNS/CIDR/端口 pinning 与 GB transport identity 边界已发布 v0.0.27，GB PostgreSQL 注册持久化已发布 v0.0.28**。TODO 8 / M4 接口演示已经闭环；按用户范围，正式小程序由专人开发。
 源码 `2b66812fd0d6e64609c1bc3fccbccccf71a4f99d` 已获两位独立审阅者同快照 APPROVE；[证据](evidence/M4/2026-10-08/README.md)覆盖 39 项测试、真实数据库后端和浏览器演示。发布快照 `036523d` 亦获同两位审阅者批准，已推送 `main` 与 `v0.0.11`，tag CI 镜像构建发布成功；[发布收据](evidence/M4/2026-10-08/release.md)。
 **主清单 20 项：13 项已完成已核验，剩 7 项（M7a、M7b、M8a–M8d、R55）**；补充对账与外部验收另列。
 M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、web `66c52624f6d97c9dd7fe29b05b64b3db39c4a72d` 的阶段证据保留。
 外部微信、硬件、生产 License 和客户安装仍按 `external_blocked` 记录。
+
+当前处于已有功能验证阶段：S2a/S2b诊断增强与回归、D18输入边界已分别发布v0.0.31–v0.0.33；V1历史证据正在逐项核对。主阶段13/20的软件范围计数没有因证据整理增加。
 
 本节是对已有证据的状态整理，不是重新运行验收。下方旧表、计划勾选和历史证据
 中的待审措辞存在滞后；有冲突时使用本节列出的范围和最终收据定位，不将旧勾选
@@ -26,7 +28,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 |---|---|---|---|
 | TODO 1 | 项目指南、范围冻结、provider/验收映射 | 已完成已核验 | 指南与静态检查范围；[证据](evidence/rebuild/foundation-guidance.txt)，收据 `.omo/evidence/todo1-review-e-code-review.md`、`todo1-gate-review-c.md`；不代表 R01/R02 全部发布验收通过 |
 | TODO 2 | 领域规则、窄 ports、依赖边界与不变量 | 已完成已核验 | [证据](evidence/rebuild/contracts.txt)，收据 `.omo/evidence/todo2-review-f-code-review.md`、`todo2-gate-review-e.md` |
-| TODO 3 / M0 | PostgreSQL/Timescale 底座、迁移、事务、审计 | 已完成已核验 | 历史最终软件候选双审批准；[证据](evidence/rebuild/postgres-timescale.txt)，收据 `.omo/evidence/todo3-final-code-review-v3.md`、`todo3-final-gate-review-v3.md`；旧计划未勾选须对账 |
+| TODO 3 / M0 | PostgreSQL/Timescale 底座、迁移、事务、审计 | 已完成已核验 | 历史冻结共享工作树的软件双审记录；[实现证据](evidence/rebuild/postgres-timescale.txt)、[归档收据及限制](evidence/rebuild/reconciliation/2026-10-13/README.md)。代码收据有601a1183摘要，门审未显式重复摘要；不补造commit绑定，不将历史计划未勾选当作当前状态，源绑定补证仍属V1 |
 | TODO 4 / M1 | MQTT 身份/ACL、采集、影子、历史、报警与 outbox | 已完成已核验 | 真实 DB/MQTT 软件链；[证据](evidence/rebuild/mqtt-ingestion.txt)，双审 `.omo/evidence/todo4-independent-{code,gate}-review.md`，同 manifest `d0dc8a9c…`；真实硬件另验 |
 | TODO 5 / M2 | 登录、归属转移、资源 API 与授权 | 已完成已核验 | [证据](evidence/rebuild/ownership-api.txt)，双审 `.omo/evidence/todo5-independent-{code,gate}-review.md`，同 manifest `c4a1c98e…`；微信真实用户流程另验 |
 | TODO 6 | 通知事务意图、持久 outbox、重试/租约与微信适配器 | 已完成已核验 | 软件范围；[证据](evidence/rebuild/notifications.txt)，双审 `.omo/evidence/todo6-independent-{code,gate}-review.md`，同 manifest `ef5bf5cf…`；微信实发另验 |
@@ -60,7 +62,8 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | S2a | Debug dump 多阶段关联、下游诊断、版本目录与定时保留 | 已完成已核验 | 实现提交 `a7335a2`、tree `2bd5fd8` 获两位未参与编辑者同快照 APPROVE；发布 v0.0.31。HTTP/MQTT/数据库、License准入与通知/微信安全关联诊断，`logs/{version}`，默认启动及每6小时按记录时间清除6小时前数据；文件保存 debug、stderr 独立级别。真实 Timescale/MQTT、本地微信HTTP、文件/并发/失败边界与实际服务启动通过；[证据与双审](evidence/deployment/2026-10-13-debug-dump/README.md)。全库 build/vet通过，race仍有既有 gbcatalog 固定日期的11项失败，未称全库全绿；专属测试容器已清理。外部微信/硬件及 License交付专项仍未验收，M7a/M8进度不变 |
 | S2b | 既有GB目录日期测试修复与全库回归闭环 | 已完成已核验 | 提交 `69a7631`、tree `52c1266` 两位未参与编辑者同快照 APPROVE；发布 v0.0.32。旧固定日期夹具11项失败已复现，改为运行时起点后原断言11项全部通过；冻结快照真实专属 Timescale `make verify` build/vet/race通过（33个有测试包），目录PG存储7项无SKIP通过，96 operations / 568契约fixtures通过；[证据与双审](evidence/deployment/2026-10-13-gbcatalog-validation/README.md)。关闭S2a历史全库失败限制；专属测试容器与卷已清理。浏览器由用户验收，微信/硬件/License交付仍不计通过，M7a/M8进度不变 |
 | S4 | 空库自动建表、Web 首启初始化和业务 API 门禁 | 已完成已核验 | 根源码 `360bc87` / web `b340cae` 同候选两位独立审阅者 APPROVE；真实隔离 Timescale、并发/回滚/非法输入、Go 全库、契约、前端 52 测试/类型检查/构建及 Docker 首启通过，修订后实际 Vite 代理已核验；web 已推送远端；浏览器由用户验收；[证据与双审](evidence/deployment/2026-10-08-web-setup/README.md) |
-| V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 已完成待核验 | 实现/历史批准已存在，文档同步尚未完整核对：TODO 3旧计划未勾、R36/R37及旧 Dxx逐项核对；TODO 8历史拒绝已由 `2b66812` 新同快照双审闭环；不得直接批量改 passed |
+| V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 正在进行 | [首批对账](evidence/rebuild/reconciliation/2026-10-13/README.md)已核对TODO3、D01–D11、M6b `.a`，归档历史收据并保留源绑定缺口；TODO3/M5候选摘要补证、子项门禁语义及其余Rxx旧表仍待核验，不批量改passed |
+| V1a | 首批历史收据归档、范围说明和陈旧状态引用校正 | 已完成待核验 | 仅对账文档，未重新验收业务代码；M6b source/candidate/web及两审一致，R36/R37整体仍not_run以保留未来 `.b`；TODO3/M5缺少明确源绑定的部分如实登记；本轮冻结快照独立双审待收据归档 |
 | V2 | 微信真实登录、订阅、通知及用户归属流程 | 已完成待核验 | 仅指已有服务端/适配器及接口演示软件；真实凭据、资质、用户/真机为 external_blocked；TODO 8软件演示完成不代替真实微信验收 |
 | V3 | 实际签发方License导入/续期与客户离线安装 | 已完成待核验 | 已有工具/软件链；真实签发方、干净断网x86_64客户主机30分钟安装及ARM64证据待提供 |
 | V4 | 公网TLS/网络暴露、100GiB恢复、发布中断、长时容量 | 已完成待核验 | 已有脚本/模板/软件烟测；真实主机、证书、恢复介质及24小时500设备/90天fixture演练为 external_blocked |
@@ -69,15 +72,19 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | X1 | R36.b/R37.b/R39.b 后续资源权限、执行撤权和License复验 | 待完成已调研 | 跨阶段规则已明确；Key/播放/命令/jobs/下载的真实入口按 M6d–M8d分别实现验收 |
 | S3 | Redis 类缓存引入调研 | 待完成已调研 | 仅形成候选用途、窄 port、故障语义和验证门槛；当前未引入 Redis 依赖、容器或生产配置；[调研记录](research/redis-cache-evaluation.md)；不阻塞 M6d |
 | D12/D13/D15/D16/D17 | 平台owner边界、遥测角色、支持到期时区/精度、租户管理员资源范围 | 已完成已核验 | 已纳入 M6b `0335438` 同候选批准；[gate](evidence/rebuild/gates/M6b.json)明确列出 fixed_defects；旧计划未勾需同步 |
-| D14 | M6b证据归档与同快照批准绑定 | 已完成待核验 | gate和批准文件已存在，但manifest及旧表仍不同步；纳入 V1，完成对账后关闭 |
+| D14 | M6b证据归档与同快照批准绑定 | 已完成待核验 | 已核对 `.a` 的source ef6510f/candidate0335438/web e840923与两审一致，并补齐旧README与manifest范围说明；整体R36/R37含未来 `.b` 仍not_run，现门禁CLI无法表达该分阶段范围且成功分支会重写gate元数据；工具语义与完整范围仍纳入V1，未整体关闭 |
 | D18 | 新组织创建接口严格JSON单对象校验 | 已完成已核验 | 提交 `eed35d5` / tree `8e85609` 两位未参与编辑者同最终快照 APPROVE，发布v0.0.33。仅允许name:string单对象，额外字段、尾随JSON与非法形状返回400且无组织/审计写入；保留正常创建、403/409与事务回滚。原生服务curl、真实HTTP/Timescale race、全库33测试包build/vet/race、96 operations / 568契约fixtures通过；审阅后测试输入加强，旧handler和移除闭合key校验均使最终用例失败；[证据与双审](evidence/deployment/2026-10-13-tenant-json/README.md)。测试容器/卷已清理，浏览器与外部验收仍另列，不宣称全部实时handler契约通过 |
-| D01–D11 | 历史构建/迁移/API/报警/通知/运维缺陷登记 | 已完成待核验 | 多项已有阶段修复与批准；逐项核对最终关闭证据，适用外部部分保留阻塞；不沿用旧表来推断当前代码缺陷 |
+| D01–D11 | 历史构建/迁移/API/报警/通知/运维缺陷登记 | 正在进行 | 已逐项追溯M0/M1、TODO5/6/9软件证据，见V1a；D03–D07/D09已有后继软件收据，D08/D11的M5候选摘要缺口保留；D01 tag镜像CI已执行但远端测试job不计通过，D10/D11真实环境仍阻塞；不从旧“待M2”文字推断当前未实现 |
 | F1 | 全量范围、Rxx归属、provider与证据追溯审计 | 待完成未调研 | TODO 13最终发布快照审计，现有manifest检查不代替该轮核验 |
 | F2 | 最终架构/代码质量、安全与依赖边界审计 | 待完成未调研 | TODO 13，待全部功能完成后冻结候选执行 |
 | F3 | 最终完整软件/真实链路/前端及适用外部QA | 待完成未调研 | TODO 13，必须重新绑定最终版本，不能拼接不同版本的passed |
 | F4 | 最终范围、发布产物、手册与恢复流程一致性审计 | 待完成未调研 | TODO 13，和F1–F3汇总至R55；适用外部未通过不能称全部完成 |
 
 当前按用户最新范围优先测试、修复已有功能与 V1 历史证据对账；M7a/M8 后续新功能暂缓。微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
+
+## 历史基线记录（非当前实施状态）
+
+以下保留较早阶段的原始叙述和部分状态表；当时的“待M2/待双审/远程CI未执行”不表示当前结论。当前状态使用上方主清单、补充项及对应后继收据，首批来源对账见V1a。历史记录不继承为当前版本的测试结果。
 
 附加部署里程碑：统一服务器 `deploy/docker-compose.yaml` 与源码构建覆盖
 `deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，并发布至 v0.0.6；用户明确免除该配置变更的双审。

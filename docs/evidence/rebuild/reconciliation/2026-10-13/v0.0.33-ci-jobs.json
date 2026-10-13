@@ -1,0 +1,20 @@
+[
+  {
+    "name": "build-image",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/AutoCONFIG/iolink/actions/runs/38410342151/job/115340679974"
+  },
+  {
+    "name": "integration",
+    "status": "completed",
+    "conclusion": "skipped",
+    "html_url": "https://github.com/AutoCONFIG/iolink/actions/runs/38410342151/job/115340681959"
+  },
+  {
+    "name": "build",
+    "status": "completed",
+    "conclusion": "skipped",
+    "html_url": "https://github.com/AutoCONFIG/iolink/actions/runs/38410342151/job/115340682238"
+  }
+]

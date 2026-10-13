@@ -1,6 +1,6 @@
 # M6b independent review history
 
-Latest review status: pending. No earlier approval is reused after source changes or the platform-admin owner fix.
+Latest recorded review: R36.a/R37.a APPROVE on `03354381b5954087d82d0d3f807cad9993b94b8d`, with executable source `ef6510ffa5e43fd9796352ae324e09dfc3820c68` and web `e84092326d9979e066c611e2be8eb6b9736e09f3`. See [final verification and two approvals](2026-10-04-version-revocation/README.md). Future R36.b/R37.b and current full-release acceptance remain unverified. Entries below preserve the review state at their recorded dates.
 
 ## 2026-09-30, before Casbin correction
 
@@ -43,7 +43,7 @@ These two approvals referred to the pre-fix final worktree. They are stale/rejec
 - Snapshot reviewed: `764c5eb01dcbee0d015bf7153ded74f3881ba07f`.
 - `/root/m6b_review_764_retry1`: REQUEST_CHANGES. Evidence in `.omo/evidence/m6b-review-764-retry1-viewer-repro.log` shows owner and viewer `POST /api/v2/devices/review-device/telemetry` both returned HTTP 202; viewer increased telemetry rows from 1 to 2 and changed shadow temperature from the owner control value 20 to 25.
 - `/root/m6b_review_764_a` and `/root/m6b_review_764_b`: inconclusive because API returned 429; neither is an approval.
-- Current state: D13 is open. R36/R37 software status is pending (`not_run` in the requirement manifest); previous approvals and prior passing checks remain historical evidence for their own source snapshots only. M6b gate is pending until D13 is fixed, fresh relevant verification completes, and two independent reviewers approve the same exact post-fix snapshot.
+- State at this review date: D13 was open and M6b was pending. This was superseded by the fixes and final R36.a/R37.a receipt above; earlier approvals and checks remain evidence only for their own snapshots. Overall R36/R37 still retain not_run for future `.b` scope.
 
 ## 2026-10-03 D15 support-expiry timezone fix
 
@@ -56,3 +56,9 @@ These two approvals referred to the pre-fix final worktree. They are stale/rejec
 - D16 fix: web `e84092326d9979e066c611e2be8eb6b9736e09f3`, assembled in parent `8197c590dfaa1eb1bdd3b7c7606f5b95c05896da`; evidence in [`../../rebuild/M6b-D16/`](../../rebuild/M6b-D16/).
 - D17 fix: `62acecee62160d48efcd48f0e161a927ad583ef6`, integrated as `a96b234`; evidence in [`2026-10-03-d17-app-scope/`](2026-10-03-d17-app-scope/).
 - Fresh verification and review of the combined candidate are pending. No current software-gate pass is claimed.
+
+## 2026-10-04 final source-bound approvals
+
+- Executable source: `ef6510ffa5e43fd9796352ae324e09dfc3820c68`; candidate: `03354381b5954087d82d0d3f807cad9993b94b8d`; web: `e84092326d9979e066c611e2be8eb6b9736e09f3`.
+- [Code review](2026-10-04-version-revocation/code-review-approve.md) and [gate review](2026-10-04-version-revocation/gate-review-approve.md) independently approve that candidate. [Verification metadata](2026-10-04-version-revocation/verification.json) records commands against the executable source; the candidate differs in documentation only as recorded by the reviews.
+- Historical M6b gate covers R36.a/R37.a and fixes D12/D13/D15/D16/D17. R36.b/R37.b future resources are deferred; this receipt does not certify later edits or full delivery.

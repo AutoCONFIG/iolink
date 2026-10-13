@@ -1,12 +1,18 @@
 # R36 M6b tenant isolation evidence
 
+## Latest recorded acceptance
+
+R36.a software scope was approved on candidate `03354381b5954087d82d0d3f807cad9993b94b8d`, executable source `ef6510ffa5e43fd9796352ae324e09dfc3820c68`, web `e84092326d9979e066c611e2be8eb6b9736e09f3`: [source-bound verification and two independent approvals](../R37/2026-10-04-version-revocation/README.md). R36.b future resources remain unverified; the whole-requirement manifest retains `not_run`. This is a historical acceptance receipt, not a new test run or current full release acceptance.
+
+## Historical assembly record
+
 Date: 2026-10-03 (candidate assembly; earlier transcripts retained)
 
 Environment: dedicated Docker container `iolink-todo9-pg`; PostgreSQL/Timescale DSN supplied through the environment and redacted from evidence. No production data or external service credentials were used.
 
 ## Historical checks and captured output
 
-Raw historical command transcript: [`commands.txt`](commands.txt). Counts below belong to that earlier snapshot; final candidate verification and double review are pending. D17 app scope evidence is in [`../R37/2026-10-03-d17-app-scope/`](../R37/2026-10-03-d17-app-scope/).
+Raw historical command transcript: [`commands.txt`](commands.txt). Counts below belong to that earlier snapshot; verification and double review were pending at assembly time and were later completed for R36.a at the receipt above. D17 app scope evidence is in [`../R37/2026-10-03-d17-app-scope/`](../R37/2026-10-03-d17-app-scope/).
 
 ```text
 $ IOLINK_TEST_PG_DSN="$IOLINK_TEST_PG_DSN" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1
@@ -48,4 +54,4 @@ External hardware, public MQTT exposure and production migration are not claimed
 - Dependencies: Go 1.26.8; PostgreSQL/Timescale image `timescale/timescaledb@sha256:75d58b53f3337a6babd3a1cce5e503f2300bdede62dd7d743651deb1a95b6d76`; Node v24.21.0; npm 11.19.0; Playwright 1.63.0.
 - Test data: isolated migrations create default tenant; M6b fixture uses tenants 601/602, users 601/603/604/605, farms 601/602, farm assignment 603→601, revoked user 605, and cross-tenant alarm/device rows.
 - Browser artifacts: `.omo/evidence/todo10-m6a-products-created.png`, `.omo/evidence/todo10-m6a-products-model-draft.png`, `.omo/evidence/todo10-m6a-products-published-assigned.png` and the tenant-page screenshots emitted by `web/e2e/admin-pages.spec.ts`.
-- Review state: pending final assembled-candidate verification and fresh independent double review. D13 telemetry authorization and D15/D16 support-expiry fixes are recorded in shared R37 evidence. Earlier approvals are stale after source changes. Future R36.b resources and external inputs remain deferred by the acceptance matrix.
+- Historical review state at this assembly: pending final verification and fresh double review. The later R36.a receipt above supersedes that pending state and includes D13/D15/D16/D17 fixes. Earlier rejected/stale approvals remain historical; future R36.b resources and external inputs remain deferred.

@@ -1,6 +1,6 @@
 schema_version: 1
 source: docs/ACCEPTANCE.md
-status_semantics: "not_run means verification has not been evidenced; planned commands are not results"
+status_semantics: "not_run means complete verification of the row has not been evidenced; narrower historical scope is recorded in scope_note; planned commands are not results"
 gate_scope:
   M0: [R01, R03, R04]
   M5: [R28, R29, R30, R31, R32, R33]
@@ -44,8 +44,8 @@ provider_operations:
   - {id: R33, provider: postgres-timescale, operation: capacity_test, required_level: L3, status: passed, command: "make capacity", evidence_path: docs/evidence/rebuild/m5-operations.txt}
   - {id: R34, provider: postgres-timescale, operation: product_models, required_level: L4, status: passed, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R34/README.md}
   - {id: R35, provider: postgres-timescale, operation: compatibility_projection, required_level: L4, status: passed, command: "IOLINK_TEST_PG_DSN=... go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R35/README.md}
-  - {id: R36, provider: postgres-timescale, operation: tenant_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R36/README.md}
-  - {id: R37, provider: postgres-timescale, operation: rbac_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R37/README.md}
+  - {id: R36, provider: postgres-timescale, operation: tenant_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R36/README.md, scope_note: "R36.a historical software APPROVE on 03354381b5954087d82d0d3f807cad9993b94b8d; R36.b future resources not verified; see docs/evidence/acceptance/R37/2026-10-04-version-revocation/README.md. Whole row remains not_run."}
+  - {id: R37, provider: postgres-timescale, operation: rbac_isolation, required_level: L4, status: not_run, command: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1", evidence_path: docs/evidence/acceptance/R37/README.md, scope_note: "R37.a historical software APPROVE on 03354381b5954087d82d0d3f807cad9993b94b8d; R37.b future resources not verified; see docs/evidence/acceptance/R37/2026-10-04-version-revocation/README.md. Whole row remains not_run."}
   - {id: R38, provider: [postgres-timescale, embedded-http], operation: license_verification, required_level: L4, status: passed, command: "go test -race -shuffle=on ./internal/license ./internal/core ./internal/adminapi ./cmd/license-sign ./cmd/iolinkd -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
   - {id: R39, provider: [postgres-timescale, embedded-http], operation: feature_quota_guards_R39a, required_level: L4, status: passed, command: "go test -race -shuffle=on ./internal/core -count=1", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
   - {id: R40, provider: [postgres-timescale, embedded-http], operation: offline_install, required_level: L4, status: external_blocked, command: "sh scripts/build-offline-bundle.sh .tmp/offline-bundle; .tmp/offline-bundle/install.sh", evidence_path: docs/evidence/M6c/2026-10-05/README.md}
@@ -389,6 +389,7 @@ requirements:
     external_status: not_applicable
     verification: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1; verify resource-boundary authorization integration cases"
     evidence: docs/evidence/acceptance/R36/
+    scope_note: "R36.a historical software APPROVE on candidate 03354381b5954087d82d0d3f807cad9993b94b8d; R36.b remains unverified. See docs/evidence/acceptance/R37/2026-10-04-version-revocation/README.md."
   - id: R37
     wave: M6b
     owner: 10
@@ -398,6 +399,7 @@ requirements:
     external_status: not_applicable
     verification: "IOLINK_TEST_PG_DSN=\"$IOLINK_TEST_PG_DSN\" go test -race -shuffle=on ./internal/core ./internal/access ./internal/migrate ./internal/persistence ./internal/adminapi ./internal/appapi -count=1; verify role and revocation integration cases"
     evidence: docs/evidence/acceptance/R37/
+    scope_note: "R37.a historical software APPROVE on candidate 03354381b5954087d82d0d3f807cad9993b94b8d; R37.b remains unverified. See docs/evidence/acceptance/R37/2026-10-04-version-revocation/README.md."
   - id: R38
     wave: M6c
     owner: 10
