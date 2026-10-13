@@ -1,0 +1,6 @@
+=== RUN   TestContextHandlerDoesNotMutateSharedRecord
+    context_test.go:68: caller record polluted by prior context: {"level":"INFO","msg":"","count":0,"count":1,"count":2,"count":3,"count":4,"count":5,"count":6,"count":7,"!BUG":"redacted","outcome":"next"}
+--- FAIL: TestContextHandlerDoesNotMutateSharedRecord (0.00s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/observability	0.009s
+FAIL

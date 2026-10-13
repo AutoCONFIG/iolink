@@ -1,0 +1,8 @@
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	2.241s
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.038s
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.039s
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.250s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.162s
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	7.380s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	1.728s
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	6.425s

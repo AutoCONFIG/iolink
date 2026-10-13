@@ -1,0 +1,71 @@
+go build ./...
+go vet ./...
+go test -race -shuffle=on ./... -count=1
+ok  	git.hyhy.fun/rsplab/iolink/cmd/iolinkd	23.882s
+ok  	git.hyhy.fun/rsplab/iolink/cmd/license-sign	1.479s
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-once	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/mqtt-sim	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/offline-sbom	[no test files]
+?   	git.hyhy.fun/rsplab/iolink/cmd/tp-spike-pub	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.029s
+ok  	git.hyhy.fun/rsplab/iolink/internal/adminapi	13.729s
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.181s
+ok  	git.hyhy.fun/rsplab/iolink/internal/authorization	1.018s
+ok  	git.hyhy.fun/rsplab/iolink/internal/camera	1.018s
+ok  	git.hyhy.fun/rsplab/iolink/internal/camerapg	63.314s
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	153.449s
+ok  	git.hyhy.fun/rsplab/iolink/internal/domain	1.022s
+?   	git.hyhy.fun/rsplab/iolink/internal/event	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/gb	1.521s
+-test.shuffle 1791862383991573293
+--- FAIL: TestAcceptPageAggregatesAndAtomicallyReplacesSortedSnapshot (0.00s)
+    catalog_test.go:103: partial result=gbcatalog.PageResult{Refresh:gbcatalog.Refresh{DeviceID:"", SN:0, ExpectedCount:0, Deadline:time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC)}, Complete:false, Duplicate:false} err=context deadline exceeded
+--- FAIL: TestReplacePortCallDoesNotHoldCoordinatorLock (1.00s)
+    catalog_test.go:249: replace did not start
+--- FAIL: TestCompletedRefreshRejectsDifferentSumNum (0.00s)
+    catalog_test.go:163: context deadline exceeded
+--- FAIL: TestStartIsIdempotentAndPassesDeadlineToStore (0.00s)
+    catalog_test.go:292: context deadline exceeded
+--- FAIL: TestExpireMarksStaleWithoutReplacingOldDirectory (0.00s)
+    catalog_test.go:182: context deadline exceeded
+--- FAIL: TestConcurrentCompletionReplacesOnce (0.00s)
+    catalog_test.go:235: replacements=0
+--- FAIL: TestCompletedRefreshIgnoresLateDuplicateAndDoesNotCreateNewSnapshot (0.00s)
+    catalog_test.go:145: first=gbcatalog.PageResult{Refresh:gbcatalog.Refresh{DeviceID:"", SN:0, ExpectedCount:0, Deadline:time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC)}, Complete:false, Duplicate:false} err=context deadline exceeded
+--- FAIL: TestCanceledStaleMarkDoesNotPoisonPendingRefresh (0.00s)
+    catalog_test.go:205: context deadline exceeded
+--- FAIL: TestDuplicatePageAndItemAreIdempotentButConflictsFail (0.00s)
+    catalog_test.go:124: context deadline exceeded
+--- FAIL: TestStoreErrorsDoNotMarkComplete (0.00s)
+    catalog_test.go:310: err=context deadline exceeded
+--- FAIL: TestInvalidPagesAndDeadlineAreRejected (0.00s)
+    catalog_test.go:283: empty complete should be valid: context deadline exceeded
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/gbcatalog	1.025s
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalogpg	12.707s
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbpg	8.392s
+ok  	git.hyhy.fun/rsplab/iolink/internal/ingestion	2.331s
+ok  	git.hyhy.fun/rsplab/iolink/internal/license	45.842s
+?   	git.hyhy.fun/rsplab/iolink/internal/media	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/rtp	1.017s
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/rtsp	1.014s
+ok  	git.hyhy.fun/rsplab/iolink/internal/media/zlm	1.018s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediahttp	1.057s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediajobs	1.016s
+ok  	git.hyhy.fun/rsplab/iolink/internal/mediapg	30.605s
+ok  	git.hyhy.fun/rsplab/iolink/internal/migrate	21.863s
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	13.392s
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	2.370s
+ok  	git.hyhy.fun/rsplab/iolink/internal/openapi	1.188s
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.039s
+ok  	git.hyhy.fun/rsplab/iolink/internal/persistence	3.410s
+ok  	git.hyhy.fun/rsplab/iolink/internal/platform	1.969s
+ok  	git.hyhy.fun/rsplab/iolink/internal/playback	1.020s
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	9.408s
+?   	git.hyhy.fun/rsplab/iolink/internal/testdb	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/videocredential	1.021s
+?   	git.hyhy.fun/rsplab/iolink/internal/web	[no test files]
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.240s
+?   	git.hyhy.fun/rsplab/iolink/internal/wire	[no test files]
+FAIL
+make: *** [Makefile:25: verify] Error 1

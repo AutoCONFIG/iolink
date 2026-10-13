@@ -1,0 +1,7 @@
+Mutation: remove only record = record.Clone() using a Go build overlay; candidate filesystem remains unchanged.
+Command: go test -race -count=1 -overlay /tmp/iolink-review-clone-mutant-_vugvyhn/overlay.json ./internal/observability -run ^TestContextHandlerDoesNotMutateSharedRecord$ -v
+=== RUN   TestContextHandlerDoesNotMutateSharedRecord
+--- PASS: TestContextHandlerDoesNotMutateSharedRecord (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	1.012s
+EXIT_CODE=0

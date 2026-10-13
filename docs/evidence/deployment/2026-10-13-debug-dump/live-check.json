@@ -1,0 +1,51 @@
+{
+  "request_id": "6FONWU26YRGTCKN4VSKQ2VYWPK",
+  "linked_records": [
+    {
+      "time": "2026-10-13T11:34:37.534603777+08:00",
+      "level": "DEBUG",
+      "msg": "http request started",
+      "stage": "http",
+      "route": "/setup/v1/status",
+      "method": "GET",
+      "outcome": "started",
+      "request_id": "6FONWU26YRGTCKN4VSKQ2VYWPK"
+    },
+    {
+      "time": "2026-10-13T11:34:37.534671073+08:00",
+      "level": "DEBUG",
+      "msg": "database query started",
+      "stage": "database",
+      "outcome": "started",
+      "span_id": "ORO2CJGWFQNPT6SSSQ4J4UCYQ4",
+      "request_id": "6FONWU26YRGTCKN4VSKQ2VYWPK"
+    },
+    {
+      "time": "2026-10-13T11:34:37.536383035+08:00",
+      "level": "DEBUG",
+      "msg": "database query completed",
+      "stage": "database",
+      "outcome": "completed",
+      "span_id": "ORO2CJGWFQNPT6SSSQ4J4UCYQ4",
+      "duration_ms": 1,
+      "request_id": "6FONWU26YRGTCKN4VSKQ2VYWPK"
+    },
+    {
+      "time": "2026-10-13T11:34:37.536434792+08:00",
+      "level": "INFO",
+      "msg": "http request",
+      "route": "/setup/v1/status",
+      "method": "GET",
+      "status": 200,
+      "duration_ms": 1,
+      "tenant_id": 0,
+      "actor_id": 0,
+      "request_id": "6FONWU26YRGTCKN4VSKQ2VYWPK"
+    }
+  ],
+  "file_debug_present": true,
+  "console_debug_absent": true,
+  "version_directory": "v0.0.31",
+  "verdict": "PASS",
+  "console_parser": "slog JSON only; Gin route startup text excluded"
+}

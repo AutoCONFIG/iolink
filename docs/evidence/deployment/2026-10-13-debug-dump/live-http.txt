@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Cache-Control: no-store
+Content-Type: application/json
+X-Request-Id: 6FONWU26YRGTCKN4VSKQ2VYWPK
+Date: Tue, 13 Oct 2026 03:34:37 GMT
+Content-Length: 18
+
+{"required":true}
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+Date: Tue, 13 Oct 2026 03:34:37 GMT
+Content-Length: 6
+
+ready

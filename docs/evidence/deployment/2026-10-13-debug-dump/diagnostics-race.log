@@ -1,0 +1,182 @@
+-test.shuffle 1791862222584695256
+=== RUN   TestStructuredFileLoggingRotates
+--- PASS: TestStructuredFileLoggingRotates (1.27s)
+=== RUN   TestStructuredFileLoggingLevelsAndRedaction
+--- PASS: TestStructuredFileLoggingLevelsAndRedaction (0.00s)
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/..
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/.
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/../outside
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths//absolute
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/v/child
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/v/
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/file_link
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/directory_link
+--- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/.. (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/. (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/../outside (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths//absolute (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/v/child (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/v/ (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/file_link (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/directory_link (0.00s)
+=== RUN   TestSinkFailureDegradesReadinessAndRetainsStderr
+--- PASS: TestSinkFailureDegradesReadinessAndRetainsStderr (0.00s)
+=== RUN   TestDumpFailureFallsBackToStderrEvenBelowConsoleLevel
+--- PASS: TestDumpFailureFallsBackToStderrEvenBelowConsoleLevel (0.00s)
+=== RUN   TestConcurrentCloseAndWritesCannotReopenClosedSink
+--- PASS: TestConcurrentCloseAndWritesCannotReopenClosedSink (0.00s)
+=== RUN   TestReopenedWriterEnforcesBackupsAtExactSizeBoundary
+--- PASS: TestReopenedWriterEnforcesBackupsAtExactSizeBoundary (0.02s)
+=== RUN   TestErrorsKeepSafeClassificationWithoutValues
+--- PASS: TestErrorsKeepSafeClassificationWithoutValues (0.00s)
+=== RUN   TestContextHandlerDoesNotMutateSharedRecord
+--- PASS: TestContextHandlerDoesNotMutateSharedRecord (0.00s)
+=== RUN   TestMalformedStartupDumpFailsClosedWithoutPartialRewrite
+--- PASS: TestMalformedStartupDumpFailsClosedWithoutPartialRewrite (0.04s)
+=== RUN   TestDumpRetainsDebugAndConsoleUsesConfiguredLevelWithGroupedAttrs
+--- PASS: TestDumpRetainsDebugAndConsoleUsesConfiguredLevelWithGroupedAttrs (0.00s)
+=== RUN   TestStartupPrunesStaleRecordsAndRemovesEmptyOldDumps
+--- PASS: TestStartupPrunesStaleRecordsAndRemovesEmptyOldDumps (0.01s)
+=== RUN   TestSinkClosedCannotReopenFile
+--- PASS: TestSinkClosedCannotReopenFile (0.00s)
+=== RUN   TestCleanupFailureDisablesReadinessAndPreservesOriginal
+--- PASS: TestCleanupFailureDisablesReadinessAndPreservesOriginal (0.03s)
+=== RUN   TestLogConfigRejectsInvalidBounds
+--- PASS: TestLogConfigRejectsInvalidBounds (0.00s)
+=== RUN   TestConcurrentLoggingProducesCompleteJSONAndSurvivesReopen
+--- PASS: TestConcurrentLoggingProducesCompleteJSONAndSurvivesReopen (0.03s)
+=== RUN   TestConcurrentPruningAndWritingPreservesCompleteRecentRecords
+--- PASS: TestConcurrentPruningAndWritingPreservesCompleteRecentRecords (0.01s)
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction/attrs
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction/group
+--- PASS: TestDerivedLoggerPreservesContextAndRedaction (0.00s)
+    --- PASS: TestDerivedLoggerPreservesContextAndRedaction/attrs (0.00s)
+    --- PASS: TestDerivedLoggerPreservesContextAndRedaction/group (0.00s)
+=== RUN   TestRetentionLeavesUnrelatedFilesAndSymlinks
+--- PASS: TestRetentionLeavesUnrelatedFilesAndSymlinks (0.00s)
+=== RUN   TestDurationEnvironmentIsAppliedAndInvalidDurationsRejected
+--- PASS: TestDurationEnvironmentIsAppliedAndInvalidDurationsRejected (0.00s)
+=== RUN   TestRetentionPrunesRecordsInAllDumpLocations
+--- PASS: TestRetentionPrunesRecordsInAllDumpLocations (0.00s)
+=== RUN   TestBackupLimitIgnoresUnknownAndSymlinkEntries
+--- PASS: TestBackupLimitIgnoresUnknownAndSymlinkEntries (0.00s)
+=== RUN   TestStderrFailureDisablesReadinessButKeepsPersistedRecord
+=== RUN   TestStderrFailureDisablesReadinessButKeepsPersistedRecord/error
+=== RUN   TestStderrFailureDisablesReadinessButKeepsPersistedRecord/short_write
+--- PASS: TestStderrFailureDisablesReadinessButKeepsPersistedRecord (0.00s)
+    --- PASS: TestStderrFailureDisablesReadinessButKeepsPersistedRecord/error (0.00s)
+    --- PASS: TestStderrFailureDisablesReadinessButKeepsPersistedRecord/short_write (0.00s)
+=== RUN   TestInvalidLogPathFailsStartup
+--- PASS: TestInvalidLogPathFailsStartup (0.00s)
+=== RUN   TestPeriodicCleanupUsesConfiguredIntervalAndStopsOnClose
+--- PASS: TestPeriodicCleanupUsesConfiguredIntervalAndStopsOnClose (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	2.459s
+-test.shuffle 1791862222916415163
+=== RUN   TestHealthEndpointsReportDependenciesAndDrainState
+--- PASS: TestHealthEndpointsReportDependenciesAndDrainState (0.00s)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/success
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/denied
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/failure
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/panic
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/unmatched
+--- PASS: TestRequestLogsCorrelateWithoutUntrustedContent (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/success (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/denied (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/failure (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/panic (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/unmatched (0.00s)
+=== RUN   TestHealthEndpointsFailClosedOnDependencyErrors
+--- PASS: TestHealthEndpointsFailClosedOnDependencyErrors (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.063s
+-test.shuffle 1791862222957999890
+=== RUN   TestHandleReportNormalizes
+--- PASS: TestHandleReportNormalizes (0.00s)
+=== RUN   TestRejectedPublishStillHasCorrelation
+--- PASS: TestRejectedPublishStillHasCorrelation (0.00s)
+=== RUN   TestRangeValidation
+2026/10/13 11:30:22 WARN field out of range device=dev-001 field=temperature ingest_id=22ZBGXXZGXPWENRHRGBOV2IHH3 stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=dev-001 field=ph ingest_id=22ZBGXXZGXPWENRHRGBOV2IHH3 stage=mqtt_validation
+--- PASS: TestRangeValidation (0.00s)
+=== RUN   TestHandleGenericReportPreservesEnumAndNumberProperties
+--- PASS: TestHandleGenericReportPreservesEnumAndNumberProperties (0.00s)
+=== RUN   TestParseUplinkTopic
+--- PASS: TestParseUplinkTopic (0.00s)
+=== RUN   TestSlowDeviceDoesNotBlockOthersOrCancellation
+--- PASS: TestSlowDeviceDoesNotBlockOthersOrCancellation (0.00s)
+=== RUN   TestPublishEmitsCorrelatedSafeRecords
+--- PASS: TestPublishEmitsCorrelatedSafeRecords (0.00s)
+=== RUN   TestRevisionLookupFailureFailsClosed
+--- PASS: TestRevisionLookupFailureFailsClosed (0.00s)
+=== RUN   TestAuthHook
+--- PASS: TestAuthHook (0.00s)
+=== RUN   TestResolveFailureAtEstablishmentFailsClosed
+--- PASS: TestResolveFailureAtEstablishmentFailsClosed (0.00s)
+=== RUN   TestConnectAuthGenericClientID
+--- PASS: TestConnectAuthGenericClientID (0.00s)
+=== RUN   TestPayloadValidationAndACL
+2026/10/13 11:30:22 WARN field out of range device=one field=temperature ingest_id=RDDLQQKKHLHQGEWLTBLDSV73VD stage=mqtt_validation
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=ONDSKCWLL7ZJWZR5KIFO4UNBDM stage=mqtt_validation outcome=rejected error_code=json
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=BKN7V3XTPWRQLBBZ3HOBU3OTBY stage=mqtt_validation outcome=rejected error_code=json
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=U77U5HLA7MBPOAUOQ2W35PFMPL stage=mqtt_validation outcome=rejected error_code=json
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=RIT7E4FQM6M454LGZZBVAEE5FY stage=mqtt_validation outcome=rejected error_code=type
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=N6VMOAU5ZSGAUGSUMETNRHEXX6 stage=mqtt_validation outcome=rejected error_code=type
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=WSSE3SHFH3A4ZW5M7R3ZTQYVIM stage=mqtt_dispatch outcome=rejected error_code=dispatch err="invalid message_id"
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=JASGP2BE4DZKUSLULJGQVP2APK stage=mqtt_validation outcome=rejected error_code=json
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=LAD4AWOTJYYLHNUXY7WIHMW532 stage=mqtt_validation outcome=rejected error_code=envelope
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=QXCSDCFEJUWZNQLLSSSEPJXSTC stage=mqtt_validation outcome=rejected error_code=topic
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=372LETHAZZA6DJBL3E26ZRP775 stage=mqtt_validation outcome=rejected error_code=topic
+2026/10/13 11:30:22 WARN mqtt message rejected ingest_id=6HPZAVZO52F7EAXQSCNDXYAC7Y stage=mqtt_validation outcome=rejected error_code=envelope
+--- PASS: TestPayloadValidationAndACL (0.00s)
+=== RUN   TestAllDocumentedMetricBoundaries
+2026/10/13 11:30:22 WARN field out of range device=one field=temperature ingest_id=UMVZT2C27YUO5Z3TJZ2YHAC7F6 stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=temperature ingest_id=7Y4CKV746R4XWY6Z7MNTVPU6HF stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=dissolved_oxygen ingest_id=BYI3TRKDKWEVJ42NCGFK7IUWBX stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=dissolved_oxygen ingest_id=D6TTKAWVUGDW2FCULZSDS2UQED stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=ph ingest_id=EE4OAW7YHQ7HXMQZIWEL7YVCP6 stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=ph ingest_id=M36MNC72FLD2KAD5V7V2FIPOXY stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=turbidity ingest_id=5A7ZKQMYR6EEYXFPL2Y57PPXST stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=turbidity ingest_id=MY5QFNXU2JKGQDL66NGOGWYQCT stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=salinity ingest_id=HGJ6FLYNJRXBEBBHD3GJLIRSDK stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=salinity ingest_id=6YZNFTAL55J3MBB6GYXK2XTCTA stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=battery ingest_id=RECJDMUEFUT5Y5TN7CM7QPPFPG stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=battery ingest_id=62I4SFX3Z5YDUBAQB3GPE64N6C stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=signal ingest_id=F4XCLJPZOPRCZPVYDYJ4PDAQEZ stage=mqtt_validation
+2026/10/13 11:30:22 WARN field out of range device=one field=signal ingest_id=6P4LBKLWTOC4FKJ6OWCJ4RG7CX stage=mqtt_validation
+--- PASS: TestAllDocumentedMetricBoundaries (0.00s)
+=== RUN   TestCheckACL
+--- PASS: TestCheckACL (0.00s)
+=== RUN   TestAuthenticatedLifecycleWatchdogAndTakeover
+=== RUN   TestAuthenticatedLifecycleWatchdogAndTakeover/1m0s
+=== RUN   TestAuthenticatedLifecycleWatchdogAndTakeover/5m0s
+--- PASS: TestAuthenticatedLifecycleWatchdogAndTakeover (0.00s)
+    --- PASS: TestAuthenticatedLifecycleWatchdogAndTakeover/1m0s (0.00s)
+    --- PASS: TestAuthenticatedLifecycleWatchdogAndTakeover/5m0s (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.031s
+-test.shuffle 1791862223145613404
+=== RUN   TestBootstrapWhenInvalidThenNoAccounts
+    server_test.go:77: integration: set IOLINK_TEST_PG_DSN to a disposable Timescale instance
+--- SKIP: TestBootstrapWhenInvalidThenNoAccounts (0.00s)
+=== RUN   TestBootstrapWhenAuditFailsThenRollsBack
+    server_test.go:141: integration: set IOLINK_TEST_PG_DSN to a disposable Timescale instance
+--- SKIP: TestBootstrapWhenAuditFailsThenRollsBack (0.00s)
+=== RUN   TestBootstrapWhenConcurrentThenSingleAdministrator
+    server_test.go:119: integration: set IOLINK_TEST_PG_DSN to a disposable Timescale instance
+--- SKIP: TestBootstrapWhenConcurrentThenSingleAdministrator (0.00s)
+=== RUN   TestBootstrapWhenDatabaseUnavailableThenFailsClosed
+    server_test.go:156: integration: set IOLINK_TEST_PG_DSN to a disposable Timescale instance
+--- SKIP: TestBootstrapWhenDatabaseUnavailableThenFailsClosed (0.00s)
+=== RUN   TestBootstrapWhenFreshThenInitialized
+    server_test.go:45: integration: set IOLINK_TEST_PG_DSN to a disposable Timescale instance
+--- SKIP: TestBootstrapWhenFreshThenInitialized (0.00s)
+=== RUN   TestBootstrapWhenHTTPSProxyOriginThenInitialized
+    server_test.go:111: integration: set IOLINK_TEST_PG_DSN to a disposable Timescale instance
+--- SKIP: TestBootstrapWhenHTTPSProxyOriginThenInitialized (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	1.031s

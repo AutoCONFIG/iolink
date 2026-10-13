@@ -1,0 +1,36 @@
+=== RUN   TestAcceptPageAggregatesAndAtomicallyReplacesSortedSnapshot
+    catalog_test.go:103: partial result=gbcatalog.PageResult{Refresh:gbcatalog.Refresh{DeviceID:"", SN:0, ExpectedCount:0, Deadline:time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC)}, Complete:false, Duplicate:false} err=context deadline exceeded
+--- FAIL: TestAcceptPageAggregatesAndAtomicallyReplacesSortedSnapshot (0.00s)
+=== RUN   TestDuplicatePageAndItemAreIdempotentButConflictsFail
+    catalog_test.go:124: context deadline exceeded
+--- FAIL: TestDuplicatePageAndItemAreIdempotentButConflictsFail (0.00s)
+=== RUN   TestCompletedRefreshIgnoresLateDuplicateAndDoesNotCreateNewSnapshot
+    catalog_test.go:145: first=gbcatalog.PageResult{Refresh:gbcatalog.Refresh{DeviceID:"", SN:0, ExpectedCount:0, Deadline:time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC)}, Complete:false, Duplicate:false} err=context deadline exceeded
+--- FAIL: TestCompletedRefreshIgnoresLateDuplicateAndDoesNotCreateNewSnapshot (0.00s)
+=== RUN   TestCompletedRefreshRejectsDifferentSumNum
+    catalog_test.go:163: context deadline exceeded
+--- FAIL: TestCompletedRefreshRejectsDifferentSumNum (0.00s)
+=== RUN   TestExpireMarksStaleWithoutReplacingOldDirectory
+    catalog_test.go:182: context deadline exceeded
+--- FAIL: TestExpireMarksStaleWithoutReplacingOldDirectory (0.00s)
+=== RUN   TestCanceledStaleMarkDoesNotPoisonPendingRefresh
+    catalog_test.go:205: context deadline exceeded
+--- FAIL: TestCanceledStaleMarkDoesNotPoisonPendingRefresh (0.00s)
+=== RUN   TestConcurrentCompletionReplacesOnce
+    catalog_test.go:235: replacements=0
+--- FAIL: TestConcurrentCompletionReplacesOnce (0.00s)
+=== RUN   TestReplacePortCallDoesNotHoldCoordinatorLock
+    catalog_test.go:249: replace did not start
+--- FAIL: TestReplacePortCallDoesNotHoldCoordinatorLock (1.00s)
+=== RUN   TestInvalidPagesAndDeadlineAreRejected
+    catalog_test.go:283: empty complete should be valid: context deadline exceeded
+--- FAIL: TestInvalidPagesAndDeadlineAreRejected (0.00s)
+=== RUN   TestStartIsIdempotentAndPassesDeadlineToStore
+    catalog_test.go:292: context deadline exceeded
+--- FAIL: TestStartIsIdempotentAndPassesDeadlineToStore (0.00s)
+=== RUN   TestStoreErrorsDoNotMarkComplete
+    catalog_test.go:310: err=context deadline exceeded
+--- FAIL: TestStoreErrorsDoNotMarkComplete (0.00s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/gbcatalog	1.012s
+FAIL

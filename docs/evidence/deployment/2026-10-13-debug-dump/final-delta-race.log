@@ -1,0 +1,231 @@
+-test.shuffle 1791862986085575510
+=== RUN   TestCleanupFailureDisablesReadinessAndPreservesOriginal
+--- PASS: TestCleanupFailureDisablesReadinessAndPreservesOriginal (0.02s)
+=== RUN   TestReopenedWriterEnforcesBackupsAtExactSizeBoundary
+--- PASS: TestReopenedWriterEnforcesBackupsAtExactSizeBoundary (0.01s)
+=== RUN   TestStructuredFileLoggingRotates
+--- PASS: TestStructuredFileLoggingRotates (0.91s)
+=== RUN   TestSinkClosedCannotReopenFile
+--- PASS: TestSinkClosedCannotReopenFile (0.00s)
+=== RUN   TestConcurrentCloseAndWritesCannotReopenClosedSink
+--- PASS: TestConcurrentCloseAndWritesCannotReopenClosedSink (0.00s)
+=== RUN   TestStructuredFileLoggingLevelsAndRedaction
+--- PASS: TestStructuredFileLoggingLevelsAndRedaction (0.00s)
+=== RUN   TestRetentionPrunesRecordsInAllDumpLocations
+--- PASS: TestRetentionPrunesRecordsInAllDumpLocations (0.00s)
+=== RUN   TestDurationEnvironmentIsAppliedAndInvalidDurationsRejected
+--- PASS: TestDurationEnvironmentIsAppliedAndInvalidDurationsRejected (0.00s)
+=== RUN   TestPeriodicCleanupUsesConfiguredIntervalAndStopsOnClose
+--- PASS: TestPeriodicCleanupUsesConfiguredIntervalAndStopsOnClose (0.00s)
+=== RUN   TestLogConfigRejectsInvalidBounds
+--- PASS: TestLogConfigRejectsInvalidBounds (0.00s)
+=== RUN   TestDumpRetainsDebugAndConsoleUsesConfiguredLevelWithGroupedAttrs
+--- PASS: TestDumpRetainsDebugAndConsoleUsesConfiguredLevelWithGroupedAttrs (0.00s)
+=== RUN   TestRetentionLeavesUnrelatedFilesAndSymlinks
+--- PASS: TestRetentionLeavesUnrelatedFilesAndSymlinks (0.00s)
+=== RUN   TestConcurrentLoggingProducesCompleteJSONAndSurvivesReopen
+--- PASS: TestConcurrentLoggingProducesCompleteJSONAndSurvivesReopen (0.03s)
+=== RUN   TestErrorsKeepSafeClassificationWithoutValues
+--- PASS: TestErrorsKeepSafeClassificationWithoutValues (0.00s)
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/..
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/.
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/../outside
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths//absolute
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/v/child
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/v/
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/file_link
+=== RUN   TestNewRejectsVersionEscapeAndSymlinkedActivePaths/directory_link
+--- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/.. (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/. (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/../outside (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths//absolute (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/v/child (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/v/ (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/file_link (0.00s)
+    --- PASS: TestNewRejectsVersionEscapeAndSymlinkedActivePaths/directory_link (0.00s)
+=== RUN   TestStartupPrunesStaleRecordsAndRemovesEmptyOldDumps
+--- PASS: TestStartupPrunesStaleRecordsAndRemovesEmptyOldDumps (0.00s)
+=== RUN   TestDumpFailureFallsBackToStderrEvenBelowConsoleLevel
+--- PASS: TestDumpFailureFallsBackToStderrEvenBelowConsoleLevel (0.00s)
+=== RUN   TestStderrFailureDisablesReadinessButKeepsPersistedRecord
+=== RUN   TestStderrFailureDisablesReadinessButKeepsPersistedRecord/error
+=== RUN   TestStderrFailureDisablesReadinessButKeepsPersistedRecord/short_write
+--- PASS: TestStderrFailureDisablesReadinessButKeepsPersistedRecord (0.00s)
+    --- PASS: TestStderrFailureDisablesReadinessButKeepsPersistedRecord/error (0.00s)
+    --- PASS: TestStderrFailureDisablesReadinessButKeepsPersistedRecord/short_write (0.00s)
+=== RUN   TestSinkFailureDegradesReadinessAndRetainsStderr
+--- PASS: TestSinkFailureDegradesReadinessAndRetainsStderr (0.00s)
+=== RUN   TestConcurrentPruningAndWritingPreservesCompleteRecentRecords
+--- PASS: TestConcurrentPruningAndWritingPreservesCompleteRecentRecords (0.01s)
+=== RUN   TestBackupLimitIgnoresUnknownAndSymlinkEntries
+--- PASS: TestBackupLimitIgnoresUnknownAndSymlinkEntries (0.00s)
+=== RUN   TestContextHandlerDoesNotMutateSharedRecord
+--- PASS: TestContextHandlerDoesNotMutateSharedRecord (0.00s)
+=== RUN   TestInvalidLogPathFailsStartup
+--- PASS: TestInvalidLogPathFailsStartup (0.00s)
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction/attrs
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction/group
+--- PASS: TestDerivedLoggerPreservesContextAndRedaction (0.00s)
+    --- PASS: TestDerivedLoggerPreservesContextAndRedaction/attrs (0.00s)
+    --- PASS: TestDerivedLoggerPreservesContextAndRedaction/group (0.00s)
+=== RUN   TestMalformedStartupDumpFailsClosedWithoutPartialRewrite
+--- PASS: TestMalformedStartupDumpFailsClosedWithoutPartialRewrite (0.02s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	2.034s
+-test.shuffle 1791862986454832036
+=== RUN   TestWorkerDisablesAfterOwnerMembershipRevoked
+--- PASS: TestWorkerDisablesAfterOwnerMembershipRevoked (0.71s)
+=== RUN   TestWorkerReclaimsExpiredProcessingLease
+--- PASS: TestWorkerReclaimsExpiredProcessingLease (0.57s)
+=== RUN   TestWorkerDeadlineRecordsUnknown
+2026/10/13 11:43:07 INFO notification attempt completed stage=outbox operation=finish outcome=unknown duration_ms=1
+--- PASS: TestWorkerDeadlineRecordsUnknown (0.00s)
+=== RUN   TestWorkersClaimOneRowOnly
+--- PASS: TestWorkersClaimOneRowOnly (0.55s)
+=== RUN   TestWorkerRetriesWithBoundedBackoffAndFails
+--- PASS: TestWorkerRetriesWithBoundedBackoffAndFails (0.60s)
+=== RUN   TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData
+=== RUN   TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/sent
+    worker_debug_test.go:114: {"count":1,"level":"DEBUG","msg":"notification attempt","operation":"claim","outcome":"claimed","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"outbox","time":"2026-10-13T11:43:08.872261191+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"started","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"notification","time":"2026-10-13T11:43:08.872351872+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"wechat","time":"2026-10-13T11:43:08.872379003+08:00"}
+    worker_debug_test.go:114: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"wechat","status":200,"time":"2026-10-13T11:43:08.873036839+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"wechat","time":"2026-10-13T11:43:08.873107061+08:00"}
+    worker_debug_test.go:114: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"success","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"wechat","status":200,"time":"2026-10-13T11:43:08.873696328+08:00"}
+    worker_debug_test.go:114: {"duration_ms":1,"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"completed","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"notification","time":"2026-10-13T11:43:08.873742034+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"notification attempt","operation":"finish","outcome":"started","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"outbox","time":"2026-10-13T11:43:08.873775336+08:00"}
+    worker_debug_test.go:114: {"duration_ms":1,"level":"INFO","msg":"notification attempt completed","operation":"finish","outcome":"sent","request_id":"C2XA3X3OHWH73U76QQLKFPAYIW","stage":"outbox","time":"2026-10-13T11:43:08.873801165+08:00"}
+=== RUN   TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/provider_rejected
+    worker_debug_test.go:114: {"count":1,"level":"DEBUG","msg":"notification attempt","operation":"claim","outcome":"claimed","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"outbox","time":"2026-10-13T11:43:08.874743385+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"started","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"notification","time":"2026-10-13T11:43:08.874792738+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"wechat","time":"2026-10-13T11:43:08.874821922+08:00"}
+    worker_debug_test.go:114: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"wechat","status":200,"time":"2026-10-13T11:43:08.875247432+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"wechat","time":"2026-10-13T11:43:08.875321992+08:00"}
+    worker_debug_test.go:114: {"duration_ms":0,"error_code":"permanent","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"wechat","status":403,"time":"2026-10-13T11:43:08.875768912+08:00"}
+    worker_debug_test.go:114: {"duration_ms":1,"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"completed","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"notification","time":"2026-10-13T11:43:08.87581052+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"notification attempt","operation":"finish","outcome":"started","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"outbox","time":"2026-10-13T11:43:08.875845415+08:00"}
+    worker_debug_test.go:114: {"duration_ms":1,"level":"INFO","msg":"notification attempt completed","operation":"finish","outcome":"failed","request_id":"STLZ2R2A7VNIWA4PIZUH7NSPBJ","stage":"outbox","time":"2026-10-13T11:43:08.875870482+08:00"}
+=== RUN   TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/persistence_failed
+    worker_debug_test.go:114: {"count":1,"level":"DEBUG","msg":"notification attempt","operation":"claim","outcome":"claimed","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"outbox","time":"2026-10-13T11:43:08.876835365+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"started","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"notification","time":"2026-10-13T11:43:08.876894216+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"wechat","time":"2026-10-13T11:43:08.876921046+08:00"}
+    worker_debug_test.go:114: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"wechat","status":200,"time":"2026-10-13T11:43:08.877393895+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"wechat","time":"2026-10-13T11:43:08.877434661+08:00"}
+    worker_debug_test.go:114: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"success","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"wechat","status":200,"time":"2026-10-13T11:43:08.877761616+08:00"}
+    worker_debug_test.go:114: {"duration_ms":0,"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"completed","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"notification","time":"2026-10-13T11:43:08.877791752+08:00"}
+    worker_debug_test.go:114: {"level":"DEBUG","msg":"notification attempt","operation":"finish","outcome":"started","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"outbox","time":"2026-10-13T11:43:08.877828411+08:00"}
+    worker_debug_test.go:114: {"err":"*errors.errorString","level":"WARN","msg":"notification result persistence failed","operation":"finish","outcome":"failed","request_id":"ZXWD3COSONUQBANSWJVNHOCRYO","stage":"outbox","time":"2026-10-13T11:43:08.877844171+08:00"}
+--- PASS: TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData (0.01s)
+    --- PASS: TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/sent (0.00s)
+    --- PASS: TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/provider_rejected (0.00s)
+    --- PASS: TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/persistence_failed (0.00s)
+=== RUN   TestWorkerDisablesWithoutConsent
+--- PASS: TestWorkerDisablesWithoutConsent (0.58s)
+=== RUN   TestWorkerDisablesWithoutCurrentOwnerSubscription
+--- PASS: TestWorkerDisablesWithoutCurrentOwnerSubscription (0.54s)
+=== RUN   TestWorkerRecordsUnknownResult
+--- PASS: TestWorkerRecordsUnknownResult (0.54s)
+=== RUN   TestWorkerClaimFailureIsCorrelatedAndSafe
+--- PASS: TestWorkerClaimFailureIsCorrelatedAndSafe (0.00s)
+=== RUN   TestWorkerRevalidatesCurrentOwnerBeforeSend
+--- PASS: TestWorkerRevalidatesCurrentOwnerBeforeSend (0.57s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	5.677s
+-test.shuffle 1791862986453478513
+=== RUN   TestWeChatSenderNonzeroProviderCodeFails
+--- PASS: TestWeChatSenderNonzeroProviderCodeFails (0.00s)
+=== RUN   TestWeChatSenderDisabledWithoutCredentials
+--- PASS: TestWeChatSenderDisabledWithoutCredentials (0.00s)
+=== RUN   TestWeChatSenderMissingSendCodeIsUnknown
+--- PASS: TestWeChatSenderMissingSendCodeIsUnknown (0.00s)
+=== RUN   TestWeChatSenderRejectsDuplicateTemplateFields
+--- PASS: TestWeChatSenderRejectsDuplicateTemplateFields (0.00s)
+=== RUN   TestSenderTracesSafeDownstreamOutcomes
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/success
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.454498288+08:00"}
+    tracing_test.go:108: {"duration_ms":1,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:43:06.455646305+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.455695378+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:43:06.456208822+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/token_http_failure
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.456919277+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"permanent","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":400,"time":"2026-10-13T11:43:06.457450585+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/send_http_failure
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.457992263+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:43:06.458702487+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.458740539+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"permanent","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":403,"time":"2026-10-13T11:43:06.459115433+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/malformed_send_response
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.459865873+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:43:06.460335275+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.460376633+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"unknown","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:43:06.460792684+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/provider_failure
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.461623124+08:00"}
+    tracing_test.go:108: {"duration_ms":1,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:43:06.462864216+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.462935861+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"permanent","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:43:06.463365498+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/token_timeout
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.464035196+08:00"}
+    tracing_test.go:108: {"duration_ms":100,"error_code":"deadline_exceeded","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":0,"time":"2026-10-13T11:43:06.564605895+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/send_timeout
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.565221331+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:43:06.566149956+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:43:06.56619457+08:00"}
+    tracing_test.go:108: {"duration_ms":100,"error_code":"deadline_exceeded","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":0,"time":"2026-10-13T11:43:06.666770919+08:00"}
+--- PASS: TestSenderTracesSafeDownstreamOutcomes (0.21s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/success (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/token_http_failure (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/send_http_failure (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/malformed_send_response (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/provider_failure (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/token_timeout (0.10s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/send_timeout (0.10s)
+=== RUN   TestWeChatSenderRefreshesExpiredTokenOnce
+--- PASS: TestWeChatSenderRefreshesExpiredTokenOnce (0.00s)
+=== RUN   TestWeChatSenderRejectsHTTPAndMalformedResponses
+=== RUN   TestWeChatSenderRejectsHTTPAndMalformedResponses/http_500
+=== RUN   TestWeChatSenderRejectsHTTPAndMalformedResponses/http_400
+=== RUN   TestWeChatSenderRejectsHTTPAndMalformedResponses/malformed_token
+--- PASS: TestWeChatSenderRejectsHTTPAndMalformedResponses (0.00s)
+    --- PASS: TestWeChatSenderRejectsHTTPAndMalformedResponses/http_500 (0.00s)
+    --- PASS: TestWeChatSenderRejectsHTTPAndMalformedResponses/http_400 (0.00s)
+    --- PASS: TestWeChatSenderRejectsHTTPAndMalformedResponses/malformed_token (0.00s)
+=== RUN   TestWeChatSenderUsesConfiguredTemplateFields
+--- PASS: TestWeChatSenderUsesConfiguredTemplateFields (0.00s)
+=== RUN   TestWeChatSenderTokenTransportIsRetryable
+--- PASS: TestWeChatSenderTokenTransportIsRetryable (0.00s)
+=== RUN   TestSenderTraceReportsCachedTokenWithoutAnotherTokenRequest
+    tracing_test.go:151: {"time":"2026-10-13T11:43:06.669792886+08:00","level":"DEBUG","msg":"wechat downstream request","stage":"wechat","operation":"access_token","outcome":"started","request_id":"cached-delivery"}
+        {"time":"2026-10-13T11:43:06.669838632+08:00","level":"DEBUG","msg":"wechat downstream request","stage":"wechat","operation":"access_token","outcome":"cache_hit","status":0,"duration_ms":0,"error_code":"","request_id":"cached-delivery"}
+        {"time":"2026-10-13T11:43:06.669895629+08:00","level":"DEBUG","msg":"wechat downstream request","stage":"wechat","operation":"subscribe_send","outcome":"started","request_id":"cached-delivery"}
+        {"time":"2026-10-13T11:43:06.670282136+08:00","level":"DEBUG","msg":"wechat downstream request","stage":"wechat","operation":"subscribe_send","outcome":"success","status":200,"duration_ms":0,"error_code":"","request_id":"cached-delivery"}
+        
+--- PASS: TestSenderTraceReportsCachedTokenWithoutAnotherTokenRequest (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.233s
+-test.shuffle 1791862986455408348
+=== RUN   TestProductModelPublishAndTenantIsolation
+--- PASS: TestProductModelPublishAndTenantIsolation (0.72s)
+=== RUN   TestValidateProductModelFields
+=== RUN   TestValidateProductModelFields/bad_identifier
+=== RUN   TestValidateProductModelFields/unknown_type
+=== RUN   TestValidateProductModelFields/duplicate
+=== RUN   TestValidateProductModelFields/invalid_range
+=== RUN   TestValidateProductModelFields/enum_numeric
+--- PASS: TestValidateProductModelFields (0.00s)
+    --- PASS: TestValidateProductModelFields/bad_identifier (0.00s)
+    --- PASS: TestValidateProductModelFields/unknown_type (0.00s)
+    --- PASS: TestValidateProductModelFields/duplicate (0.00s)
+    --- PASS: TestValidateProductModelFields/invalid_range (0.00s)
+    --- PASS: TestValidateProductModelFields/enum_numeric (0.00s)
+=== RUN   TestTenantPredicateRejectsSQLInjectionIdentifiers
+--- PASS: TestTenantPredicateRejectsSQLInjectionIdentifiers (0.00s)
+=== RUN   TestTelemetrySnapshotQueryCannotCrossTenantFarmChain
+--- PASS: TestTelemetrySnapshotQueryCannotCrossTenantFarmChain (0.00s)
+=== RUN   TestTelemetrySnapshotQueryRequiresActiveOwnerMembership
+--- PASS: TestTelemetrySnapshotQueryRequiresActiveOwnerMembership (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/persistence	1.739s

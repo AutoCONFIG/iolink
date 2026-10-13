@@ -1,0 +1,577 @@
+-test.shuffle 1791862730875240320
+=== RUN   TestDumpFailureFallsBackToStderrEvenBelowConsoleLevel
+--- PASS: TestDumpFailureFallsBackToStderrEvenBelowConsoleLevel (0.00s)
+=== RUN   TestBackupLimitIgnoresUnknownAndSymlinkEntries
+--- PASS: TestBackupLimitIgnoresUnknownAndSymlinkEntries (0.00s)
+=== RUN   TestCleanupFailureDisablesReadinessAndPreservesOriginal
+--- PASS: TestCleanupFailureDisablesReadinessAndPreservesOriginal (0.03s)
+=== RUN   TestContextHandlerDoesNotMutateSharedRecord
+--- PASS: TestContextHandlerDoesNotMutateSharedRecord (0.00s)
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction/attrs
+=== RUN   TestDerivedLoggerPreservesContextAndRedaction/group
+--- PASS: TestDerivedLoggerPreservesContextAndRedaction (0.00s)
+    --- PASS: TestDerivedLoggerPreservesContextAndRedaction/attrs (0.00s)
+    --- PASS: TestDerivedLoggerPreservesContextAndRedaction/group (0.00s)
+=== RUN   TestDumpRetainsDebugAndConsoleUsesConfiguredLevelWithGroupedAttrs
+--- PASS: TestDumpRetainsDebugAndConsoleUsesConfiguredLevelWithGroupedAttrs (0.00s)
+=== RUN   TestMalformedStartupDumpFailsClosedWithoutPartialRewrite
+--- PASS: TestMalformedStartupDumpFailsClosedWithoutPartialRewrite (0.04s)
+=== RUN   TestConcurrentCloseAndWritesCannotReopenClosedSink
+--- PASS: TestConcurrentCloseAndWritesCannotReopenClosedSink (0.00s)
+=== RUN   TestConcurrentPruningAndWritingPreservesCompleteRecentRecords
+--- PASS: TestConcurrentPruningAndWritingPreservesCompleteRecentRecords (0.10s)
+=== RUN   TestRetentionPrunesRecordsInAllDumpLocations
+--- PASS: TestRetentionPrunesRecordsInAllDumpLocations (0.00s)
+=== RUN   TestSinkClosedCannotReopenFile
+--- PASS: TestSinkClosedCannotReopenFile (0.00s)
+=== RUN   TestPeriodicCleanupUsesConfiguredIntervalAndStopsOnClose
+--- PASS: TestPeriodicCleanupUsesConfiguredIntervalAndStopsOnClose (0.00s)
+=== RUN   TestDurationEnvironmentIsAppliedAndInvalidDurationsRejected
+--- PASS: TestDurationEnvironmentIsAppliedAndInvalidDurationsRejected (0.00s)
+=== RUN   TestReopenedWriterEnforcesBackupsAtExactSizeBoundary
+--- PASS: TestReopenedWriterEnforcesBackupsAtExactSizeBoundary (0.01s)
+=== RUN   TestStartupPrunesStaleRecordsAndRemovesEmptyOldDumps
+--- PASS: TestStartupPrunesStaleRecordsAndRemovesEmptyOldDumps (0.00s)
+=== RUN   TestRetentionLeavesUnrelatedFilesAndSymlinks
+--- PASS: TestRetentionLeavesUnrelatedFilesAndSymlinks (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/observability	1.235s
+-test.shuffle 1791862731028759960
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/success
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/denied
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/failure
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/panic
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+=== RUN   TestRequestLogsCorrelateWithoutUntrustedContent/unmatched
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices/:device_no       --> git.hyhy.fun/rsplab/iolink/internal/operations.TestRequestLogsCorrelateWithoutUntrustedContent.func1.1 (2 handlers)
+--- PASS: TestRequestLogsCorrelateWithoutUntrustedContent (0.01s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/success (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/denied (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/failure (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/panic (0.00s)
+    --- PASS: TestRequestLogsCorrelateWithoutUntrustedContent/unmatched (0.00s)
+=== RUN   TestHealthEndpointsFailClosedOnDependencyErrors
+--- PASS: TestHealthEndpointsFailClosedOnDependencyErrors (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/operations	1.044s
+-test.shuffle 1791862731060589275
+=== RUN   TestPublishEmitsCorrelatedSafeRecords
+--- PASS: TestPublishEmitsCorrelatedSafeRecords (0.00s)
+=== RUN   TestRejectedPublishStillHasCorrelation
+--- PASS: TestRejectedPublishStillHasCorrelation (0.00s)
+=== RUN   TestRevisionLookupFailureFailsClosed
+--- PASS: TestRevisionLookupFailureFailsClosed (0.00s)
+=== RUN   TestResolveFailureAtEstablishmentFailsClosed
+--- PASS: TestResolveFailureAtEstablishmentFailsClosed (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/access	1.031s
+-test.shuffle 1791862731150762443
+=== RUN   TestBootstrapWhenDatabaseUnavailableThenFailsClosed
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /setup/v1/status          --> git.hyhy.fun/rsplab/iolink/internal/setupapi.(*Server).Routes.func1 (2 handlers)
+[GIN-debug] POST   /setup/v1/initialize      --> git.hyhy.fun/rsplab/iolink/internal/setupapi.(*Server).Routes.func2 (2 handlers)
+--- PASS: TestBootstrapWhenDatabaseUnavailableThenFailsClosed (0.92s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/setupapi	1.954s
+-test.shuffle 1791862731346380470
+=== RUN   TestTelemetryWriteDeniedWhenActorContextMissing
+=== RUN   TestTelemetryWriteDeniedWhenActorContextMissing/unscoped
+    telemetry_permission_test.go:136: environment real_timescaledb=2.30.2
+    telemetry_permission_test.go:142: scenario=unscoped error=forbidden before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestTelemetryWriteDeniedWhenActorContextMissing/missing_actor
+    telemetry_permission_test.go:136: environment real_timescaledb=2.30.2
+    telemetry_permission_test.go:142: scenario=missing_actor error=forbidden before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestTelemetryWriteDeniedWhenActorContextMissing/missing_role
+    telemetry_permission_test.go:136: environment real_timescaledb=2.30.2
+    telemetry_permission_test.go:142: scenario=missing_role error=forbidden before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestTelemetryWriteDeniedWhenActorContextMissing/missing_tenant
+    telemetry_permission_test.go:136: environment real_timescaledb=2.30.2
+    telemetry_permission_test.go:142: scenario=missing_tenant error=forbidden before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+--- PASS: TestTelemetryWriteDeniedWhenActorContextMissing (2.39s)
+    --- PASS: TestTelemetryWriteDeniedWhenActorContextMissing/unscoped (0.75s)
+    --- PASS: TestTelemetryWriteDeniedWhenActorContextMissing/missing_actor (0.56s)
+    --- PASS: TestTelemetryWriteDeniedWhenActorContextMissing/missing_role (0.54s)
+    --- PASS: TestTelemetryWriteDeniedWhenActorContextMissing/missing_tenant (0.54s)
+=== RUN   TestDebugDumpHTTPRegisterDeviceLicenseRejectionCorrelation
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /devices                  --> git.hyhy.fun/rsplab/iolink/internal/core_test.TestDebugDumpHTTPRegisterDeviceLicenseRejectionCorrelation.func1 (2 handlers)
+    debug_dump_integration_test.go:259: {"level":"DEBUG","method":"POST","msg":"http request started","outcome":"started","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","route":"/devices","stage":"http","time":"2026-10-13T11:38:54.325937886+08:00"}
+    debug_dump_integration_test.go:259: {"level":"DEBUG","msg":"database query started","outcome":"started","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"RBACDEU5CW7NC5POJLI7PKHYVX","stage":"database","time":"2026-10-13T11:38:54.326030089+08:00"}
+    debug_dump_integration_test.go:259: {"duration_ms":0,"level":"DEBUG","msg":"database query completed","outcome":"completed","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"RBACDEU5CW7NC5POJLI7PKHYVX","stage":"database","time":"2026-10-13T11:38:54.326294955+08:00"}
+    debug_dump_integration_test.go:259: {"level":"DEBUG","msg":"database query started","outcome":"started","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"LCCQVCODK3ACZ2IZF2XRHPI55S","stage":"database","time":"2026-10-13T11:38:54.326406725+08:00"}
+    debug_dump_integration_test.go:259: {"duration_ms":1,"level":"DEBUG","msg":"database query completed","outcome":"completed","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"LCCQVCODK3ACZ2IZF2XRHPI55S","stage":"database","time":"2026-10-13T11:38:54.327609541+08:00"}
+    debug_dump_integration_test.go:259: {"level":"DEBUG","msg":"database query started","outcome":"started","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"ADOPSJQEJDITPA7B4XRTU22V5P","stage":"database","time":"2026-10-13T11:38:54.327722713+08:00"}
+    debug_dump_integration_test.go:259: {"duration_ms":0,"level":"DEBUG","msg":"database query completed","outcome":"completed","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"ADOPSJQEJDITPA7B4XRTU22V5P","stage":"database","time":"2026-10-13T11:38:54.328269198+08:00"}
+    debug_dump_integration_test.go:259: {"level":"DEBUG","msg":"database query started","outcome":"started","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"47DWS6NN7DINHF54TJLDOKS22I","stage":"database","time":"2026-10-13T11:38:54.328375187+08:00"}
+    debug_dump_integration_test.go:259: {"duration_ms":1,"level":"DEBUG","msg":"database query completed","outcome":"completed","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"47DWS6NN7DINHF54TJLDOKS22I","stage":"database","time":"2026-10-13T11:38:54.32952865+08:00"}
+    debug_dump_integration_test.go:259: {"level":"DEBUG","msg":"database query started","outcome":"started","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"XSH43BXWK6R4GI7ZRT5VGGMWNY","stage":"database","time":"2026-10-13T11:38:54.329636893+08:00"}
+    debug_dump_integration_test.go:259: {"duration_ms":0,"level":"DEBUG","msg":"database query completed","outcome":"completed","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"XSH43BXWK6R4GI7ZRT5VGGMWNY","stage":"database","time":"2026-10-13T11:38:54.329780723+08:00"}
+    debug_dump_integration_test.go:259: {"level":"DEBUG","msg":"database query started","outcome":"started","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"XV7WVQPQ2XLQ5BQ57MJEOOVWFE","stage":"database","time":"2026-10-13T11:38:54.329868728+08:00"}
+    debug_dump_integration_test.go:259: {"duration_ms":0,"level":"DEBUG","msg":"database query completed","outcome":"completed","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"XV7WVQPQ2XLQ5BQ57MJEOOVWFE","stage":"database","time":"2026-10-13T11:38:54.330486086+08:00"}
+    debug_dump_integration_test.go:259: {"duration_ms":0,"err":"*errors.errorString","level":"DEBUG","msg":"device admission completed","operation":"verifier","outcome":"rejected","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","stage":"license","time":"2026-10-13T11:38:54.330560415+08:00"}
+    debug_dump_integration_test.go:259: {"level":"DEBUG","msg":"database query started","outcome":"started","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"ZAP7H5E7OYPZKZDCIDHIZEJHPP","stage":"database","time":"2026-10-13T11:38:54.33064308+08:00"}
+    debug_dump_integration_test.go:259: {"duration_ms":0,"level":"DEBUG","msg":"database query completed","outcome":"completed","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","span_id":"ZAP7H5E7OYPZKZDCIDHIZEJHPP","stage":"database","time":"2026-10-13T11:38:54.330795156+08:00"}
+    debug_dump_integration_test.go:259: {"actor_id":0,"duration_ms":4,"level":"WARN","method":"POST","msg":"http request","request_id":"OQGYII5UZV5XAV3RS433ARKNUZ","route":"/devices","status":403,"tenant_id":0,"time":"2026-10-13T11:38:54.330870687+08:00"}
+--- PASS: TestDebugDumpHTTPRegisterDeviceLicenseRejectionCorrelation (0.63s)
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /admin/v1/login           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).login-fm (2 handlers)
+[GIN-debug] POST   /admin/v1/register        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).register-fm (2 handlers)
+[GIN-debug] GET    /admin/v1/session         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).session-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/password        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).changePassword-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/tenants         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listTenants-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/tenants/:id/members --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listTenantMembers-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/tenants/:id/members/:user_id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setTenantMember-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/license         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getLicense-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/license         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).importLicense-fm (3 handlers)
+[GIN-debug] POST   /admin/v1/tenants         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createTenant-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/platform/stats  --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).platformStats-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/platform/users  --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).platformUsers-fm (3 handlers)
+[GIN-debug] PUT    /admin/v1/tenants/:id/status --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setTenantStatus-fm (3 handlers)
+[GIN-debug] GET    /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarms-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/farms           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createFarm-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/users           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listUsers-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateFarm-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/farms/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteFarm-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id/owner --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setFarmOwner-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/farms/:id/members --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listFarmMembers-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/farms/:id/members/:user_id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).setFarmMember-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listPonds-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/ponds           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createPond-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updatePond-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/ponds/:id       --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deletePond-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listDevices-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/devices         --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).registerDevice-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDevice-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteDevice-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/devices/:device_no/restore --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).restoreDevice-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/devices/:device_no/pond --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).moveDevice-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listRules-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarm-rules     --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createRule-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).updateRule-fm (4 handlers)
+[GIN-debug] DELETE /admin/v1/alarm-rules/:id --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).deleteRule-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/alarms          --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAlarms-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).confirmAlarm-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/alarms/batch-confirm --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).batchConfirm-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/stats           --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).stats-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/api-keys        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAPIKeys-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/api-keys/audit  --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listAPIKeyAudit-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/api-keys        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createAPIKey-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/api-keys/:key_id/rotate --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).rotateAPIKey-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/api-keys/:key_id/revoke --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).revokeAPIKey-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/products        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listProducts-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products        --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createProduct-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/products/:product_id/models --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).listProductModels-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products/:product_id/models --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).createProductModel-fm (4 handlers)
+[GIN-debug] POST   /admin/v1/products/:product_id/models/:version/publish --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).publishProductModel-fm (4 handlers)
+[GIN-debug] GET    /admin/v1/devices/:device_no/product --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).getDeviceProduct-fm (4 handlers)
+[GIN-debug] PUT    /admin/v1/devices/:device_no/product --> git.hyhy.fun/rsplab/iolink/internal/adminapi.(*Server).assignDeviceProduct-fm (4 handlers)
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner
+2026/10/13 11:38:55 WARN http request route=/admin/v1/farms method=GET status=401 duration_ms=1 tenant_id=0 actor_id=0
+2026/10/13 11:38:55 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=164 tenant_id=0 actor_id=0
+2026/10/13 11:38:55 WARN http request route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+    platform_membership_test.go:76: ADMIN stored role=owner old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/admin
+2026/10/13 11:38:55 WARN http request route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/13 11:38:55 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=149 tenant_id=0 actor_id=0
+2026/10/13 11:38:55 WARN http request route=/admin/v1/farms method=GET status=403 duration_ms=1 tenant_id=0 actor_id=0
+    platform_membership_test.go:76: ADMIN stored role=admin old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/member
+2026/10/13 11:38:55 WARN http request route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/13 11:38:55 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=144 tenant_id=0 actor_id=0
+2026/10/13 11:38:55 WARN http request route=/admin/v1/farms method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+    platform_membership_test.go:76: ADMIN stored role=member old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/viewer
+2026/10/13 11:38:55 WARN http request route=/admin/v1/farms method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/13 11:38:55 INFO http request route=/admin/v1/login method=POST status=200 duration_ms=142 tenant_id=0 actor_id=0
+2026/10/13 11:38:55 WARN http request route=/admin/v1/farms method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+    platform_membership_test.go:76: ADMIN stored role=viewer old token=401 fresh login business read=403
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_false
+=== RUN   TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_true
+--- PASS: TestM6bStoredPlatformMembershipFailsClosed (1.35s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner (0.17s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/admin (0.16s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/member (0.15s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/viewer (0.15s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_false (0.00s)
+    --- PASS: TestM6bStoredPlatformMembershipFailsClosed/owner_assignment_scoped_true (0.00s)
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/singular_open
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.2
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=false err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/singular_confirmed
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.2
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=singular already_confirmed=true err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/batch_open
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.2
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=false err=forbidden unchanged=true
+=== RUN   TestM6bAlarmMutationsRejectPartialTenantContext/batch_confirmed
+    alarm_partial_context_test.go:15: environment real_timescaledb=2.30.2
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+    alarm_partial_context_test.go:41: operation=batch already_confirmed=true err=forbidden unchanged=true
+--- PASS: TestM6bAlarmMutationsRejectPartialTenantContext (2.28s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/singular_open (0.55s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/singular_confirmed (0.54s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/batch_open (0.59s)
+    --- PASS: TestM6bAlarmMutationsRejectPartialTenantContext/batch_confirmed (0.60s)
+=== RUN   TestDebugDumpRealMQTTCorePostgresCorrelation
+=== RUN   TestDebugDumpRealMQTTCorePostgresCorrelation/success
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"mqtt message received","outcome":"started","protocol":"mqtt","qos":1,"retain":false,"stage":"mqtt_ingress","time":"2026-10-13T11:38:58.542899619+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"mqtt dispatch started","outcome":"started","rejected_count":1,"stage":"mqtt_dispatch","time":"2026-10-13T11:38:58.545463558+08:00"}
+    debug_dump_integration_test.go:228: {"field_count":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","kind":"status_change","level":"DEBUG","msg":"event validation started","outcome":"started","stage":"core_validation","time":"2026-10-13T11:38:58.545549298+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","kind":"status_change","level":"DEBUG","msg":"event validation completed","outcome":"accepted","stage":"core_validation","time":"2026-10-13T11:38:58.545640159+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"B4FA2O2OEBASFPTBCJJ37FWDLT","stage":"database","time":"2026-10-13T11:38:58.545727112+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"B4FA2O2OEBASFPTBCJJ37FWDLT","stage":"database","time":"2026-10-13T11:38:58.545961832+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"XWUHYO7KTUU5PWL43DVNW3XQHM","stage":"database","time":"2026-10-13T11:38:58.546062251+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"XWUHYO7KTUU5PWL43DVNW3XQHM","stage":"database","time":"2026-10-13T11:38:58.546694707+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"5GA7K76BMLK4ZHNVO76YPBPXZO","stage":"database","time":"2026-10-13T11:38:58.54678713+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"5GA7K76BMLK4ZHNVO76YPBPXZO","stage":"database","time":"2026-10-13T11:38:58.547348082+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"4XM2WM2LGOWOK7DYDVL3M5HMHQ","stage":"database","time":"2026-10-13T11:38:58.547435987+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"4XM2WM2LGOWOK7DYDVL3M5HMHQ","stage":"database","time":"2026-10-13T11:38:58.548458695+08:00"}
+    debug_dump_integration_test.go:228: {"device_hash":"7692c3ad3540bb803c020b3a","duration_ms":2,"field_count":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","kind":"status_change","level":"DEBUG","msg":"device event completed","outcome":"completed","stage":"ingestion","time":"2026-10-13T11:38:58.548547562+08:00"}
+    debug_dump_integration_test.go:228: {"field_count":1,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","kind":"properties","level":"DEBUG","msg":"event validation started","outcome":"started","stage":"core_validation","time":"2026-10-13T11:38:58.548660033+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","kind":"properties","level":"DEBUG","msg":"event validation completed","outcome":"accepted","stage":"core_validation","time":"2026-10-13T11:38:58.548727119+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"ZCSMVNONGB5CMOYYYGSTWPDRMU","stage":"database","time":"2026-10-13T11:38:58.548800917+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"ZCSMVNONGB5CMOYYYGSTWPDRMU","stage":"database","time":"2026-10-13T11:38:58.548939768+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"2LICEQQ5KRV7QUIBLPBUAJWMXH","stage":"database","time":"2026-10-13T11:38:58.549024637+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"2LICEQQ5KRV7QUIBLPBUAJWMXH","stage":"database","time":"2026-10-13T11:38:58.550600903+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"FVSX52UBKYZQ44I5NSJEARB3DV","stage":"database","time":"2026-10-13T11:38:58.55067897+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"FVSX52UBKYZQ44I5NSJEARB3DV","stage":"database","time":"2026-10-13T11:38:58.551591992+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"RMBQRDXPLTE2LZRF5FZCXNICKD","stage":"database","time":"2026-10-13T11:38:58.551712779+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"RMBQRDXPLTE2LZRF5FZCXNICKD","stage":"database","time":"2026-10-13T11:38:58.552256759+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"HYPGHUGJGZFY7YYAMHVU4YAFYY","stage":"database","time":"2026-10-13T11:38:58.552340606+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"HYPGHUGJGZFY7YYAMHVU4YAFYY","stage":"database","time":"2026-10-13T11:38:58.553466268+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"IPJXJPNID4LTDUPFRR6JJCMY56","stage":"database","time":"2026-10-13T11:38:58.553740622+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"IPJXJPNID4LTDUPFRR6JJCMY56","stage":"database","time":"2026-10-13T11:38:58.554920215+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"WSBMZQ44XVWGFJALZPN5Y5TQBH","stage":"database","time":"2026-10-13T11:38:58.555017527+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"WSBMZQ44XVWGFJALZPN5Y5TQBH","stage":"database","time":"2026-10-13T11:38:58.555709455+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"UQLOOERL56F5YWH37SYW4JQ4NV","stage":"database","time":"2026-10-13T11:38:58.555815474+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"UQLOOERL56F5YWH37SYW4JQ4NV","stage":"database","time":"2026-10-13T11:38:58.556530014+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"JTNJFBPC4CKKARSGZHTEHD42HK","stage":"database","time":"2026-10-13T11:38:58.556610304+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"JTNJFBPC4CKKARSGZHTEHD42HK","stage":"database","time":"2026-10-13T11:38:58.557303024+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"BMCK5322Q3R7YM5JLRCFMVLNHQ","stage":"database","time":"2026-10-13T11:38:58.557395988+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"BMCK5322Q3R7YM5JLRCFMVLNHQ","stage":"database","time":"2026-10-13T11:38:58.557734032+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"7JL2M45UJ7UWDSPPPWATVJYCZ7","stage":"database","time":"2026-10-13T11:38:58.557809824+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"7JL2M45UJ7UWDSPPPWATVJYCZ7","stage":"database","time":"2026-10-13T11:38:58.558862709+08:00"}
+    debug_dump_integration_test.go:228: {"count":0,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","level":"DEBUG","msg":"telemetry transaction committed","outcome":"committed","stage":"persistence","time":"2026-10-13T11:38:58.558950544+08:00"}
+    debug_dump_integration_test.go:228: {"device_hash":"7692c3ad3540bb803c020b3a","duration_ms":10,"field_count":1,"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","kind":"properties","level":"DEBUG","msg":"device event completed","outcome":"completed","stage":"ingestion","time":"2026-10-13T11:38:58.559014925+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"JOUMLTHLSQMKFSA26PD3W7PXGF","kind":"properties","level":"DEBUG","msg":"mqtt message dispatched","outcome":"accepted","stage":"mqtt_dispatch","time":"2026-10-13T11:38:58.55911892+08:00"}
+=== RUN   TestDebugDumpRealMQTTCorePostgresCorrelation/duplicate
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"mqtt message received","outcome":"started","protocol":"mqtt","qos":1,"retain":false,"stage":"mqtt_ingress","time":"2026-10-13T11:38:59.20224269+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"mqtt dispatch started","outcome":"started","rejected_count":1,"stage":"mqtt_dispatch","time":"2026-10-13T11:38:59.203748173+08:00"}
+    debug_dump_integration_test.go:228: {"field_count":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","kind":"status_change","level":"DEBUG","msg":"event validation started","outcome":"started","stage":"core_validation","time":"2026-10-13T11:38:59.203825819+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","kind":"status_change","level":"DEBUG","msg":"event validation completed","outcome":"accepted","stage":"core_validation","time":"2026-10-13T11:38:59.203908805+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"2GWDZXGIYELA6O6RJC7R76ESWV","stage":"database","time":"2026-10-13T11:38:59.203990648+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"2GWDZXGIYELA6O6RJC7R76ESWV","stage":"database","time":"2026-10-13T11:38:59.204176697+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"V3WS2T6B444R44YGQJ377PCL6H","stage":"database","time":"2026-10-13T11:38:59.204270333+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"V3WS2T6B444R44YGQJ377PCL6H","stage":"database","time":"2026-10-13T11:38:59.204733481+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"UKZPHLT7E5CQ4JWFPNXX7GQDTN","stage":"database","time":"2026-10-13T11:38:59.204810786+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"UKZPHLT7E5CQ4JWFPNXX7GQDTN","stage":"database","time":"2026-10-13T11:38:59.205298762+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"OU3IW7QFCDI4NE3HPSVJNJ6GGO","stage":"database","time":"2026-10-13T11:38:59.205385885+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"OU3IW7QFCDI4NE3HPSVJNJ6GGO","stage":"database","time":"2026-10-13T11:38:59.206393856+08:00"}
+    debug_dump_integration_test.go:228: {"device_hash":"7692c3ad3540bb803c020b3a","duration_ms":2,"field_count":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","kind":"status_change","level":"DEBUG","msg":"device event completed","outcome":"completed","stage":"ingestion","time":"2026-10-13T11:38:59.206479907+08:00"}
+    debug_dump_integration_test.go:228: {"field_count":1,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","kind":"properties","level":"DEBUG","msg":"event validation started","outcome":"started","stage":"core_validation","time":"2026-10-13T11:38:59.20657212+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","kind":"properties","level":"DEBUG","msg":"event validation completed","outcome":"accepted","stage":"core_validation","time":"2026-10-13T11:38:59.206640909+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"AXAXMFNHBRQKZQUB6XS7IWBO37","stage":"database","time":"2026-10-13T11:38:59.206712794+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"AXAXMFNHBRQKZQUB6XS7IWBO37","stage":"database","time":"2026-10-13T11:38:59.206839902+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"NMMXYKXKIDMP5AMY7J33DZYBR2","stage":"database","time":"2026-10-13T11:38:59.206909553+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"NMMXYKXKIDMP5AMY7J33DZYBR2","stage":"database","time":"2026-10-13T11:38:59.207470555+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"EXU5DAQNYCDGC5JRA3LA3YPT27","stage":"database","time":"2026-10-13T11:38:59.207549153+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"EXU5DAQNYCDGC5JRA3LA3YPT27","stage":"database","time":"2026-10-13T11:38:59.207795485+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"ASZB3F6HJ3LPU5DOBUR3XQ5XE2","stage":"database","time":"2026-10-13T11:38:59.207864174+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"ASZB3F6HJ3LPU5DOBUR3XQ5XE2","stage":"database","time":"2026-10-13T11:38:59.208033361+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"event deduplicated","outcome":"duplicate","stage":"deduplication","time":"2026-10-13T11:38:59.208122658+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"V4RJYVMGTDWW3PEPMCYMRDCII3","stage":"database","time":"2026-10-13T11:38:59.208179385+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"V4RJYVMGTDWW3PEPMCYMRDCII3","stage":"database","time":"2026-10-13T11:38:59.209177727+08:00"}
+    debug_dump_integration_test.go:228: {"device_hash":"7692c3ad3540bb803c020b3a","duration_ms":2,"field_count":1,"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","kind":"properties","level":"DEBUG","msg":"device event completed","outcome":"completed","stage":"ingestion","time":"2026-10-13T11:38:59.209284046+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"OI7XQUWGYW2WX76ANMDTQTTKKD","kind":"properties","level":"DEBUG","msg":"mqtt message dispatched","outcome":"accepted","stage":"mqtt_dispatch","time":"2026-10-13T11:38:59.209389975+08:00"}
+=== RUN   TestDebugDumpRealMQTTCorePostgresCorrelation/database_failure
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"mqtt message received","outcome":"started","protocol":"mqtt","qos":1,"retain":false,"stage":"mqtt_ingress","time":"2026-10-13T11:38:59.891878135+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"mqtt dispatch started","outcome":"started","rejected_count":1,"stage":"mqtt_dispatch","time":"2026-10-13T11:38:59.894737388+08:00"}
+    debug_dump_integration_test.go:228: {"field_count":0,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","kind":"status_change","level":"DEBUG","msg":"event validation started","outcome":"started","stage":"core_validation","time":"2026-10-13T11:38:59.894847905+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","kind":"status_change","level":"DEBUG","msg":"event validation completed","outcome":"accepted","stage":"core_validation","time":"2026-10-13T11:38:59.894962871+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"IALK2YLDWQZT6VQSXFN4G5RDX5","stage":"database","time":"2026-10-13T11:38:59.895053+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"IALK2YLDWQZT6VQSXFN4G5RDX5","stage":"database","time":"2026-10-13T11:38:59.895295013+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"LMQ337F2APGU4PECPKPI2G7ZC3","stage":"database","time":"2026-10-13T11:38:59.895396834+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"LMQ337F2APGU4PECPKPI2G7ZC3","stage":"database","time":"2026-10-13T11:38:59.895999314+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"AJDSGTTLL5X7CV2JEOYLDCFLL3","stage":"database","time":"2026-10-13T11:38:59.896101736+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"AJDSGTTLL5X7CV2JEOYLDCFLL3","stage":"database","time":"2026-10-13T11:38:59.896768216+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"RYLDXJEFYNZSCM4I4Z2PVEJ2EF","stage":"database","time":"2026-10-13T11:38:59.8968661+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"RYLDXJEFYNZSCM4I4Z2PVEJ2EF","stage":"database","time":"2026-10-13T11:38:59.898024613+08:00"}
+    debug_dump_integration_test.go:228: {"device_hash":"7692c3ad3540bb803c020b3a","duration_ms":3,"field_count":0,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","kind":"status_change","level":"DEBUG","msg":"device event completed","outcome":"completed","stage":"ingestion","time":"2026-10-13T11:38:59.898150149+08:00"}
+    debug_dump_integration_test.go:228: {"field_count":1,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","kind":"properties","level":"DEBUG","msg":"event validation started","outcome":"started","stage":"core_validation","time":"2026-10-13T11:38:59.898271717+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","kind":"properties","level":"DEBUG","msg":"event validation completed","outcome":"accepted","stage":"core_validation","time":"2026-10-13T11:38:59.898353109+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"RRP36JHKCZXSZFI2C67A2AKS5S","stage":"database","time":"2026-10-13T11:38:59.898433901+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"RRP36JHKCZXSZFI2C67A2AKS5S","stage":"database","time":"2026-10-13T11:38:59.898591496+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"KOM22ECF75DQABYKU2RHCWCYQ6","stage":"database","time":"2026-10-13T11:38:59.898683138+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"KOM22ECF75DQABYKU2RHCWCYQ6","stage":"database","time":"2026-10-13T11:38:59.900675996+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"YYVZJBY3Q2PBCJWCUCV5MT54VE","stage":"database","time":"2026-10-13T11:38:59.900803946+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"YYVZJBY3Q2PBCJWCUCV5MT54VE","stage":"database","time":"2026-10-13T11:38:59.901853174+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"VIAE7X55JONZETL3FZPX4VGN74","stage":"database","time":"2026-10-13T11:38:59.901951839+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"VIAE7X55JONZETL3FZPX4VGN74","stage":"database","time":"2026-10-13T11:38:59.902477926+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"WQULN5APAC7QSNQLR3S4EGXIMM","stage":"database","time":"2026-10-13T11:38:59.902616305+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":1,"err":"postgres_P0001","ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"WARN","msg":"database query completed","outcome":"failed","span_id":"WQULN5APAC7QSNQLR3S4EGXIMM","stage":"database","time":"2026-10-13T11:38:59.903728481+08:00"}
+    debug_dump_integration_test.go:228: {"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query started","outcome":"started","span_id":"HM6ID4WE62DDLWTPWV4OFN6LLN","stage":"database","time":"2026-10-13T11:38:59.903865027+08:00"}
+    debug_dump_integration_test.go:228: {"duration_ms":0,"ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"DEBUG","msg":"database query completed","outcome":"completed","span_id":"HM6ID4WE62DDLWTPWV4OFN6LLN","stage":"database","time":"2026-10-13T11:38:59.904032522+08:00"}
+    debug_dump_integration_test.go:228: {"device_hash":"7692c3ad3540bb803c020b3a","duration_ms":5,"err":"postgres_P0001","ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"WARN","msg":"device event rejected","outcome":"failed","stage":"ingestion","time":"2026-10-13T11:38:59.904124694+08:00"}
+    debug_dump_integration_test.go:228: {"err":"postgres_P0001","error_code":"dispatch","ingest_id":"SUTT4RJERFIIRSSDDYXS5A7RAS","level":"WARN","msg":"mqtt message rejected","outcome":"rejected","stage":"mqtt_dispatch","time":"2026-10-13T11:38:59.904226435+08:00"}
+--- PASS: TestDebugDumpRealMQTTCorePostgresCorrelation (1.95s)
+    --- PASS: TestDebugDumpRealMQTTCorePostgresCorrelation/success (0.60s)
+    --- PASS: TestDebugDumpRealMQTTCorePostgresCorrelation/duplicate (0.65s)
+    --- PASS: TestDebugDumpRealMQTTCorePostgresCorrelation/database_failure (0.70s)
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/actor
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.2
+    app_resource_scope_test.go:107: scenario=manager_actor error=not found
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/role
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.2
+    app_resource_scope_test.go:107: scenario=manager_role error=not found
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/membership
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.2
+    app_resource_scope_test.go:107: scenario=manager_membership error=not found
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/platform_authority
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.2
+    app_resource_scope_test.go:107: scenario=manager_platform_authority error=not found
+=== RUN   TestAppResourceScopeWhenManagerContextIsForged/missing_actor
+    app_resource_scope_test.go:84: environment real_timescaledb=2.30.2
+    app_resource_scope_test.go:107: scenario=manager_missing_actor error=not found
+--- PASS: TestAppResourceScopeWhenManagerContextIsForged (2.65s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/actor (0.54s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/role (0.53s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/membership (0.52s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/platform_authority (0.52s)
+    --- PASS: TestAppResourceScopeWhenManagerContextIsForged/missing_actor (0.53s)
+=== RUN   TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation
+=== RUN   TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation/role
+    telemetry_permission_test.go:79: environment real_timescaledb=2.30.2
+    telemetry_permission_test.go:95: scenario=role error=forbidden before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation/expired
+    telemetry_permission_test.go:79: environment real_timescaledb=2.30.2
+    telemetry_permission_test.go:95: scenario=expired error=not found before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+=== RUN   TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation/tenant_inactive
+    telemetry_permission_test.go:79: environment real_timescaledb=2.30.2
+    telemetry_permission_test.go:95: scenario=tenant_inactive error=not found before={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []} after={"alarms": [], "outbox": [], "shadows": [], "telemetry": [], "sensor_data": []}
+--- PASS: TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation (1.61s)
+    --- PASS: TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation/role (0.53s)
+    --- PASS: TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation/expired (0.54s)
+    --- PASS: TestTelemetryWriteDeniedWhenMembershipChangesAfterContextCreation/tenant_inactive (0.53s)
+=== RUN   TestHandleEventValidationDumpUsesCorrelationAndSafeError
+--- PASS: TestHandleEventValidationDumpUsesCorrelationAndSafeError (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	13.954s
+-test.shuffle 1791862731341616055
+=== RUN   TestLoginWithoutTenantMembershipFailsClosed
+--- PASS: TestLoginWithoutTenantMembershipFailsClosed (0.00s)
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/success
+    wechat_debug_test.go:91: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-13T11:38:51.345450366+08:00"}
+    wechat_debug_test.go:91: {"duration_ms":1,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"success","request_id":"login-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.346716851+08:00"}
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/provider_failure
+    wechat_debug_test.go:91: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-13T11:38:51.347300446+08:00"}
+    wechat_debug_test.go:91: {"duration_ms":0,"error_code":"provider_error","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"login-correlation","stage":"wechat","status":400,"time":"2026-10-13T11:38:51.347815221+08:00"}
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/malformed_response
+    wechat_debug_test.go:91: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-13T11:38:51.348302104+08:00"}
+    wechat_debug_test.go:91: {"duration_ms":0,"error_code":"response_decode","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"login-correlation","stage":"wechat","status":503,"time":"2026-10-13T11:38:51.348778397+08:00"}
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/timeout
+    wechat_debug_test.go:91: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-13T11:38:51.349288233+08:00"}
+    wechat_debug_test.go:91: {"duration_ms":100,"error_code":"deadline_exceeded","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"login-correlation","stage":"wechat","status":0,"time":"2026-10-13T11:38:51.449936457+08:00"}
+--- PASS: TestWechatLoginTracesSafeHTTPOutcomes (0.11s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/success (0.00s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/provider_failure (0.00s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/malformed_response (0.00s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/timeout (0.10s)
+=== RUN   TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream
+=== RUN   TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream/success
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /api/v1/auth/tenants      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listTenants-fm (3 handlers)
+[GIN-debug] POST   /api/v1/auth/tenant       --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).switchTenant-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (3 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (3 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (3 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] GET    /api/v1/cameras           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listCameras-fm (4 handlers)
+[GIN-debug] GET    /api/v1/cameras/:camera_id --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getCamera-fm (4 handlers)
+[GIN-debug] POST   /api/v2/devices/:device_no/telemetry --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).submitTelemetryV2-fm (3 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/model/latest --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).modelLatestV2-fm (3 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/history --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).telemetryHistoryV2-fm (3 handlers)
+    wechat_debug_test.go:163: {"level":"DEBUG","method":"POST","msg":"http request started","outcome":"started","request_id":"C7YRTY4RQCMBFG3C7V7QOO4GCZ","route":"/api/v1/auth/login","stage":"http","time":"2026-10-13T11:38:51.451095871+08:00"}
+    wechat_debug_test.go:163: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"C7YRTY4RQCMBFG3C7V7QOO4GCZ","stage":"wechat","time":"2026-10-13T11:38:51.45130296+08:00"}
+    wechat_debug_test.go:163: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"success","request_id":"C7YRTY4RQCMBFG3C7V7QOO4GCZ","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.45189488+08:00"}
+    wechat_debug_test.go:163: {"actor_id":0,"duration_ms":1,"level":"INFO","method":"POST","msg":"http request","request_id":"C7YRTY4RQCMBFG3C7V7QOO4GCZ","route":"/api/v1/auth/login","status":200,"tenant_id":0,"time":"2026-10-13T11:38:51.452195143+08:00"}
+=== RUN   TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream/provider_rejected
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/auth/login        --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).login-fm (2 handlers)
+[GIN-debug] GET    /api/v1/auth/tenants      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listTenants-fm (3 handlers)
+[GIN-debug] POST   /api/v1/auth/tenant       --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).switchTenant-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds             --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listPonds-fm (3 handlers)
+[GIN-debug] GET    /api/v1/ponds/:id         --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getPond-fm (3 handlers)
+[GIN-debug] GET    /api/v1/devices           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listDevices-fm (3 handlers)
+[GIN-debug] GET    /api/v1/devices/:device_no --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getDevice-fm (3 handlers)
+[GIN-debug] GET    /api/v1/water/latest      --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterLatest-fm (3 handlers)
+[GIN-debug] GET    /api/v1/water/history     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).waterHistory-fm (3 handlers)
+[GIN-debug] GET    /api/v1/alarms            --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listAlarms-fm (3 handlers)
+[GIN-debug] GET    /api/v1/stats/summary     --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).statsSummary-fm (3 handlers)
+[GIN-debug] POST   /api/v1/alarms/:id/confirm --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).confirmAlarm-fm (3 handlers)
+[GIN-debug] GET    /api/v1/cameras           --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).listCameras-fm (4 handlers)
+[GIN-debug] GET    /api/v1/cameras/:camera_id --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).getCamera-fm (4 handlers)
+[GIN-debug] POST   /api/v2/devices/:device_no/telemetry --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).submitTelemetryV2-fm (3 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/model/latest --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).modelLatestV2-fm (3 handlers)
+[GIN-debug] GET    /api/v2/devices/:device_no/history --> git.hyhy.fun/rsplab/iolink/internal/appapi.(*Server).telemetryHistoryV2-fm (3 handlers)
+    wechat_debug_test.go:163: {"level":"DEBUG","method":"POST","msg":"http request started","outcome":"started","request_id":"NX6CGZBGX4TQPQDX2A4PY6EBRK","route":"/api/v1/auth/login","stage":"http","time":"2026-10-13T11:38:51.453384293+08:00"}
+    wechat_debug_test.go:163: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"NX6CGZBGX4TQPQDX2A4PY6EBRK","stage":"wechat","time":"2026-10-13T11:38:51.453473791+08:00"}
+    wechat_debug_test.go:163: {"duration_ms":0,"error_code":"provider_error","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"NX6CGZBGX4TQPQDX2A4PY6EBRK","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.454076552+08:00"}
+    wechat_debug_test.go:163: {"actor_id":0,"duration_ms":0,"level":"WARN","method":"POST","msg":"http request","request_id":"NX6CGZBGX4TQPQDX2A4PY6EBRK","route":"/api/v1/auth/login","status":401,"tenant_id":0,"time":"2026-10-13T11:38:51.454131424+08:00"}
+--- PASS: TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream (0.00s)
+    --- PASS: TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream/success (0.00s)
+    --- PASS: TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream/provider_rejected (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.149s
+-test.shuffle 1791862731329977136
+=== RUN   TestSenderTraceReportsCachedTokenWithoutAnotherTokenRequest
+    tracing_test.go:151: {"time":"2026-10-13T11:38:51.335626672+08:00","level":"DEBUG","msg":"wechat downstream request","stage":"wechat","operation":"access_token","outcome":"started","request_id":"cached-delivery"}
+        {"time":"2026-10-13T11:38:51.335659333+08:00","level":"DEBUG","msg":"wechat downstream request","stage":"wechat","operation":"access_token","outcome":"cache_hit","status":0,"duration_ms":0,"error_code":"","request_id":"cached-delivery"}
+        {"time":"2026-10-13T11:38:51.335691573+08:00","level":"DEBUG","msg":"wechat downstream request","stage":"wechat","operation":"subscribe_send","outcome":"started","request_id":"cached-delivery"}
+        {"time":"2026-10-13T11:38:51.336207751+08:00","level":"DEBUG","msg":"wechat downstream request","stage":"wechat","operation":"subscribe_send","outcome":"success","status":200,"duration_ms":0,"error_code":"","request_id":"cached-delivery"}
+        
+--- PASS: TestSenderTraceReportsCachedTokenWithoutAnotherTokenRequest (0.00s)
+=== RUN   TestSenderTracesSafeDownstreamOutcomes
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/success
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.338367352+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.338844126+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.338884962+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.3392408+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/token_http_failure
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.340071287+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"permanent","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":400,"time":"2026-10-13T11:38:51.3406805+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/send_http_failure
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.341280024+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.341759383+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.341806241+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"permanent","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":403,"time":"2026-10-13T11:38:51.342190422+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/malformed_send_response
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.342906805+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.343347091+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.343391354+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"unknown","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.343750928+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/provider_failure
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.344692114+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.345104868+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.345158548+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"permanent","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.345539012+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/token_timeout
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.346451914+08:00"}
+    tracing_test.go:108: {"duration_ms":100,"error_code":"deadline_exceeded","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":0,"time":"2026-10-13T11:38:51.44711236+08:00"}
+=== RUN   TestSenderTracesSafeDownstreamOutcomes/send_timeout
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.447816671+08:00"}
+    tracing_test.go:108: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"delivery-correlation","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.448379587+08:00"}
+    tracing_test.go:108: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"delivery-correlation","stage":"wechat","time":"2026-10-13T11:38:51.448424551+08:00"}
+    tracing_test.go:108: {"duration_ms":100,"error_code":"deadline_exceeded","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"delivery-correlation","stage":"wechat","status":0,"time":"2026-10-13T11:38:51.548976264+08:00"}
+--- PASS: TestSenderTracesSafeDownstreamOutcomes (0.21s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/success (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/token_http_failure (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/send_http_failure (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/malformed_send_response (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/provider_failure (0.00s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/token_timeout (0.10s)
+    --- PASS: TestSenderTracesSafeDownstreamOutcomes/send_timeout (0.10s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/wechat	1.241s
+-test.shuffle 1791862731331254852
+=== RUN   TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData
+=== RUN   TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/sent
+    worker_debug_test.go:102: {"count":1,"level":"DEBUG","msg":"notification attempt","operation":"claim","outcome":"claimed","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"outbox","time":"2026-10-13T11:38:51.339743422+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"started","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"notification","time":"2026-10-13T11:38:51.339933218+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"wechat","time":"2026-10-13T11:38:51.339975398+08:00"}
+    worker_debug_test.go:102: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.340870927+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"wechat","time":"2026-10-13T11:38:51.340912254+08:00"}
+    worker_debug_test.go:102: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"success","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.341382216+08:00"}
+    worker_debug_test.go:102: {"duration_ms":1,"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"completed","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"notification","time":"2026-10-13T11:38:51.341434484+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"notification attempt","operation":"finish","outcome":"started","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"outbox","time":"2026-10-13T11:38:51.341482474+08:00"}
+    worker_debug_test.go:102: {"duration_ms":1,"level":"INFO","msg":"notification attempt completed","operation":"finish","outcome":"sent","request_id":"6D6BRSG2UZCKNZBAG5K7AM3BW2","stage":"outbox","time":"2026-10-13T11:38:51.341517059+08:00"}
+=== RUN   TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/provider_rejected
+    worker_debug_test.go:102: {"count":1,"level":"DEBUG","msg":"notification attempt","operation":"claim","outcome":"claimed","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"outbox","time":"2026-10-13T11:38:51.342682104+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"started","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"notification","time":"2026-10-13T11:38:51.342747497+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"wechat","time":"2026-10-13T11:38:51.342792952+08:00"}
+    worker_debug_test.go:102: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.343429556+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"wechat","time":"2026-10-13T11:38:51.343494958+08:00"}
+    worker_debug_test.go:102: {"duration_ms":0,"error_code":"permanent","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"failed","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"wechat","status":403,"time":"2026-10-13T11:38:51.344006988+08:00"}
+    worker_debug_test.go:102: {"duration_ms":1,"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"completed","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"notification","time":"2026-10-13T11:38:51.344065528+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"notification attempt","operation":"finish","outcome":"started","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"outbox","time":"2026-10-13T11:38:51.344118768+08:00"}
+    worker_debug_test.go:102: {"duration_ms":1,"level":"INFO","msg":"notification attempt completed","operation":"finish","outcome":"failed","request_id":"X742EUYHPYYCWTT2YFBOQ7APPZ","stage":"outbox","time":"2026-10-13T11:38:51.344149345+08:00"}
+=== RUN   TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/persistence_failed
+    worker_debug_test.go:102: {"count":1,"level":"DEBUG","msg":"notification attempt","operation":"claim","outcome":"claimed","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"outbox","time":"2026-10-13T11:38:51.345337504+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"started","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"notification","time":"2026-10-13T11:38:51.345398949+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"started","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"wechat","time":"2026-10-13T11:38:51.345425339+08:00"}
+    worker_debug_test.go:102: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"access_token","outcome":"success","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.345866246+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"started","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"wechat","time":"2026-10-13T11:38:51.345901161+08:00"}
+    worker_debug_test.go:102: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"subscribe_send","outcome":"success","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"wechat","status":200,"time":"2026-10-13T11:38:51.346310819+08:00"}
+    worker_debug_test.go:102: {"duration_ms":0,"level":"DEBUG","msg":"notification attempt","operation":"send","outcome":"completed","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"notification","time":"2026-10-13T11:38:51.346361945+08:00"}
+    worker_debug_test.go:102: {"level":"DEBUG","msg":"notification attempt","operation":"finish","outcome":"started","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"outbox","time":"2026-10-13T11:38:51.346411649+08:00"}
+    worker_debug_test.go:102: {"err":"*errors.errorString","level":"INFO","msg":"notification result persistence failed","operation":"finish","outcome":"failed","request_id":"ZIYTNQJLJB6KCCCX5FM37AQLNJ","stage":"outbox","time":"2026-10-13T11:38:51.346444881+08:00"}
+--- PASS: TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData (0.01s)
+    --- PASS: TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/sent (0.00s)
+    --- PASS: TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/provider_rejected (0.00s)
+    --- PASS: TestWorkerCorrelatesAttemptAndDownstreamWithoutSensitiveData/persistence_failed (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/notifications	1.038s

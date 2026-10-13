@@ -1,0 +1,6 @@
+go build ./...
+go vet ./...
+# git.hyhy.fun/rsplab/iolink/internal/core_test
+# [git.hyhy.fun/rsplab/iolink/internal/core_test]
+vet: internal/core/debug_dump_integration_test.go:4:2: "context" imported and not used
+make: *** [Makefile:24: verify] Error 1
