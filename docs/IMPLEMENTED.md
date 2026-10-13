@@ -58,6 +58,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | S1 | 服务器/开发两份 Compose、latest-pg16 | 已完成已核验 | 用户免双审；隔离构建/首启/重启通过；[证据](evidence/deployment/2026-10-03-compose/) |
 | S2 | JSON日志转储、轮转、关联ID、脱敏及健康状态 | 已完成已核验 | 双审都批准 `1bc74b8`，验证 source `e1b78e1`；[证据](evidence/deployment/2026-10-03-logging/README.md)、`code-review.md`及 `.omo/evidence/logging-gate-review.md`；下方旧“待双审”已过时 |
 | S2a | Debug dump 多阶段关联、下游诊断、版本目录与定时保留 | 已完成已核验 | 实现提交 `a7335a2`、tree `2bd5fd8` 获两位未参与编辑者同快照 APPROVE；发布 v0.0.31。HTTP/MQTT/数据库、License准入与通知/微信安全关联诊断，`logs/{version}`，默认启动及每6小时按记录时间清除6小时前数据；文件保存 debug、stderr 独立级别。真实 Timescale/MQTT、本地微信HTTP、文件/并发/失败边界与实际服务启动通过；[证据与双审](evidence/deployment/2026-10-13-debug-dump/README.md)。全库 build/vet通过，race仍有既有 gbcatalog 固定日期的11项失败，未称全库全绿；专属测试容器已清理。外部微信/硬件及 License交付专项仍未验收，M7a/M8进度不变 |
+| S2b | 既有GB目录日期测试修复与全库回归闭环 | 已完成已核验 | 提交 `69a7631`、tree `52c1266` 两位未参与编辑者同快照 APPROVE；发布 v0.0.32。旧固定日期夹具11项失败已复现，改为运行时起点后原断言11项全部通过；冻结快照真实专属 Timescale `make verify` build/vet/race通过（33个有测试包），目录PG存储7项无SKIP通过，96 operations / 568契约fixtures通过；[证据与双审](evidence/deployment/2026-10-13-gbcatalog-validation/README.md)。关闭S2a历史全库失败限制；专属测试容器与卷已清理。浏览器由用户验收，微信/硬件/License交付仍不计通过，M7a/M8进度不变 |
 | S4 | 空库自动建表、Web 首启初始化和业务 API 门禁 | 已完成已核验 | 根源码 `360bc87` / web `b340cae` 同候选两位独立审阅者 APPROVE；真实隔离 Timescale、并发/回滚/非法输入、Go 全库、契约、前端 52 测试/类型检查/构建及 Docker 首启通过，修订后实际 Vite 代理已核验；web 已推送远端；浏览器由用户验收；[证据与双审](evidence/deployment/2026-10-08-web-setup/README.md) |
 | V1 | 历史 TODO、Rxx状态及批准快照收据对账 | 已完成待核验 | 实现/历史批准已存在，文档同步尚未完整核对：TODO 3旧计划未勾、R36/R37及旧 Dxx逐项核对；TODO 8历史拒绝已由 `2b66812` 新同快照双审闭环；不得直接批量改 passed |
 | V2 | 微信真实登录、订阅、通知及用户归属流程 | 已完成待核验 | 仅指已有服务端/适配器及接口演示软件；真实凭据、资质、用户/真机为 external_blocked；TODO 8软件演示完成不代替真实微信验收 |
@@ -76,7 +77,7 @@ M6d 已发布 `v0.0.10`，源码 `81c842e6903814cee187e67a699485ef6f934148`、we
 | F3 | 最终完整软件/真实链路/前端及适用外部QA | 待完成未调研 | TODO 13，必须重新绑定最终版本，不能拼接不同版本的passed |
 | F4 | 最终范围、发布产物、手册与恢复流程一致性审计 | 待完成未调研 | TODO 13，和F1–F3汇总至R55；适用外部未通过不能称全部完成 |
 
-推荐下一步：闭环 M7a 领域/加密/013存储基础，再实施摄像机API、媒体与GB链路；V1历史证据对账仍待闭环。微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
+当前按用户最新范围优先测试、修复已有功能与 V1 历史证据对账；M7a/M8 后续新功能暂缓。微信、硬件、生产 License 和客户安装仍按 `external_blocked` 保留。
 
 附加部署里程碑：统一服务器 `deploy/docker-compose.yaml` 与源码构建覆盖
 `deploy/docker-compose.dev.yaml` 已通过隔离容器构建、首启及重启验证，并发布至 v0.0.6；用户明确免除该配置变更的双审。

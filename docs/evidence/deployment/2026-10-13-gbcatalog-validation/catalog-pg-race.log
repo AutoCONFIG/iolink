@@ -1,0 +1,17 @@
+-test.shuffle 1791896619422466367
+=== RUN   TestStartRefreshIsIdempotentAndSerializesSamePeer
+--- PASS: TestStartRefreshIsIdempotentAndSerializesSamePeer (1.12s)
+=== RUN   TestRegistrationAndCatalogConstraints
+--- PASS: TestRegistrationAndCatalogConstraints (0.62s)
+=== RUN   TestReplaceCatalogAtomicallyReplacesDirectory
+--- PASS: TestReplaceCatalogAtomicallyReplacesDirectory (0.57s)
+=== RUN   TestExpiredStartMarksDeviceStaleAtomically
+--- PASS: TestExpiredStartMarksDeviceStaleAtomically (0.51s)
+=== RUN   TestExpiredRefreshMarksStaleAndPreservesChannels
+--- PASS: TestExpiredRefreshMarksStaleAndPreservesChannels (0.52s)
+=== RUN   TestReplaceCatalogRejectsLateDatabaseDeadlineWithOldObservedAt
+--- PASS: TestReplaceCatalogRejectsLateDatabaseDeadlineWithOldObservedAt (0.82s)
+=== RUN   TestMigrationIsIdempotent
+--- PASS: TestMigrationIsIdempotent (0.54s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalogpg	5.717s

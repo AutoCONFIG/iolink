@@ -1,0 +1,2 @@
+sh: 0: cannot open scripts/embed-frontend.sh: No such file
+make: *** [Makefile:9: embed-front] Error 2

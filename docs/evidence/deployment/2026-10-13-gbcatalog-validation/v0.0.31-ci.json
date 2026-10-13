@@ -1,0 +1,9 @@
+{
+  "id": 38344069527,
+  "status": "completed",
+  "conclusion": "success",
+  "event": "push",
+  "head_branch": "v0.0.31",
+  "head_sha": "9c5dba929cf705c0cbee307876b5c300d127ba37",
+  "html_url": "https://github.com/AutoCONFIG/iolink/actions/runs/38344069527"
+}

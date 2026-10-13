@@ -1,0 +1,4 @@
+100644 blob 275076fc710934cbd0de1c5b6f82952db145a963	internal/gbcatalog/catalog.go
+100644 blob 5995746b1dad521f4390f244bfaa861368a92add	internal/gbcatalog/catalog_test.go
+100644 blob 3f106e72fb0ed77de7929a05837cee29872efcb5	internal/gbcatalog/contracts.go
+100644 blob 39e9a1fada923b10cf2e9494002d2cba05bcb975	internal/gbcatalog/validation.go

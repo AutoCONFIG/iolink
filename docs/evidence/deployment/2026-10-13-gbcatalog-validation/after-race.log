@@ -1,0 +1,25 @@
+-test.shuffle 1791864164930933987
+=== RUN   TestDuplicatePageAndItemAreIdempotentButConflictsFail
+--- PASS: TestDuplicatePageAndItemAreIdempotentButConflictsFail (0.00s)
+=== RUN   TestStoreErrorsDoNotMarkComplete
+--- PASS: TestStoreErrorsDoNotMarkComplete (0.00s)
+=== RUN   TestStartIsIdempotentAndPassesDeadlineToStore
+--- PASS: TestStartIsIdempotentAndPassesDeadlineToStore (0.00s)
+=== RUN   TestCompletedRefreshRejectsDifferentSumNum
+--- PASS: TestCompletedRefreshRejectsDifferentSumNum (0.00s)
+=== RUN   TestConcurrentCompletionReplacesOnce
+--- PASS: TestConcurrentCompletionReplacesOnce (0.00s)
+=== RUN   TestAcceptPageAggregatesAndAtomicallyReplacesSortedSnapshot
+--- PASS: TestAcceptPageAggregatesAndAtomicallyReplacesSortedSnapshot (0.00s)
+=== RUN   TestCompletedRefreshIgnoresLateDuplicateAndDoesNotCreateNewSnapshot
+--- PASS: TestCompletedRefreshIgnoresLateDuplicateAndDoesNotCreateNewSnapshot (0.00s)
+=== RUN   TestExpireMarksStaleWithoutReplacingOldDirectory
+--- PASS: TestExpireMarksStaleWithoutReplacingOldDirectory (0.00s)
+=== RUN   TestCanceledStaleMarkDoesNotPoisonPendingRefresh
+--- PASS: TestCanceledStaleMarkDoesNotPoisonPendingRefresh (0.00s)
+=== RUN   TestReplacePortCallDoesNotHoldCoordinatorLock
+--- PASS: TestReplacePortCallDoesNotHoldCoordinatorLock (0.00s)
+=== RUN   TestInvalidPagesAndDeadlineAreRejected
+--- PASS: TestInvalidPagesAndDeadlineAreRejected (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/gbcatalog	1.012s

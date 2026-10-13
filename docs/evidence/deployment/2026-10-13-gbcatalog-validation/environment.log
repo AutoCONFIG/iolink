@@ -1,0 +1,4 @@
+/iolink-validation-pg-20261013 gbcatalog-20261013 timescale/timescaledb:latest-pg16 sha256:6f139d56042989bd35f50ba5986e492cd32e35cc6778c50be2659add298dc09f
+PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+2.30.2
+go version go1.26.8 linux/amd64
