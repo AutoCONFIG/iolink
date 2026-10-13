@@ -179,7 +179,7 @@ func (f *fakeStore) FindAdminByID(_ context.Context, id int64) (*domain.User, er
 	if f.admin != nil && f.admin.ID == id {
 		return f.admin, nil
 	}
-	return nil, domain.ErrUnknownMetric
+	return nil, domain.ErrNotFound
 }
 
 func (f *fakeStore) ChangeAdminPassword(_ context.Context, id int64, oldPW, newPW string) error {

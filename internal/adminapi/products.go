@@ -22,7 +22,7 @@ type assignmentRequest struct {
 
 func (s *Server) productCatalog(c *gin.Context) (ProductCatalog, int64, bool) {
 	if s.deps.Catalog == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "product catalog unavailable"})
+		s.providerUnavailable(c)
 		return nil, 0, false
 	}
 	if tenant, scoped := domain.TenantID(c.Request.Context()); scoped {
@@ -30,7 +30,7 @@ func (s *Server) productCatalog(c *gin.Context) (ProductCatalog, int64, bool) {
 	}
 	tenant, err := s.deps.Catalog.DefaultTenantID(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "tenant unavailable"})
+		s.providerFailure(c, err)
 		return nil, 0, false
 	}
 	return s.deps.Catalog, tenant, true
@@ -43,7 +43,7 @@ func (s *Server) listProducts(c *gin.Context) {
 	}
 	items, err := catalog.ListProducts(c.Request.Context(), tenant)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "product query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, items)
@@ -55,7 +55,7 @@ func (s *Server) createProduct(c *gin.Context) {
 		return
 	}
 	var req productCreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := bindBaselineJSON(c, &req, "name"); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
@@ -73,7 +73,7 @@ func (s *Server) createProduct(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "product create failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusCreated, item)
@@ -113,7 +113,7 @@ func (s *Server) listProductModels(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "model query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, items)
@@ -130,7 +130,7 @@ func (s *Server) createProductModel(c *gin.Context) {
 		return
 	}
 	var req productModelRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := bindProductModelJSON(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
@@ -140,7 +140,7 @@ func (s *Server) createProductModel(c *gin.Context) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "model query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	version := 1
@@ -165,7 +165,7 @@ func (s *Server) createProductModel(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "model create failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusCreated, item)
@@ -189,12 +189,12 @@ func (s *Server) publishProductModel(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "publish failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	item, err := catalog.GetProductModel(c.Request.Context(), tenant, productID, version)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "model query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, item)
@@ -211,7 +211,7 @@ func (s *Server) getDeviceProduct(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "not_found"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "assignment query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"device_no": c.Param("device_no"), "product_id": model.ProductID, "model_version": model.Version, "assigned_at": model.AssignedAt})
@@ -223,7 +223,7 @@ func (s *Server) assignDeviceProduct(c *gin.Context) {
 		return
 	}
 	var req assignmentRequest
-	if err := c.ShouldBindJSON(&req); err != nil || req.ProductID < 1 || req.ModelVersion < 1 {
+	if err := bindBaselineJSON(c, &req, "product_id", "model_version"); err != nil || req.ProductID < 1 || req.ModelVersion < 1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
@@ -240,12 +240,12 @@ func (s *Server) assignDeviceProduct(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "assignment failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	model, err := catalog.DeviceAssignment(c.Request.Context(), tenant, c.Param("device_no"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "assignment query failed"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"device_no": c.Param("device_no"), "product_id": model.ProductID, "model_version": model.Version, "assigned_at": model.AssignedAt})

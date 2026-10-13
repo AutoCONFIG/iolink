@@ -54,12 +54,18 @@ func (s *Service) EnsureUser(ctx context.Context, openID string) (*domain.User, 
 func (s *Service) UserTokenVersion(ctx context.Context, id int64) (int, error) {
 	var version int
 	err := s.pool.QueryRow(ctx, `SELECT token_version FROM users WHERE id=$1`, id).Scan(&version)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, domain.ErrNotFound
+	}
 	return version, err
 }
 
 func (s *Service) UserAuthority(ctx context.Context, id int64) (string, error) {
 	var authority string
 	err := s.pool.QueryRow(ctx, `SELECT coalesce(authority,'USER') FROM users WHERE id=$1`, id).Scan(&authority)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", domain.ErrNotFound
+	}
 	return authority, err
 }
 
@@ -82,12 +88,18 @@ func (s *Service) DefaultTenantForUser(ctx context.Context, id int64) (int64, er
 func (s *Service) TenantMembershipVersion(ctx context.Context, userID, tenantID int64) (int64, error) {
 	var version int64
 	err := s.pool.QueryRow(ctx, `SELECT tm.permission_version FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.user_id=$1 AND tm.tenant_id=$2 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())`+tenantMembershipAuthority, userID, tenantID).Scan(&version)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, domain.ErrInactiveTenant
+	}
 	return version, err
 }
 
 func (s *Service) TenantRole(ctx context.Context, userID, tenantID int64) (string, error) {
 	var role string
 	err := s.pool.QueryRow(ctx, `SELECT tm.role FROM tenant_memberships tm JOIN tenants t ON t.id=tm.tenant_id WHERE tm.user_id=$1 AND tm.tenant_id=$2 AND tm.active AND t.active AND (tm.expires_at IS NULL OR tm.expires_at>now())`+tenantMembershipAuthority, userID, tenantID).Scan(&role)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", domain.ErrInactiveTenant
+	}
 	return role, err
 }
 

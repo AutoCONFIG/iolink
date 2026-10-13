@@ -72,7 +72,7 @@ func TestM6bProductWritesRejectRevocationAfterMiddleware(t *testing.T) {
 				switch operation {
 				case "create_model":
 					path = fmt.Sprintf("/admin/v1/products/%d/models", product.ID)
-					body = `{"fields":[{"identifier":"temperature","type":"number","readable":true}]}`
+					body = `{"fields":[{"identifier":"temperature","type":"number","unit":"C","readable":true,"writable":false,"nullable":false}]}`
 				case "publish_model":
 					path = fmt.Sprintf("/admin/v1/products/%d/models/2/publish", product.ID)
 					body = ""

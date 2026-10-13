@@ -2,12 +2,11 @@ package adminapi
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
+	"net/http"
+
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"github.com/gin-gonic/gin"
-	"io"
-	"net/http"
 )
 
 type RegistrationStore interface {
@@ -17,31 +16,25 @@ type RegistrationStore interface {
 func (s *Server) register(c *gin.Context) {
 	store, ok := s.deps.Store.(RegistrationStore)
 	if !ok {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "registration unavailable"})
+		s.organizationUnavailable(c)
 		return
 	}
 	var input domain.Registration
 	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 4096)
-	decoder := json.NewDecoder(c.Request.Body)
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
-		return
-	}
-	if err := decoder.Decode(&struct{}{}); err != io.EOF {
+	if err := bindBaselineJSON(c, &input, "username", "password"); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	if err := store.RegisterUser(c.Request.Context(), input); err != nil {
 		switch {
 		case errors.Is(err, domain.ErrBootstrapInput):
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid registration"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		case errors.Is(err, domain.ErrConflict):
-			c.JSON(http.StatusConflict, gin.H{"error": "username unavailable"})
+			c.JSON(http.StatusConflict, gin.H{"error": "conflict"})
 		case errors.Is(err, domain.ErrForbidden):
-			c.JSON(http.StatusForbidden, gin.H{"error": "platform not initialized"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "registration failed"})
+			s.providerFailure(c, err)
 		}
 		return
 	}

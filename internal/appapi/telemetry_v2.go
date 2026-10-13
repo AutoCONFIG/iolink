@@ -19,7 +19,7 @@ type telemetryV2Request struct {
 func (s *Server) modelLatestV2(c *gin.Context) {
 	repo, ok := s.deps.Telemetry.(domain.DeviceModelLatestRepo)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "model unavailable"})
+		s.providerUnavailable(c)
 		return
 	}
 	result, err := repo.ModelLatestForUser(c.Request.Context(), c.Param("device_no"), uid(c))
@@ -28,8 +28,11 @@ func (s *Server) modelLatestV2(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+		s.providerFailure(c, err)
 		return
+	}
+	if result.Fields == nil {
+		result.Fields = []domain.ModelField{}
 	}
 	c.JSON(http.StatusOK, result)
 }
@@ -37,13 +40,11 @@ func (s *Server) modelLatestV2(c *gin.Context) {
 func (s *Server) submitTelemetryV2(c *gin.Context) {
 	repo, ok := s.deps.Telemetry.(domain.GenericTelemetryRepo)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "telemetry unavailable"})
+		s.providerUnavailable(c)
 		return
 	}
-	var req telemetryV2Request
-	decoder := json.NewDecoder(c.Request.Body)
-	decoder.DisallowUnknownFields()
-	if err := decoder.Decode(&req); err != nil || req.Timestamp.IsZero() || len(req.Properties) == 0 || len(req.Properties) > 128 {
+	req, err := decodeTelemetryV2Request(c.Request.Body)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
@@ -57,7 +58,7 @@ func (s *Server) submitTelemetryV2(c *gin.Context) {
 		case errors.Is(err, domain.ErrInvalidProductModel):
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+			s.providerFailure(c, err)
 		}
 		return
 	}
@@ -71,20 +72,29 @@ func (s *Server) submitTelemetryV2(c *gin.Context) {
 func (s *Server) telemetryHistoryV2(c *gin.Context) {
 	repo, ok := s.deps.Telemetry.(domain.GenericTelemetryRepo)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "telemetry unavailable"})
+		s.providerUnavailable(c)
 		return
 	}
-	metric := c.Query("metric")
-	if !validTelemetryIdentifier(metric) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
-		return
-	}
-	from, to, err := parseTelemetryWindow(c.Query("from"), c.Query("to"))
+	values, err := parseQueryInput(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "1000"))
+	metric := values.Get("metric")
+	if !validTelemetryIdentifier(metric) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	if (values.Has("from") && values.Get("from") == "") || (values.Has("to") && values.Get("to") == "") {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	from, to, err := parseTelemetryWindow(values.Get("from"), values.Get("to"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	limit, err := strconv.Atoi(queryValueOrDefault(values, "limit", "1000"))
 	if err != nil || limit < 1 || limit > 10000 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
@@ -99,7 +109,7 @@ func (s *Server) telemetryHistoryV2(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal_error"})
+		s.providerFailure(c, err)
 		return
 	}
 	if points == nil {

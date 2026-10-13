@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+	"unicode/utf8"
+
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"git.hyhy.fun/rsplab/iolink/internal/persistence"
 	"github.com/jackc/pgx/v5/pgconn"
-	"strings"
 )
 
 func (s *Service) ListPlatformUsers(ctx context.Context, query string) ([]domain.PlatformUser, error) {
@@ -44,7 +46,7 @@ func (s *Service) CreateTenant(ctx context.Context, name string, actorID int64) 
 		return domain.Tenant{}, domain.ErrForbidden
 	}
 	name = strings.TrimSpace(name)
-	if name == "" || len(name) > 128 || name == "__iolink_system__" {
+	if name == "" || !utf8.ValidString(name) || utf8.RuneCountInString(name) > 128 || name == "__iolink_system__" {
 		return domain.Tenant{}, domain.ErrInvalidProductModel
 	}
 	tx, err := s.pool.Begin(ctx)

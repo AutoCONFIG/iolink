@@ -1,0 +1,343 @@
+-test.shuffle 1791911300416452942
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#01
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#02
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#03
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#04
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#05
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#06
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#07
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#08
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#09
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/unauthenticated_session
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/unauthenticated_session/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /session status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_admin_platform_stats
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_admin_platform_stats/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /platform/stats status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_platform_directory
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_platform_directory/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /platform/users status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/platform_business_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/platform_business_members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /farms/{id}/members status=403 issues=[{response_selection []}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_tenant_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_tenant_members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /tenants/{id}/members status=403 issues=[{response_selection []}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_farm_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_farm_members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /farms/{id}/members status=403 issues=[{response_selection []}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /tenants/{id}/members status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_write
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_write/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/missing_farm_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/missing_farm_members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /farms/{id}/members status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_create_tenant
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_create_tenant/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: POST /tenants status=403 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_0_PUT_/tenants/{id}/status
+    platform_contract_boundary_test.go:45: PUT /tenants/{id}/status status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_0_PUT_/tenants/{id}/status/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/status status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_1_GET_/tenants/{id}/members
+    platform_contract_boundary_test.go:45: GET /tenants/{id}/members status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_1_GET_/tenants/{id}/members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /tenants/{id}/members status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_2_PUT_/tenants/{id}/members/{user_id}
+    platform_contract_boundary_test.go:45: PUT /tenants/{id}/members/{user_id} status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_2_PUT_/tenants/{id}/members/{user_id}/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_3_PUT_/tenants/{id}/members/{user_id}
+    platform_contract_boundary_test.go:45: PUT /tenants/{id}/members/{user_id} status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_3_PUT_/tenants/{id}/members/{user_id}/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_4_GET_/farms/{id}/members
+    platform_contract_boundary_test.go:45: GET /farms/{id}/members status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_4_GET_/farms/{id}/members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /farms/{id}/members status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_5_PUT_/farms/{id}/members/{user_id}
+    platform_contract_boundary_test.go:45: PUT /farms/{id}/members/{user_id} status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_5_PUT_/farms/{id}/members/{user_id}/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /farms/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_6_PUT_/farms/{id}/members/{user_id}
+    platform_contract_boundary_test.go:45: PUT /farms/{id}/members/{user_id} status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_6_PUT_/farms/{id}/members/{user_id}/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /farms/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_0_PUT_/tenants/{id}/status
+    platform_contract_boundary_test.go:45: PUT /tenants/{id}/status status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_0_PUT_/tenants/{id}/status/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/status status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_1_GET_/tenants/{id}/members
+    platform_contract_boundary_test.go:45: GET /tenants/{id}/members status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_1_GET_/tenants/{id}/members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /tenants/{id}/members status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_2_PUT_/tenants/{id}/members/{user_id}
+    platform_contract_boundary_test.go:45: PUT /tenants/{id}/members/{user_id} status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_2_PUT_/tenants/{id}/members/{user_id}/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_3_PUT_/tenants/{id}/members/{user_id}
+    platform_contract_boundary_test.go:45: PUT /tenants/{id}/members/{user_id} status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_3_PUT_/tenants/{id}/members/{user_id}/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_4_GET_/farms/{id}/members
+    platform_contract_boundary_test.go:45: GET /farms/{id}/members status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_4_GET_/farms/{id}/members/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /farms/{id}/members status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_5_PUT_/farms/{id}/members/{user_id}
+    platform_contract_boundary_test.go:45: PUT /farms/{id}/members/{user_id} status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_5_PUT_/farms/{id}/members/{user_id}/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /farms/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_6_PUT_/farms/{id}/members/{user_id}
+    platform_contract_boundary_test.go:45: PUT /farms/{id}/members/{user_id} status=404 want=400
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_6_PUT_/farms/{id}/members/{user_id}/response_contract
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /farms/{id}/members/{user_id} status=404 issues=[{enum [properties error enum]}]
+--- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers (11.76s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#01 (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#02 (0.25s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#03 (0.27s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#04 (0.29s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#05 (0.29s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#06 (0.27s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#07 (0.27s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#08 (0.26s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#09 (0.25s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/unauthenticated_session (0.28s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/unauthenticated_session/response_contract (0.28s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_admin_platform_stats (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_admin_platform_stats/response_contract (0.26s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_platform_directory (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_platform_directory/response_contract (0.27s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/platform_business_members (0.26s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/platform_business_members/response_contract (0.26s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_tenant_members (0.28s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_tenant_members/response_contract (0.28s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_farm_members (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_farm_members/response_contract (0.27s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_members (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_members/response_contract (0.27s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_write (0.28s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_write/response_contract (0.28s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/missing_farm_members (0.25s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/missing_farm_members/response_contract (0.25s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_create_tenant (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_create_tenant/response_contract (0.27s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_0_PUT_/tenants/{id}/status (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_0_PUT_/tenants/{id}/status/response_contract (0.27s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_1_GET_/tenants/{id}/members (0.26s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_1_GET_/tenants/{id}/members/response_contract (0.26s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_2_PUT_/tenants/{id}/members/{user_id} (0.24s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_2_PUT_/tenants/{id}/members/{user_id}/response_contract (0.24s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_3_PUT_/tenants/{id}/members/{user_id} (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_3_PUT_/tenants/{id}/members/{user_id}/response_contract (0.26s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_4_GET_/farms/{id}/members (0.25s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_4_GET_/farms/{id}/members/response_contract (0.24s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_5_PUT_/farms/{id}/members/{user_id} (0.25s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_5_PUT_/farms/{id}/members/{user_id}/response_contract (0.24s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_6_PUT_/farms/{id}/members/{user_id} (0.26s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_6_PUT_/farms/{id}/members/{user_id}/response_contract (0.25s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_0_PUT_/tenants/{id}/status (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_0_PUT_/tenants/{id}/status/response_contract (0.26s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_1_GET_/tenants/{id}/members (0.25s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_1_GET_/tenants/{id}/members/response_contract (0.25s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_2_PUT_/tenants/{id}/members/{user_id} (0.27s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_2_PUT_/tenants/{id}/members/{user_id}/response_contract (0.27s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_3_PUT_/tenants/{id}/members/{user_id} (0.35s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_3_PUT_/tenants/{id}/members/{user_id}/response_contract (0.34s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_4_GET_/farms/{id}/members (0.34s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_4_GET_/farms/{id}/members/response_contract (0.34s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_5_PUT_/farms/{id}/members/{user_id} (0.36s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_5_PUT_/farms/{id}/members/{user_id}/response_contract (0.35s)
+    --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_6_PUT_/farms/{id}/members/{user_id} (0.37s)
+        --- FAIL: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_6_PUT_/farms/{id}/members/{user_id}/response_contract (0.36s)
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#09
+=== NAME  TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list
+    platform_contract_boundary_test.go:84: GET /tenants status=401 want=500
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#10
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /tenants status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#10
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /platform/stats status=500 issues=[{response_selection []}]
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#09
+=== NAME  TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status
+    platform_contract_boundary_test.go:84: PUT /tenants/{id}/status status=401 want=500
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#10
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/status status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#09
+=== NAME  TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members
+    platform_contract_boundary_test.go:84: GET /tenants/{id}/members status=401 want=500
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#10
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: GET /tenants/{id}/members status=401 issues=[{enum [properties error enum]}]
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#10
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/members/{user_id} status=500 issues=[{response_selection []}]
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#10
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: POST /tenants status=500 issues=[{response_selection []}]
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#10
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /farms/{id}/members/{user_id} status=500 issues=[{response_selection []}]
+--- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic (32.44s)
+    --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list (4.53s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract (0.28s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#03 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#04 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#06 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#07 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#08 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#09 (0.26s)
+        --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#10 (0.26s)
+    --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats (4.44s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#09 (0.25s)
+        --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#10 (0.24s)
+    --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status (5.19s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#05 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#06 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#07 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#09 (0.26s)
+        --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#10 (0.25s)
+    --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members (4.68s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#07 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#09 (0.25s)
+        --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#10 (0.25s)
+    --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write (4.45s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#03 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#04 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#05 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#06 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#07 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#08 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#09 (0.26s)
+        --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#10 (0.25s)
+    --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create (4.34s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#01 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#02 (0.28s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#03 (0.29s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#05 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#06 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#08 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#09 (0.24s)
+        --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#10 (0.24s)
+    --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write (4.80s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#04 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#09 (0.24s)
+        --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#10 (0.23s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	44.292s
+FAIL

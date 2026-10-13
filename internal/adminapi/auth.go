@@ -130,12 +130,24 @@ func (s *Server) authRequired(c *gin.Context) {
 		return
 	}
 	current, err := s.deps.Store.AdminTokenVersion(c.Request.Context(), int64(aid))
-	if err != nil || int64(version) != int64(current) {
+	if err != nil {
+		s.authProviderFailure(c, err)
+		return
+	}
+	if int64(version) != int64(current) {
 		abortCameraAuth(c, http.StatusUnauthorized, "token revoked")
 		return
 	}
 	admin, adminErr := s.deps.Store.FindAdminByID(c.Request.Context(), int64(aid))
-	if adminErr != nil || (admin.Authority != "ADMIN" && admin.Authority != "USER") {
+	if adminErr != nil {
+		s.authProviderFailure(c, adminErr)
+		return
+	}
+	if admin == nil {
+		s.authProviderUnavailable(c)
+		return
+	}
+	if admin.Authority != "ADMIN" && admin.Authority != "USER" {
 		abortCameraAuth(c, http.StatusUnauthorized, "invalid admin")
 		return
 	}
@@ -154,7 +166,7 @@ func (s *Server) authRequired(c *gin.Context) {
 				return
 			}
 			if !errors.Is(membershipErr, domain.ErrNotFound) && !errors.Is(membershipErr, domain.ErrInactiveTenant) {
-				abortCameraAuth(c, http.StatusUnauthorized, "tenant unavailable")
+				s.authProviderFailure(c, membershipErr)
 				return
 			}
 			if !platformAdmin && errors.Is(membershipErr, domain.ErrInactiveTenant) {
@@ -169,13 +181,21 @@ func (s *Server) authRequired(c *gin.Context) {
 			return
 		}
 		membershipVersion, err := tenants.TenantMembershipVersion(c.Request.Context(), int64(aid), int64(tenantRaw))
-		if err != nil || int64(membershipRaw) != membershipVersion {
+		if err != nil {
+			s.authProviderFailure(c, err)
+			return
+		}
+		if int64(membershipRaw) != membershipVersion {
 			abortCameraAuth(c, http.StatusUnauthorized, "tenant membership revoked")
 			return
 		}
 		role, roleErr := tenants.TenantRole(c.Request.Context(), int64(aid), int64(tenantRaw))
 		claimRole, roleOK := claims["tenant_role"].(string)
-		if roleErr != nil || !roleOK || claimRole != role {
+		if roleErr != nil {
+			s.authProviderFailure(c, roleErr)
+			return
+		}
+		if !roleOK || claimRole != role {
 			abortCameraAuth(c, http.StatusUnauthorized, "tenant role invalid")
 			return
 		}

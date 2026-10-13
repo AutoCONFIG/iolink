@@ -1,0 +1,11 @@
+-test.shuffle 1791913967652616423
+=== RUN   TestExtendedAppContractsEmptyHistoryAndHiddenModel
+    extended_app_contract_test.go:125: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:126: app contract method=GET route=/devices/{device_no}/history status=200 expected=200
+    extended_app_contract_test.go:131: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+    extended_app_contract_test.go:136: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+    extended_app_contract_test.go:136: HTTP contract rejected response: GET /devices/{device_no}/model/latest status=200 issues=[{type [properties fields type]} {type [properties fields type]}]
+--- FAIL: TestExtendedAppContractsEmptyHistoryAndHiddenModel (1.15s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.184s
+FAIL

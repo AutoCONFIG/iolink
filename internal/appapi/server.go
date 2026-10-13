@@ -111,7 +111,7 @@ func (s *Server) Routes() http.Handler {
 }
 
 type tenantSwitchRequest struct {
-	TenantID int64 `json:"tenant_id" binding:"required"`
+	TenantID int64 `json:"tenant_id"`
 }
 
 func (s *Server) listTenants(c *gin.Context) {
@@ -125,12 +125,15 @@ func (s *Server) listTenants(c *gin.Context) {
 		s.providerFailure(c, err)
 		return
 	}
+	if tenants == nil {
+		tenants = []iolinkcontractsdomain.TenantMembership{}
+	}
 	c.JSON(http.StatusOK, tenants)
 }
 
 func (s *Server) switchTenant(c *gin.Context) {
-	var req tenantSwitchRequest
-	if err := c.ShouldBindJSON(&req); err != nil || req.TenantID < 1 {
+	req, err := decodeTenantSwitch(c.Request.Body)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
@@ -318,14 +321,18 @@ func (s *Server) authRequired(c *gin.Context) {
 		return
 	}
 	current, err := s.deps.Users.UserTokenVersion(c.Request.Context(), int64(uid))
-	if err != nil || int64(version) != int64(current) {
+	if err != nil {
+		s.authProviderFailure(c, err)
+		return
+	}
+	if int64(version) != int64(current) {
 		abortCameraAuth(c, http.StatusUnauthorized, "token revoked")
 		return
 	}
 	if authorities, ok := s.deps.Users.(userAuthorityStore); ok {
 		authority, authorityErr := authorities.UserAuthority(c.Request.Context(), int64(uid))
 		if authorityErr != nil {
-			abortCameraAuth(c, http.StatusUnauthorized, "authority unavailable")
+			s.authProviderFailure(c, authorityErr)
 			return
 		}
 		c.Set("platform_admin", authority == "ADMIN")
@@ -348,7 +355,11 @@ func (s *Server) authRequired(c *gin.Context) {
 			return
 		}
 		membershipVersion, err := tenants.TenantMembershipVersion(c.Request.Context(), int64(uid), int64(tenantRaw))
-		if err != nil || int64(membershipRaw) != membershipVersion {
+		if err != nil {
+			s.authProviderFailure(c, err)
+			return
+		}
+		if int64(membershipRaw) != membershipVersion {
 			abortCameraAuth(c, http.StatusUnauthorized, "tenant membership revoked")
 			return
 		}
@@ -358,8 +369,12 @@ func (s *Server) authRequired(c *gin.Context) {
 			return
 		}
 		role, roleErr := roles.TenantRole(c.Request.Context(), int64(uid), int64(tenantRaw))
+		if roleErr != nil {
+			s.authProviderFailure(c, roleErr)
+			return
+		}
 		claimRole, roleOK := claims["tenant_role"].(string)
-		if roleErr != nil || !roleOK || claimRole != role {
+		if !roleOK || claimRole != role {
 			abortCameraAuth(c, http.StatusUnauthorized, "tenant role invalid")
 			return
 		}

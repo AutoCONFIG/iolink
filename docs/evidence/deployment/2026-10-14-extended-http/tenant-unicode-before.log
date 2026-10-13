@@ -1,0 +1,19 @@
+-test.shuffle 1791914609638957949
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/response_contract
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length
+    tenant_name_contract_test.go:23: POST /tenants status=400 want=201
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length/response_contract
+=== NAME  TestTenantNameLimitCountsUnicodeCharacters/name_length
+    tenant_name_contract_test.go:29: tenant name acceptance and persisted count differ
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length#01
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length#01/response_contract
+--- FAIL: TestTenantNameLimitCountsUnicodeCharacters (1.48s)
+    --- PASS: TestTenantNameLimitCountsUnicodeCharacters/response_contract (0.23s)
+    --- FAIL: TestTenantNameLimitCountsUnicodeCharacters/name_length (0.24s)
+        --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length/response_contract (0.24s)
+    --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length#01 (0.23s)
+        --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length#01/response_contract (0.23s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	1.533s
+FAIL

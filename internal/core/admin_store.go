@@ -58,6 +58,9 @@ func (s *Service) FindAdminByLogin(ctx context.Context, login string) (*domain.U
 func (s *Service) AdminTokenVersion(ctx context.Context, id int64) (int, error) {
 	var version int
 	err := s.pool.QueryRow(ctx, `SELECT token_version FROM users WHERE id=$1 AND authority IN ('ADMIN','USER')`, id).Scan(&version)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return 0, domain.ErrNotFound
+	}
 	return version, err
 }
 
@@ -427,6 +430,9 @@ func (s *Service) FindAdminByID(ctx context.Context, id int64) (*domain.User, er
 		`SELECT id, coalesce(username,''), coalesce(open_id,''), coalesce(password_hash,''), coalesce(authority,'USER')
 		 FROM users WHERE id=$1 AND authority IN ('ADMIN','USER')`, id).
 		Scan(&u.ID, &u.Username, &u.OpenID, &u.PasswordHash, &u.Authority)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, domain.ErrNotFound
+	}
 	if err != nil {
 		return nil, err
 	}

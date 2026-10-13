@@ -1,0 +1,581 @@
+-test.shuffle 1791914079214457521
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/device_page_capability
+    device_list_test.go:79: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.218214053+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"AK7MWFREB46PEEDRJ4SPXQC3RZ"}
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/pond_lookup
+    device_list_test.go:79: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.220527495+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"BZMKK25EB4I6UDB7S6OUEYXBPN"}
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/device_lookup
+    device_list_test.go:79: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.222751568+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"JLGZP3CRD2YAK2A2SVCJPQO6ER"}
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/latest_owner_lookup
+    device_list_test.go:79: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.225113552+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"26SG3O4BFHQMGNRSL6NPUAVNPM"}
+=== RUN   TestResourceLookupProviderFailuresUseSafeInternalError/history_owner_lookup
+    device_list_test.go:79: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.227249789+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"POE5KKTIAELPQIDEAKCCQ7XPQ7"}
+--- PASS: TestResourceLookupProviderFailuresUseSafeInternalError (0.01s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/device_page_capability (0.00s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/pond_lookup (0.00s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/device_lookup (0.00s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/latest_owner_lookup (0.00s)
+    --- PASS: TestResourceLookupProviderFailuresUseSafeInternalError/history_owner_lookup (0.00s)
+=== RUN   TestPondLatestReturnsNullWhenPondHasNoDevices
+=== RUN   TestPondLatestReturnsNullWhenPondHasNoDevices//ponds
+=== RUN   TestPondLatestReturnsNullWhenPondHasNoDevices//ponds/1
+--- PASS: TestPondLatestReturnsNullWhenPondHasNoDevices (0.00s)
+    --- PASS: TestPondLatestReturnsNullWhenPondHasNoDevices//ponds (0.00s)
+    --- PASS: TestPondLatestReturnsNullWhenPondHasNoDevices//ponds/1 (0.00s)
+=== RUN   TestMiniPlaybackRoutesFailClosedWhenCapabilityMissing
+=== RUN   TestMiniPlaybackRoutesFailClosedWhenCapabilityMissing/POST
+2026/10/14 01:54:39 ERROR http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:103: status=503 safe_code=unavailable capability=nil
+=== RUN   TestMiniPlaybackRoutesFailClosedWhenCapabilityMissing/GET
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=GET status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:103: status=503 safe_code=unavailable capability=nil
+=== RUN   TestMiniPlaybackRoutesFailClosedWhenCapabilityMissing/DELETE
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=DELETE status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:103: status=503 safe_code=unavailable capability=nil
+--- PASS: TestMiniPlaybackRoutesFailClosedWhenCapabilityMissing (0.00s)
+    --- PASS: TestMiniPlaybackRoutesFailClosedWhenCapabilityMissing/POST (0.00s)
+    --- PASS: TestMiniPlaybackRoutesFailClosedWhenCapabilityMissing/GET (0.00s)
+    --- PASS: TestMiniPlaybackRoutesFailClosedWhenCapabilityMissing/DELETE (0.00s)
+=== RUN   TestTenantViewerCannotConfirmAlarm
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 WARN http request route=/api/v1/alarms/:id/confirm method=POST status=403 duration_ms=0 tenant_id=7 actor_id=1
+--- PASS: TestTenantViewerCannotConfirmAlarm (0.00s)
+=== RUN   TestHistoryHTTPBoundsAndUnits
+--- PASS: TestHistoryHTTPBoundsAndUnits (0.00s)
+=== RUN   TestLoginInputAcceptsOneExactCodeField
+--- PASS: TestLoginInputAcceptsOneExactCodeField (0.00s)
+=== RUN   TestSubmitTelemetryV2ReturnsAcceptedResult
+--- PASS: TestSubmitTelemetryV2ReturnsAcceptedResult (0.00s)
+=== RUN   TestTenantCapableTokenWithoutClaimsRejected
+2026/10/14 01:54:39 WARN http request route=/api/v1/auth/tenants method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestTenantCapableTokenWithoutClaimsRejected (0.00s)
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/present
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/wrapped_missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/unsupported
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/provider_failure
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-14T01:54:39.241231791+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"*fmt.wrapError","request_id":"72JYTSJWNTMZQMALPUW5SU4ITP"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/provider_timeout
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-14T01:54:39.242132258+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"deadline_exceeded","request_id":"BLC7LYM6PD7SV6UUETZIXEKVD5"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/present
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/wrapped_missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/unsupported
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/provider_failure
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-14T01:54:39.246484885+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"*fmt.wrapError","request_id":"GPWIW2IRJS3A46YSRLANAXR4JN"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/provider_timeout
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-14T01:54:39.247491392+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"deadline_exceeded","request_id":"2V5D2CLEDGXM6QWWYEBGYWCNSL"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/present
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/wrapped_missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/unsupported
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/provider_failure
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-14T01:54:39.252891133+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"*errors.errorString","request_id":"7YLZ4YJU5OASP57QP2EACCMJ6S"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/provider_timeout
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-14T01:54:39.253730666+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"deadline_exceeded","request_id":"PC5SDDUDVYITABAG6YDUJ2PUZU"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/present
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/wrapped_missing
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/unsupported
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/provider_failure
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-14T01:54:39.258067162+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"*errors.errorString","request_id":"6TH3UP5E2EHQIEITYMFK72TNRP"}
+=== RUN   TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/provider_timeout
+    latest_reading_test.go:79: correlated safe telemetry diagnostic: {"time":"2026-10-14T01:54:39.258928085+08:00","level":"ERROR","msg":"telemetry latest query failed","stage":"telemetry_latest","outcome":"failed","err":"deadline_exceeded","request_id":"Z5JAFYA2LX6BZYMCX3GOITDRLC"}
+--- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure (0.02s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/present (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/wrapped_missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/unsupported (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/provider_failure (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/provider_timeout (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/present (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/wrapped_missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/unsupported (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/provider_failure (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//ponds/1/provider_timeout (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/present (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/wrapped_missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/unsupported (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/provider_failure (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//devices/dev-001/provider_timeout (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/present (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/wrapped_missing (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/unsupported (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/provider_failure (0.00s)
+    --- PASS: TestLatestHTTPDistinguishesMissingShadowFromProviderFailure//water/latest?device_no=dev-001/provider_timeout (0.00s)
+=== RUN   TestDeviceListInputRejectsInvalidBounds
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page=%zz
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page=
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page=0
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page=-1
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page=invalid
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page=9223372036854775807&page_size=200
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page_size=
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page_size=0
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page_size=201
+=== RUN   TestDeviceListInputRejectsInvalidBounds/page_size=invalid
+=== RUN   TestDeviceListInputRejectsInvalidBounds/pond_id=
+=== RUN   TestDeviceListInputRejectsInvalidBounds/pond_id=0
+=== RUN   TestDeviceListInputRejectsInvalidBounds/pond_id=-1
+=== RUN   TestDeviceListInputRejectsInvalidBounds/pond_id=invalid
+=== RUN   TestDeviceListInputRejectsInvalidBounds/status=
+=== RUN   TestDeviceListInputRejectsInvalidBounds/status=invalid
+=== RUN   TestDeviceListInputRejectsInvalidBounds/name=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+--- PASS: TestDeviceListInputRejectsInvalidBounds (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page=%zz (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page= (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page=0 (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page=-1 (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page=invalid (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page=9223372036854775807&page_size=200 (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page_size= (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page_size=0 (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page_size=201 (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/page_size=invalid (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/pond_id= (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/pond_id=0 (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/pond_id=-1 (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/pond_id=invalid (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/status= (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/status=invalid (0.00s)
+    --- PASS: TestDeviceListInputRejectsInvalidBounds/name=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (0.00s)
+=== RUN   TestDeviceListInputPreservesValidFilters
+--- PASS: TestDeviceListInputPreservesValidFilters (0.00s)
+=== RUN   TestTelemetryInputRejectsInvalidPropertiesBeforeTheRepository
+--- PASS: TestTelemetryInputRejectsInvalidPropertiesBeforeTheRepository (0.00s)
+=== RUN   TestSubmitTelemetryV2RejectsEmptyProperties
+--- PASS: TestSubmitTelemetryV2RejectsEmptyProperties (0.00s)
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/missing_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/invalid_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/expired_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/token_revoked
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/membership_revoked
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/role_changed
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/missing_tenant
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=403 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=403 safe_code=forbidden application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/platform_admin
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:79: status=403 safe_code=forbidden application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/authority_unavailable
+2026/10/14 01:54:39 ERROR http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:79: status=503 safe_code=unavailable application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/missing_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/invalid_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/expired_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/token_revoked
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/membership_revoked
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/role_changed
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/missing_tenant
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=403 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=403 safe_code=forbidden application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/platform_admin
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:79: status=403 safe_code=forbidden application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/authority_unavailable
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=GET status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:79: status=503 safe_code=unavailable application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/missing_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/invalid_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/expired_bearer
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/token_revoked
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/membership_revoked
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/role_changed
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=401 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=401 safe_code=unauthorized application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/missing_tenant
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=403 duration_ms=0 tenant_id=0 actor_id=0
+    playback_auth_test.go:79: status=403 safe_code=forbidden application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/platform_admin
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:79: status=403 safe_code=forbidden application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/authority_unavailable
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=DELETE status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_auth_test.go:79: status=503 safe_code=unavailable application_calls=0
+--- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication (0.02s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST (0.01s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/missing_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/invalid_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/expired_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/token_revoked (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/membership_revoked (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/role_changed (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/missing_tenant (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/platform_admin (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/POST/authority_unavailable (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET (0.01s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/missing_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/invalid_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/expired_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/token_revoked (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/membership_revoked (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/role_changed (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/missing_tenant (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/platform_admin (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/GET/authority_unavailable (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE (0.01s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/missing_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/invalid_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/expired_bearer (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/token_revoked (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/membership_revoked (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/role_changed (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/missing_tenant (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/platform_admin (0.00s)
+        --- PASS: TestMiniPlaybackRoutesRejectInvalidAuthorityBeforeApplication/DELETE/authority_unavailable (0.00s)
+=== RUN   TestAuthRejectsMissingExpiry
+2026/10/14 01:54:39 WARN http request route=/api/v1/ponds method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestAuthRejectsMissingExpiry (0.00s)
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/success
+    wechat_debug_test.go:93: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-14T01:54:39.283251845+08:00"}
+    wechat_debug_test.go:93: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"success","request_id":"login-correlation","stage":"wechat","status":200,"time":"2026-10-14T01:54:39.283649594+08:00"}
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/provider_failure
+    wechat_debug_test.go:93: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-14T01:54:39.284000015+08:00"}
+    wechat_debug_test.go:93: {"duration_ms":0,"error_code":"upstream_status","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"login-correlation","stage":"wechat","status":400,"time":"2026-10-14T01:54:39.284326881+08:00"}
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/malformed_response
+    wechat_debug_test.go:93: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-14T01:54:39.284669517+08:00"}
+    wechat_debug_test.go:93: {"duration_ms":0,"error_code":"upstream_status","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"login-correlation","stage":"wechat","status":503,"time":"2026-10-14T01:54:39.284978069+08:00"}
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/invalid_credential
+    wechat_debug_test.go:93: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-14T01:54:39.285308101+08:00"}
+    wechat_debug_test.go:93: {"duration_ms":0,"error_code":"provider_error","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"login-correlation","stage":"wechat","status":200,"time":"2026-10-14T01:54:39.285613718+08:00"}
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/malformed_success_response
+    wechat_debug_test.go:93: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-14T01:54:39.285949431+08:00"}
+    wechat_debug_test.go:93: {"duration_ms":0,"error_code":"response_decode","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"login-correlation","stage":"wechat","status":200,"time":"2026-10-14T01:54:39.286248254+08:00"}
+=== RUN   TestWechatLoginTracesSafeHTTPOutcomes/timeout
+    wechat_debug_test.go:93: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"login-correlation","stage":"wechat","time":"2026-10-14T01:54:39.286640864+08:00"}
+    wechat_debug_test.go:93: {"duration_ms":100,"error_code":"deadline_exceeded","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"login-correlation","stage":"wechat","status":0,"time":"2026-10-14T01:54:39.387243829+08:00"}
+--- PASS: TestWechatLoginTracesSafeHTTPOutcomes (0.10s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/success (0.00s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/provider_failure (0.00s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/malformed_response (0.00s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/invalid_credential (0.00s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/malformed_success_response (0.00s)
+    --- PASS: TestWechatLoginTracesSafeHTTPOutcomes/timeout (0.10s)
+=== RUN   TestModelLatestV2ReturnsTypedDynamicDetail
+--- PASS: TestModelLatestV2ReturnsTypedDynamicDetail (0.00s)
+=== RUN   TestTenantTokenRevocationAndSwitchBoundary
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 WARN http request route=/api/v1/auth/tenant method=POST status=404 duration_ms=0 tenant_id=7 actor_id=1
+2026/10/14 01:54:39 WARN http request route=/api/v1/auth/tenants method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestTenantTokenRevocationAndSwitchBoundary (0.00s)
+=== RUN   TestLoginAndListPonds
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 INFO http request route=/api/v1/ponds method=GET status=200 duration_ms=0 tenant_id=7 actor_id=1
+--- PASS: TestLoginAndListPonds (0.00s)
+=== RUN   TestTenantRoleConfirmationMatrix
+=== RUN   TestTenantRoleConfirmationMatrix/owner
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 INFO http request route=/api/v1/alarms/:id/confirm method=POST status=204 duration_ms=0 tenant_id=7 actor_id=1
+=== RUN   TestTenantRoleConfirmationMatrix/admin
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 INFO http request route=/api/v1/alarms/:id/confirm method=POST status=204 duration_ms=0 tenant_id=7 actor_id=1
+=== RUN   TestTenantRoleConfirmationMatrix/member
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 INFO http request route=/api/v1/alarms/:id/confirm method=POST status=204 duration_ms=0 tenant_id=7 actor_id=1
+=== RUN   TestTenantRoleConfirmationMatrix/support
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 INFO http request route=/api/v1/alarms/:id/confirm method=POST status=204 duration_ms=0 tenant_id=7 actor_id=1
+=== RUN   TestTenantRoleConfirmationMatrix/viewer
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 WARN http request route=/api/v1/alarms/:id/confirm method=POST status=403 duration_ms=0 tenant_id=7 actor_id=1
+--- PASS: TestTenantRoleConfirmationMatrix (0.01s)
+    --- PASS: TestTenantRoleConfirmationMatrix/owner (0.00s)
+    --- PASS: TestTenantRoleConfirmationMatrix/admin (0.00s)
+    --- PASS: TestTenantRoleConfirmationMatrix/member (0.00s)
+    --- PASS: TestTenantRoleConfirmationMatrix/support (0.00s)
+    --- PASS: TestTenantRoleConfirmationMatrix/viewer (0.00s)
+=== RUN   TestTenantTokenWithoutRoleRejected
+2026/10/14 01:54:39 WARN http request route=/api/v1/auth/tenants method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestTenantTokenWithoutRoleRejected (0.00s)
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/11/playback-sessions{}
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/11/playback-sessions?tenant_id=8
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/0/playback-sessions
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/+11/playback-sessions
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/9223372036854775808/playback-sessions
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/GET/api/v1/playback-sessions/87c0826e-3dd8-45b3-b0f1-968fe2917be0{}
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/GET/api/v1/playback-sessions/87c0826e-3dd8-45b3-b0f1-968fe2917be0?tenant_id=8
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/GET/api/v1/playback-sessions/not-a-uuid
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/DELETE/api/v1/playback-sessions/87c0826e-3dd8-45b3-b0f1-968fe2917be0{}
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/DELETE/api/v1/playback-sessions/87c0826e-3dd8-45b3-b0f1-968fe2917be0?tenant_id=8
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+=== RUN   TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/DELETE/api/v1/playback-sessions/not-a-uuid
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=400 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:42: status=400 safe_code=invalid_request application_calls=0
+--- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication (0.01s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/11/playback-sessions{} (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/11/playback-sessions?tenant_id=8 (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/0/playback-sessions (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/+11/playback-sessions (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/POST/api/v1/cameras/9223372036854775808/playback-sessions (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/GET/api/v1/playback-sessions/87c0826e-3dd8-45b3-b0f1-968fe2917be0{} (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/GET/api/v1/playback-sessions/87c0826e-3dd8-45b3-b0f1-968fe2917be0?tenant_id=8 (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/GET/api/v1/playback-sessions/not-a-uuid (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/DELETE/api/v1/playback-sessions/87c0826e-3dd8-45b3-b0f1-968fe2917be0{} (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/DELETE/api/v1/playback-sessions/87c0826e-3dd8-45b3-b0f1-968fe2917be0?tenant_id=8 (0.00s)
+    --- PASS: TestMiniPlaybackRoutesRejectInvalidRequestBeforeApplication/DELETE/api/v1/playback-sessions/not-a-uuid (0.00s)
+=== RUN   TestLoginWithoutTenantMembershipFailsClosed
+--- PASS: TestLoginWithoutTenantMembershipFailsClosed (0.00s)
+=== RUN   TestAuthRequired
+2026/10/14 01:54:39 WARN http request route=/api/v1/ponds method=GET status=401 duration_ms=0 tenant_id=0 actor_id=0
+--- PASS: TestAuthRequired (0.00s)
+=== RUN   TestHistoryBusinessDay
+--- PASS: TestHistoryBusinessDay (0.00s)
+=== RUN   TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream
+=== RUN   TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream/success
+    wechat_debug_test.go:165: {"level":"DEBUG","method":"POST","msg":"http request started","outcome":"started","request_id":"OLJUI5WKDDW36OZDNAYCYIUAFV","route":"/api/v1/auth/login","stage":"http","time":"2026-10-14T01:54:39.406923603+08:00"}
+    wechat_debug_test.go:165: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"OLJUI5WKDDW36OZDNAYCYIUAFV","stage":"wechat","time":"2026-10-14T01:54:39.40698578+08:00"}
+    wechat_debug_test.go:165: {"duration_ms":0,"error_code":"","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"success","request_id":"OLJUI5WKDDW36OZDNAYCYIUAFV","stage":"wechat","status":200,"time":"2026-10-14T01:54:39.407348294+08:00"}
+    wechat_debug_test.go:165: {"actor_id":0,"duration_ms":0,"level":"INFO","method":"POST","msg":"http request","request_id":"OLJUI5WKDDW36OZDNAYCYIUAFV","route":"/api/v1/auth/login","status":200,"tenant_id":0,"time":"2026-10-14T01:54:39.407453041+08:00"}
+=== RUN   TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream/provider_rejected
+    wechat_debug_test.go:165: {"level":"DEBUG","method":"POST","msg":"http request started","outcome":"started","request_id":"FGVMOHXPI64LRP7ZYLAKYJIEAU","route":"/api/v1/auth/login","stage":"http","time":"2026-10-14T01:54:39.408059595+08:00"}
+    wechat_debug_test.go:165: {"level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"started","request_id":"FGVMOHXPI64LRP7ZYLAKYJIEAU","stage":"wechat","time":"2026-10-14T01:54:39.408117755+08:00"}
+    wechat_debug_test.go:165: {"duration_ms":0,"error_code":"provider_error","level":"DEBUG","msg":"wechat downstream request","operation":"code2session","outcome":"failed","request_id":"FGVMOHXPI64LRP7ZYLAKYJIEAU","stage":"wechat","status":200,"time":"2026-10-14T01:54:39.408452125+08:00"}
+    wechat_debug_test.go:165: {"actor_id":0,"duration_ms":0,"level":"WARN","method":"POST","msg":"http request","request_id":"FGVMOHXPI64LRP7ZYLAKYJIEAU","route":"/api/v1/auth/login","status":401,"tenant_id":0,"time":"2026-10-14T01:54:39.408501398+08:00"}
+--- PASS: TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream (0.00s)
+    --- PASS: TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream/success (0.00s)
+    --- PASS: TestWechatLoginHTTPPropagatesGeneratedRequestIDToDownstream/provider_rejected (0.00s)
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/outage=false
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/outage=true
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/1/outage=false
+=== RUN   TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/1/outage=true
+--- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage (0.00s)
+    --- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/outage=false (0.00s)
+    --- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/outage=true (0.00s)
+    --- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/1/outage=false (0.00s)
+    --- PASS: TestPondLatestSelectsFreshestSupportedShadowAndRejectsPartialOutage//ponds/1/outage=true (0.00s)
+=== RUN   TestWaterLatest
+2026/10/14 01:54:39 INFO http request route=/api/v1/auth/login method=POST status=200 duration_ms=0 tenant_id=0 actor_id=0
+2026/10/14 01:54:39 INFO http request route=/api/v1/water/latest method=GET status=200 duration_ms=0 tenant_id=7 actor_id=1
+--- PASS: TestWaterLatest (0.00s)
+=== RUN   TestTelemetryHistoryV2RejectsBadMetric
+--- PASS: TestTelemetryHistoryV2RejectsBadMetric (0.00s)
+=== RUN   TestExtendedRequestParsingEnforcesExactTypedFields
+--- PASS: TestExtendedRequestParsingEnforcesExactTypedFields (0.00s)
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.4152069+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"DEAP46QGMRXQWP533JXIP664K4"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.417590955+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"MMA7HU2UATGVYSQUZWGCUEVZAH"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.419521335+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"LUH73XMINXEL6L6I27DHU476CD"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.421309226+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"S6O46J5FEMSWS2C4W2G6VA2ORV"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.423115441+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"OS5X7XCS66TGKARHP27ZXUJLNU"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_ponds
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.425250026+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"XHPMXLPMKJJVIJHLCIII4QBO2O"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.426941865+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"HCQSX7TDBO22LWIUDDV65MNAN5"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/history_query
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.428728945+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"OZODEP4TMTRTH2FLKGE73ABQMA"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/history_capability
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.43049799+08:00","level":"ERROR","msg":"HTTP provider capability unavailable","stage":"http_provider","request_id":"UTL5EG4YN5IM7QV7V36FKL4JRX"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_list
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.432857057+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"6EBAC7FMWLQUJRNNGUGUZAB6GY"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_filtered
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.434642614+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"HI3WUTNV6HKLHHXYTSHEOXNNXY"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/alarm_confirm
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.436622878+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"F2RU5VXXY5HXNFN7EJYGDHUCAJ"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_ponds
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.438536165+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"HQMU3XMTKCDNVXFTRCVACTWXKZ"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_devices
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.440436778+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"6GIHLA5MJ2KYOAQYWUKNINDAJQ"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_alarms
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.442599436+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"ZYP4ZBQR7I2XHYWF4I4UVI7DL4"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_user
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.443814847+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"4MPSX3M3DFL3M7PPPTSGTDZMQM"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_tenant
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.444922876+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"WOFSXTGW6ZVUJ3UOL6HMR2RXM6"}
+=== RUN   TestBaselineHTTPProviderFailuresUseSafeInternalError/login_version
+    provider_error_test.go:105: status=500 response=internal_error correlated_diagnostic={"time":"2026-10-14T01:54:39.445992052+08:00","level":"ERROR","msg":"HTTP provider operation failed","stage":"http_provider","err":"*errors.errorString","request_id":"IPLJOLOMMWRXC6PQF5R4PLVHVE"}
+--- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError (0.03s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_list_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/pond_detail_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_ponds (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/device_list_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/history_query (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/history_capability (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_list (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarms_filtered (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/alarm_confirm (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_ponds (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_devices (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/summary_alarms (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_user (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_tenant (0.00s)
+    --- PASS: TestBaselineHTTPProviderFailuresUseSafeInternalError/login_version (0.00s)
+=== RUN   TestMiniPlaybackRoutesForwardAuthenticatedActor
+=== RUN   TestMiniPlaybackRoutesForwardAuthenticatedActor/POST
+2026/10/14 01:54:39 INFO http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=201 duration_ms=0 tenant_id=7 actor_id=9
+    playback_route_test.go:95: status=201 actor=7/9/viewer/4 session_state=pending session_public_fields=4
+=== RUN   TestMiniPlaybackRoutesForwardAuthenticatedActor/GET
+2026/10/14 01:54:39 INFO http request route=/api/v1/playback-sessions/:session_id method=GET status=200 duration_ms=0 tenant_id=7 actor_id=9
+    playback_route_test.go:95: status=200 actor=7/9/viewer/4 session_state=ready session_public_fields=4
+=== RUN   TestMiniPlaybackRoutesForwardAuthenticatedActor/DELETE
+2026/10/14 01:54:39 INFO http request route=/api/v1/playback-sessions/:session_id method=DELETE status=204 duration_ms=0 tenant_id=7 actor_id=9
+    playback_route_test.go:51: status=204 actor=7/9/viewer/4 response_bytes=0
+--- PASS: TestMiniPlaybackRoutesForwardAuthenticatedActor (0.00s)
+    --- PASS: TestMiniPlaybackRoutesForwardAuthenticatedActor/POST (0.00s)
+    --- PASS: TestMiniPlaybackRoutesForwardAuthenticatedActor/GET (0.00s)
+    --- PASS: TestMiniPlaybackRoutesForwardAuthenticatedActor/DELETE (0.00s)
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/cross_owner_or_missing
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=404 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=404 safe_code=not_found application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/forbidden
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=403 safe_code=forbidden application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/license_required
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=403 safe_code=forbidden application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/conflict
+2026/10/14 01:54:39 WARN http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=409 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=409 safe_code=conflict application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/disabled
+2026/10/14 01:54:39 ERROR http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=503 safe_code=unavailable application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/license_unavailable
+2026/10/14 01:54:39 ERROR http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=503 safe_code=unavailable application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/provider_raw
+2026/10/14 01:54:39 ERROR http request route=/api/v1/cameras/:camera_id/playback-sessions method=POST status=500 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=500 safe_code=internal_error application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/cross_owner_or_missing
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=404 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=404 safe_code=not_found application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/forbidden
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=403 safe_code=forbidden application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/license_required
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=403 safe_code=forbidden application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/conflict
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=GET status=409 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=409 safe_code=conflict application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/disabled
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=GET status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=503 safe_code=unavailable application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/license_unavailable
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=GET status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=503 safe_code=unavailable application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/provider_raw
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=GET status=500 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=500 safe_code=internal_error application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/cross_owner_or_missing
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=404 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=404 safe_code=not_found application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/forbidden
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=403 safe_code=forbidden application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/license_required
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=403 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=403 safe_code=forbidden application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/conflict
+2026/10/14 01:54:39 WARN http request route=/api/v1/playback-sessions/:session_id method=DELETE status=409 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=409 safe_code=conflict application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/disabled
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=DELETE status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=503 safe_code=unavailable application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/license_unavailable
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=DELETE status=503 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=503 safe_code=unavailable application_calls=1
+=== RUN   TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/provider_raw
+2026/10/14 01:54:39 ERROR http request route=/api/v1/playback-sessions/:session_id method=DELETE status=500 duration_ms=0 tenant_id=7 actor_id=9
+    playback_boundary_test.go:84: status=500 safe_code=internal_error application_calls=1
+--- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors (0.02s)
+    --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST (0.01s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/cross_owner_or_missing (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/forbidden (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/license_required (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/conflict (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/disabled (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/license_unavailable (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/POST/provider_raw (0.00s)
+    --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET (0.01s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/cross_owner_or_missing (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/forbidden (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/license_required (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/conflict (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/disabled (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/license_unavailable (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/GET/provider_raw (0.00s)
+    --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE (0.01s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/cross_owner_or_missing (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/forbidden (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/license_required (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/conflict (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/disabled (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/license_unavailable (0.00s)
+        --- PASS: TestMiniPlaybackRoutesReturnSafeApplicationErrors/DELETE/provider_raw (0.00s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/appapi	1.279s

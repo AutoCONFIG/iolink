@@ -1,0 +1,254 @@
+=== RUN   TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:24: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:24: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#01
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:28: product contract method=GET route=/products/{product_id}/models status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#02
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:32: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#03
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:33: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#04
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:37: product contract method=PUT route=/devices/{device_no}/product status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#05
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:51: product contract method=GET route=/devices/{device_no}/product status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#06
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:52: product contract method=GET route=/products status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#07
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:56: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#08
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:60: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#09
+--- PASS: TestProductContractHTTPPositiveMatrix (3.59s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract (0.23s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#01 (0.23s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#02 (0.23s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#03 (0.24s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#04 (0.24s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#05 (0.25s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#06 (0.24s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#07 (0.24s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#08 (0.24s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#09 (0.26s)
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged
+    product_contract_http_test.go:71: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged
+    product_contract_http_test.go:71: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract#01
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged
+    product_contract_http_test.go:72: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract#02
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00
+    product_contract_http_test.go:97: product contract method=POST route=/products status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01
+    product_contract_http_test.go:97: product contract method=POST route=/products status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02
+    product_contract_http_test.go:97: product contract method=POST route=/products status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03
+    product_contract_http_test.go:97: product contract method=POST route=/products status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_04
+    product_contract_http_test.go:97: product contract method=POST route=/products status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_04/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_05
+    product_contract_http_test.go:97: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_05/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06
+    product_contract_http_test.go:97: product contract method=POST route=/products/{product_id}/models status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07
+    product_contract_http_test.go:97: product contract method=POST route=/products/{product_id}/models status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08
+    product_contract_http_test.go:97: product contract method=POST route=/products/{product_id}/models status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09
+    product_contract_http_test.go:97: product contract method=POST route=/products/{product_id}/models status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10
+    product_contract_http_test.go:97: product contract method=POST route=/products/{product_id}/models status=201 expected=400
+    product_contract_http_test.go:97: product status got=201 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_11
+    product_contract_http_test.go:97: product contract method=GET route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_11/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: GET /products/{product_id}/models status=400 issues=[{response_selection []}]
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_12
+    product_contract_http_test.go:97: product contract method=POST route=/products/{product_id}/models/{version}/publish status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_12/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_13
+    product_contract_http_test.go:97: product contract method=PUT route=/devices/{device_no}/product status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_13/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14
+    product_contract_http_test.go:97: product contract method=PUT route=/devices/{device_no}/product status=200 expected=400
+    product_contract_http_test.go:97: product status got=200 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14
+    product_contract_http_test.go:100: invalid product request changed persisted state
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_15
+    product_contract_http_test.go:97: product contract method=PUT route=/devices/{device_no}/product status=200 expected=400
+    product_contract_http_test.go:97: product status got=200 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_15/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_16
+    product_contract_http_test.go:97: product contract method=PUT route=/devices/{device_no}/product status=200 expected=400
+    product_contract_http_test.go:97: product status got=200 want=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_16/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_17
+    product_contract_http_test.go:97: product contract method=PUT route=/devices/{device_no}/product status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_17/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_18
+    product_contract_http_test.go:97: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_18/response_contract
+--- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged (6.87s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract#01 (0.24s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract#02 (0.24s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00/response_contract (0.24s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01 (0.24s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01/response_contract (0.23s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02 (0.24s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02/response_contract (0.24s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03 (0.23s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03/response_contract (0.23s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_04 (0.24s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_04/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_05 (0.24s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_05/response_contract (0.24s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06/response_contract (0.24s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07/response_contract (0.26s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08/response_contract (0.24s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09/response_contract (0.24s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10/response_contract (0.24s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_11 (0.24s)
+        --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_11/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_12 (0.24s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_12/response_contract (0.23s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_13 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_13/response_contract (0.25s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14/response_contract (0.25s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_15 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_15/response_contract (0.25s)
+    --- FAIL: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_16 (0.24s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_16/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_17 (0.24s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_17/response_contract (0.23s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_18 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_18/response_contract (0.24s)
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged
+    product_contract_scope_test.go:12: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract
+=== NAME  TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged
+    product_contract_scope_test.go:12: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#01
+=== NAME  TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged
+    product_contract_scope_test.go:13: ERROR: cannot insert multiple commands into a prepared statement (SQLSTATE 42601)
+--- FAIL: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged (1.59s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#01 (0.26s)
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:49: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:49: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#01
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:50: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#02
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:51: product contract method=PUT route=/devices/{device_no}/product status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#03
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:53: product contract method=GET route=/products status=401 expected=401
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#04
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_00
+    product_contract_scope_test.go:66: product contract method=POST route=/products status=403 expected=403
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_00/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: POST /products status=403 issues=[{response_selection []}]
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_01
+    product_contract_scope_test.go:66: product contract method=POST route=/products/{product_id}/models status=403 expected=403
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_01/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: POST /products/{product_id}/models status=403 issues=[{response_selection []}]
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_02
+    product_contract_scope_test.go:66: product contract method=POST route=/products/{product_id}/models/{version}/publish status=403 expected=403
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_02/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: POST /products/{product_id}/models/{version}/publish status=403 issues=[{response_selection []}]
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_03
+    product_contract_scope_test.go:66: product contract method=PUT route=/devices/{device_no}/product status=403 expected=403
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_03/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: PUT /devices/{device_no}/product status=403 issues=[{response_selection []}]
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:78: product contract method=GET route=/products status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#05
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:78: product contract method=GET route=/products/{product_id}/models status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#06
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:78: product contract method=GET route=/devices/{device_no}/product status=404 expected=200
+    product_contract_scope_test.go:78: product status got=404 want=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#07
+--- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged (4.40s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract (0.30s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#01 (0.27s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#02 (0.24s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#03 (0.24s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#04 (0.24s)
+    --- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_00 (0.24s)
+        --- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_00/response_contract (0.23s)
+    --- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_01 (0.27s)
+        --- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_01/response_contract (0.27s)
+    --- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_02 (0.32s)
+        --- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_02/response_contract (0.31s)
+    --- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_03 (0.25s)
+        --- FAIL: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_03/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#05 (0.25s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#06 (0.27s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#07 (0.24s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	16.529s
+FAIL

@@ -1,0 +1,4 @@
+dump_records 27
+provider_records 7
+distinct_request_ids 7
+error_classes {'postgres_42P01': 7}

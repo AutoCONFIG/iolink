@@ -1,0 +1,33 @@
+-test.shuffle 1791912774400739275
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_users
+    identity_provider_contract_test.go:11: GET /farms status=401 want=500
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_users/response_contract
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_users
+    identity_provider_contract_test.go:18: app contract method=GET route=/ponds status=401 expected=500
+    identity_provider_contract_test.go:18: app HTTP status: GET /ponds got=401 want=500
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenants
+    identity_provider_contract_test.go:11: GET /farms status=401 want=500
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenants/response_contract
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_tenants
+    identity_provider_contract_test.go:18: app contract method=GET route=/ponds status=401 expected=500
+    identity_provider_contract_test.go:18: app HTTP status: GET /ponds got=401 want=500
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenant_memberships
+    identity_provider_contract_test.go:11: GET /farms status=401 want=500
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenant_memberships/response_contract
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_tenant_memberships
+    identity_provider_contract_test.go:18: app contract method=GET route=/ponds status=401 expected=500
+    identity_provider_contract_test.go:18: app HTTP status: GET /ponds got=401 want=500
+--- FAIL: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials (5.62s)
+    --- FAIL: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_users (1.34s)
+        --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_users/response_contract (0.37s)
+    --- FAIL: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_users (0.69s)
+    --- FAIL: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenants (1.11s)
+        --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenants/response_contract (0.23s)
+    --- FAIL: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_tenants (0.56s)
+    --- FAIL: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenant_memberships (1.28s)
+        --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenant_memberships/response_contract (0.23s)
+    --- FAIL: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_tenant_memberships (0.64s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	5.703s
+FAIL

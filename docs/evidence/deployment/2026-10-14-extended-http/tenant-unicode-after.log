@@ -1,0 +1,15 @@
+-test.shuffle 1791914652544090445
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/response_contract
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length/response_contract
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length#01
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length#01/response_contract
+--- PASS: TestTenantNameLimitCountsUnicodeCharacters (1.47s)
+    --- PASS: TestTenantNameLimitCountsUnicodeCharacters/response_contract (0.24s)
+    --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length (0.24s)
+        --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length/response_contract (0.23s)
+    --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length#01 (0.23s)
+        --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length#01/response_contract (0.23s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	2.535s

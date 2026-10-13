@@ -60,9 +60,9 @@ func TestBaselineAdminHTTPProviderFailuresUseSafeInternalError(t *testing.T) {
 		{"login_membership", "POST", "/login", `{"username":"admin","password":"admin123"}`, func(f *fakeStore) AdminStore { return failloginMembership{f} }},
 		{"login_role", "POST", "/login", `{"username":"admin","password":"admin123"}`, func(f *fakeStore) AdminStore { return failloginRole{f} }},
 		{"member_list", "GET", "/farms/1/members", ``, func(f *fakeStore) AdminStore { return failfarmMemberList{f} }},
-		{"member_set", "PUT", "/farms/1/members/9", `{"role":"member"}`, func(f *fakeStore) AdminStore { return failfarmMemberSet{f} }},
+		{"member_set", "PUT", "/farms/1/members/9", `{"role":"member","active":true}`, func(f *fakeStore) AdminStore { return failfarmMemberSet{f} }},
 		{"missing_member_list", "GET", "/farms/1/members", ``, func(f *fakeStore) AdminStore { return f }},
-		{"missing_member_set", "PUT", "/farms/1/members/9", `{"role":"member"}`, func(f *fakeStore) AdminStore { return f }},
+		{"missing_member_set", "PUT", "/farms/1/members/9", `{"role":"member","active":true}`, func(f *fakeStore) AdminStore { return f }},
 	} {
 		t.Run(tc.name, func(t *testing.T) { exerciseAdminProviderFailure(t, tc) })
 	}

@@ -2,9 +2,11 @@ package adminapi
 
 import (
 	"context"
+	"net/http"
+	"unicode/utf8"
+
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type PlatformUserStore interface {
@@ -13,22 +15,25 @@ type PlatformUserStore interface {
 
 func (s *Server) platformUsers(c *gin.Context) {
 	if !c.GetBool("platform_admin") {
-		c.JSON(http.StatusForbidden, gin.H{"error": "platform admin required"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 		return
 	}
 	store, ok := s.deps.Store.(PlatformUserStore)
 	if !ok {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "user directory unavailable"})
+		s.organizationUnavailable(c)
+		return
+	}
+	if !validBaselineQuery(c) {
 		return
 	}
 	query := c.Query("query")
-	if len(query) > 128 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid query"})
+	if !utf8.ValidString(query) || utf8.RuneCountInString(query) > 128 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	users, err := store.ListPlatformUsers(c.Request.Context(), query)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "user directory unavailable"})
+		s.providerFailure(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, users)

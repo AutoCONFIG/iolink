@@ -8,7 +8,6 @@ import (
 	"math/big"
 	"net/http"
 	"strconv"
-	"time"
 	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
@@ -32,12 +31,6 @@ type ownerReq struct {
 	OwnerID json.RawMessage `json:"owner_id" binding:"required"`
 }
 
-type farmMemberRequest struct {
-	Role      string     `json:"role"`
-	Active    *bool      `json:"active"`
-	ExpiresAt *time.Time `json:"expires_at"`
-}
-
 func (s *Server) listFarmMembers(c *gin.Context) {
 	role := domain.TenantRole(c.Request.Context())
 	if role != "owner" && role != "admin" {
@@ -50,7 +43,7 @@ func (s *Server) listFarmMembers(c *gin.Context) {
 		return
 	}
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
+	if err != nil || id < 1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
@@ -77,25 +70,21 @@ func (s *Server) setFarmMember(c *gin.Context) {
 		return
 	}
 	farmID, err := strconv.ParseInt(c.Param("id"), 10, 64)
-	if err != nil {
+	if err != nil || farmID < 1 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
 	userID, err := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if err != nil || userID < 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
+		return
+	}
+	req, err := parseMembershipBody(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 		return
 	}
-	var req farmMemberRequest
-	if err := c.ShouldBindJSON(&req); err != nil || req.Role == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
-		return
-	}
-	active := true
-	if req.Active != nil {
-		active = *req.Active
-	}
-	if err := store.SetFarmMember(c.Request.Context(), farmID, userID, req.Role, active, req.ExpiresAt, aid(c)); err != nil {
+	if err := store.SetFarmMember(c.Request.Context(), farmID, userID, req.Role, *req.Active, req.ExpiresAt, aid(c)); err != nil {
 		if errors.Is(err, domain.ErrForbidden) {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
 			return
@@ -315,8 +304,9 @@ func (s *Server) listPonds(c *gin.Context) {
 		s.providerFailure(c, err)
 		return
 	}
-	if raw := c.Query("farm_id"); raw != "" {
-		farmID, parseErr := strconv.ParseInt(raw, 10, 64)
+	values := c.Request.URL.Query()
+	if values.Has("farm_id") {
+		farmID, parseErr := strconv.ParseInt(values.Get("farm_id"), 10, 64)
 		if parseErr != nil || farmID < 1 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return
@@ -778,8 +768,9 @@ func (s *Server) listRules(c *gin.Context) {
 		return
 	}
 	pondID := int64(0)
-	if raw := c.Query("pond_id"); raw != "" {
-		pondID, err = strconv.ParseInt(raw, 10, 64)
+	values := c.Request.URL.Query()
+	if values.Has("pond_id") {
+		pondID, err = strconv.ParseInt(values.Get("pond_id"), 10, 64)
 		if err != nil || pondID < 1 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid_request"})
 			return

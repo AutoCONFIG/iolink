@@ -1,0 +1,183 @@
+-test.shuffle 1791914199328714071
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/auth/tenants
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=GET route=/auth/tenants status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/auth/tenant
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=POST route=/auth/tenant status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/telemetry
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=POST route=/devices/{device_no}/telemetry status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/model/latest
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=GET route=/devices/{device_no}/model/latest status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/history
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=GET route=/devices/{device_no}/history status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/auth/tenants
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=GET route=/auth/tenants status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/auth/tenant
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=POST route=/auth/tenant status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/telemetry
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=POST route=/devices/{device_no}/telemetry status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/telemetry#01
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=POST route=/devices/{device_no}/telemetry status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/model/latest
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=GET route=/devices/{device_no}/model/latest status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/history
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=GET route=/devices/{device_no}/history status=500 expected=500
+--- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures (7.52s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/auth/tenants (0.71s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/auth/tenant (0.70s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/telemetry (0.67s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/model/latest (0.68s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/history (0.68s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/auth/tenants (0.68s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/auth/tenant (0.68s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/telemetry (0.70s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/telemetry#01 (0.70s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/model/latest (0.67s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/history (0.67s)
+=== RUN   TestExtendedAppContractsExcludeExpiredTargetTenant
+    extended_app_contract_test.go:132: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:135: app contract method=GET route=/auth/tenants status=200 expected=200
+    extended_app_contract_test.go:144: app contract method=POST route=/auth/tenant status=404 expected=404
+--- PASS: TestExtendedAppContractsExcludeExpiredTargetTenant (0.86s)
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites
+    extended_app_contract_test.go:81: environment real_timescaledb=2.30.2
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#01
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#02
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#03
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#04
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#05
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#06
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#07
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status404
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#01
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#02
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#03
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#04
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#05
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#06
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#07
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#08
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#09
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#10
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status404
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status404#01
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/model/latest_status404
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/model/latest status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/model/latest_status404#01
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/model/latest status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status404
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#01
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#02
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#03
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#04
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#05
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#06
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+--- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites (6.90s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#01 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#02 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#03 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#04 (0.19s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#05 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#06 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#07 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status404 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#01 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#02 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#03 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#04 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#05 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#06 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#07 (0.19s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#08 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#09 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#10 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status404 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status404#01 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/model/latest_status404 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/model/latest_status404#01 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status404 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#01 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#02 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#03 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#04 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#05 (0.20s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#06 (0.20s)
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres
+    extended_app_contract_test.go:12: environment real_timescaledb=2.30.2
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/GET/auth/tenants
+    extended_app_contract_test.go:22: app contract method=GET route=/auth/tenants status=200 expected=200
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/POST/auth/tenant
+    extended_app_contract_test.go:22: app contract method=POST route=/auth/tenant status=200 expected=200
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/POST/devices/{device_no}/telemetry
+    extended_app_contract_test.go:22: app contract method=POST route=/devices/{device_no}/telemetry status=202 expected=202
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/GET/devices/{device_no}/model/latest
+    extended_app_contract_test.go:22: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/GET/devices/{device_no}/history
+    extended_app_contract_test.go:22: app contract method=GET route=/devices/{device_no}/history status=200 expected=200
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/switched_token_enforces_target_role
+    extended_app_contract_test.go:62: app contract method=POST route=/auth/tenant status=200 expected=200
+    extended_app_contract_test.go:68: app contract method=GET route=/devices/{device_no}/model/latest status=404 expected=404
+    extended_app_contract_test.go:69: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+    extended_app_contract_test.go:75: app contract method=POST route=/devices/{device_no}/telemetry status=403 expected=403
+--- PASS: TestExtendedAppContractsPositiveWithRealPostgres (2.29s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/GET/auth/tenants (0.20s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/POST/auth/tenant (0.20s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/POST/devices/{device_no}/telemetry (0.21s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/GET/devices/{device_no}/model/latest (0.20s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/GET/devices/{device_no}/history (0.21s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/switched_token_enforces_target_role (0.80s)
+=== RUN   TestExtendedAppContractsEmptyHistoryAndHiddenModel
+    extended_app_contract_test.go:149: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:150: app contract method=GET route=/devices/{device_no}/history status=200 expected=200
+    extended_app_contract_test.go:155: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+    extended_app_contract_test.go:160: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+--- PASS: TestExtendedAppContractsEmptyHistoryAndHiddenModel (1.12s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	19.723s

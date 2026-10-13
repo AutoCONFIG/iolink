@@ -89,6 +89,7 @@ paths:
                   tenant_role: { type: string }
                 additionalProperties: false
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
   /register:
     post:
       tags: [auth]
@@ -175,6 +176,8 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /platform/stats:
     get:
       tags: [stats]
@@ -187,6 +190,8 @@ paths:
               schema: { $ref: '#/components/schemas/PlatformStats' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /tenants/{id}/status:
     put:
       tags: [tenants]
@@ -208,6 +213,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
   /tenants/{id}/members:
     get:
       tags: [tenants]
@@ -225,6 +231,9 @@ paths:
                 items: { $ref: '#/components/schemas/TenantMembership' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
   /tenants/{id}/members/{user_id}:
     put:
       tags: [tenants]
@@ -251,6 +260,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
   /password:
     post:
       tags:
@@ -491,6 +501,9 @@ paths:
                 items: { $ref: '#/components/schemas/FarmMembership' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
   /farms/{id}/members/{user_id}:
     put:
       tags: [farms]
@@ -514,6 +527,7 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
   /ponds:
     get:
       tags:
@@ -1152,6 +1166,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '409': { $ref: '#/components/responses/Conflict' }
         '500': { $ref: '#/components/responses/InternalError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
   /products/{product_id}/models:
     get:
       tags: [products]
@@ -1173,6 +1188,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
         '500': { $ref: '#/components/responses/InternalError' }
+        '400': { $ref: '#/components/responses/BadRequest' }
     post:
       tags: [products]
       summary: 创建不可变模型版本
@@ -1198,6 +1214,7 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '500': { $ref: '#/components/responses/InternalError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
   /products/{product_id}/models/{version}/publish:
     post:
       tags: [products]
@@ -1223,6 +1240,7 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '500': { $ref: '#/components/responses/InternalError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
   /devices/{device_no}/product:
     get:
       tags: [products, devices]
@@ -1266,6 +1284,7 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '500': { $ref: '#/components/responses/InternalError' }
+        '403': { $ref: '#/components/responses/Forbidden' }
   /api-keys:
     get:
       tags: [auth]

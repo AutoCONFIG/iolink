@@ -1,0 +1,100 @@
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated
+    product_contract_failures_test.go:15: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated
+    product_contract_failures_test.go:15: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract#01
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated
+    product_contract_failures_test.go:16: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract#02
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00
+    product_contract_failures_test.go:36: product contract method=GET route=/products status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: GET /products status=500 issues=[{enum [properties error enum]}]
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00
+    product_contract_failures_test.go:39: SQL failure did not produce a safe correlated error
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01
+    product_contract_failures_test.go:36: product contract method=POST route=/products status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: POST /products status=500 issues=[{enum [properties error enum]}]
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01
+    product_contract_failures_test.go:39: SQL failure did not produce a safe correlated error
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02
+    product_contract_failures_test.go:36: product contract method=GET route=/products/{product_id}/models status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: GET /products/{product_id}/models status=500 issues=[{enum [properties error enum]}]
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02
+    product_contract_failures_test.go:39: SQL failure did not produce a safe correlated error
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03
+    product_contract_failures_test.go:36: product contract method=POST route=/products/{product_id}/models status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: POST /products/{product_id}/models status=500 issues=[{enum [properties error enum]}]
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03
+    product_contract_failures_test.go:39: SQL failure did not produce a safe correlated error
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04
+    product_contract_failures_test.go:36: product contract method=POST route=/products/{product_id}/models/{version}/publish status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: POST /products/{product_id}/models/{version}/publish status=500 issues=[{enum [properties error enum]}]
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04
+    product_contract_failures_test.go:39: SQL failure did not produce a safe correlated error
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05
+    product_contract_failures_test.go:36: product contract method=GET route=/devices/{device_no}/product status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: GET /devices/{device_no}/product status=500 issues=[{enum [properties error enum]}]
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05
+    product_contract_failures_test.go:39: SQL failure did not produce a safe correlated error
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06
+    product_contract_failures_test.go:36: product contract method=PUT route=/devices/{device_no}/product status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06/response_contract
+    product_contract_helpers_test.go:75: HTTP contract rejected response: PUT /devices/{device_no}/product status=500 issues=[{enum [properties error enum]}]
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06
+    product_contract_failures_test.go:39: SQL failure did not produce a safe correlated error
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated
+    product_contract_failures_test.go:76: missing safely classified SQLSTATE diagnostic for request
+    product_contract_failures_test.go:76: missing safely classified SQLSTATE diagnostic for request
+    product_contract_failures_test.go:76: missing safely classified SQLSTATE diagnostic for request
+    product_contract_failures_test.go:76: missing safely classified SQLSTATE diagnostic for request
+    product_contract_failures_test.go:76: missing safely classified SQLSTATE diagnostic for request
+    product_contract_failures_test.go:76: missing safely classified SQLSTATE diagnostic for request
+    product_contract_failures_test.go:76: missing safely classified SQLSTATE diagnostic for request
+--- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated (3.26s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract (0.23s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract#01 (0.23s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract#02 (0.23s)
+    --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00 (0.23s)
+        --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00/response_contract (0.22s)
+    --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01 (0.23s)
+        --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01/response_contract (0.23s)
+    --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02 (0.24s)
+        --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02/response_contract (0.23s)
+    --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03 (0.24s)
+        --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03/response_contract (0.23s)
+    --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04 (0.24s)
+        --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04/response_contract (0.23s)
+    --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05 (0.24s)
+        --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05/response_contract (0.23s)
+    --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06 (0.23s)
+        --- FAIL: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06/response_contract (0.23s)
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:84: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract
+=== NAME  TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:84: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#01
+=== NAME  TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:85: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#02
+=== NAME  TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:92: product contract method=PUT route=/devices/{device_no}/product status=500 expected=500
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#03
+    product_contract_helpers_test.go:75: HTTP contract rejected response: PUT /devices/{device_no}/product status=500 issues=[{enum [properties error enum]}]
+=== NAME  TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:95: failed assignment left partial state or unsafe error
+--- FAIL: TestProductContractHTTPAssignmentAuditFailureRollsBack (1.77s)
+    --- PASS: TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract (0.23s)
+    --- PASS: TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#01 (0.23s)
+    --- PASS: TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#02 (0.23s)
+    --- FAIL: TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#03 (0.23s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	5.105s
+FAIL

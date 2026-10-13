@@ -1,0 +1,30 @@
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#10
+    platform_contract_fixture_test.go:92: HTTP contract rejected response: PUT /tenants/{id}/status status=500 issues=[{response_selection []}]
+--- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic (4.07s)
+    --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit (4.07s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#02 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#04 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#05 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#06 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#08 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#09 (0.24s)
+        --- FAIL: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#10 (0.23s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	4.152s
+FAIL

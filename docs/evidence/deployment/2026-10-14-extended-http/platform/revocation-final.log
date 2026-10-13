@@ -1,0 +1,52 @@
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#01
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#02
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#03
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#04
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#05
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#06
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#07
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#08
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#09
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/PUT_farm_member
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/PUT_farm_member/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/GET_farm_members
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/GET_farm_members/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/viewer_visible
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/viewer_visible/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/revoke_farm_member
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/revoke_farm_member/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/viewer_revoked
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/viewer_revoked/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/revoke_tenant_member
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/revoke_tenant_member/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/tenant_token_revoked
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/tenant_token_revoked/response_contract
+--- PASS: TestPlatformFarmMemberContractAndImmediateRevocation (5.79s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#01 (0.23s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#02 (0.25s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#03 (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#04 (0.25s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#05 (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#06 (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#07 (0.26s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#08 (0.26s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#09 (0.26s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/PUT_farm_member (0.27s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/PUT_farm_member/response_contract (0.26s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/GET_farm_members (0.26s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/GET_farm_members/response_contract (0.25s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/viewer_visible (0.26s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/viewer_visible/response_contract (0.26s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/revoke_farm_member (0.27s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/revoke_farm_member/response_contract (0.26s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/viewer_revoked (0.25s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/viewer_revoked/response_contract (0.25s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/revoke_tenant_member (0.27s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/revoke_tenant_member/response_contract (0.27s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/tenant_token_revoked (0.26s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/tenant_token_revoked/response_contract (0.26s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	6.859s
