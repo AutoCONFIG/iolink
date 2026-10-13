@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"git.hyhy.fun/rsplab/iolink/internal/domain"
 	"github.com/jackc/pgx/v5"
@@ -19,7 +20,7 @@ var validOpenScopes = map[string]bool{
 }
 
 func validateAPIKeyInput(name string, scopes []string, resources domain.APIKeyResourceScope) error {
-	if strings.TrimSpace(name) == "" || len([]byte(name)) > 128 {
+	if strings.TrimSpace(name) == "" || utf8.RuneCountInString(name) > 128 {
 		return domain.ErrInvalidAPIKey
 	}
 	if len(scopes) == 0 || len(scopes) > 16 {

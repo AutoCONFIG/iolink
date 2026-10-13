@@ -1,0 +1,5 @@
+ascii_128: characters=128 bytes=128 valid=True keywords=[]
+unicode_128: characters=128 bytes=384 valid=True keywords=[]
+ascii_129: characters=129 bytes=129 valid=False keywords=['maxLength']
+unicode_129: characters=129 bytes=387 valid=False keywords=['maxLength']
+APIKeyCreate request schema boundary oracle PASS

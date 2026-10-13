@@ -1,0 +1,46 @@
+-test.shuffle 1791922561846468854
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128
+    api_key_name_contract_test.go:42: POST /api-keys characters=128 bytes=128 status=201 key_delta=1 issued_audit_delta=1
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128
+    api_key_name_contract_test.go:38: POST /api-keys status=400 want=201
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128
+    api_key_name_contract_test.go:42: POST /api-keys characters=128 bytes=384 status=400 key_delta=0 issued_audit_delta=0
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129
+    api_key_name_contract_test.go:42: POST /api-keys characters=129 bytes=129 status=400 key_delta=0 issued_audit_delta=0
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129
+    api_key_name_contract_test.go:42: POST /api-keys characters=129 bytes=387 status=400 key_delta=0 issued_audit_delta=0
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys
+    api_key_name_contract_test.go:85: GET /api-keys status=200 one_time_secret_absent=true
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit
+=== RUN   TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit/response_contract
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit
+    api_key_name_contract_test.go:85: GET /api-keys/audit status=200 one_time_secret_absent=true
+=== NAME  TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity
+    api_key_name_contract_test.go:101: diagnostic_dump_credentials_and_request_name_absent=true
+--- FAIL: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity (2.38s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128 (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_128/response_contract (0.23s)
+    --- FAIL: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128 (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_128/response_contract (0.23s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129 (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/ascii_129/response_contract (0.24s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129 (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/unicode_129/response_contract (0.23s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/response_contract (0.23s)
+    --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit (0.24s)
+        --- PASS: TestAPIKeyNameContract_countsCharactersAndPreservesAtomicity/secret_privacy/api-keys/audit/response_contract (0.23s)
+FAIL
+FAIL	git.hyhy.fun/rsplab/iolink/internal/core	2.434s
+FAIL
+exit_code=1

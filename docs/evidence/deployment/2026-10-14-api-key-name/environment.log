@@ -1,0 +1,5 @@
+go version go1.26.8 linux/amd64
+Python 3.14.6
+PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+2.30.2
+HTTP fixture: httptest.NewServer real loopback TCP; real /user/v1/login JWT; local signed test License openapi feature; test vault configured; GIN_MODE=release; PostgreSQL role=iolink host=127.0.0.1 port=33127 database=per-test isolated allocation (credential omitted)
