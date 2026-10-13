@@ -85,7 +85,7 @@ func (s *fakeStore) MarkStale(ctx context.Context, device string, _ time.Time) e
 
 func testCoordinator(t *testing.T) (*Coordinator, *fakeStore, *fakeClock) {
 	t.Helper()
-	clock := &fakeClock{now: time.Date(2026, 10, 11, 2, 0, 0, 0, time.UTC)}
+	clock := &fakeClock{now: time.Now().UTC()}
 	store := &fakeStore{}
 	c, err := New(store, clock.Now)
 	if err != nil {
