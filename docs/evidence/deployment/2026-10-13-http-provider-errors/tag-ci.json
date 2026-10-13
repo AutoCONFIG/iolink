@@ -1,0 +1,14 @@
+{
+  "tag": "v0.0.36",
+  "head_sha": "4fffc4b3397f6c2faa94f5cde384a570ed50004f",
+  "run_id": 38432624675,
+  "url": "https://github.com/AutoCONFIG/iolink/actions/runs/38432624675",
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": {
+    "build-image": "success",
+    "build": "skipped",
+    "integration": "skipped"
+  },
+  "scope": "Image publication only; skipped Go jobs are not test acceptance."
+}

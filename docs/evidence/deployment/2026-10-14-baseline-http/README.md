@@ -29,3 +29,9 @@ before文件均是已执行失败的记录；admin-login-before中的故障fixtu
 修订将共同响应的既定错误码写成各响应的enum（generic Error和License专用错误保持其范围），规范原接口的400/401/403/404/409文字；`error-code-before.log` 真实失败后修复。审阅还指出非法查询转义被URL.Query丢弃、以及微信上游故障被当401/非2xx可能被当成功；`query-before.log`、`app-query-before.log`、`wechat-before.log` 记录实际失败。现在显式检查ParseQuery；只有已识别无效凭证为401，非2xx/解码/网络/缺openid/服务端失败为502/upstream_error，无用户写入，安全诊断请求ID一致。受控HTTP微信提供者不是真实微信验收。
 
 首次导出未带未改web子模块的dist，导致embed/一次focus编译失败；`snapshot-*-prerequisite-failed.log` 保留。补入web gitlink `39299dfb0d7771690117a2765fb766a9b715f554` 的当前未改dist（index SHA256 `a2cf487d2b7cd9c2486ae55e386d12f519fbfaa99fb1dab4c21a1817dd2ee632`）后重跑通过；一次Python选择器文件名拼错也保留为selector-failed，不计通过。worker unit日志来自共享树（含原playback草稿）只作过程回归，最终源证据以修订后导出命令及双审为准。
+
+## 最终批准与保留缺口
+
+实现提交 `b7919d7`，批准树 `91926edee43fb1d05e3ea32e914f44149259d5c7`。[代码审阅](reviews/code-final.md)与[门审](reviews/gate-final.md)均为未编辑者对同一树明确APPROVE、质量WATCH。`final-snapshot-verify.log` 是该树导出后的全库build/vet/race，33测试包、core232.874s，终端95867 exit0；`final-snapshot-focused.log` 28顶层/noSKIP（8464 exit0），包括35正向及指定失败面；Python110（68247 exit0）、96操作/584合成fixture通过。审阅者另独立重放实际PG/HTTP、29验证器测试和静态契约，详报告。
+
+批准限定为本次实际测试集和三个阻断项修复，不是穷尽35操作的所有故障组合。下一批真实平台测试已发现共享认证依赖SQL故障仍会被401掩盖；部分可选数值过滤的显式空值也尚待核验修复。严格Python类型检查12项诊断仍未通过。上述缺口继续登记于IMPLEMENTED，V1d和R02整体不升级完成。发布v0.0.37，服务器镜像更新与浏览器实际使用仍按既有流程。
