@@ -1,0 +1,1490 @@
+-test.shuffle 1791914802378950608
+=== RUN   TestExtendedAppContractsExcludeExpiredTargetTenant
+    extended_app_contract_test.go:132: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:135: app contract method=GET route=/auth/tenants status=200 expected=200
+    extended_app_contract_test.go:144: app contract method=POST route=/auth/tenant status=404 expected=404
+--- PASS: TestExtendedAppContractsExcludeExpiredTargetTenant (1.61s)
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations
+    product_contract_failures_test.go:110: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/response_contract
+=== NAME  TestProductContractHTTPMissingTokenRejectsAllOperations
+    product_contract_failures_test.go:110: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/response_contract#01
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_00
+    product_contract_failures_test.go:124: product contract method=GET route=/products status=401 expected=401
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_00/response_contract
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_01
+    product_contract_failures_test.go:124: product contract method=POST route=/products status=401 expected=401
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_01/response_contract
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_02
+    product_contract_failures_test.go:124: product contract method=GET route=/products/{product_id}/models status=401 expected=401
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_02/response_contract
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_03
+    product_contract_failures_test.go:124: product contract method=POST route=/products/{product_id}/models status=401 expected=401
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_03/response_contract
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_04
+    product_contract_failures_test.go:124: product contract method=POST route=/products/{product_id}/models/{version}/publish status=401 expected=401
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_04/response_contract
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_05
+    product_contract_failures_test.go:124: product contract method=GET route=/devices/{device_no}/product status=401 expected=401
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_05/response_contract
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_06
+    product_contract_failures_test.go:124: product contract method=PUT route=/devices/{device_no}/product status=401 expected=401
+=== RUN   TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_06/response_contract
+--- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations (4.43s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/response_contract (0.29s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/response_contract#01 (0.32s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_00 (0.33s)
+        --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_00/response_contract (0.32s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_01 (0.35s)
+        --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_01/response_contract (0.34s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_02 (0.30s)
+        --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_02/response_contract (0.29s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_03 (0.32s)
+        --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_03/response_contract (0.32s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_04 (0.36s)
+        --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_04/response_contract (0.36s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_05 (0.32s)
+        --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_05/response_contract (0.31s)
+    --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_06 (0.32s)
+        --- PASS: TestProductContractHTTPMissingTokenRejectsAllOperations/unauthorized_06/response_contract (0.31s)
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/auth/tenants
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=GET route=/auth/tenants status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/auth/tenant
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=POST route=/auth/tenant status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/telemetry
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=POST route=/devices/{device_no}/telemetry status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/model/latest
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=GET route=/devices/{device_no}/model/latest status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/history
+    extended_app_contract_test.go:180: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:189: app contract method=GET route=/devices/{device_no}/history status=401 expected=401
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/auth/tenants
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=GET route=/auth/tenants status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/auth/tenant
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=POST route=/auth/tenant status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/telemetry
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=POST route=/devices/{device_no}/telemetry status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/telemetry#01
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=POST route=/devices/{device_no}/telemetry status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/model/latest
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=GET route=/devices/{device_no}/model/latest status=500 expected=500
+=== RUN   TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/history
+    extended_app_contract_test.go:204: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:217: app contract method=GET route=/devices/{device_no}/history status=500 expected=500
+--- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures (16.74s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/auth/tenants (1.40s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/auth/tenant (2.87s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/telemetry (1.61s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/model/latest (1.68s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/expired_/devices/{device_no}/history (1.30s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/auth/tenants (1.18s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/auth/tenant (1.19s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/telemetry (1.52s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/telemetry#01 (1.22s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/model/latest (1.46s)
+    --- PASS: TestExtendedAppContractsRejectExpiredMembershipAndProviderFailures/provider_/devices/{device_no}/history (1.31s)
+=== RUN   TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:25: product contract method=GET route=/products status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:30: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#01
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:30: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#02
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:34: product contract method=GET route=/products/{product_id}/models status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#03
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:38: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#04
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:39: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#05
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:43: product contract method=PUT route=/devices/{device_no}/product status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#06
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:57: product contract method=GET route=/devices/{device_no}/product status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#07
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:68: product contract method=PUT route=/devices/{device_no}/product status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#08
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:72: product contract method=GET route=/products status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#09
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:76: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#10
+=== NAME  TestProductContractHTTPPositiveMatrix
+    product_contract_http_test.go:80: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPPositiveMatrix/response_contract#11
+--- PASS: TestProductContractHTTPPositiveMatrix (5.36s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract (0.29s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#01 (0.29s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#02 (0.28s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#03 (0.35s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#04 (0.29s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#05 (0.27s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#06 (0.28s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#07 (0.26s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#08 (0.26s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#09 (0.26s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#10 (0.28s)
+    --- PASS: TestProductContractHTTPPositiveMatrix/response_contract#11 (0.27s)
+=== RUN   TestExtendedAppContractsEmptyHistoryAndHiddenModel
+    extended_app_contract_test.go:149: environment real_timescaledb=2.30.2
+    extended_app_contract_test.go:150: app contract method=GET route=/devices/{device_no}/history status=200 expected=200
+    extended_app_contract_test.go:155: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+    extended_app_contract_test.go:160: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+--- PASS: TestExtendedAppContractsEmptyHistoryAndHiddenModel (1.60s)
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_session
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_session/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenants_empty
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenants_empty/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/POST_register
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/POST_register/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_platform_users
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_platform_users/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/POST_tenants
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/POST_tenants/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/PUT_tenant_member
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/PUT_tenant_member/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenant_members
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenant_members/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenants
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenants/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_platform_stats
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_platform_stats/response_contract
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/PUT_tenant_status
+=== RUN   TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/PUT_tenant_status/response_contract
+--- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning (4.77s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_session (0.28s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_session/response_contract (0.28s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenants_empty (0.28s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenants_empty/response_contract (0.28s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/POST_register (0.41s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/POST_register/response_contract (0.26s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_platform_users (0.27s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_platform_users/response_contract (0.26s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/POST_tenants (0.27s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/POST_tenants/response_contract (0.26s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/PUT_tenant_member (0.28s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/PUT_tenant_member/response_contract (0.26s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenant_members (0.28s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenant_members/response_contract (0.28s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenants (0.28s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_tenants/response_contract (0.27s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_platform_stats (0.28s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/GET_platform_stats/response_contract (0.27s)
+    --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/PUT_tenant_status (0.29s)
+        --- PASS: TestPlatformOrganizationContractSuccessAndNoAutomaticProvisioning/PUT_tenant_status/response_contract (0.28s)
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#10
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#01
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#02
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#03
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#04
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#05
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#06
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#07
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#08
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#09
+=== RUN   TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#10
+--- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites (85.00s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#01 (0.24s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#02 (0.26s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#03 (0.41s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#04 (0.29s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#05 (0.25s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#06 (0.28s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#07 (0.26s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#08 (0.25s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/response_contract#09 (0.25s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown (5.12s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#01 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#08 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_unknown/response_contract#10 (0.24s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing (4.65s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#05 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#09 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_trailing/response_contract#10 (0.24s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null (4.78s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#01 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#05 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/register_null/response_contract#10 (0.27s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown (4.79s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#03 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#04 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#05 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_unknown/response_contract#10 (0.24s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing (4.91s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#02 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#03 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#06 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_trailing/response_contract#10 (0.26s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null (5.51s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_null/response_contract#10 (0.23s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown (5.00s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#02 (0.27s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#03 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#05 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#06 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#07 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#09 (0.27s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_unknown/response_contract#10 (0.30s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing (5.13s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract (0.28s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#01 (0.27s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#02 (0.34s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#03 (0.29s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#04 (0.27s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#05 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#07 (0.38s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#08 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#09 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_trailing/response_contract#10 (0.31s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null (4.66s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#07 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#08 (0.29s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#09 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/status_null/response_contract#10 (0.28s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown (4.72s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#01 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#02 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#05 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#08 (0.27s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#09 (0.27s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_unknown/response_contract#10 (0.26s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing (4.61s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract (0.28s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#02 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#03 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#05 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#06 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#07 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#09 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_trailing/response_contract#10 (0.24s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null (4.65s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#03 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#06 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#07 (0.26s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#08 (0.30s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_null/response_contract#10 (0.25s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted (4.43s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#09 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/tenant_member_omitted/response_contract#10 (0.23s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown (4.43s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#02 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_unknown/response_contract#10 (0.23s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing (4.35s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#05 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_trailing/response_contract#10 (0.24s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null (4.49s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#03 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#09 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_null/response_contract#10 (0.23s)
+    --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted (4.38s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#05 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#07 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#08 (0.23s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationContractInvalidRequestsLeaveNoWrites/farm_member_omitted/response_contract#10 (0.24s)
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:52: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:52: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#01
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:53: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#02
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:54: product contract method=PUT route=/devices/{device_no}/product status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#03
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:57: product contract method=GET route=/products status=401 expected=401
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#04
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_00
+    product_contract_scope_test.go:70: product contract method=POST route=/products status=403 expected=403
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_00/response_contract
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_01
+    product_contract_scope_test.go:70: product contract method=POST route=/products/{product_id}/models status=403 expected=403
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_01/response_contract
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_02
+    product_contract_scope_test.go:70: product contract method=POST route=/products/{product_id}/models/{version}/publish status=403 expected=403
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_02/response_contract
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_03
+    product_contract_scope_test.go:70: product contract method=PUT route=/devices/{device_no}/product status=403 expected=403
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_03/response_contract
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:82: product contract method=GET route=/products status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#05
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:82: product contract method=GET route=/products/{product_id}/models status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#06
+=== NAME  TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged
+    product_contract_scope_test.go:82: product contract method=GET route=/devices/{device_no}/product status=200 expected=200
+=== RUN   TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#07
+--- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged (4.38s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#01 (0.25s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#02 (0.24s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#03 (0.23s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#04 (0.23s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_00 (0.25s)
+        --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_00/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_01 (0.25s)
+        --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_01/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_02 (0.25s)
+        --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_02/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_03 (0.27s)
+        --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/viewer_03/response_contract (0.27s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#05 (0.23s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#06 (0.23s)
+    --- PASS: TestProductContractHTTPViewerWritesAndRevokedTokenLeaveStateUnchanged/response_contract#07 (0.23s)
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#01
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#02
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#03
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#04
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#05
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#06
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#07
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#08
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#09
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/unauthenticated_session
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/unauthenticated_session/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_admin_platform_stats
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_admin_platform_stats/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_platform_directory
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_platform_directory/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/platform_business_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/platform_business_members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_tenant_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_tenant_members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_farm_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_farm_members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_write
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_write/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/missing_farm_members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/missing_farm_members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_create_tenant
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_create_tenant/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_0_PUT_/tenants/{id}/status
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_0_PUT_/tenants/{id}/status/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_1_GET_/tenants/{id}/members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_1_GET_/tenants/{id}/members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_2_PUT_/tenants/{id}/members/{user_id}
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_2_PUT_/tenants/{id}/members/{user_id}/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_3_PUT_/tenants/{id}/members/{user_id}
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_3_PUT_/tenants/{id}/members/{user_id}/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_4_GET_/farms/{id}/members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_4_GET_/farms/{id}/members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_5_PUT_/farms/{id}/members/{user_id}
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_5_PUT_/farms/{id}/members/{user_id}/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_6_PUT_/farms/{id}/members/{user_id}
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_6_PUT_/farms/{id}/members/{user_id}/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_0_PUT_/tenants/{id}/status
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_0_PUT_/tenants/{id}/status/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_1_GET_/tenants/{id}/members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_1_GET_/tenants/{id}/members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_2_PUT_/tenants/{id}/members/{user_id}
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_2_PUT_/tenants/{id}/members/{user_id}/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_3_PUT_/tenants/{id}/members/{user_id}
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_3_PUT_/tenants/{id}/members/{user_id}/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_4_GET_/farms/{id}/members
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_4_GET_/farms/{id}/members/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_5_PUT_/farms/{id}/members/{user_id}
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_5_PUT_/farms/{id}/members/{user_id}/response_contract
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_6_PUT_/farms/{id}/members/{user_id}
+=== RUN   TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_6_PUT_/farms/{id}/members/{user_id}/response_contract
+--- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers (10.28s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#01 (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#02 (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#03 (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#04 (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#05 (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#06 (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#07 (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#08 (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/response_contract#09 (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/unauthenticated_session (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/unauthenticated_session/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_admin_platform_stats (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_admin_platform_stats/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_platform_directory (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_platform_directory/response_contract (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/platform_business_members (0.23s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/platform_business_members/response_contract (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_tenant_members (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_tenant_members/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_farm_members (0.25s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/viewer_farm_members/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_members (0.25s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_members/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_write (0.25s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/foreign_tenant_write/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/missing_farm_members (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/missing_farm_members/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_create_tenant (0.25s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/user_create_tenant/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_0_PUT_/tenants/{id}/status (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_0_PUT_/tenants/{id}/status/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_1_GET_/tenants/{id}/members (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_1_GET_/tenants/{id}/members/response_contract (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_2_PUT_/tenants/{id}/members/{user_id} (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_2_PUT_/tenants/{id}/members/{user_id}/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_3_PUT_/tenants/{id}/members/{user_id} (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_3_PUT_/tenants/{id}/members/{user_id}/response_contract (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_4_GET_/farms/{id}/members (0.25s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_4_GET_/farms/{id}/members/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_5_PUT_/farms/{id}/members/{user_id} (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_5_PUT_/farms/{id}/members/{user_id}/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_6_PUT_/farms/{id}/members/{user_id} (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/0_6_PUT_/farms/{id}/members/{user_id}/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_0_PUT_/tenants/{id}/status (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_0_PUT_/tenants/{id}/status/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_1_GET_/tenants/{id}/members (0.23s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_1_GET_/tenants/{id}/members/response_contract (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_2_PUT_/tenants/{id}/members/{user_id} (0.24s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_2_PUT_/tenants/{id}/members/{user_id}/response_contract (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_3_PUT_/tenants/{id}/members/{user_id} (0.23s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_3_PUT_/tenants/{id}/members/{user_id}/response_contract (0.23s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_4_GET_/farms/{id}/members (0.25s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_4_GET_/farms/{id}/members/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_5_PUT_/farms/{id}/members/{user_id} (0.26s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_5_PUT_/farms/{id}/members/{user_id}/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_6_PUT_/farms/{id}/members/{user_id} (0.25s)
+        --- PASS: TestPlatformOrganizationPermissionsAndInvalidIdentifiers/-1_6_PUT_/farms/{id}/members/{user_id}/response_contract (0.25s)
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged
+    product_contract_scope_test.go:12: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract
+=== NAME  TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged
+    product_contract_scope_test.go:12: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#01
+=== NAME  TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged
+    product_contract_scope_test.go:13: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#02
+=== NAME  TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged
+    product_contract_scope_test.go:14: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#03
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_00
+    product_contract_scope_test.go:32: product contract method=GET route=/products/{product_id}/models status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_00/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_01
+    product_contract_scope_test.go:32: product contract method=POST route=/products/{product_id}/models status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_01/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_02
+    product_contract_scope_test.go:32: product contract method=POST route=/products/{product_id}/models/{version}/publish status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_02/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_03
+    product_contract_scope_test.go:32: product contract method=GET route=/devices/{device_no}/product status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_03/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_04
+    product_contract_scope_test.go:32: product contract method=PUT route=/devices/{device_no}/product status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_04/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_05
+    product_contract_scope_test.go:32: product contract method=PUT route=/devices/{device_no}/product status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_05/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_06
+    product_contract_scope_test.go:32: product contract method=GET route=/products/{product_id}/models status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_06/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_07
+    product_contract_scope_test.go:32: product contract method=GET route=/devices/{device_no}/product status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_07/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_08
+    product_contract_scope_test.go:32: product contract method=PUT route=/devices/{device_no}/product status=404 expected=404
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_08/response_contract
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_09
+    product_contract_scope_test.go:32: product contract method=POST route=/products status=409 expected=409
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_09/response_contract
+=== NAME  TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged
+    product_contract_scope_test.go:41: product contract method=GET route=/products status=200 expected=200
+=== RUN   TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#04
+--- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged (5.23s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract (0.23s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#01 (0.24s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#02 (0.25s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#03 (0.25s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_00 (0.25s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_00/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_01 (0.24s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_01/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_02 (0.24s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_02/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_03 (0.25s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_03/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_04 (0.24s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_04/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_05 (0.30s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_05/response_contract (0.30s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_06 (0.26s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_06/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_07 (0.25s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_07/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_08 (0.25s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_08/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_09 (0.26s)
+        --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/hidden_09/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPCrossTenantAndMissingTargetsLeaveStateUnchanged/response_contract#04 (0.27s)
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#01
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#02
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#03
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#04
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#05
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#06
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#07
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#08
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#09
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/PUT_farm_member
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/PUT_farm_member/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/GET_farm_members
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/GET_farm_members/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/viewer_visible
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/viewer_visible/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/revoke_farm_member
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/revoke_farm_member/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/viewer_revoked
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/viewer_revoked/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/revoke_tenant_member
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/revoke_tenant_member/response_contract
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/tenant_token_revoked
+=== RUN   TestPlatformFarmMemberContractAndImmediateRevocation/tenant_token_revoked/response_contract
+--- PASS: TestPlatformFarmMemberContractAndImmediateRevocation (6.00s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#01 (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#02 (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#03 (0.23s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#04 (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#05 (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#06 (0.25s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#07 (0.23s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#08 (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/response_contract#09 (0.23s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/PUT_farm_member (0.24s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/PUT_farm_member/response_contract (0.23s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/GET_farm_members (0.24s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/GET_farm_members/response_contract (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/viewer_visible (0.24s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/viewer_visible/response_contract (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/revoke_farm_member (0.25s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/revoke_farm_member/response_contract (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/viewer_revoked (0.23s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/viewer_revoked/response_contract (0.23s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/revoke_tenant_member (0.26s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/revoke_tenant_member/response_contract (0.24s)
+    --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/tenant_token_revoked (0.24s)
+        --- PASS: TestPlatformFarmMemberContractAndImmediateRevocation/tenant_token_revoked/response_contract (0.24s)
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/response_contract
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/registration
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/registration/response_contract
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_create
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_create/response_contract
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/platform_stats
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/platform_stats/response_contract
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/platform_users
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/platform_users/response_contract
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_list
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_list/response_contract
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_status
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_status/response_contract
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_members
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_members/response_contract
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_member_write
+=== RUN   TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_member_write/response_contract
+--- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics (3.99s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/response_contract (0.28s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/registration (0.25s)
+        --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/registration/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_create (0.25s)
+        --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_create/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/platform_stats (0.26s)
+        --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/platform_stats/response_contract (0.26s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/platform_users (0.24s)
+        --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/platform_users/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_list (0.24s)
+        --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_list/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_status (0.24s)
+        --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_status/response_contract (0.24s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_members (0.25s)
+        --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_members/response_contract (0.25s)
+    --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_member_write (0.25s)
+        --- PASS: TestPlatformOrganizationMissingCapabilitiesRejectAndRecordDiagnostics/tenant_member_write/response_contract (0.24s)
+=== RUN   TestBaselineNumericFiltersRejectExplicitEmptyValues
+=== RUN   TestBaselineNumericFiltersRejectExplicitEmptyValues//ponds
+=== RUN   TestBaselineNumericFiltersRejectExplicitEmptyValues//ponds/response_contract
+=== RUN   TestBaselineNumericFiltersRejectExplicitEmptyValues//alarm-rules
+=== RUN   TestBaselineNumericFiltersRejectExplicitEmptyValues//alarm-rules/response_contract
+--- PASS: TestBaselineNumericFiltersRejectExplicitEmptyValues (2.10s)
+    --- PASS: TestBaselineNumericFiltersRejectExplicitEmptyValues//ponds (0.25s)
+        --- PASS: TestBaselineNumericFiltersRejectExplicitEmptyValues//ponds/response_contract (0.25s)
+    --- PASS: TestBaselineNumericFiltersRejectExplicitEmptyValues//alarm-rules (0.25s)
+        --- PASS: TestBaselineNumericFiltersRejectExplicitEmptyValues//alarm-rules/response_contract (0.25s)
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_users
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_users/response_contract
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_users
+    identity_provider_contract_test.go:18: app contract method=GET route=/ponds status=500 expected=500
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenants
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenants/response_contract
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_tenants
+    identity_provider_contract_test.go:18: app contract method=GET route=/ponds status=500 expected=500
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenant_memberships
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenant_memberships/response_contract
+=== RUN   TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_tenant_memberships
+    identity_provider_contract_test.go:18: app contract method=GET route=/ponds status=500 expected=500
+--- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials (11.25s)
+    --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_users (2.03s)
+        --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_users/response_contract (0.24s)
+    --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_users (1.44s)
+    --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenants (2.82s)
+        --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenants/response_contract (0.25s)
+    --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_tenants (1.20s)
+    --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenant_memberships (2.22s)
+        --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/admin_tenant_memberships/response_contract (0.27s)
+    --- PASS: TestIdentityStorageFailuresAreNotReportedAsRevokedCredentials/app_tenant_memberships (1.53s)
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites
+    extended_app_contract_test.go:81: environment real_timescaledb=2.30.2
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#01
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#02
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#03
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#04
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#05
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#06
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#07
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status404
+    extended_app_contract_test.go:125: app contract method=POST route=/auth/tenant status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#01
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#02
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#03
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#04
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#05
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#06
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#07
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#08
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#09
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#10
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status404
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status404#01
+    extended_app_contract_test.go:125: app contract method=POST route=/devices/{device_no}/telemetry status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/model/latest_status404
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/model/latest status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/model/latest_status404#01
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/model/latest status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status404
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=404 expected=404
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#01
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#02
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#03
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#04
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#05
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+=== RUN   TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#06
+    extended_app_contract_test.go:125: app contract method=GET route=/devices/{device_no}/history status=400 expected=400
+--- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites (8.07s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400 (0.25s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#01 (0.23s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#02 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#03 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#04 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#05 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#06 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status400#07 (0.23s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/auth/tenant_status404 (0.24s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#01 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#02 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#03 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#04 (0.25s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#05 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#06 (0.23s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#07 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#08 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#09 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status400#10 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status404 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/POST_/devices/{device_no}/telemetry_status404#01 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/model/latest_status404 (0.23s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/model/latest_status404#01 (0.25s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status404 (0.21s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400 (0.24s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#01 (0.23s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#02 (0.23s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#03 (0.22s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#04 (0.23s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#05 (0.23s)
+    --- PASS: TestExtendedAppContractsRejectInvalidInputWithoutWrites/GET_/devices/{device_no}/history_status400#06 (0.21s)
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/response_contract
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length/response_contract
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length#01
+=== RUN   TestTenantNameLimitCountsUnicodeCharacters/name_length#01/response_contract
+--- PASS: TestTenantNameLimitCountsUnicodeCharacters (2.47s)
+    --- PASS: TestTenantNameLimitCountsUnicodeCharacters/response_contract (0.26s)
+    --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length (0.25s)
+        --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length/response_contract (0.25s)
+    --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length#01 (0.26s)
+        --- PASS: TestTenantNameLimitCountsUnicodeCharacters/name_length#01/response_contract (0.26s)
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged
+    product_contract_http_test.go:91: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged
+    product_contract_http_test.go:91: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract#01
+=== NAME  TestProductContractHTTPInvalidRequestsLeaveStateUnchanged
+    product_contract_http_test.go:92: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract#02
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00
+    product_contract_http_test.go:117: product contract method=POST route=/products status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01
+    product_contract_http_test.go:117: product contract method=POST route=/products status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02
+    product_contract_http_test.go:117: product contract method=POST route=/products status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03
+    product_contract_http_test.go:117: product contract method=POST route=/products status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_04
+    product_contract_http_test.go:117: product contract method=POST route=/products status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_04/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_05
+    product_contract_http_test.go:117: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_05/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06
+    product_contract_http_test.go:117: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07
+    product_contract_http_test.go:117: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08
+    product_contract_http_test.go:117: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09
+    product_contract_http_test.go:117: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10
+    product_contract_http_test.go:117: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_11
+    product_contract_http_test.go:117: product contract method=GET route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_11/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_12
+    product_contract_http_test.go:117: product contract method=POST route=/products/{product_id}/models/{version}/publish status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_12/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_13
+    product_contract_http_test.go:117: product contract method=PUT route=/devices/{device_no}/product status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_13/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14
+    product_contract_http_test.go:117: product contract method=PUT route=/devices/{device_no}/product status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_15
+    product_contract_http_test.go:117: product contract method=PUT route=/devices/{device_no}/product status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_15/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_16
+    product_contract_http_test.go:117: product contract method=PUT route=/devices/{device_no}/product status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_16/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_17
+    product_contract_http_test.go:117: product contract method=PUT route=/devices/{device_no}/product status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_17/response_contract
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_18
+    product_contract_http_test.go:117: product contract method=POST route=/products/{product_id}/models status=400 expected=400
+=== RUN   TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_18/response_contract
+--- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged (7.55s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract#01 (0.27s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/response_contract#02 (0.26s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00 (0.27s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_00/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01 (0.28s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_01/response_contract (0.28s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02 (0.27s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_02/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03 (0.28s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_03/response_contract (0.27s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_04 (0.28s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_04/response_contract (0.28s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_05 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_05/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_06/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_07/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_08/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_09/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_10/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_11 (0.28s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_11/response_contract (0.27s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_12 (0.28s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_12/response_contract (0.28s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_13 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_13/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_14/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_15 (0.27s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_15/response_contract (0.27s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_16 (0.25s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_16/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_17 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_17/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_18 (0.26s)
+        --- PASS: TestProductContractHTTPInvalidRequestsLeaveStateUnchanged/invalid_18/response_contract (0.25s)
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated
+    product_contract_failures_test.go:15: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated
+    product_contract_failures_test.go:15: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract#01
+=== NAME  TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated
+    product_contract_failures_test.go:16: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract#02
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00
+    product_contract_failures_test.go:36: product contract method=GET route=/products status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00/response_contract
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01
+    product_contract_failures_test.go:36: product contract method=POST route=/products status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01/response_contract
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02
+    product_contract_failures_test.go:36: product contract method=GET route=/products/{product_id}/models status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02/response_contract
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03
+    product_contract_failures_test.go:36: product contract method=POST route=/products/{product_id}/models status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03/response_contract
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04
+    product_contract_failures_test.go:36: product contract method=POST route=/products/{product_id}/models/{version}/publish status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04/response_contract
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05
+    product_contract_failures_test.go:36: product contract method=GET route=/devices/{device_no}/product status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05/response_contract
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06
+    product_contract_failures_test.go:36: product contract method=PUT route=/devices/{device_no}/product status=500 expected=500
+=== RUN   TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06/response_contract
+--- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated (4.22s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract (0.27s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract#01 (0.28s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/response_contract#02 (0.26s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00 (0.26s)
+        --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_00/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01 (0.26s)
+        --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_01/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02 (0.27s)
+        --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_02/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03 (0.28s)
+        --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_03/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04 (0.27s)
+        --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_04/response_contract (0.26s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05 (0.25s)
+        --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_05/response_contract (0.25s)
+    --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06 (0.27s)
+        --- PASS: TestProductContractHTTPActualSQLFailuresAreSafeAndCorrelated/sql_06/response_contract (0.26s)
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#10
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#10
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#10
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#10
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#10
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#10
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#10
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#01
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#02
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#03
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#04
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#05
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#06
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#07
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#08
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#09
+=== RUN   TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#10
+--- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic (38.79s)
+    --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list (4.80s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#01 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#03 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#05 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#06 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#07 (0.30s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#09 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_list/response_contract#10 (0.27s)
+    --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats (5.01s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#01 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#02 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#03 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#04 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#05 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#06 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#07 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#09 (0.28s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/platform_stats/response_contract#10 (0.27s)
+    --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status (5.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#02 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#05 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#06 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#09 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status/response_contract#10 (0.24s)
+    --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit (4.62s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#02 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#03 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#04 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#06 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#07 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_status_audit/response_contract#10 (0.26s)
+    --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members (4.67s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#05 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#08 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#09 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_members/response_contract#10 (0.25s)
+    --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write (4.88s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#03 (0.23s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#04 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#06 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#07 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#08 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#09 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_member_write/response_contract#10 (0.24s)
+    --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create (4.68s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#01 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#02 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#03 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#05 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#06 (0.26s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#07 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#08 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#09 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/tenant_create/response_contract#10 (0.24s)
+    --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write (4.90s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#01 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#02 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#03 (0.28s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#04 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#05 (0.25s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#06 (0.28s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#07 (0.28s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#08 (0.27s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#09 (0.24s)
+        --- PASS: TestPlatformOrganizationDatabaseFailuresAreInternalAndAtomic/farm_member_write/response_contract#10 (0.25s)
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:92: product contract method=POST route=/products status=201 expected=201
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract
+=== NAME  TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:92: product contract method=POST route=/products/{product_id}/models status=201 expected=201
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#01
+=== NAME  TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:93: product contract method=POST route=/products/{product_id}/models/{version}/publish status=200 expected=200
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#02
+=== NAME  TestProductContractHTTPAssignmentAuditFailureRollsBack
+    product_contract_failures_test.go:100: product contract method=PUT route=/devices/{device_no}/product status=500 expected=500
+=== RUN   TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#03
+--- PASS: TestProductContractHTTPAssignmentAuditFailureRollsBack (2.37s)
+    --- PASS: TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract (0.24s)
+    --- PASS: TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#01 (0.24s)
+    --- PASS: TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#02 (0.25s)
+    --- PASS: TestProductContractHTTPAssignmentAuditFailureRollsBack/response_contract#03 (0.25s)
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres
+    extended_app_contract_test.go:12: environment real_timescaledb=2.30.2
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/GET/auth/tenants
+    extended_app_contract_test.go:22: app contract method=GET route=/auth/tenants status=200 expected=200
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/POST/auth/tenant
+    extended_app_contract_test.go:22: app contract method=POST route=/auth/tenant status=200 expected=200
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/POST/devices/{device_no}/telemetry
+    extended_app_contract_test.go:22: app contract method=POST route=/devices/{device_no}/telemetry status=202 expected=202
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/GET/devices/{device_no}/model/latest
+    extended_app_contract_test.go:22: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/GET/devices/{device_no}/history
+    extended_app_contract_test.go:22: app contract method=GET route=/devices/{device_no}/history status=200 expected=200
+=== RUN   TestExtendedAppContractsPositiveWithRealPostgres/switched_token_enforces_target_role
+    extended_app_contract_test.go:62: app contract method=POST route=/auth/tenant status=200 expected=200
+    extended_app_contract_test.go:68: app contract method=GET route=/devices/{device_no}/model/latest status=404 expected=404
+    extended_app_contract_test.go:69: app contract method=GET route=/devices/{device_no}/model/latest status=200 expected=200
+    extended_app_contract_test.go:75: app contract method=POST route=/devices/{device_no}/telemetry status=403 expected=403
+--- PASS: TestExtendedAppContractsPositiveWithRealPostgres (2.66s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/GET/auth/tenants (0.23s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/POST/auth/tenant (0.21s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/POST/devices/{device_no}/telemetry (0.24s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/GET/devices/{device_no}/model/latest (0.21s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/GET/devices/{device_no}/history (0.22s)
+    --- PASS: TestExtendedAppContractsPositiveWithRealPostgres/switched_token_enforces_target_role (0.87s)
+PASS
+ok  	git.hyhy.fun/rsplab/iolink/internal/core	230.035s

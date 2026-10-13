@@ -17,4 +17,14 @@
 
 专属Timescale PG16.15/2.30.2，127.0.0.1:33127；容器`iolink-http-contract-pg-20261013`、网络`iolink-http-contract-20261013`、卷`iolink-http-contract-data-20261013`均label `iolink.task=http-contract-20261013`。每测试独立建/删数据库。使用 `GIN_MODE=release IOLINK_TEST_PG_DSN=<专属DSN> IOLINK_CONTRACT_PYTHON=<主仓contracts venv绝对路径> go test -race -shuffle=on -count=1 -v ./internal/core`，各日志选择器限定其目标函数；全库以最终`make verify`为准，静态`make verify-contracts`为合成检查。
 
-待最终源回归与独立双审，不记完成。APIKey/Open/restore/初始化与camera已实现面将继续；新GB/media/playback、真实设备/微信、License交付专项、浏览器、长期容量/大恢复仍单列，不冒称通过。
+## 最终源码与双审
+
+实现提交 `cf0bc62`，tree `e88a723196d503455a6b9d3c0d4d58dd085248eb`，冻结导出 `/tmp/iolink-extended-http-20261014` 与候选1,383个tracked blobs一致。未包含AGENTS、playback或下一批草稿。
+
+- `snapshot-verify.log`：同冻结源真实DSN `make verify`，session15762终端exit0，build/vet/race全33测试包通过，core419.417s。
+- `snapshot-focused.log`：同冻结源21顶层专项，无SKIP，session20878终端exit0，core230.035s。
+- `snapshot-python.log`：110 Python通过，session66278终端exit0；严格类型既有12诊断未通过，不计为通过。
+- `snapshot-contracts.log`：96操作/603合成fixture通过，不能替代真实HTTP矩阵。
+- [代码审阅](reviews/code-review.md)与[独立门审](reviews/gate-review.md)：两位未参与编辑者针对同一完整tree明确APPROVE/WATCH，无阻断。范围仅为本批23操作及共享修复。
+
+发布v0.0.38。APIKey/Open/restore/初始化与camera已实现面继续；R02/V1d整体仍在进行。新GB/media/playback、真实设备/微信、License交付专项、浏览器、长期容量/大恢复仍单列，不冒称通过。
