@@ -1,0 +1,13 @@
+
+> iolink-admin-ui@0.1.0 test
+> vitest run tests
+
+
+ RUN  v5.0.1 /media/yun/706bc403-c76c-4fdd-8a3f-d954b6189048/iolink/web
+
+
+ Test Files  11 passed (11)
+      Tests  68 passed (68)
+   Start at  15:21:11
+   Duration  800ms (tests 49%, transform 34%, import 15%, worker 2%)
+
